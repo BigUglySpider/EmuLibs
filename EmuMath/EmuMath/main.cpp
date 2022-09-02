@@ -956,16 +956,12 @@ int main()
 	std::cout << "BASIC FMADD(\n" << to_add_fast_a << ",\n\n" << to_add_fast_b << ",\n\n" << 10 << "\n)=\n" << to_add_fast_a.BasicFmadd(to_add_fast_b, 10) << "\n\n";
 	std::cout << "BASIC FMSUB(\n" << to_add_fast_a << ",\n\n" << to_add_fast_b << ",\n\n" << 10 << "\n)=\n" << to_add_fast_a.BasicFmsub(to_add_fast_b, 10) << "\n\n";
 
+	std::cout << "\n\n---\n\n";
 	float test_in_floats[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
-	std::cout << (to_add_fast_a % EmuSIMD::setr<__m128>(10, 20, 30, 40)) << "\n\n";
-	std::cout << (to_add_fast_a % EmuMath::FastVector<4, float>(test_in_floats)) << "\n\n";
-	std::cout << (to_add_fast_a % EmuMath::FastVector<3, float>(test_in_floats)) << "\n\n";
-	std::cout << (to_add_fast_a % 5) << "\n\n";
-
-	std::cout << "BEFORE:\n" << to_add_fast_a << "\n";
-	EmuMath::Helpers::fast_matrix_basic_fmsub_assign(to_add_fast_a, 10, 2);
-	std::cout << "AFTER:\n" << to_add_fast_a << "\n\n";
-
+	std::cout << (to_add_fast_a *= EmuSIMD::setr<__m128>(10, 20, 30, 40)) << "\n\n";
+	std::cout << (to_add_fast_a *= EmuMath::FastVector<4, float>(test_in_floats)) << "\n\n";
+	std::cout << (to_add_fast_a *= EmuMath::FastVector<3, float>(test_in_floats)) << "\n\n";
+	std::cout << (to_add_fast_a *= 5) << "\n\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

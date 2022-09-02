@@ -7,19 +7,22 @@ namespace EmuMath::Helpers
 {
 #pragma region BASIC_ADD
 	/// <summary>
-	/// <para> Performs a basic addition operation of the two passed FastMatrix instances, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// <para> The right-hand Matrix may be any size, but must encapsulate the same type with the same register width, and share the same major order. </para>
-	/// <para> If the right-hand Vector does not contain respective registers to the left-hand Matrix, indices will be copied directly from `lhs_`. </para>
+	/// <para> Performs a basic addition operation on this Matrix using the passed right-hand operand. </para>
+	/// <para> `Rhs_` will be treated in one of the following ways: </para>
+	/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be used. </para>
+	/// <para> 
+	///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+	///		and registers in all major chunks will be used with the respective register of the FastVector.
+	/// </para>
+	/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+	/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
 	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of addition. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">
-	///		FastMatrix appearing on the right-hand side of addition, 
-	///		which shares encapsulated type, register width, and major order with the left-hand operand.
-	/// </param>
-	/// <returns>FastMatrix resulting from adding respective indices in the passed two FastMatrix instances.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::EmuFastMatrix RhsFastMatrix_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsFastMatrix_>
-	[[nodiscard]] constexpr inline auto fast_matrix_add(LhsFastMatrix_&& lhs_, RhsFastMatrix_&& rhs_)
+	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic addition. The output type will be the same as this FastMatrix type.</param>
+	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic addition.</param>
+	/// <returns>FastMatrix of the `lhs_` type containing the result of a basic addition operation with the passed operands.</returns>
+	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
+	requires (EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>)
+	[[nodiscard]] constexpr inline auto fast_matrix_add(LhsFastMatrix_&& lhs_, Rhs_&& rhs_)
 		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
@@ -31,104 +34,60 @@ namespace EmuMath::Helpers
 			_major_indices(),
 			_register_indices(),
 			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsFastMatrix_>(rhs_)
+			std::forward<Rhs_>(rhs_)
 		);
 	}
 
 	/// <summary>
-	/// <para> Performs a basic addition operation of the passed FastMatrix and FastVector, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// <para> The right-hand Vector may be any size, but must encapsulate the same type with the same register width. </para>
-	/// <para> If the right-hand Matrix does not contain respective registers to the left-hand Matrix, indices will be copied directly from `lhs_`. </para>
+	/// <para> Performs a basic addition operation on this Matrix using the passed right-hand operand. </para>
+	/// <para> `Rhs_` will be treated in one of the following ways: </para>
+	/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be used. </para>
+	/// <para> 
+	///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+	///		and registers in all major chunks will be used with the respective register of the FastVector.
+	/// </para>
+	/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+	/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
 	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of addition. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">
-	///		FastVector representing a major chunk, which will be added to all major chunks within the left-hand Matrix, 
-	///		which shares encapsulated type and register type with the left-hand operand.
-	/// </param>
-	/// <returns>FastMatrix resulting from adding respective indices in the passed FastMatrix's major chunks and the passed FastVector.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::EmuFastVector RhsMajorFastVector_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsMajorFastVector_>
-	[[nodiscard]] constexpr inline auto fast_matrix_add(LhsFastMatrix_&& lhs_, RhsMajorFastVector_&& rhs_all_majors_)
-		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
+	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic addition. Results are assigned to this Matrix.</param>
+	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic addition.</param>
+	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
+	requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) && !std::is_const_v<LhsFastMatrix_>)
+	[[nodiscard]] constexpr inline void fast_matrix_add_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
 		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
 		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
 		using _func = _fast_matrix_underlying::_basic_add_func<_lhs_fast_mat_uq>;
-		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
+		_fast_matrix_underlying::_basic_func_assign_for_matrix<true, _func>
 		(
+			lhs_,
 			_major_indices(),
 			_register_indices(),
-			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsMajorFastVector_>(rhs_all_majors_)
-		);
-	}
-
-	/// <summary>
-	/// <para> Performs a basic addition operation of the passed FastMatrix and SIMD register, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// <para> The passed register must be the same as the passed Matrix's `register_type`. </para>
-	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of addition. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">SIMD register of `lhs_`'s `register_type`, to add to all of the passed Matrix's registers.</param>
-	/// <returns>FastMatrix resulting from adding respective registers in the passed Matrix and the passed register.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::KnownSIMD RhsRegisterForAll_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsRegisterForAll_>
-	[[nodiscard]] constexpr inline auto fast_matrix_add(LhsFastMatrix_&& lhs_, RhsRegisterForAll_&& rhs_all_registers_)
-		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
-	{
-		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
-		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
-		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
-		using _func = _fast_matrix_underlying::_basic_add_func<_lhs_fast_mat_uq>;
-		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
-		(
-			_major_indices(),
-			_register_indices(),
-			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsRegisterForAll_>(rhs_all_registers_)
-		);
-	}
-
-	/// <summary>
-	/// <para> Performs a basic addition operation of the passed FastMatrix and scalar, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of addition. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">Scalar to create a register of and add to all of the passed Matrix's indices.</param>
-	/// <returns>FastMatrix resulting from adding the passed scalar value to all indices of the passed Matrix.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::Arithmetic RhsScalarForAll_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsScalarForAll_>
-	[[nodiscard]] constexpr inline auto fast_matrix_add(LhsFastMatrix_&& lhs_, RhsScalarForAll_&& rhs_all_)
-		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
-	{
-		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
-		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
-		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
-		using _func = _fast_matrix_underlying::_basic_add_func<_lhs_fast_mat_uq>;
-		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
-		(
-			_major_indices(),
-			_register_indices(),
-			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsScalarForAll_>(rhs_all_)
+			lhs_,
+			std::forward<Rhs_>(rhs_)
 		);
 	}
 #pragma endregion
 
 #pragma region BASIC_SUBTRACT
 	/// <summary>
-	/// <para> Performs a basic subtraction operation of the two passed FastMatrix instances, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// <para> The right-hand Matrix may be any size, but must encapsulate the same type with the same register width, and share the same major order. </para>
-	/// <para> If the right-hand Matrix does not contain respective registers to the left-hand Matrix, indices will be copied directly from `lhs_`. </para>
+	/// <para> Performs a basic subtraction operation on this Matrix using the passed right-hand operand. </para>
+	/// <para> `Rhs_` will be treated in one of the following ways: </para>
+	/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be used. </para>
+	/// <para> 
+	///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+	///		and registers in all major chunks will be used with the respective register of the FastVector.
+	/// </para>
+	/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+	/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
 	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of subtraction. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">
-	///		FastMatrix appearing on the right-hand side of subtraction, 
-	///		which shares encapsulated type, register width, and major order with the left-hand operand.
-	/// </param>
-	/// <returns>FastMatrix resulting from subtracting respective indices in the passed two FastMatrix instances.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::EmuFastMatrix RhsFastMatrix_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsFastMatrix_>
-	[[nodiscard]] constexpr inline auto fast_matrix_subtract(LhsFastMatrix_&& lhs_, RhsFastMatrix_&& rhs_)
+	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic subtraction. The output type will be the same as this FastMatrix type.</param>
+	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic subtraction.</param>
+	/// <returns>FastMatrix of the `lhs_` type containing the result of a basic subtraction operation with the passed operands.</returns>
+	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
+	requires (EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>)
+	[[nodiscard]] constexpr inline auto fast_matrix_subtract(LhsFastMatrix_&& lhs_, Rhs_&& rhs_)
 		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
@@ -140,104 +99,60 @@ namespace EmuMath::Helpers
 			_major_indices(),
 			_register_indices(),
 			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsFastMatrix_>(rhs_)
+			std::forward<Rhs_>(rhs_)
 		);
 	}
 
 	/// <summary>
-	/// <para> Performs a basic subtraction operation of the passed FastMatrix and FastVector, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// <para> The right-hand Vector may be any size, but must encapsulate the same type with the same register width. </para>
-	/// <para> If the right-hand Vector does not contain respective registers to the left-hand Matrix, indices will be copied directly from `lhs_`. </para>
+	/// <para> Performs a basic subtraction operation on this Matrix using the passed right-hand operand. </para>
+	/// <para> `Rhs_` will be treated in one of the following ways: </para>
+	/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be used. </para>
+	/// <para> 
+	///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+	///		and registers in all major chunks will be used with the respective register of the FastVector.
+	/// </para>
+	/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+	/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
 	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of subtraction. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">
-	///		FastVector representing a major chunk, which will be subtracted from all major chunks within the left-hand Matrix, 
-	///		which shares encapsulated type and register type with the left-hand operand.
-	/// </param>
-	/// <returns>FastMatrix resulting from subtracting respective indices in the passed FastMatrix's major chunks and the passed FastVector.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::EmuFastVector RhsMajorFastVector_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsMajorFastVector_>
-	[[nodiscard]] constexpr inline auto fast_matrix_subtract(LhsFastMatrix_&& lhs_, RhsMajorFastVector_&& rhs_all_majors_)
-		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
+	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic subtraction. Results are assigned to this Matrix.</param>
+	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic subtraction.</param>
+	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
+	requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) && !std::is_const_v<LhsFastMatrix_>)
+	[[nodiscard]] constexpr inline void fast_matrix_subtract_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
 		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
 		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
 		using _func = _fast_matrix_underlying::_basic_sub_func<_lhs_fast_mat_uq>;
-		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
+		_fast_matrix_underlying::_basic_func_assign_for_matrix<true, _func>
 		(
+			lhs_,
 			_major_indices(),
 			_register_indices(),
-			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsMajorFastVector_>(rhs_all_majors_)
-		);
-	}
-
-	/// <summary>
-	/// <para> Performs a basic subtraction operation of the passed FastMatrix and SIMD register, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// <para> The passed register must be the same as the passed Matrix's `register_type`. </para>
-	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of subtraction. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">SIMD register of `lhs_`'s `register_type`, to subtract from all of the passed Matrix's registers.</param>
-	/// <returns>FastMatrix resulting from subtracting respective registers in the passed Matrix and the passed register.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::KnownSIMD RhsRegisterForAll_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsRegisterForAll_>
-	[[nodiscard]] constexpr inline auto fast_matrix_subtract(LhsFastMatrix_&& lhs_, RhsRegisterForAll_&& rhs_all_registers_)
-		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
-	{
-		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
-		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
-		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
-		using _func = _fast_matrix_underlying::_basic_sub_func<_lhs_fast_mat_uq>;
-		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
-		(
-			_major_indices(),
-			_register_indices(),
-			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsRegisterForAll_>(rhs_all_registers_)
-		);
-	}
-
-	/// <summary>
-	/// <para> Performs a basic subtraction operation of the passed FastMatrix and scalar, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of subtraction. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">Scalar to create a register of and subtract from all of the passed Matrix's indices.</param>
-	/// <returns>FastMatrix resulting from subtracting the passed scalar value to all indices of the passed Matrix.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::Arithmetic RhsScalarForAll_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsScalarForAll_>
-	[[nodiscard]] constexpr inline auto fast_matrix_subtract(LhsFastMatrix_&& lhs_, RhsScalarForAll_&& rhs_all_)
-		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
-	{
-		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
-		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
-		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
-		using _func = _fast_matrix_underlying::_basic_sub_func<_lhs_fast_mat_uq>;
-		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
-		(
-			_major_indices(),
-			_register_indices(),
-			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsScalarForAll_>(rhs_all_)
+			lhs_,
+			std::forward<Rhs_>(rhs_)
 		);
 	}
 #pragma endregion
 
 #pragma region BASIC_MULTIPLY
 	/// <summary>
-	/// <para> Performs a basic multiplication operation of the two passed FastMatrix instances, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// <para> The right-hand Matrix may be any size, but must encapsulate the same type with the same register width, and share the same major order. </para>
-	/// <para> If the right-hand Matrix does not contain respective registers to the left-hand Matrix, indices will be zeroed as if multiplied by 0. </para>
+	/// <para> Performs a basic multiplication operation on this Matrix using the passed right-hand operand. </para>
+	/// <para> This cannot be used to perform a standard multiplication by a Matrix. Use `fast_matrix_multiply` to allow such behaviour. </para>
+	/// <para> `Rhs_` will be treated in one of the following ways: </para>
+	/// <para> 
+	///		--- 1: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+	///		and registers in all major chunks will be used with the respective register of the FastVector.
+	/// </para>
+	/// <para> --- 2: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+	/// <para> --- 3: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
 	/// </summary>
 	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic multiplication. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">
-	///		FastMatrix appearing on the right-hand side of basic multiplication, 
-	///		which shares encapsulated type, register width, and major order with the left-hand operand.
-	/// </param>
-	/// <returns>FastMatrix resulting from multiplying respective indices in the passed two FastMatrix instances.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::EmuFastMatrix RhsFastMatrix_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsFastMatrix_>
-	[[nodiscard]] constexpr inline auto fast_matrix_basic_multiply(LhsFastMatrix_&& lhs_, RhsFastMatrix_&& rhs_)
+	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic multiplication.</param>
+	/// <returns>FastMatrix of the `lhs_` type containing the result of a basic multiplication operation with the passed operands.</returns>
+	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
+	requires (EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>)
+	[[nodiscard]] constexpr inline auto fast_matrix_basic_multiply(LhsFastMatrix_&& lhs_, Rhs_&& rhs_)
 		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
@@ -249,107 +164,60 @@ namespace EmuMath::Helpers
 			_major_indices(),
 			_register_indices(),
 			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsFastMatrix_>(rhs_)
+			std::forward<Rhs_>(rhs_)
 		);
 	}
 
 	/// <summary>
-	/// <para> Performs a basic multiplication operation of the passed FastMatrix and FastVector, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// <para> The right-hand Vector may be any size, but must encapsulate the same type with the same register width. </para>
-	/// <para> If the right-hand Vector does not contain respective registers to the left-hand Matrix, indices will be zeroed as if multiplied by 0. </para>
+	/// <para> Performs a basic multiplication operation on this Matrix using the passed right-hand operand. </para>
+	/// <para> `Rhs_` will be treated in one of the following ways: </para>
+	/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be used. </para>
+	/// <para> 
+	///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+	///		and registers in all major chunks will be used with the respective register of the FastVector.
+	/// </para>
+	/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+	/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
 	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic multiplication. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">
-	///		FastVector representing a major chunk to multiply all major chunks within the left-hand Matrix by, 
-	///		which shares encapsulated type and register type with the left-hand operand.
-	/// </param>
-	/// <returns>FastMatrix resulting from multiplying respective indices in the passed FastMatrix's major chunks and the passed FastVector.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::EmuFastVector RhsMajorFastVector_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsMajorFastVector_>
-	[[nodiscard]] constexpr inline auto fast_matrix_basic_multiply(LhsFastMatrix_&& lhs_, RhsMajorFastVector_&& rhs_all_majors_)
-		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
+	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic multiplication. Results are assigned to this Matrix.</param>
+	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic multiplication.</param>
+	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
+	requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) && !std::is_const_v<LhsFastMatrix_>)
+	[[nodiscard]] constexpr inline void fast_matrix_basic_multiply_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
 		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
 		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
 		using _func = _fast_matrix_underlying::_basic_mul_func<_lhs_fast_mat_uq>;
-		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
+		_fast_matrix_underlying::_basic_func_assign_for_matrix<true, _func>
 		(
+			lhs_,
 			_major_indices(),
 			_register_indices(),
-			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsMajorFastVector_>(rhs_all_majors_)
-		);
-	}
-
-	/// <summary>
-	/// <para> Performs a basic multiplication operation of the passed FastMatrix and SIMD register, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// <para> The passed register must be the same as the passed Matrix's `register_type`. </para>
-	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic multiplication. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">SIMD register of `lhs_`'s `register_type`, to multiply all of the passed Matrix's registers by.</param>
-	/// <returns>FastMatrix resulting from multiplying respective registers in the passed Matrix and the passed register.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::KnownSIMD RhsRegisterForAll_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsRegisterForAll_>
-	[[nodiscard]] constexpr inline auto fast_matrix_basic_multiply(LhsFastMatrix_&& lhs_, RhsRegisterForAll_&& rhs_all_registers_)
-		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
-	{
-		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
-		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
-		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
-		using _func = _fast_matrix_underlying::_basic_mul_func<_lhs_fast_mat_uq>;
-		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
-		(
-			_major_indices(),
-			_register_indices(),
-			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsRegisterForAll_>(rhs_all_registers_)
-		);
-	}
-
-	/// <summary>
-	/// <para> Performs a basic multiplication operation of the passed FastMatrix and scalar, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of multiplication. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">Scalar to create a register of and multiply all of the passed Matrix's indices by.</param>
-	/// <returns>FastMatrix resulting from multiplying all indices of the passed Matrix by the passed scalar value.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::Arithmetic RhsScalarForAll_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsScalarForAll_>
-	[[nodiscard]] constexpr inline auto fast_matrix_basic_multiply(LhsFastMatrix_&& lhs_, RhsScalarForAll_&& rhs_all_)
-		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
-	{
-		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
-		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
-		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
-		using _func = _fast_matrix_underlying::_basic_mul_func<_lhs_fast_mat_uq>;
-		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
-		(
-			_major_indices(),
-			_register_indices(),
-			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsScalarForAll_>(rhs_all_)
+			lhs_,
+			std::forward<Rhs_>(rhs_)
 		);
 	}
 #pragma endregion
 
 #pragma region BASIC_DIVIDE
 	/// <summary>
-	/// <para> Performs a basic division operation of the two passed FastMatrix instances, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// <para> The right-hand Matrix may be any size, but must encapsulate the same type with the same register width, and share the same major order. </para>
+	/// <para> Performs a basic division operation on this Matrix using the passed right-hand operand. </para>
+	/// <para> `Rhs_` will be treated in one of the following ways: </para>
+	/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be used. </para>
 	/// <para> 
-	///		If the right-hand Matrix does not contain respective registers to the left-hand Matrix, 
-	///		indices will be copied directly from `lhs_`, as a divide by the implied 0 would result in likely unwanted NaNs. 
+	///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+	///		and registers in all major chunks will be used with the respective register of the FastVector.
 	/// </para>
+	/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+	/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
 	/// </summary>
 	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic division. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">
-	///		FastMatrix appearing on the right-hand side of basic division, 
-	///		which shares encapsulated type, register width, and major order with the left-hand operand.
-	/// </param>
-	/// <returns>FastMatrix resulting from dividing respective indices in the passed two FastMatrix instances.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::EmuFastMatrix RhsFastMatrix_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsFastMatrix_>
-	[[nodiscard]] constexpr inline auto fast_matrix_basic_divide(LhsFastMatrix_&& lhs_, RhsFastMatrix_&& rhs_)
+	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic division.</param>
+	/// <returns>FastMatrix of the `lhs_` type containing the result of a basic division operation with the passed operands.</returns>
+	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
+	requires (EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>)
+	[[nodiscard]] constexpr inline auto fast_matrix_basic_divide(LhsFastMatrix_&& lhs_, Rhs_&& rhs_)
 		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
@@ -361,109 +229,60 @@ namespace EmuMath::Helpers
 			_major_indices(),
 			_register_indices(),
 			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsFastMatrix_>(rhs_)
+			std::forward<Rhs_>(rhs_)
 		);
 	}
 
 	/// <summary>
-	/// <para> Performs a basic division operation of the passed FastMatrix and FastVector, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// <para> The right-hand Vector may be any size, but must encapsulate the same type with the same register width. </para>
-	/// <para>
-	///		If the right-hand Vector does not contain respective registers to the left-hand Matrix, 
-	///		indices will be copied directly from `lhs_`, as a divide by the implied 0 would result in likely unwanted NaNs. </para>
+	/// <para> Performs a basic division operation on this Matrix using the passed right-hand operand. </para>
+	/// <para> `Rhs_` will be treated in one of the following ways: </para>
+	/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be used. </para>
+	/// <para> 
+	///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+	///		and registers in all major chunks will be used with the respective register of the FastVector.
+	/// </para>
+	/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+	/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
 	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic division. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">
-	///		FastVector representing a major chunk to divide all major chunks within the left-hand Matrix by, 
-	///		which shares encapsulated type and register type with the left-hand operand.
-	/// </param>
-	/// <returns>FastMatrix resulting from dividing respective indices in the passed FastMatrix's major chunks and the passed FastVector.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::EmuFastVector RhsMajorFastVector_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsMajorFastVector_>
-	[[nodiscard]] constexpr inline auto fast_matrix_basic_divide(LhsFastMatrix_&& lhs_, RhsMajorFastVector_&& rhs_all_majors_)
-		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
+	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic division. Results are assigned to this Matrix.</param>
+	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic division.</param>
+	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
+	requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) && !std::is_const_v<LhsFastMatrix_>)
+	[[nodiscard]] constexpr inline void fast_matrix_basic_divide_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
 		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
 		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
 		using _func = _fast_matrix_underlying::_basic_div_func<_lhs_fast_mat_uq>;
-		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
+		_fast_matrix_underlying::_basic_func_assign_for_matrix<true, _func>
 		(
+			lhs_,
 			_major_indices(),
 			_register_indices(),
-			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsMajorFastVector_>(rhs_all_majors_)
-		);
-	}
-
-	/// <summary>
-	/// <para> Performs a basic division operation of the passed FastMatrix and SIMD register, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// <para> The passed register must be the same as the passed Matrix's `register_type`. </para>
-	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic division. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">SIMD register of `lhs_`'s `register_type`, to divide all of the passed Matrix's registers by.</param>
-	/// <returns>FastMatrix resulting from dividing respective registers in the passed Matrix and the passed register.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::KnownSIMD RhsRegisterForAll_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsRegisterForAll_>
-	[[nodiscard]] constexpr inline auto fast_matrix_basic_divide(LhsFastMatrix_&& lhs_, RhsRegisterForAll_&& rhs_all_registers_)
-		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
-	{
-		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
-		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
-		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
-		using _func = _fast_matrix_underlying::_basic_div_func<_lhs_fast_mat_uq>;
-		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
-		(
-			_major_indices(),
-			_register_indices(),
-			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsRegisterForAll_>(rhs_all_registers_)
-		);
-	}
-
-	/// <summary>
-	/// <para> Performs a basic division operation of the passed FastMatrix and scalar, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of division. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">Scalar to create a register of and divide all of the passed Matrix's indices by.</param>
-	/// <returns>FastMatrix resulting from dividing all indices of the passed Matrix by the passed scalar value.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::Arithmetic RhsScalarForAll_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsScalarForAll_>
-	[[nodiscard]] constexpr inline auto fast_matrix_basic_divide(LhsFastMatrix_&& lhs_, RhsScalarForAll_&& rhs_all_)
-		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
-	{
-		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
-		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
-		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
-		using _func = _fast_matrix_underlying::_basic_div_func<_lhs_fast_mat_uq>;
-		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
-		(
-			_major_indices(),
-			_register_indices(),
-			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsScalarForAll_>(rhs_all_)
+			lhs_,
+			std::forward<Rhs_>(rhs_)
 		);
 	}
 #pragma endregion
 
 #pragma region BASIC_MOD
 	/// <summary>
-	/// <para> Performs a basic modulo division operation of the two passed FastMatrix instances, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// <para> The right-hand Matrix may be any size, but must encapsulate the same type with the same register width, and share the same major order. </para>
+	/// <para> Performs a basic modulo-division operation on this Matrix using the passed right-hand operand. </para>
+	/// <para> `Rhs_` will be treated in one of the following ways: </para>
+	/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be used. </para>
 	/// <para> 
-	///		If the right-hand Matrix does not contain respective registers to the left-hand Matrix, 
-	///		indices will be copied directly from `lhs_`, as a divide by the implied 0 would result in likely unwanted NaNs. 
+	///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+	///		and registers in all major chunks will be used with the respective register of the FastVector.
 	/// </para>
+	/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+	/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
 	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic modulo division. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">
-	///		FastMatrix appearing on the right-hand side of basic modulo division, 
-	///		which shares encapsulated type, register width, and major order with the left-hand operand.
-	/// </param>
-	/// <returns>FastMatrix resulting from modulo dividing respective indices in the passed two FastMatrix instances.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::EmuFastMatrix RhsFastMatrix_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsFastMatrix_>
-	[[nodiscard]] constexpr inline auto fast_matrix_basic_mod(LhsFastMatrix_&& lhs_, RhsFastMatrix_&& rhs_)
+	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic modulo-division. The output type will be the same as this FastMatrix type.</param>
+	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic modulo-division.</param>
+	/// <returns>FastMatrix of the `lhs_` type containing the result of a basic modulo-division operation with the passed operands.</returns>
+	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
+	requires (EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>)
+	[[nodiscard]] constexpr inline auto fast_matrix_basic_mod(LhsFastMatrix_&& lhs_, Rhs_&& rhs_)
 		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
@@ -475,87 +294,38 @@ namespace EmuMath::Helpers
 			_major_indices(),
 			_register_indices(),
 			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsFastMatrix_>(rhs_)
+			std::forward<Rhs_>(rhs_)
 		);
 	}
 
 	/// <summary>
-	/// <para> Performs a basic modulo division operation of the passed FastMatrix and FastVector, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// <para> The right-hand Vector may be any size, but must encapsulate the same type with the same register width. </para>
-	/// <para>
-	///		If the right-hand Vector does not contain respective registers to the left-hand Matrix, 
-	///		indices will be copied directly from `lhs_`, as a divide by the implied 0 would result in likely unwanted NaNs. </para>
+	/// <para> Performs a basic modulodivision operation on this Matrix using the passed right-hand operand. </para>
+	/// <para> `Rhs_` will be treated in one of the following ways: </para>
+	/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be used. </para>
+	/// <para> 
+	///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+	///		and registers in all major chunks will be used with the respective register of the FastVector.
+	/// </para>
+	/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+	/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
 	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic modulo division. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">
-	///		FastVector representing a major chunk to divide all major chunks within the left-hand Matrix by, 
-	///		which shares encapsulated type and register type with the left-hand operand.
-	/// </param>
-	/// <returns>FastMatrix resulting from modulo division of respective indices in the passed FastMatrix's major chunks and the passed FastVector.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::EmuFastVector RhsMajorFastVector_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsMajorFastVector_>
-	[[nodiscard]] constexpr inline auto fast_matrix_basic_mod(LhsFastMatrix_&& lhs_, RhsMajorFastVector_&& rhs_all_majors_)
-		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
+	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic modulodivision. Results are assigned to this Matrix.</param>
+	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic modulodivision.</param>
+	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
+	requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) && !std::is_const_v<LhsFastMatrix_>)
+	[[nodiscard]] constexpr inline void fast_matrix_basic_mod_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
 		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
 		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
 		using _func = _fast_matrix_underlying::_basic_mod_func<_lhs_fast_mat_uq>;
-		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
+		_fast_matrix_underlying::_basic_func_assign_for_matrix<true, _func>
 		(
+			lhs_,
 			_major_indices(),
 			_register_indices(),
-			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsMajorFastVector_>(rhs_all_majors_)
-		);
-	}
-
-	/// <summary>
-	/// <para> Performs a basic modulo division operation of the passed FastMatrix and SIMD register, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// <para> The passed register must be the same as the passed Matrix's `register_type`. </para>
-	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic modulo division. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">SIMD register of `lhs_`'s `register_type`, to divide all of the passed Matrix's registers by.</param>
-	/// <returns>FastMatrix resulting from modulo division of respective registers in the passed Matrix and the passed register.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::KnownSIMD RhsRegisterForAll_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsRegisterForAll_>
-	[[nodiscard]] constexpr inline auto fast_matrix_basic_mod(LhsFastMatrix_&& lhs_, RhsRegisterForAll_&& rhs_all_registers_)
-		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
-	{
-		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
-		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
-		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
-		using _func = _fast_matrix_underlying::_basic_mod_func<_lhs_fast_mat_uq>;
-		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
-		(
-			_major_indices(),
-			_register_indices(),
-			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsRegisterForAll_>(rhs_all_registers_)
-		);
-	}
-
-	/// <summary>
-	/// <para> Performs a basic modulo division operation of the passed FastMatrix and scalar, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of modulo division. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">Scalar to create a register of and modulo divide all of the passed Matrix's indices by.</param>
-	/// <returns>FastMatrix resulting from modulo dividing all indices of the passed Matrix by the passed scalar value.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::Arithmetic RhsScalarForAll_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsScalarForAll_>
-	[[nodiscard]] constexpr inline auto fast_matrix_basic_mod(LhsFastMatrix_&& lhs_, RhsScalarForAll_&& rhs_all_)
-		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
-	{
-		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
-		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
-		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
-		using _func = _fast_matrix_underlying::_basic_mod_func<_lhs_fast_mat_uq>;
-		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
-		(
-			_major_indices(),
-			_register_indices(),
-			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsScalarForAll_>(rhs_all_)
+			lhs_,
+			std::forward<Rhs_>(rhs_)
 		);
 	}
 #pragma endregion
@@ -765,20 +535,39 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::EmuFastMatrix RhsFastMatrix_>
+	requires
+	(
+		(EmuConcepts::EmuFastMatrixMultPair<LhsFastMatrix_, RhsFastMatrix_>) &&
+		!std::is_const_v<LhsFastMatrix_> &&
+		std::is_same_v
+		<
+			typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type,
+			typename EmuMath::TMP::fast_matrix_multiply_result<LhsFastMatrix_, RhsFastMatrix_>::type
+		>
+	)
+	constexpr inline void fast_matrix_multiply_assign(LhsFastMatrix_& lhs_fast_matrix_, RhsFastMatrix_&& rhs_fast_matrix_)
+	{
+		lhs_fast_matrix_ = EmuMath::Helpers::fast_matrix_multiply(lhs_fast_matrix_, std::forward<RhsFastMatrix_>(rhs_fast_matrix_));
+	}
+
 	/// <summary>
-	/// <para> Performs a basic multiplication operation of the passed FastMatrix and FastVector, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// <para> The right-hand Vector may be any size, but must encapsulate the same type with the same register width. </para>
-	/// <para> If the right-hand Vector does not contain respective registers to the left-hand Matrix, indices will be zeroed as if multiplied by 0. </para>
+	/// <para> Performs a basic multiplication operation on this Matrix using the passed right-hand operand. </para>
+	/// <para>  This cannot be used to perform a basic, non-standard multiplication by a Matrix. Use `fast_matrix_basic_multiply` to allow such behaviour. </para>
+	/// <para> `Rhs_` will be treated in one of the following ways: </para>
+	/// <para> 
+	///		--- 1: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+	///		and registers in all major chunks will be used with the respective register of the FastVector.
+	/// </para>
+	/// <para> --- 2: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+	/// <para> --- 3: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
 	/// </summary>
 	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic multiplication. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">
-	///		FastVector representing a major chunk to multiply all major chunks within the left-hand Matrix by, 
-	///		which shares encapsulated type and register type with the left-hand operand.
-	/// </param>
-	/// <returns>FastMatrix resulting from multiplying respective indices in the passed FastMatrix's major chunks and the passed FastVector.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::EmuFastVector RhsMajorFastVector_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsMajorFastVector_>
-	[[nodiscard]] constexpr inline auto fast_matrix_multiply(LhsFastMatrix_&& lhs_, RhsMajorFastVector_&& rhs_all_majors_)
+	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic multiplication.</param>
+	/// <returns>FastMatrix of the `lhs_` type containing the result of a basic multiplication operation with the passed operands.</returns>
+	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
+	requires (!(EmuConcepts::EmuFastMatrix<Rhs_>) && (EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>))
+	[[nodiscard]] constexpr inline auto fast_matrix_multiply(LhsFastMatrix_&& lhs_, Rhs_&& rhs_)
 		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
@@ -790,56 +579,41 @@ namespace EmuMath::Helpers
 			_major_indices(),
 			_register_indices(),
 			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsMajorFastVector_>(rhs_all_majors_)
+			std::forward<Rhs_>(rhs_)
 		);
 	}
 
 	/// <summary>
-	/// <para> Performs a basic multiplication operation of the passed FastMatrix and SIMD register, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// <para> The passed register must be the same as the passed Matrix's `register_type`. </para>
+	/// <para> Performs a basic multiplication operation on this Matrix using the passed right-hand operand. </para>
+	/// <para> 
+	///		This cannot be used to perform a basic, non-standard multiplication by a Matrix. 
+	///		Use `fast_matrix_basic_multiply_assign` to allow such behaviour.
+	/// </para>
+	/// <para> `Rhs_` will be treated in one of the following ways: </para>
+	/// <para> 
+	///		--- 1: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+	///		and registers in all major chunks will be used with the respective register of the FastVector.
+	/// </para>
+	/// <para> --- 2: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+	/// <para> --- 3: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
 	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic multiplication. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">SIMD register of `lhs_`'s `register_type`, to multiply all of the passed Matrix's registers by.</param>
-	/// <returns>FastMatrix resulting from multiplying respective registers in the passed Matrix and the passed register.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::KnownSIMD RhsRegisterForAll_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsRegisterForAll_>
-	[[nodiscard]] constexpr inline auto fast_matrix_multiply(LhsFastMatrix_&& lhs_, RhsRegisterForAll_&& rhs_all_registers_)
-		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
+	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic multiplication. Results are assigned to this Matrix.</param>
+	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic multiplication.</param>
+	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
+	requires (!(EmuConcepts::EmuFastMatrix<Rhs_>) && (EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) && !std::is_const_v<LhsFastMatrix_>)
+	constexpr inline void fast_matrix_multiply_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
 		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
 		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
 		using _func = _fast_matrix_underlying::_basic_mul_func<_lhs_fast_mat_uq>;
-		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
+		_fast_matrix_underlying::_basic_func_assign_for_matrix<true, _func>
 		(
+			lhs_,
 			_major_indices(),
 			_register_indices(),
-			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsRegisterForAll_>(rhs_all_registers_)
-		);
-	}
-
-	/// <summary>
-	/// <para> Performs a basic multiplication operation of the passed FastMatrix and scalar, outputting the result as a FastMatrix of the left-hand type. </para>
-	/// </summary>
-	/// <param name="lhs_">FastMatrix appearing on the left-hand side of multiplication. The output type will be the same as this FastMatrix type.</param>
-	/// <param name="rhs_">Scalar to create a register of and multiply all of the passed Matrix's indices by.</param>
-	/// <returns>FastMatrix resulting from multiplying all indices of the passed Matrix by the passed scalar value.</returns>
-	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::Arithmetic RhsScalarForAll_>
-	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsScalarForAll_>
-	[[nodiscard]] constexpr inline auto fast_matrix_multiply(LhsFastMatrix_&& lhs_, RhsScalarForAll_&& rhs_all_)
-		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
-	{
-		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
-		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
-		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
-		using _func = _fast_matrix_underlying::_basic_mul_func<_lhs_fast_mat_uq>;
-		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
-		(
-			_major_indices(),
-			_register_indices(),
-			std::forward<LhsFastMatrix_>(lhs_),
-			std::forward<RhsScalarForAll_>(rhs_all_)
+			lhs_,
+			std::forward<Rhs_>(rhs_)
 		);
 	}
 #pragma endregion
