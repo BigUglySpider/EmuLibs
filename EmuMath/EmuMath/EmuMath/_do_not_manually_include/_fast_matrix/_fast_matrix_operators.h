@@ -259,6 +259,13 @@ requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) &&
 #pragma endregion
 
 #pragma region STD_MULTIPLY_ASSIGN_OPERATORS
+/// <summary>
+/// <para> Standard Matrix * Matrix multiplication function for use with instances of EmuMath::FastMatrix. </para>
+/// <para> This is only available where the two passed Matrices encapsulate data that is exactly valid for a standard Matrix multiplication. </para>
+/// <para> Furthermore, the resulting Matrix type of the given multiplication must be the same type as the `lhs_` Matrix. </para>
+/// </summary>
+/// <param name="lhs_fast_matrix_">FastMatrix appearing on the left-hand side of standard Matrix multiplication. Results will be assigned to this.</param>
+/// <param name="rhs_fast_matrix_">FastMatrix appearing on the right-hand side of standard Matrix multiplication.</param>
 template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::EmuFastMatrix RhsFastMatrix_>
 requires
 (
