@@ -963,6 +963,22 @@ int main()
 	std::cout << (to_add_fast_a *= EmuMath::FastVector<3, float>(test_in_floats)) << "\n\n";
 	std::cout << (to_add_fast_a *= 5) << "\n\n";
 
+	auto some_8x8_fast_mat = EmuMath::FastMatrix<8, 8, float, true, 128>
+	(
+		1, 2, 3, 4, 5, 6, 7, 8,
+		9, 10, 11, 12, 13, 14, 15, 16,
+		17, 18, 19, 20, 21, 22, 23, 24,
+		25, 26, 27, 28, 29, 30, 31, 32,
+		33, 34, 35, 36, 37, 38, 39, 40,
+		41, 42, 43, 44, 45, 46, 47, 48,
+		49, 50, 51, 52, 53, 54, 55, 56,
+		57, 58, 59, 60, 61, 62, 63, 64
+	);
+	std::cout << (some_8x8_fast_mat * some_8x8_fast_mat) << "\n\n";
+	std::cout << (some_8x8_fast_mat *= some_8x8_fast_mat) << "\n\n";
+	std::cout << (some_8x8_fast_mat *= some_8x8_fast_mat) << "\n\n";
+
+
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN; 

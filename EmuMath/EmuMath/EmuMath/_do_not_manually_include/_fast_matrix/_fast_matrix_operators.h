@@ -204,7 +204,7 @@ requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) &&
 /// <param name="lhs_">FastMatrix appearing on the left-hand side of basic multiplication. Results are assigned to this Matrix.</param>
 /// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic multiplication.</param>
 template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
-requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) && !std::is_const_v<LhsFastMatrix_>)
+requires (!(EmuConcepts::EmuFastMatrix<Rhs_>) && (EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) && !std::is_const_v<LhsFastMatrix_>)
 [[nodiscard]] constexpr inline LhsFastMatrix_& operator*=(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
 {
 	EmuMath::Helpers::fast_matrix_multiply_assign(lhs_, std::forward<Rhs_>(rhs_));
@@ -227,7 +227,7 @@ requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) &&
 /// <param name="lhs_">FastMatrix appearing on the left-hand side of basic division. Results are assigned to this Matrix.</param>
 /// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic division.</param>
 template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
-requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) && !std::is_const_v<LhsFastMatrix_>)
+requires (!(EmuConcepts::EmuFastMatrix<Rhs_>) && (EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) && !std::is_const_v<LhsFastMatrix_>)
 [[nodiscard]] constexpr inline LhsFastMatrix_& operator/=(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
 {
 	EmuMath::Helpers::fast_matrix_basic_divide_assign(lhs_, std::forward<Rhs_>(rhs_));
@@ -250,7 +250,7 @@ requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) &&
 /// <param name="lhs_">FastMatrix appearing on the left-hand side of basic modulodivision. Results are assigned to this Matrix.</param>
 /// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic modulodivision.</param>
 template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
-requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) && !std::is_const_v<LhsFastMatrix_>)
+requires (!(EmuConcepts::EmuFastMatrix<Rhs_>) && (EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) && !std::is_const_v<LhsFastMatrix_>)
 [[nodiscard]] constexpr inline LhsFastMatrix_& operator%=(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
 {
 	EmuMath::Helpers::fast_matrix_basic_mod_assign(lhs_, std::forward<Rhs_>(rhs_));

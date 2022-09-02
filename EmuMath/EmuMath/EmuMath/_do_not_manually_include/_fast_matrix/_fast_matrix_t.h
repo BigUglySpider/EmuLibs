@@ -885,6 +885,202 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region BASIC_ARITHMETIC_ASSIGN
+	public:
+		/// <summary>
+		/// <para> Performs a basic addition operation on this Matrix using the passed right-hand operand. </para>
+		/// <para> Results are assigned to this Matrix. </para>
+		/// <para> `Rhs_` will be treated in one of the following ways: </para>
+		/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be used. </para>
+		/// <para> 
+		///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+		///		and registers in all major chunks will be used with the respective register of the FastVector.
+		/// </para>
+		/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+		/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
+		/// </summary>
+		/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic addition.</param>
+		template<class Rhs_>
+		requires EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, Rhs_>
+		constexpr inline void AddAssign(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::fast_matrix_add_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a basic subtraction operation on this Matrix using the passed right-hand operand. </para>
+		/// <para> Results are assigned to this Matrix. </para>
+		/// <para> `Rhs_` will be treated in one of the following ways: </para>
+		/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be used. </para>
+		/// <para> 
+		///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+		///		and registers in all major chunks will be used with the respective register of the FastVector.
+		/// </para>
+		/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+		/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
+		/// </summary>
+		/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic subtraction.</param>
+		template<class Rhs_>
+		requires EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, Rhs_>
+		constexpr inline void SubtractAssign(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::fast_matrix_subtract_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a basic multiplication operation on this Matrix using the passed right-hand operand. </para>
+		/// <para> Results are assigned to this Matrix. </para>
+		/// <para> This cannot be used to perform a standard multiplication by a Matrix. Use `Multiply` to allow such behaviour. </para>
+		/// <para> `Rhs_` will be treated in one of the following ways: </para>
+		/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be used. </para>
+		/// <para> 
+		///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+		///		and registers in all major chunks will be used with the respective register of the FastVector.
+		/// </para>
+		/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+		/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
+		/// </summary>
+		/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic multiplication.</param>
+		template<class Rhs_>
+		requires EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, Rhs_>
+		constexpr inline void BasicMultiplyAssign(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::fast_matrix_basic_multiply_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a basic division operation on this Matrix using the passed right-hand operand. </para>
+		/// <para> Results are assigned to this Matrix. </para>
+		/// <para> `Rhs_` will be treated in one of the following ways: </para>
+		/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be used. </para>
+		/// <para> 
+		///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+		///		and registers in all major chunks will be used with the respective register of the FastVector.
+		/// </para>
+		/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+		/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
+		/// </summary>
+		/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic division.</param>
+		template<class Rhs_>
+		requires EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, Rhs_>
+		constexpr inline void BasicDivideAssign(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::fast_matrix_basic_divide_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a basic modulo division operation on this Matrix using the passed right-hand operand. </para>
+		/// <para> Results are assigned to this Matrix. </para>
+		/// <para> `Rhs_` will be treated in one of the following ways: </para>
+		/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be used. </para>
+		/// <para> 
+		///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+		///		and registers in all major chunks will be used with the respective register of the FastVector.
+		/// </para>
+		/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+		/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
+		/// </summary>
+		/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic modulo division.</param>
+		template<class Rhs_>
+		requires EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, Rhs_>
+		constexpr inline void BasicModAssign(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::fast_matrix_basic_mod_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Performs a basic fused-multiply-add operation on this Matrix, 
+		///		multiplying it by `rhs_` and adding `to_add_` to the intermediate multiplication result.
+		/// </para>
+		/// <para> Results are assigned to this Matrix. </para>
+		/// <para> `Rhs_` and `ToAdd_` will be treated in one of the following ways: </para>
+		/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be used. </para>
+		/// <para> 
+		///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+		///		and registers in all major chunks will be used with the respective register of the FastVector.
+		/// </para>
+		/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+		/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
+		/// </summary>
+		/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic multiplication.</param>
+		/// <param name="to_add_">One of the several described argument types, which will be added to intermediate multiplication results.</param>
+		template<class Rhs_, class ToAdd_>
+		requires EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, Rhs_, ToAdd_>
+		constexpr inline void BasicFmaddAssign(Rhs_&& rhs_, ToAdd_&& to_add_)
+		{
+			EmuMath::Helpers::fast_matrix_basic_fmadd_assign(*this, std::forward<Rhs_>(rhs_), std::forward<ToAdd_>(to_add_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Performs a basic fused-multiply-subtract operation on this Matrix, 
+		///		multiplying it by `rhs_` and adding `to_add_` to the intermediate multiplication result.
+		/// </para>
+		/// <para> Results are assigned to this Matrix. </para>
+		/// <para> `Rhs_` and `ToSubtract_` will be treated in one of the following ways: </para>
+		/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be used. </para>
+		/// <para> 
+		///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+		///		and registers in all major chunks will be used with the respective register of the FastVector.
+		/// </para>
+		/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+		/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
+		/// </summary>
+		/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic multiplication.</param>
+		/// <param name="to_subtract_">One of the several described argument types, which will be subtracted from intermediate multiplication results.</param>
+		template<class Rhs_, class ToSubtract_>
+		requires EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, Rhs_, ToSubtract_>
+		constexpr inline void BasicFmsubAssign(Rhs_&& rhs_, ToSubtract_&& to_subtract_)
+		{
+			EmuMath::Helpers::fast_matrix_basic_fmsub_assign(*this, std::forward<Rhs_>(rhs_), std::forward<ToSubtract_>(to_subtract_));
+		}
+#pragma endregion
+
+#pragma region STD_ARITHMETIC_ASSIGN
+	public:
+		/// <summary>
+		/// <para> Standard Matrix * Matrix multiplication function for use with instances of EmuMath::FastMatrix. </para>
+		/// <para> This is only available where the two passed Matrices encapsulate data that is exactly valid for a standard Matrix multiplication. </para>
+		/// <para> Furthermore, the resulting Matrix type of the given multiplication must be the same type as the `lhs_` Matrix. </para>
+		/// </summary>
+		/// <param name="lhs_fast_matrix_">FastMatrix appearing on the left-hand side of standard Matrix multiplication. Results will be assigned to this.</param>
+		/// <param name="rhs_fast_matrix_">FastMatrix appearing on the right-hand side of standard Matrix multiplication.</param>
+		template<EmuConcepts::EmuFastMatrix RhsFastMatrix_>
+		requires
+		(
+			(EmuConcepts::EmuFastMatrixMultPair<this_type, RhsFastMatrix_>) &&
+			std::is_same_v<this_type, typename EmuMath::TMP::fast_matrix_multiply_result<this_type, RhsFastMatrix_>::type>
+		)
+		constexpr inline void MultiplyAssign(RhsFastMatrix_&& rhs_fast_matrix_)
+		{
+			EmuMath::Helpers::fast_matrix_multiply_assign(*this, std::forward<RhsFastMatrix_>(rhs_fast_matrix_));
+		}
+
+		/// <summary>
+		/// <para> Performs a basic multiplication operation on this Matrix using the passed right-hand operand. </para>
+		/// <para> Results are assigned to this Matrix. </para>
+		/// <para> 
+		///		This cannot be used to perform a basic, non-standard multiplication by a Matrix. 
+		///		Use `fast_matrix_basic_multiply_assign` to allow such behaviour.
+		/// </para>
+		/// <para> `Rhs_` will be treated in one of the following ways: </para>
+		/// <para> 
+		///		--- 1: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+		///		and registers in all major chunks will be used with the respective register of the FastVector.
+		/// </para>
+		/// <para> --- 2: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+		/// <para> --- 3: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
+		/// </summary>
+		/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic multiplication.</param>
+		template<class Rhs_>
+		requires (!(EmuConcepts::EmuFastMatrix<Rhs_>) && (EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, Rhs_>))
+		constexpr inline void MultiplyAssign(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::fast_matrix_multiply_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+#pragma endregion
+
 #pragma region ASSIGNMENT_OPERATORS
 	public:
 		constexpr inline this_type& operator=(const this_type&) = default;
