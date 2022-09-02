@@ -34,6 +34,60 @@ namespace EmuMath::Helpers
 			std::forward<RhsFastMatrix_>(rhs_)
 		);
 	}
+
+	/// <summary>
+	/// <para> Performs a basic addition operation of the passed FastMatrix and FastVector, outputting the result as a FastMatrix of the left-hand type. </para>
+	/// <para> The right-hand Vector may be any size, but must encapsulate the same type with the same register width. </para>
+	/// <para> If the right-hand Matrix does not contain respective registers to the left-hand Matrix, indices will be copied directly from `lhs_`. </para>
+	/// </summary>
+	/// <param name="lhs_">FastMatrix appearing on the left-hand side of addition. The output type will be the same as this FastMatrix type.</param>
+	/// <param name="rhs_">
+	///		FastVector representing a major chunk, which will be added to all major chunks within the left-hand Matrix, 
+	///		which shares encapsulated type and register type with the left-hand operand.
+	/// </param>
+	/// <returns>FastMatrix resulting from adding respective indices in the passed FastMatrix's major chunks and the passed FastVector.</returns>
+	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::EmuFastVector RhsMajorFastVector_>
+	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsMajorFastVector_>
+	[[nodiscard]] constexpr inline auto fast_matrix_add(LhsFastMatrix_&& lhs_, RhsMajorFastVector_&& rhs_all_majors_)
+		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
+	{
+		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
+		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
+		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
+		using _func = _fast_matrix_underlying::_basic_add_func<_lhs_fast_mat_uq>;
+		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
+		(
+			_major_indices(),
+			_register_indices(),
+			std::forward<LhsFastMatrix_>(lhs_),
+			std::forward<RhsMajorFastVector_>(rhs_all_majors_)
+		);
+	}
+
+	/// <summary>
+	/// <para> Performs a basic addition operation of the passed FastMatrix and SIMD register, outputting the result as a FastMatrix of the left-hand type. </para>
+	/// <para> The passed register must be the same as the passed Matrix's `register_type`. </para>
+	/// </summary>
+	/// <param name="lhs_">FastMatrix appearing on the left-hand side of addition. The output type will be the same as this FastMatrix type.</param>
+	/// <param name="rhs_">SIMD register of `lhs_`'s `register_type`, to add to all of the passed Matrix's registers.</param>
+	/// <returns>FastMatrix resulting from adding respective registers in the passed Matrix and the passed register.</returns>
+	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::KnownSIMD RhsRegisterForAll_>
+	requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsRegisterForAll_>
+	[[nodiscard]] constexpr inline auto fast_matrix_add(LhsFastMatrix_&& lhs_, RhsRegisterForAll_&& rhs_all_registers_)
+		-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
+	{
+		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
+		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
+		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
+		using _func = _fast_matrix_underlying::_basic_add_func<_lhs_fast_mat_uq>;
+		return _fast_matrix_underlying::_basic_func_for_matrix<true, _func, _lhs_fast_mat_uq>
+		(
+			_major_indices(),
+			_register_indices(),
+			std::forward<LhsFastMatrix_>(lhs_),
+			std::forward<RhsRegisterForAll_>(rhs_all_registers_)
+		);
+	}
 #pragma endregion
 
 #pragma region BASIC_SUBTRACT

@@ -65,7 +65,19 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 			// Vector treated as a major chunk arg to apply to all majors
 			if constexpr (RegisterIndex_ < _arg_unqualified_type::num_registers)
 			{
-				return std::forward<Arg_>(arg_).template GetRegister<RegisterIndex_>();
+				// If we have a partial register going out, we need to mask it so we don't use invalid padding values
+				if constexpr (!_arg_unqualified_type::requires_partial_register || RegisterIndex_ < (_arg_unqualified_type::num_registers - 1))
+				{
+					return std::forward<Arg_>(arg_).template GetRegister<RegisterIndex_>();
+				}
+				else
+				{
+					return EmuSIMD::bitwise_and
+					(
+						std::forward<Arg_>(arg_).template GetRegister<RegisterIndex_>(),
+						_arg_unqualified_type::make_partial_end_exclude_mask_register()
+					);
+				}
 			}
 			else
 			{

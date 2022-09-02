@@ -960,6 +960,11 @@ int main()
 	std::cout << "FMSUB [\n" << to_add_fast_a << ", \n\n" << to_add_fast_b << ", \n\n" << another_fast_matrix << "\n]=\n";
 	std::cout << EmuMath::Helpers::fast_matrix_basic_fmsub(to_add_fast_a, to_add_fast_b, another_fast_matrix) << "\n\n";
 
+	float test_in_floats[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
+	std::cout << EmuMath::Helpers::fast_matrix_add(to_add_fast_a, EmuSIMD::setr<__m128>(10, 20, 30, 40)) << "\n\n";
+	std::cout << EmuMath::Helpers::fast_matrix_add(to_add_fast_a, EmuMath::FastVector<4, float>(test_in_floats)) << "\n\n";
+	std::cout << EmuMath::Helpers::fast_matrix_add(to_add_fast_a, EmuMath::FastVector<3, float>(test_in_floats)) << "\n\n";
+
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN; 
