@@ -3,6 +3,79 @@
 
 #include "_fast_matrix_t.h"
 
+// Only includes `+` and `-` with all-Matrix inputs as these are the only operations that don't suggest another possible std operation
+// --- Although `mat0 / mat1` is not defined for matrices, it can easily be inferred as `lhs * inv(rhs)`, so it is also omitted for `lhs / rhs` operator
+
+#pragma region BASIC_ADD_OPERATORS
+/// <summary>
+/// <para> Performs a basic addition operation of the two passed FastMatrix instances, outputting the result as a FastMatrix of the left-hand type. </para>
+/// <para> The right-hand Matrix may be any size, but must encapsulate the same type with the same register width, and share the same major order. </para>
+/// <para> If the right-hand Vector does not contain respective registers to the left-hand Matrix, indices will be copied directly from `lhs_`. </para>
+/// </summary>
+/// <param name="lhs_">FastMatrix appearing on the left-hand side of addition. The output type will be the same as this FastMatrix type.</param>
+/// <param name="rhs_">
+///		FastMatrix appearing on the right-hand side of addition, 
+///		which shares encapsulated type, register width, and major order with the left-hand operand.
+/// </param>
+/// <returns>FastMatrix resulting from adding respective indices in the passed two FastMatrix instances.</returns>
+template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::EmuFastMatrix RhsFastMatrix_>
+requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsFastMatrix_>
+[[nodiscard]] constexpr inline auto operator+(LhsFastMatrix_&& lhs_, RhsFastMatrix_&& rhs_)
+	-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
+{
+	return EmuMath::Helpers::fast_matrix_add(std::forward<LhsFastMatrix_>(lhs_), std::forward<RhsFastMatrix_>(rhs_));
+}
+
+/// <summary>
+/// <para> Performs a basic addition operation of the passed FastMatrix and FastVector, outputting the result as a FastMatrix of the left-hand type. </para>
+/// <para> The right-hand Vector may be any size, but must encapsulate the same type with the same register width. </para>
+/// <para> If the right-hand Matrix does not contain respective registers to the left-hand Matrix, indices will be copied directly from `lhs_`. </para>
+/// </summary>
+/// <param name="lhs_">FastMatrix appearing on the left-hand side of addition. The output type will be the same as this FastMatrix type.</param>
+/// <param name="rhs_">
+///		FastVector representing a major chunk, which will be added to all major chunks within the left-hand Matrix, 
+///		which shares encapsulated type and register type with the left-hand operand.
+/// </param>
+/// <returns>FastMatrix resulting from adding respective indices in the passed FastMatrix's major chunks and the passed FastVector.</returns>
+template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::EmuFastVector RhsMajorFastVector_>
+requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsMajorFastVector_>
+[[nodiscard]] constexpr inline auto operator+(LhsFastMatrix_&& lhs_, RhsMajorFastVector_&& rhs_all_majors_)
+	-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
+{
+	return EmuMath::Helpers::fast_matrix_add(std::forward<LhsFastMatrix_>(lhs_), std::forward<RhsMajorFastVector_>(rhs_all_majors_));
+}
+
+/// <summary>
+/// <para> Performs a basic addition operation of the passed FastMatrix and SIMD register, outputting the result as a FastMatrix of the left-hand type. </para>
+/// <para> The passed register must be the same as the passed Matrix's `register_type`. </para>
+/// </summary>
+/// <param name="lhs_">FastMatrix appearing on the left-hand side of addition. The output type will be the same as this FastMatrix type.</param>
+/// <param name="rhs_">SIMD register of `lhs_`'s `register_type`, to add to all of the passed Matrix's registers.</param>
+/// <returns>FastMatrix resulting from adding respective registers in the passed Matrix and the passed register.</returns>
+template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::KnownSIMD RhsRegisterForAll_>
+requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsRegisterForAll_>
+[[nodiscard]] constexpr inline auto operator+(LhsFastMatrix_&& lhs_, RhsRegisterForAll_&& rhs_all_registers_)
+	-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
+{
+	return EmuMath::Helpers::fast_matrix_add(std::forward<LhsFastMatrix_>(lhs_), std::forward<RhsRegisterForAll_>(rhs_all_registers_));
+}
+
+/// <summary>
+/// <para> Performs a basic addition operation of the passed FastMatrix and scalar, outputting the result as a FastMatrix of the left-hand type. </para>
+/// </summary>
+/// <param name="lhs_">FastMatrix appearing on the left-hand side of addition. The output type will be the same as this FastMatrix type.</param>
+/// <param name="rhs_">Scalar to create a register of and add to all of the passed Matrix's indices.</param>
+/// <returns>FastMatrix resulting from adding passed scalar value to all indices of the passed Matrix.</returns>
+template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, EmuConcepts::Arithmetic RhsScalarForAll_>
+requires EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, RhsScalarForAll_>
+[[nodiscard]] constexpr inline auto operator+(LhsFastMatrix_&& lhs_, RhsScalarForAll_&& rhs_all_)
+	-> typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type
+{
+	return EmuMath::Helpers::fast_matrix_add(std::forward<LhsFastMatrix_>(lhs_), std::forward<RhsScalarForAll_>(rhs_all_));
+}
+#pragma endregion
+
+#pragma region STD_ARTIHMETIC_OPERATORS
 /// <summary>
 /// <para> Standard MAT*MAT multiplication operator to multiply two EmuMath FastMatrix instances. </para>
 /// <para> This is not available where `lhs * rhs` is an invalid matrix multiplication operation. </para>
@@ -17,5 +90,6 @@ requires EmuConcepts::EmuFastMatrixMultPair<LhsFastMatrix_, RhsFastMatrix_>
 {
 	return EmuMath::Helpers::fast_matrix_multiply(std::forward<LhsFastMatrix_>(lhs_fast_matrix_), std::forward<RhsFastMatrix_>(rhs_fast_matrix_));
 }
+#pragma endregion
 
 #endif

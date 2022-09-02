@@ -1,6 +1,7 @@
 #ifndef EMU_MATH_COMMON_MATH_TMP_H_INC_
 #define EMU_MATH_COMMON_MATH_TMP_H_INC_ 1
 
+#include "../../../EmuCore/CommonConcepts/Arithmetic.h"
 #include "../../../EmuCore/TMPHelpers/TypeConvertors.h"
 
 #pragma region CHECKS

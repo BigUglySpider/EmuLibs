@@ -39,6 +39,19 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		}
 	}
 
+	template<class ExpectedRegisterType_, class Arg_>
+	[[nodiscard]] constexpr inline decltype(auto) _forward_or_make_register(Arg_&& arg_)
+	{
+		if constexpr (EmuConcepts::Arithmetic<Arg_>)
+		{
+			return EmuSIMD::set1<ExpectedRegisterType_>(std::forward<Arg_>(arg_));
+		}
+		else
+		{
+			return std::forward<Arg_>(arg_);
+		}
+	}
+
 	template
 	<
 		bool UseRegisterOutOfRangeSpecialisations_, class Func_, EmuConcepts::EmuFastMatrix OutFastMatrix_,
@@ -51,17 +64,31 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		Args_&&...args_
 	)
 	{
+		using _out_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutFastMatrix_>::type;
+		if constexpr ((... || (EmuConcepts::Arithmetic<Args_>)))
+		{
+			// If we have any args that require an intermediate register to be made, make the registers before initiating the static loop
+			// --- We recursively call back on this function with the registers; this will result in the `else` branch being taken on said call
+			return _basic_func_for_matrix<UseRegisterOutOfRangeSpecialisations_, Func_, OutFastMatrix_>
+			(
+				std::index_sequence<MajorIndices_...>(),
+				std::index_sequence<RegisterIndices_...>(),
+				_forward_or_make_register<typename _out_fast_mat_uq::register_type, Args_>(std::forward<Args_>(args_))...
+			);
+		}
+		else
+		{
 #pragma warning(push)
 #pragma warning(disable: 26800)
-		using _out_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutFastMatrix_>::type;
-		return OutFastMatrix_
-		(
-			_basic_func_for_major_chunk<UseRegisterOutOfRangeSpecialisations_, Func_, typename _out_fast_mat_uq::major_chunk_type, MajorIndices_, RegisterIndices_...>
+			return OutFastMatrix_
 			(
-				std::forward<Args_>(args_)...
-			)...
-		);
+				_basic_func_for_major_chunk<UseRegisterOutOfRangeSpecialisations_, Func_, typename _out_fast_mat_uq::major_chunk_type, MajorIndices_, RegisterIndices_...>
+				(
+					std::forward<Args_>(args_)...
+				)...
+			);
 #pragma warning(pop)
+		}
 	}
 }
 

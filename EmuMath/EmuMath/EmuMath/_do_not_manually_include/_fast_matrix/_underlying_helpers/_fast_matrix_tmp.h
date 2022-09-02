@@ -36,7 +36,7 @@ namespace EmuMath::TMP
 	};
 }
 
-namespace EmuConcepts
+namespace EmuMath::Concepts
 {
 	/// <summary>
 	/// <para> Concept representing a pair of types meeting the `EmuFastMatrix` concept which can additionally be multiplied in the given order. </para>
@@ -84,6 +84,28 @@ namespace EmuConcepts
 		(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv_t<Lhs_>::register_type, typename EmuCore::TMP::remove_ref_cv<Registers_>::type>)
 	);
 
+	template<class Lhs_, class...Scalars_>
+	concept EmuFastMatrixAndScalarsBasicOpCompatible =
+	(
+		(EmuConcepts::EmuFastMatrix<Lhs_>) &&
+		(... && EmuConcepts::Arithmetic<Scalars_>) &&
+		(
+			... && 
+			(
+				std::is_same_v
+				<
+					typename EmuCore::TMP::remove_ref_cv<typename EmuCore::TMP::remove_ref_cv_t<Lhs_>::value_type>::type,
+					typename EmuCore::TMP::remove_ref_cv<Scalars_>::type
+				> ||
+				EmuCore::TMP::is_static_castable_v
+				<
+					Scalars_,
+					typename EmuCore::TMP::remove_ref_cv<typename EmuCore::TMP::remove_ref_cv_t<Lhs_>::value_type>::type
+				>
+			)
+		)
+	);
+
 	namespace _fast_matrix_underlying
 	{
 		template<class Lhs_, class Rhs_>
@@ -91,7 +113,8 @@ namespace EmuConcepts
 		(
 			EmuConcepts::EmuFastMatricesBasicOpCompatible<Lhs_, Rhs_> ||
 			EmuConcepts::EmuFastMatrixAndVectorsBasicOpCompatible<Lhs_, Rhs_> ||
-			EmuConcepts::EmuFastMatrixAndRegistersBasicOpCompatible<Lhs_, Rhs_>
+			EmuConcepts::EmuFastMatrixAndRegistersBasicOpCompatible<Lhs_, Rhs_> ||
+			EmuConcepts::EmuFastMatrixAndScalarsBasicOpCompatible<Lhs_, Rhs_>
 		);
 	}
 
