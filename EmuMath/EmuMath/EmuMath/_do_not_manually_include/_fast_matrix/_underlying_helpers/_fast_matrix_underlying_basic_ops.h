@@ -51,6 +51,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		Args_&&...args_
 	)
 	{
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		using _out_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutFastMatrix_>::type;
 		return OutFastMatrix_
 		(
@@ -59,6 +61,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 				std::forward<Args_>(args_)...
 			)...
 		);
+#pragma warning(pop)
 	}
 }
 

@@ -58,13 +58,47 @@ namespace EmuConcepts
 	);
 
 	template<class Lhs_, class...Others_>
-	concept EmuFastMatrixBasicOpCompatible =
+	concept EmuFastMatricesBasicOpCompatible =
 	(
 		(EmuConcepts::EmuFastMatrix<Lhs_>) &&
 		(... && EmuConcepts::EmuFastMatrix<Others_>) &&
-		(... && (EmuCore::TMP::remove_ref_cv_t<Lhs_>::register_width == EmuCore::TMP::remove_ref_cv_t<Others_>::register_width)) &&
+		(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv_t<Lhs_>::register_type, typename EmuCore::TMP::remove_ref_cv_t<Others_>::register_type>) &&
 		(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv_t<Lhs_>::value_type, typename EmuCore::TMP::remove_ref_cv_t<Others_>::value_type>) &&
 		(... && (EmuCore::TMP::remove_ref_cv_t<Lhs_>::is_column_major == EmuCore::TMP::remove_ref_cv_t<Others_>::is_column_major))
+	);
+
+	template<class Lhs_, class...FastVectors_>
+	concept EmuFastMatrixAndVectorsBasicOpCompatible =
+	(
+		(EmuConcepts::EmuFastMatrix<Lhs_>) &&
+		(... && EmuConcepts::EmuFastVector<FastVectors_>) &&
+		(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv_t<Lhs_>::register_type, typename EmuCore::TMP::remove_ref_cv_t<FastVectors_>::register_type>) &&
+		(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv_t<Lhs_>::value_type, typename EmuCore::TMP::remove_ref_cv_t<FastVectors_>::value_type>)
+	);
+
+	template<class Lhs_, class...Registers_>
+	concept EmuFastMatrixAndRegistersBasicOpCompatible =
+	(
+		(EmuConcepts::EmuFastMatrix<Lhs_>) &&
+		(... && EmuConcepts::KnownSIMD<Registers_>) &&
+		(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv_t<Lhs_>::register_type, typename EmuCore::TMP::remove_ref_cv<Registers_>::type>)
+	);
+
+	namespace _fast_matrix_underlying
+	{
+		template<class Lhs_, class Rhs_>
+		concept _any_basic_op_compatible_single_lhs =
+		(
+			EmuConcepts::EmuFastMatricesBasicOpCompatible<Lhs_, Rhs_> ||
+			EmuConcepts::EmuFastMatrixAndVectorsBasicOpCompatible<Lhs_, Rhs_> ||
+			EmuConcepts::EmuFastMatrixAndRegistersBasicOpCompatible<Lhs_, Rhs_>
+		);
+	}
+
+	template<class Lhs_, class...Others_>
+	concept EmuFastMatrixBasicOpCompatible =
+	(
+		(... && EmuConcepts::_fast_matrix_underlying::_any_basic_op_compatible_single_lhs<Lhs_, Others_>)
 	);
 }
 

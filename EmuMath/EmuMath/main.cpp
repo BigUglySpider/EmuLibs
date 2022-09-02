@@ -953,7 +953,12 @@ int main()
 	std::cout << to_add_fast_a << "\nBASIC MUL\n" << to_add_fast_b << "\n=\n" << EmuMath::Helpers::fast_matrix_basic_multiply(to_add_fast_a, to_add_fast_b) << "\n\n";
 	std::cout << to_add_fast_a << "\nBASIC DIV\n" << to_add_fast_b << "\n=\n" << EmuMath::Helpers::fast_matrix_basic_divide(to_add_fast_a, to_add_fast_b) << "\n\n";
 	std::cout << to_add_fast_a << "\nBASIC MOD\n" << to_add_fast_b << "\n=\n" << EmuMath::Helpers::fast_matrix_basic_mod(to_add_fast_a, to_add_fast_b) << "\n\n";
-
+	
+	EmuMath::FastMatrix<4, 4, float, true> another_fast_matrix(5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80);
+	std::cout << "FMADD [\n" << to_add_fast_a << ", \n\n" << to_add_fast_b << ", \n\n" << another_fast_matrix << "\n]=\n";
+	std::cout << EmuMath::Helpers::fast_matrix_basic_fmadd(to_add_fast_a, to_add_fast_b, another_fast_matrix) << "\n\n";
+	std::cout << "FMSUB [\n" << to_add_fast_a << ", \n\n" << to_add_fast_b << ", \n\n" << another_fast_matrix << "\n]=\n";
+	std::cout << EmuMath::Helpers::fast_matrix_basic_fmsub(to_add_fast_a, to_add_fast_b, another_fast_matrix) << "\n\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
