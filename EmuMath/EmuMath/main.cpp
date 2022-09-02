@@ -948,11 +948,13 @@ int main()
 
 	auto to_add_fast_a = EmuMath::FastMatrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	auto to_add_fast_b = EmuMath::FastMatrix<2, 4, float, true>(10, 20, 30, 40, 50, 60, 70, 80);
-	std::cout << to_add_fast_a << "\nPLUS\n" << to_add_fast_b << "\n=\n" << EmuMath::Helpers::fast_matrix_add(to_add_fast_a, to_add_fast_b) << "\n\n";
-	std::cout << to_add_fast_a << "\nSUB\n" << to_add_fast_b << "\n=\n" << EmuMath::Helpers::fast_matrix_subtract(to_add_fast_a, to_add_fast_b) << "\n\n";
-	std::cout << to_add_fast_a << "\nBASIC MUL\n" << to_add_fast_b << "\n=\n" << EmuMath::Helpers::fast_matrix_basic_multiply(to_add_fast_a, to_add_fast_b) << "\n\n";
-	std::cout << to_add_fast_a << "\nBASIC DIV\n" << to_add_fast_b << "\n=\n" << EmuMath::Helpers::fast_matrix_basic_divide(to_add_fast_a, to_add_fast_b) << "\n\n";
-	std::cout << to_add_fast_a << "\nBASIC MOD\n" << to_add_fast_b << "\n=\n" << EmuMath::Helpers::fast_matrix_basic_mod(to_add_fast_a, to_add_fast_b) << "\n\n";
+	std::cout << to_add_fast_a << "\nPLUS\n" << to_add_fast_b << "\n=\n" << to_add_fast_a.Add(to_add_fast_b) << "\n\n";
+	std::cout << to_add_fast_a << "\nSUB\n" << to_add_fast_b << "\n=\n" << to_add_fast_a.Subtract(to_add_fast_b) << "\n\n";
+	std::cout << to_add_fast_a << "\nBASIC MUL\n" << to_add_fast_b << "\n=\n" << to_add_fast_a.BasicMultiply(to_add_fast_b) << "\n\n";
+	std::cout << to_add_fast_a << "\nBASIC DIV\n" << to_add_fast_b << "\n=\n" << to_add_fast_a.BasicDivide(to_add_fast_b) << "\n\n";
+	std::cout << to_add_fast_a << "\nBASIC MOD\n" << to_add_fast_b << "\n=\n" << to_add_fast_a.BasicMod(to_add_fast_b) << "\n\n";
+	std::cout << "BASIC FMADD(\n" << to_add_fast_a << ",\n\n" << to_add_fast_b << ",\n\n" << 10 << "\n)=\n" << to_add_fast_a.BasicFmadd(to_add_fast_b, 10) << "\n\n";
+	std::cout << "BASIC FMSUB(\n" << to_add_fast_a << ",\n\n" << to_add_fast_b << ",\n\n" << 10 << "\n)=\n" << to_add_fast_a.BasicFmsub(to_add_fast_b, 10) << "\n\n";
 
 	float test_in_floats[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
 	std::cout << (to_add_fast_a % EmuSIMD::setr<__m128>(10, 20, 30, 40)) << "\n\n";
