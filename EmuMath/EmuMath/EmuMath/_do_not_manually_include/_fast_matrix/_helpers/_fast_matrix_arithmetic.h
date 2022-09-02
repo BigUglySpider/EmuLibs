@@ -597,6 +597,42 @@ namespace EmuMath::Helpers
 			std::forward<ToAdd_>(to_add_)
 		);
 	}
+
+	/// <summary>
+	/// <para>
+	///		Performs a basic fused-multiply-add operation on the `lhs_` FastMatrix, 
+	///		multiplying it by `rhs_` and adding `to_add_` to the intermediate multiplication result.
+	/// </para>
+	/// <para> `Rhs_` and `ToAdd_` will be treated in one of the following ways: </para>
+	/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be multiplied/added. </para>
+	/// <para> 
+	///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+	///		and registers in all major chunks will be used with the respective register of the FastVector.
+	/// </para>
+	/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+	/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
+	/// </summary>
+	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic multiplication. Results are assigned to this Matrix.</param>
+	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic multiplication.</param>
+	/// <param name="to_add_">One of the several described argument types, which will be added to intermediate multiplication results.</param>
+	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_, class ToAdd_>
+	requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_, ToAdd_>) && !std::is_const_v<LhsFastMatrix_>)
+	[[nodiscard]] constexpr inline void fast_matrix_basic_fmadd_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_, ToAdd_&& to_add_)
+	{
+		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
+		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
+		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
+		using _func = _fast_matrix_underlying::_basic_fmadd_func<_lhs_fast_mat_uq>;
+		_fast_matrix_underlying::_basic_func_assign_for_matrix<true, _func>
+		(
+			lhs_,
+			_major_indices(),
+			_register_indices(),
+			lhs_,
+			std::forward<Rhs_>(rhs_),
+			std::forward<ToAdd_>(to_add_)
+		);
+	}
 #pragma endregion
 
 #pragma region BASIC_FMSUB
@@ -634,6 +670,42 @@ namespace EmuMath::Helpers
 			std::forward<LhsFastMatrix_>(lhs_),
 			std::forward<Rhs_>(rhs_),
 			std::forward<ToSubtract_>(to_subtract_)
+		);
+	}
+
+	/// <summary>
+	/// <para>
+	///		Performs a basic fused-multiply-subtract operation on the `lhs_` FastMatrix, 
+	///		multiplying it by `rhs_` and adding `to_subtract_` to the intermediate multiplication result.
+	/// </para>
+	/// <para> `Rhs_` and `ToAdd_` will be treated in one of the following ways: </para>
+	/// <para> --- 1: Where it is a FastMatrix of the same `register_type`, `value_type` and major-order, respective registers will be used </para>
+	/// <para> 
+	///		--- 2: Where it is a FastVector of the same `register_type` and `value_type`, it will be treated as a major chunk, 
+	///		and registers in all major chunks will be used with the respective register of the FastVector.
+	/// </para>
+	/// <para> --- 3: Where it is a SIMD register recognised by EmuSIMD, all calculations will use that register. </para>
+	/// <para> --- 4: Where is is an arithmetic scalar, all indices will use that value. An intermediate register will be set to achieve this. </para>
+	/// </summary>
+	/// <param name="lhs_">FastMatrix appearing on the left-hand side of basic multiplication. Results are assigned to this Matrix.</param>
+	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic multiplication.</param>
+	/// <param name="to_subtract_">One of the several described argument types, which will be subtracted from intermediate multiplication results.</param>
+	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_, class ToAdd_>
+	requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_, ToAdd_>) && !std::is_const_v<LhsFastMatrix_>)
+	[[nodiscard]] constexpr inline void fast_matrix_basic_fmsub_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_, ToAdd_&& to_subtract_)
+	{
+		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
+		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
+		using _register_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_registers_per_major>;
+		using _func = _fast_matrix_underlying::_basic_fmsub_func<_lhs_fast_mat_uq>;
+		_fast_matrix_underlying::_basic_func_assign_for_matrix<true, _func>
+		(
+			lhs_,
+			_major_indices(),
+			_register_indices(),
+			lhs_,
+			std::forward<Rhs_>(rhs_),
+			std::forward<ToAdd_>(to_subtract_)
 		);
 	}
 #pragma endregion

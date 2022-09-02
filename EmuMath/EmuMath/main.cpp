@@ -962,6 +962,9 @@ int main()
 	std::cout << (to_add_fast_a % EmuMath::FastVector<3, float>(test_in_floats)) << "\n\n";
 	std::cout << (to_add_fast_a % 5) << "\n\n";
 
+	std::cout << "BEFORE:\n" << to_add_fast_a << "\n";
+	EmuMath::Helpers::fast_matrix_basic_fmsub_assign(to_add_fast_a, 10, 2);
+	std::cout << "AFTER:\n" << to_add_fast_a << "\n\n";
 
 
 	system("pause");
