@@ -979,6 +979,21 @@ int main()
 	auto fast_mat_4x4_to_trans = EmuMath::FastMatrix<4, 4, float, true, 128>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	std::cout << fast_mat_4x4_to_trans << "\n\nTRANS:\n" << fast_mat_4x4_to_trans.Transpose() << "\n\n";
 
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::alternating_sign_mask<__m128, 32, false>()) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::alternating_sign_mask<__m128, 32, true>()) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::alternating_sign_mask_reverse<__m128, 32, false>()) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::alternating_sign_mask_reverse<__m128, 32, true>()) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::sign_mask<32, __m128, 0, 1, 1, 0>()) << "\n\n";
+
+	constexpr auto some_translation = EmuMath::Helpers::matrix_make_translation<4, 4, float, true>(1, 2, 3);
+	auto some_fast_translation = EmuMath::FastMatrix<4, 4, float, true>(some_translation);
+	std::cout << some_fast_translation << "\n\n" 
+		<< EmuMath::Helpers::fast_matrix_inverse(some_fast_translation) << "\n\n"
+		<< (some_fast_translation * EmuMath::Helpers::fast_matrix_inverse(some_fast_translation)) << "\n\n"
+		<< (some_fast_translation.Store() * EmuMath::Helpers::fast_matrix_inverse(some_fast_translation).Store()) << "\n\n"
+		<< (EmuMath::Helpers::fast_matrix_inverse(some_fast_translation) * some_fast_translation) << "\n\n"
+		<< (EmuMath::Helpers::fast_matrix_inverse(some_fast_translation).Store() * some_fast_translation.Store()) << "\n\n";
+
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN; 

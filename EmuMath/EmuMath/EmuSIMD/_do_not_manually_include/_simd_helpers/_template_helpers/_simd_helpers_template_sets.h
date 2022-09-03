@@ -452,6 +452,32 @@ namespace EmuSIMD
 			);
 		}
 	}
+
+	template<class Register_, std::size_t PerElementWidthIfInt_ = 32, bool OddSign_ = false>
+	[[nodiscard]] constexpr inline Register_ alternating_sign_mask()
+	{
+		using index_seq = std::make_index_sequence<EmuSIMD::TMP::register_element_count_v<Register_, PerElementWidthIfInt_>>;
+		return _underlying_simd_helpers::_make_alternating_sign_mask<Register_, PerElementWidthIfInt_, OddSign_, false>(index_seq());
+	}
+
+	template<class Register_, std::size_t PerElementWidthIfInt_ = 32, bool OddSign_ = false>
+	[[nodiscard]] constexpr inline Register_ alternating_sign_mask_reverse()
+	{
+		using index_seq = std::make_index_sequence<EmuSIMD::TMP::register_element_count_v<Register_, PerElementWidthIfInt_>>;
+		return _underlying_simd_helpers::_make_alternating_sign_mask<Register_, PerElementWidthIfInt_, OddSign_, true>(index_seq());
+	}
+
+	template<std::size_t PerElementWidthIfInt_, class Register_, bool...SignAtIndex_>
+	[[nodiscard]] constexpr inline Register_ sign_mask()
+	{
+		return _underlying_simd_helpers::_make_sign_mask<Register_, PerElementWidthIfInt_, false, SignAtIndex_...>();
+	}
+
+	template<std::size_t PerElementWidthIfInt_, class Register_, bool...SignAtIndex_>
+	[[nodiscard]] constexpr inline Register_ sign_mask_reverse()
+	{
+		return _underlying_simd_helpers::_make_sign_mask<Register_, PerElementWidthIfInt_, false, SignAtIndex_...>();
+	}
 }
 
 #endif

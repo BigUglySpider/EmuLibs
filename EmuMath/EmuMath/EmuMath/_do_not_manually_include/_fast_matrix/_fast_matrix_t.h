@@ -1121,6 +1121,11 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region INVERSE_AND_RELATED
+	public:
+
+#pragma endregion
+
 #pragma region DATA
 	public:
 		/// <summary>

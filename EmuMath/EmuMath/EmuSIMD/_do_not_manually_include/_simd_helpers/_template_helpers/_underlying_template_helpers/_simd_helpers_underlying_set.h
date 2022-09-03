@@ -1066,6 +1066,54 @@ namespace EmuSIMD::_underlying_simd_helpers
 			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to load a SIMD register from memory via EmuSIMD helpers, but the provided Register_ type was not recognised as a supported SIMD register.");
 		}
 	}
+
+	template<class Register_, std::size_t PerElementWidthIfInt_, bool Reverse_, bool...SignAtIndex_>
+	[[nodiscard]] inline Register_ _make_sign_mask()
+	{
+		using register_type_uq = EmuCore::TMP::remove_ref_cv_t<Register_>;
+		if constexpr (EmuSIMD::TMP::register_element_count_v< register_type_uq, PerElementWidthIfInt_> == sizeof...(SignAtIndex_))
+		{
+			if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<register_type_uq>)
+			{
+				using int_type = EmuCore::TMP::int_of_size_t<PerElementWidthIfInt_ / CHAR_BIT>;
+				constexpr int_type sign_bit = std::numeric_limits<int_type>::min();
+				constexpr int_type no_bit = int_type(0);
+				return _set_int<Register_, PerElementWidthIfInt_, Reverse_>
+				(
+					EmuCore::TMP::conditional_value_v<SignAtIndex_, int_type, sign_bit, no_bit>...
+				);
+			}
+			else
+			{
+				using fp_type = typename std::conditional
+				<
+					(EmuSIMD::TMP::simd_register_width_v<register_type_uq> / EmuSIMD::TMP::register_element_count_v<register_type_uq, PerElementWidthIfInt_>) == 4,
+					float,
+					double
+				>::type;
+				constexpr fp_type sign_bit = fp_type(-0.0);
+				constexpr fp_type no_bit = fp_type(0.0);
+				return _set_fp<Register_, Reverse_>
+				(
+					EmuCore::TMP::conditional_value_v<SignAtIndex_, fp_type, sign_bit, no_bit>...
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Register_>(),
+				"Attempted to set a sign mask SIMD register via EmuSIMD Helpers, but the provided booleans for respective indices did not match the number of elements in the resulting register."
+			);
+		}
+	}
+
+	template<class Register_, std::size_t PerElementWidthIfInt_, bool OddSign_, bool Reverse_, std::size_t...Indices_>
+	[[nodiscard]] inline Register_ _make_alternating_sign_mask(std::index_sequence<Indices_...> indices_)
+	{
+		return _make_sign_mask<Register_, PerElementWidthIfInt_, OddSign_, ((Indices_ % 2) == 1)...>();
+	}
 }
 
 #endif
