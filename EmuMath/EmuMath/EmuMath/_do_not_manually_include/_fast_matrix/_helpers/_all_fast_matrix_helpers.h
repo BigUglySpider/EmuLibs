@@ -5,5 +5,6 @@
 #include "_fast_matrix_arithmetic.h"
 #include "_fast_matrix_load.h"
 #include "_fast_matrix_store.h"
+#include "_fast_matrix_transpose.h"
 
 #endif

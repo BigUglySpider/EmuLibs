@@ -420,6 +420,16 @@ namespace EmuMath
 		constexpr inline FastMatrix(this_type&&) noexcept = default;
 		constexpr inline FastMatrix(const this_type&) noexcept = default;
 
+		constexpr inline FastMatrix(data_type&& data_to_move_) noexcept
+			: major_chunks(std::move(data_to_move_))
+		{
+		}
+
+		constexpr inline FastMatrix(const data_type& data_to_copy_) noexcept
+			: major_chunks(data_to_copy_)
+		{
+		}
+
 		/// <summary>
 		/// <para> Loads the passed contiguous data pointer directly into a newly constructed Matrix. </para>
 		/// <para> 
@@ -437,7 +447,7 @@ namespace EmuMath
 		/// </para>
 		/// </summary>
 		/// <param name="p_data_to_load_">Pointer to at least `expected_count_for_default_load_pointer` items of this Matrix's `value_type`.</param>
-		constexpr inline FastMatrix(const value_type* p_data_to_load_)
+		constexpr inline FastMatrix(const value_type* p_data_to_load_) noexcept
 			: major_chunks(_load_data_from_pointer<false>(p_data_to_load_, major_index_sequence(), major_register_sequence()))
 		{
 		}
@@ -1085,6 +1095,30 @@ namespace EmuMath
 	public:
 		constexpr inline this_type& operator=(const this_type&) = default;
 		constexpr inline this_type& operator=(this_type&&) = default;
+#pragma endregion
+
+#pragma region TRANSPOSITION
+	public:
+		/// <summary>
+		/// <para> Outputs the transposed form of this FastMatrix. </para>
+		/// <para>
+		///		Where the output major order is opposite to this Matrix type's major order, this will create a copy of this Matrix's data 
+		///		with the opposite major order instead of performing a transposition operation. 
+		///		Such cases are effectively a reinterpretation of this Matrix.
+		/// </para>
+		/// <para>
+		///		Where the output major order is the same as this Matrix type, 
+		///		transposition operations will attempt to remain in a SIMD context such as via shuffles. 
+		///		If there are no specialised behaviours available, this will fall back to a basic store-then-set operation.
+		/// </para>
+		/// </summary>
+		/// <returns>Transposed form of this FastMatrix.</returns>
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline auto Transpose() const
+			-> typename EmuMath::TMP::fast_matrix_transpose_result<this_type, OutColumnMajor_>::type
+		{
+			return EmuMath::Helpers::fast_matrix_transpose<OutColumnMajor_>(*this);
+		}
 #pragma endregion
 
 #pragma region DATA

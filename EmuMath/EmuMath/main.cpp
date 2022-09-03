@@ -963,7 +963,7 @@ int main()
 	std::cout << (to_add_fast_a *= EmuMath::FastVector<3, float>(test_in_floats)) << "\n\n";
 	std::cout << (to_add_fast_a *= 5) << "\n\n";
 
-	auto some_8x8_fast_mat = EmuMath::FastMatrix<8, 8, float, true, 128>
+	auto some_8x8_fast_mat = EmuMath::FastMatrix<8, 8, float, true, 256>
 	(
 		1, 2, 3, 4, 5, 6, 7, 8,
 		9, 10, 11, 12, 13, 14, 15, 16,
@@ -974,10 +974,10 @@ int main()
 		49, 50, 51, 52, 53, 54, 55, 56,
 		57, 58, 59, 60, 61, 62, 63, 64
 	);
-	std::cout << (some_8x8_fast_mat * some_8x8_fast_mat) << "\n\n";
-	std::cout << (some_8x8_fast_mat *= some_8x8_fast_mat) << "\n\n";
-	std::cout << (some_8x8_fast_mat *= some_8x8_fast_mat) << "\n\n";
 
+	std::cout << "\n---\n";
+	auto fast_mat_4x4_to_trans = EmuMath::FastMatrix<4, 4, float, true, 128>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << fast_mat_4x4_to_trans << "\n\nTRANS:\n" << fast_mat_4x4_to_trans.Transpose() << "\n\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

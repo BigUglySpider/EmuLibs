@@ -164,6 +164,23 @@ namespace EmuMath::TMP
 	};
 	template<EmuConcepts::EmuFastMatrix Lhs_, EmuConcepts::EmuFastMatrix Rhs_>
 	using fast_matrix_multiply_result_t = typename fast_matrix_multiply_result<Lhs_, Rhs_>::type;
+
+	template<EmuConcepts::EmuFastMatrix FastMatrix_, bool ColumnMajor_ = EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::is_column_major>
+	struct fast_matrix_transpose_result
+	{
+	private:
+		using _in_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
+
+	public:
+		using type = EmuMath::FastMatrix
+		<
+			_in_fast_mat_uq::num_rows,
+			_in_fast_mat_uq::num_columns,
+			typename _in_fast_mat_uq::value_type,
+			ColumnMajor_,
+			_in_fast_mat_uq::register_width
+		>;
+	};
 }
 
 #endif
