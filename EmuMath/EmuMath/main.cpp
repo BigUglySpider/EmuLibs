@@ -985,14 +985,16 @@ int main()
 	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::alternating_sign_mask_reverse<__m128, 32, true>()) << "\n";
 	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::sign_mask<32, __m128, 0, 1, 1, 0>()) << "\n\n";
 
-	constexpr auto some_translation = EmuMath::Helpers::matrix_make_translation<4, 4, float, true>(1, 2, 3);
+	float test_out_det = 0.0f;
+	constexpr auto some_translation = (
+		EmuMath::Helpers::matrix_make_rotation_3d<float, true>(EmuMath::Quaternion<float>::from_euler_constexpr(-30, 45, 90)) *
+		EmuMath::Helpers::matrix_make_scale<4, 4, float, true>(25, 13, 9) *
+		EmuMath::Helpers::matrix_make_translation<4, 4, float, true>(-17, 6, 28)
+	);
 	auto some_fast_translation = EmuMath::FastMatrix<4, 4, float, true>(some_translation);
-	std::cout << some_fast_translation << "\n\n" 
-		<< EmuMath::Helpers::fast_matrix_inverse(some_fast_translation) << "\n\n"
-		<< (some_fast_translation * EmuMath::Helpers::fast_matrix_inverse(some_fast_translation)) << "\n\n"
-		<< (some_fast_translation.Store() * EmuMath::Helpers::fast_matrix_inverse(some_fast_translation).Store()) << "\n\n"
-		<< (EmuMath::Helpers::fast_matrix_inverse(some_fast_translation) * some_fast_translation) << "\n\n"
-		<< (EmuMath::Helpers::fast_matrix_inverse(some_fast_translation).Store() * some_fast_translation.Store()) << "\n\n";
+	std::cout << some_fast_translation << "\n\n"
+		<< EmuMath::Helpers::fast_matrix_inverse(some_fast_translation, test_out_det) << "\n";
+	std::cout << "Det: " << test_out_det << "\n\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

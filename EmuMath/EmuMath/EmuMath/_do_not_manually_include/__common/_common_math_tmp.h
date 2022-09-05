@@ -102,6 +102,16 @@ namespace EmuMath::Concepts
 	concept EmuFastMatrix = EmuMath::TMP::is_emu_fast_matrix_v<T_>;
 
 	/// <summary>
+	/// <para> Concept that determines if the passed type T_ is an EmuMath Fast Matrix with square dimensions. </para>
+	/// </summary>
+	template<class T_>
+	concept EmuFastMatrixSquare =
+	(
+		(EmuFastMatrix<T_>) &&
+		(EmuCore::TMP::remove_ref_cv_t<T_>::num_columns  == EmuCore::TMP::remove_ref_cv_t<T_>::num_rows)
+	);
+
+	/// <summary>
 	/// <para> Concept that determines if the passed type T_ is an EmuMath Fast Vector. Effectively a check that `is_emu_fast_vector::value` is true. </para>
 	/// </summary>
 	template<class T_>
@@ -112,6 +122,16 @@ namespace EmuMath::Concepts
 	/// </summary>
 	template<class T_>
 	concept EmuMatrix = EmuMath::TMP::is_emu_matrix_v<T_>;
+
+	/// <summary>
+	/// <para> Concept that determines if the passed type T_ is an EmuMath Matrix with square dimensions. </para>
+	/// </summary>
+	template<class T_>
+	concept EmuMatrixSquare =
+	(
+		(EmuMatrix<T_>) &&
+		(EmuCore::TMP::remove_ref_cv_t<T_>::num_columns  == EmuCore::TMP::remove_ref_cv_t<T_>::num_rows)
+	);
 
 	/// <summary>
 	/// <para> Concept that determines if the passed type T_ is an EmuMath Quaternion. Effectively a check that `is_emu_quaternion::value` is true. </para>
