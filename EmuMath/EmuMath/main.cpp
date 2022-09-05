@@ -979,11 +979,11 @@ int main()
 	auto fast_mat_4x4_to_trans = EmuMath::FastMatrix<4, 4, float, true, 128>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	std::cout << fast_mat_4x4_to_trans << "\n\nTRANS:\n" << fast_mat_4x4_to_trans.Transpose() << "\n\n";
 
-	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::alternating_sign_mask<__m128, 32, false>()) << "\n";
-	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::alternating_sign_mask<__m128, 32, true>()) << "\n";
-	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::alternating_sign_mask_reverse<__m128, 32, false>()) << "\n";
-	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::alternating_sign_mask_reverse<__m128, 32, true>()) << "\n";
-	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::sign_mask<32, __m128, 0, 1, 1, 0>()) << "\n\n";
+	EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, EmuSIMD::alternating_sign_mask<__m128, 32, false>()) << "\n";
+	EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, EmuSIMD::alternating_sign_mask<__m128, 32, true>()) << "\n";
+	EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, EmuSIMD::alternating_sign_mask_reverse<__m128, 32, false>()) << "\n";
+	EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, EmuSIMD::alternating_sign_mask_reverse<__m128, 32, true>()) << "\n";
+	EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, EmuSIMD::sign_mask<32, __m128, 0, 1, 1, 0>()) << "\n\n";
 
 	float test_out_det = 0.0f;
 	constexpr auto some_translation = (

@@ -5,6 +5,7 @@
 #include "../_underlying_helpers/_fast_matrix_underlying_basic_arithmetic.h"
 #include "../_underlying_helpers/_fast_matrix_underlying_basic_ops.h"
 #include "../_underlying_helpers/_fast_matrix_underlying_get.h"
+#include "../_underlying_helpers/_fast_matrix_underlying_identity.h"
 #include "../_underlying_helpers/_fast_matrix_underlying_inverse_and_related.h"
 #include "../_underlying_helpers/_fast_matrix_underlying_load.h"
 #include "../_underlying_helpers/_fast_matrix_underlying_mat_mult.h"
