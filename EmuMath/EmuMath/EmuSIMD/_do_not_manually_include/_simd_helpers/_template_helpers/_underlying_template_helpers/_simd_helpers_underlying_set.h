@@ -1030,7 +1030,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return EmuSIMD::Funcs::load_f32x16(p_to_load_);
+				return EmuSIMD::Funcs::load_f32x16(reinterpret_cast<const float*>(p_to_load_));
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
@@ -1042,7 +1042,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return EmuSIMD::Funcs::load_f64x8(p_to_load_);
+				return EmuSIMD::Funcs::load_f64x8(reinterpret_cast<const double*>(p_to_load_));
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 			{
@@ -1054,7 +1054,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
 			{
-				return _mm512_load_si512(p_to_load_);
+				return _mm512_load_si512(reinterpret_cast<const EmuSIMD::i512_generic*>(p_to_load_));
 			}
 			else
 			{
