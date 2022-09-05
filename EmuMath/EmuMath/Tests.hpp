@@ -180,6 +180,7 @@ namespace EmuCore::TestingHelpers
 		{
 			// FILLS
 			out_mats.resize(NUM_LOOPS);
+			determinants.resize(NUM_LOOPS);
 
 			// RESERVES
 			lhs.reserve(NUM_LOOPS);
@@ -218,19 +219,22 @@ namespace EmuCore::TestingHelpers
 			//(fast_mat_type(lhs[i_]) * fast_mat_type(rhs[i_])).Store(out_mats[i_]);
 			EmuMath::Helpers::fast_matrix_store
 			(
-				EmuMath::Helpers::fast_matrix_add(fast_mat_type(lhs[i_]), fast_mat_type(rhs[i_])),
+				//EmuMath::Helpers::fast_matrix_add(fast_mat_type(lhs[i_]), fast_mat_type(rhs[i_])),
+				EmuMath::Helpers::fast_matrix_inverse(fast_mat_type(lhs[i_]), determinants[i_]),
 				out_mats[i_]
 			);
 		}
 		void OnTestsOver()
 		{
-			const std::size_t i_ = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
-			std::cout << lhs[i_] << "\nMUL\n" << rhs[i_] << "\n=\n" << out_mats[i_] << "\n\n";
+			const std::size_t i = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
+			//std::cout << lhs[i] << "\nMUL\n" << rhs[i] << "\n=\n" << out_mats[i] << "\n\n";
+			std::cout << lhs[i] << "\nINVERSE:\n" << out_mats[i] << "\n(Determinant: " << determinants[i] << ")\n\n";
 		}
 
 		std::vector<mat_type> out_mats;
 		std::vector<mat_type> lhs;
 		std::vector<mat_type> rhs;
+		std::vector<t_arg> determinants;
 	};
 
 	struct DirectXSimdTest
@@ -254,6 +258,7 @@ namespace EmuCore::TestingHelpers
 		{
 			// FILLS
 			out_mats.resize(NUM_LOOPS);
+			determinants.resize(NUM_LOOPS);
 
 			// RESERVES
 			lhs.reserve(NUM_LOOPS);
@@ -280,62 +285,69 @@ namespace EmuCore::TestingHelpers
 		void operator()(std::size_t i_)
 		{
 			//out_mats[i_] = DirectX::XMMatrixMultiply(lhs[i_], rhs[i_]);
-			//DirectX::XMStoreFloat4x4
+			DirectX::XMVECTOR det_vec;
+			DirectX::XMStoreFloat4x4
+			(
+				&(out_mats[i_]),
+				DirectX::XMMatrixInverse
+				(
+					&det_vec,
+					DirectX::XMLoadFloat4x4(&(lhs[i_]))
+				)
+			);
+			DirectX::XMStoreFloat(&(determinants[i_]), det_vec);
+
+#pragma region PER_VECTOR
+			//DirectX::XMStoreFloat4
 			//(
-			//	&(out_mats[i_]),
-			//	DirectX::XMMatrixMultiply
+			//	reinterpret_cast<DirectX::XMFLOAT4*>(&(out_mats[i_](0, 0))),
+			//	DirectX::XMVectorAdd
 			//	(
-			//		DirectX::XMLoadFloat4x4(&(lhs[i_])),
-			//		DirectX::XMLoadFloat4x4(&(rhs[i_]))
+			//		DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&lhs[i_](0, 0))),
+			//		DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&rhs[i_](0, 0)))
 			//	)
 			//);
-
-			DirectX::XMStoreFloat4
-			(
-				reinterpret_cast<DirectX::XMFLOAT4*>(&(out_mats[i_](0, 0))),
-				DirectX::XMVectorAdd
-				(
-					DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&lhs[i_](0, 0))),
-					DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&rhs[i_](0, 0)))
-				)
-			);
-
-			DirectX::XMStoreFloat4
-			(
-				reinterpret_cast<DirectX::XMFLOAT4*>(&(out_mats[i_](1, 0))),
-				DirectX::XMVectorAdd
-				(
-					DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&lhs[i_](1, 0))),
-					DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&rhs[i_](1, 0)))
-				)
-			);
-
-			DirectX::XMStoreFloat4
-			(
-				reinterpret_cast<DirectX::XMFLOAT4*>(&(out_mats[i_](2, 0))),
-				DirectX::XMVectorAdd
-				(
-					DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&lhs[i_](2, 0))),
-					DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&rhs[i_](2, 0)))
-				)
-			);
-
-			DirectX::XMStoreFloat4
-			(
-				reinterpret_cast<DirectX::XMFLOAT4*>(&(out_mats[i_](3, 0))),
-				DirectX::XMVectorAdd
-				(
-					DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&lhs[i_](3, 0))),
-					DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&rhs[i_](3, 0)))
-				)
-			);
+			//
+			//DirectX::XMStoreFloat4
+			//(
+			//	reinterpret_cast<DirectX::XMFLOAT4*>(&(out_mats[i_](1, 0))),
+			//	DirectX::XMVectorAdd
+			//	(
+			//		DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&lhs[i_](1, 0))),
+			//		DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&rhs[i_](1, 0)))
+			//	)
+			//);
+			//
+			//DirectX::XMStoreFloat4
+			//(
+			//	reinterpret_cast<DirectX::XMFLOAT4*>(&(out_mats[i_](2, 0))),
+			//	DirectX::XMVectorAdd
+			//	(
+			//		DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&lhs[i_](2, 0))),
+			//		DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&rhs[i_](2, 0)))
+			//	)
+			//);
+			//
+			//DirectX::XMStoreFloat4
+			//(
+			//	reinterpret_cast<DirectX::XMFLOAT4*>(&(out_mats[i_](3, 0))),
+			//	DirectX::XMVectorAdd
+			//	(
+			//		DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&lhs[i_](3, 0))),
+			//		DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&rhs[i_](3, 0)))
+			//	)
+			//);
+#pragma endregion
 		}
 		void OnTestsOver()
 		{
-			const std::size_t i_ = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
-			print_mat(lhs[i_]) << "\nMUL\n";
-			print_mat(rhs[i_]) << " =\n";
-			print_mat(out_mats[i_]) << "\n\n";
+			const std::size_t i = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
+			//print_mat(lhs[i]) << "\nMUL\n";
+			//print_mat(rhs[i]) << " =\n";
+			//print_mat(out_mats[i]) << "\n\n";
+
+			print_mat(lhs[i]) << "\nINVERSE:\n";
+			print_mat(out_mats[i]) << "(Determinant: " << determinants[i] << ")\n\n";
 		}
 
 		template<bool Is64Bit_>
@@ -400,6 +412,7 @@ namespace EmuCore::TestingHelpers
 		std::vector<mat_type> out_mats;
 		std::vector<mat_type> lhs;
 		std::vector<mat_type> rhs;
+		std::vector<float> determinants;
 	};
 
 	// ----------- TESTS SELECTION -----------
