@@ -17,7 +17,7 @@ namespace EmuMath::Helpers
 		-> typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type
 	{
 		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::register_type determinant;
-		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::INVERSE>
+		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::INVERSE, false>
 		(
 			std::forward<FastMatrix_>(in_matrix_),
 			determinant
@@ -46,7 +46,7 @@ namespace EmuMath::Helpers
 			_in_fast_mat_uq::per_element_width
 		>;
 		_offloader determinant_offloader(out_determinant_);
-		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::INVERSE>
+		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::INVERSE, true>
 		(
 			std::forward<FastMatrix_>(in_matrix_),
 			determinant_offloader.registerToOffload
@@ -68,7 +68,7 @@ namespace EmuMath::Helpers
 		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::register_type out_determinant_
 	) -> typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type
 	{
-		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::INVERSE>
+		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::INVERSE, true>
 		(
 			std::forward<FastMatrix_>(in_matrix_),
 			out_determinant_
@@ -76,6 +76,10 @@ namespace EmuMath::Helpers
 	}
 #pragma endregion
 
+// Disabled due to inconsistencies in what has been implemented
+// --- We only give access to full inverse for now
+// --- This is to allow a reliable and consistent interface
+#if 0
 #pragma region MINORS_FUNCS
 	/// <summary>
 	/// <para> Calculates the matrix of minors to the input square-dimensioned FastMatrix. </para>
@@ -87,7 +91,7 @@ namespace EmuMath::Helpers
 		-> typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type
 	{
 		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::register_type determinant;
-		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::MINORS>
+		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::MINORS, false>
 		(
 			std::forward<FastMatrix_>(in_matrix_),
 			determinant
@@ -114,7 +118,7 @@ namespace EmuMath::Helpers
 			_in_fast_mat_uq::per_element_width
 		>;
 		_offloader determinant_offloader(out_determinant_);
-		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::MINORS>
+		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::MINORS, true>
 		(
 			std::forward<FastMatrix_>(in_matrix_),
 			determinant_offloader.registerToOffload
@@ -134,7 +138,7 @@ namespace EmuMath::Helpers
 		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::register_type out_determinant_
 	) -> typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type
 	{
-		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::MINORS>
+		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::MINORS, true>
 		(
 			std::forward<FastMatrix_>(in_matrix_),
 			out_determinant_
@@ -153,7 +157,7 @@ namespace EmuMath::Helpers
 		-> typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type
 	{
 		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::register_type determinant;
-		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::COFACTORS>
+		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::COFACTORS, false>
 		(
 			std::forward<FastMatrix_>(in_matrix_),
 			determinant
@@ -180,7 +184,7 @@ namespace EmuMath::Helpers
 			_in_fast_mat_uq::per_element_width
 		>;
 		_offloader determinant_offloader(out_determinant_);
-		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::COFACTORS>
+		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::COFACTORS, true>
 		(
 			std::forward<FastMatrix_>(in_matrix_),
 			determinant_offloader.registerToOffload
@@ -200,7 +204,7 @@ namespace EmuMath::Helpers
 		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::register_type out_determinant_
 	) -> typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type
 	{
-		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::COFACTORS>
+		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::COFACTORS, true>
 		(
 			std::forward<FastMatrix_>(in_matrix_),
 			out_determinant_
@@ -208,7 +212,7 @@ namespace EmuMath::Helpers
 	}
 #pragma endregion
 
-#pragma region COFACTORS_FUNCS
+#pragma region ADJUGATE_FUNCS
 	/// <summary>
 	/// <para> Calculates the adjugate of the input square-dimensioned FastMatrix. </para>
 	/// </summary>
@@ -219,7 +223,7 @@ namespace EmuMath::Helpers
 		-> typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type
 	{
 		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::register_type determinant;
-		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::ADJUGATE>
+		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::ADJUGATE, false>
 		(
 			std::forward<FastMatrix_>(in_matrix_),
 			determinant
@@ -246,7 +250,7 @@ namespace EmuMath::Helpers
 			_in_fast_mat_uq::per_element_width
 		>;
 		_offloader determinant_offloader(out_determinant_);
-		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::ADJUGATE>
+		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::ADJUGATE, true>
 		(
 			std::forward<FastMatrix_>(in_matrix_),
 			determinant_offloader.registerToOffload
@@ -266,13 +270,14 @@ namespace EmuMath::Helpers
 		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::register_type out_determinant_
 	) -> typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type
 	{
-		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::ADJUGATE>
+		return _fast_matrix_underlying::_make_inverse_to_stage<_fast_matrix_underlying::_inverse_stage_flag::ADJUGATE, true>
 		(
 			std::forward<FastMatrix_>(in_matrix_),
 			out_determinant_
 		);
 	}
 #pragma endregion
+#endif
 }
 
 #endif

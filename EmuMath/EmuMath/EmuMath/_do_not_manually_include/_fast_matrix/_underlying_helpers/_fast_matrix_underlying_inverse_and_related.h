@@ -179,6 +179,46 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		return _make_inverse_to_stage_4x4_32bit<StageFlags_>(in_matrix_, determinant_dummy);
 	}
 
+	template<EmuConcepts::EmuFastMatrix FastMatrix_, std::size_t RowIndex_, std::size_t RegisterIndex_, class Determinant_>
+	constexpr inline void _gaussian_scale_result_register
+	(
+		FastMatrix_& row_echelon_matrix_rm_,
+		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::register_type pivot_,
+		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::register_type* p_out_registers_,
+		Determinant_ p_out_determinant_
+	)
+	{
+		using _fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
+		constexpr std::size_t offset = (RowIndex_ * _fast_mat_uq::num_registers_per_major) + RegisterIndex_;
+		auto* p_out = (p_out_registers_ + offset);
+		(*p_out) = EmuSIMD::div<_fast_mat_uq::per_element_width, _fast_mat_uq::is_signed>(*p_out, pivot_);
+	}
+
+	template<EmuConcepts::EmuFastMatrix FastMatrix_, std::size_t RowIndex_, std::size_t...MajorRegisterIndices_, class Determinant_>
+	constexpr inline void _gaussian_scale_results
+	(
+		FastMatrix_& row_echelon_matrix_rm_,
+		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::register_type* p_out_registers_,
+		Determinant_ p_out_determinant_
+	)
+	{
+		auto pivot = row_echelon_matrix_rm_.template GetRegisterOfIndex<RowIndex_, RowIndex_>();
+		if constexpr (!std::is_null_pointer_v<Determinant_>)
+		{
+			(*p_out_determinant_) = EmuSIMD::mul_all<EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::per_element_width>(*p_out_determinant_, pivot);
+		}
+
+		(
+			_gaussian_scale_result_register<FastMatrix_, RowIndex_, MajorRegisterIndices_>
+			(
+				row_echelon_matrix_rm_,
+				pivot,
+				p_out_registers_,
+				p_out_determinant_
+			), ...
+		);
+	}
+
 	template<std::size_t EliminatingRowIndex_, std::size_t RegisterIndex_, std::size_t SegmentIndex_, EmuConcepts::EmuFastMatrix FastMatrix_>
 	constexpr inline void _gaussian_eliminate_row_register_segment
 	(
@@ -226,9 +266,11 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::register_arg_type neg_pivot_
 	)
 	{
+		// The way we access columns to create multipliers can likely be improved
+		// --- As it stands, this method is quite inefficient, although it is the fallback for unspecialised cases
 		using _fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
 		using _register_type = typename _fast_mat_uq::register_type;
-		auto row_echelon_transpose = row_echelon_matrix_rm_.Transpose(); // TODO: OPTIMISE
+		auto row_echelon_transpose = row_echelon_matrix_rm_.Transpose();
 		_register_type multipliers = EmuSIMD::div<_fast_mat_uq::per_element_width, _fast_mat_uq::is_signed>
 		(
 			row_echelon_transpose.template GetRegister<EliminatingRowIndex_, RegisterIndex_>(),
@@ -269,48 +311,22 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		);
 	}
 
-	template<EmuConcepts::EmuFastMatrix FastMatrix_, std::size_t RowIndex_, std::size_t RegisterIndex_>
-	constexpr inline void _gaussian_scale_result_register
-	(
-		FastMatrix_& row_echelon_matrix_rm_,
-		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::register_type* p_out_registers_
-	)
-	{
-		using _fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
-		constexpr std::size_t offset = (RowIndex_ * _fast_mat_uq::num_registers_per_major) + RegisterIndex_;
-		auto* p_out = (p_out_registers_ + offset);
-		(*p_out) = EmuSIMD::div<_fast_mat_uq::per_element_width, _fast_mat_uq::is_signed>
-		(
-			*p_out,
-			row_echelon_matrix_rm_.template GetRegisterOfIndex<RowIndex_, RowIndex_>()
-		);
-	}
-
-	template<EmuConcepts::EmuFastMatrix FastMatrix_, std::size_t RowIndex_, std::size_t...MajorRegisterIndices_>
-	constexpr inline void _gaussian_scale_results
-	(
-		FastMatrix_& row_echelon_matrix_rm_,
-		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::register_type* p_out_registers_
-	)
-	{
-		(
-			_gaussian_scale_result_register<FastMatrix_, RowIndex_, MajorRegisterIndices_>
-			(
-				row_echelon_matrix_rm_,
-				p_out_registers_
-			), ...
-		);
-	}
-
-	template<EmuConcepts::EmuFastMatrix FastMatrix_, std::size_t...RowIndices_, std::size_t...MajorRegisterIndices_>
+	template<EmuConcepts::EmuFastMatrix FastMatrix_, class Determinant_, std::size_t...RowIndices_, std::size_t...MajorRegisterIndices_>
 	constexpr inline void _gaussian_elimnation_inverse
 	(
 		FastMatrix_& row_echelon_matrix_rm_,
 		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::register_type* p_out_registers_,
 		std::index_sequence<RowIndices_...> row_indices_,
-		std::index_sequence<MajorRegisterIndices_...> major_register_indices_
+		std::index_sequence<MajorRegisterIndices_...> major_register_indices_,
+		Determinant_ p_out_determinant_
 	)
 	{
+		if constexpr (!std::is_null_pointer_v<Determinant_>)
+		{
+			using _fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
+			(*p_out_determinant_) = EmuSIMD::set1<typename _fast_mat_uq::register_type, _fast_mat_uq::per_element_width>(1);
+		}
+
 		(
 			_gaussian_eliminate_row<RowIndices_>
 			(
@@ -325,18 +341,24 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 			_gaussian_scale_results<FastMatrix_, RowIndices_, MajorRegisterIndices_...>
 			(
 				row_echelon_matrix_rm_,
-				p_out_registers_
+				p_out_registers_,
+				p_out_determinant_
 			), ...
 		);
 	}
 
-	template<EmuConcepts::EmuFastMatrix FastMatrix_, std::size_t...RowIndices_, std::size_t...MajorRegisterIndices_, std::size_t...TotalRegisterIndices_>
+	template
+	<
+		EmuConcepts::EmuFastMatrix FastMatrix_, class Determinant_, 
+		std::size_t...RowIndices_, std::size_t...MajorRegisterIndices_, std::size_t...TotalRegisterIndices_
+	>
 	[[nodiscard]] constexpr inline auto _make_inverse_gaussian
 	(
 		FastMatrix_&& in_matrix_,
 		std::index_sequence<RowIndices_...> row_indices_,
 		std::index_sequence<MajorRegisterIndices_...> major_register_indices_,
-		std::index_sequence<TotalRegisterIndices_...> total_register_indices_
+		std::index_sequence<TotalRegisterIndices_...> total_register_indices_,
+		Determinant_ p_out_determinant_ = std::nullptr_t()
 	)
 	{
 		using _fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
@@ -351,7 +373,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		{
 			// We're manipulating rows, so we need to transpose a column-major Matrix
 			auto in_matrix_row_echelon = _make_transpose_same_major(std::forward<FastMatrix_>(in_matrix_));
-			_gaussian_elimnation_inverse(in_matrix_row_echelon, out_registers, row_index_sequence(), major_register_index_sequence());
+			_gaussian_elimnation_inverse(in_matrix_row_echelon, out_registers, row_index_sequence(), major_register_index_sequence(), p_out_determinant_);
 		}
 		else
 		{
@@ -359,13 +381,13 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 			{
 				// We can't use the passed item as side-effects may be undesirable, so we have to copy it for modifications
 				auto in_matrix_row_echelon = _fast_mat_uq(std::forward<FastMatrix_>(in_matrix_));
-				_gaussian_elimnation_inverse(in_matrix_row_echelon, out_registers, row_index_sequence(), major_register_index_sequence());
+				_gaussian_elimnation_inverse(in_matrix_row_echelon, out_registers, row_index_sequence(), major_register_index_sequence(), p_out_determinant_);
 			}
 			else
 			{
 				// As register is supposedly a temporary, we can use it directly
 				auto& in_matrix_row_echelon = EmuCore::TMP::lval_ref_cast<FastMatrix_>(std::forward<FastMatrix_>(in_matrix_));
-				_gaussian_elimnation_inverse(in_matrix_row_echelon, out_registers, row_index_sequence(), major_register_index_sequence());
+				_gaussian_elimnation_inverse(in_matrix_row_echelon, out_registers, row_index_sequence(), major_register_index_sequence(), p_out_determinant_);
 			}
 		}
 
@@ -378,7 +400,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		);
 	}
 
-	template<_inverse_stage_flag StageFlags_, EmuConcepts::EmuFastMatrix FastMatrix_>
+	template<_inverse_stage_flag StageFlags_, bool OutputDeterminant_, EmuConcepts::EmuFastMatrix FastMatrix_>
 	[[nodiscard]] constexpr inline auto _make_inverse_to_stage
 	(
 		FastMatrix_&& in_matrix_,
@@ -387,25 +409,58 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		-> typename EmuMath::TMP::fast_matrix_transpose_result<FastMatrix_>::type
 	{
 		using _fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
-		//if constexpr (_valid_for_4x4_square_inverse_32bit<_fast_mat_uq>())
-		//{
-		//	return _make_inverse_to_stage_4x4_32bit<StageFlags_>
-		//	(
-		//		EmuCore::TMP::const_lval_ref_cast<FastMatrix_>(std::forward<FastMatrix_>(in_matrix_)),
-		//		out_determinant_
-		//	);
-		//}
-		//else
+		if constexpr (_valid_for_4x4_square_inverse_32bit<_fast_mat_uq>())
 		{
-			// TODO: GENERIC CASE
-			// --- Use gauss-jordan
-			return _make_inverse_gaussian
+			return _make_inverse_to_stage_4x4_32bit<StageFlags_>
 			(
-				std::forward<FastMatrix_>(in_matrix_),
-				std::make_index_sequence<_fast_mat_uq::num_rows>(),
-				std::make_index_sequence<_fast_mat_uq::num_registers_per_major>(),
-				std::make_index_sequence<_fast_mat_uq::total_num_registers>()
+				EmuCore::TMP::const_lval_ref_cast<FastMatrix_>(std::forward<FastMatrix_>(in_matrix_)),
+				out_determinant_
 			);
+		}
+		else
+		{
+			// Generic case; gaussian elimination
+			// --- Relatively inefficient
+
+			if constexpr(StageFlags_ == _inverse_stage_flag::INVERSE)
+			{
+				if constexpr (OutputDeterminant_)
+				{
+					static_assert
+					(
+						_fast_mat_uq::num_registers_per_major == 1,
+						"Internal EmuMath Error: There is currently an issue with generic FastMatrix inverses with more than 1 register per major."
+					);
+
+					return _make_inverse_gaussian
+					(
+						std::forward<FastMatrix_>(in_matrix_),
+						std::make_index_sequence<_fast_mat_uq::num_rows>(),
+						std::make_index_sequence<_fast_mat_uq::num_registers_per_major>(),
+						std::make_index_sequence<_fast_mat_uq::total_num_registers>(),
+						&out_determinant_
+					);
+				}
+				else
+				{
+					return _make_inverse_gaussian
+					(
+						std::forward<FastMatrix_>(in_matrix_),
+						std::make_index_sequence<_fast_mat_uq::num_rows>(),
+						std::make_index_sequence<_fast_mat_uq::num_registers_per_major>(),
+						std::make_index_sequence<_fast_mat_uq::total_num_registers>(),
+						std::nullptr_t()
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<StageFlags_>(),
+					"Unable to perform a partial inverse operation (e.g. Matrix of Minors) for a fast matrix as the generic implementation is not available. Such actions are currently only available for 4x4 matrices with 32-bit elements and 128-bit registers."
+				);
+			}
 		}
 	}
 }

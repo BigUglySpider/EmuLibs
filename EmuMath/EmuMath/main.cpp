@@ -991,10 +991,29 @@ int main()
 		EmuMath::Helpers::matrix_make_scale<4, 4, float, true>(25, 13, 9) *
 		EmuMath::Helpers::matrix_make_translation<4, 4, float, true>(-17, 6, 28)
 	);
-	auto some_fast_translation = EmuMath::FastMatrix<4, 4, float, true>(some_translation);
+	//auto some_fast_translation = EmuMath::FastMatrix<4, 4, float, true>(some_translation);
+	auto some_fast_translation = EmuMath::FastMatrix<4, 4, float, true>
+	(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		1, 2, 3, 1
+	);
 	std::cout << some_fast_translation << "\n\n"
 		<< EmuMath::Helpers::fast_matrix_inverse(some_fast_translation, test_out_det) << "\n";
 	std::cout << "Det: " << test_out_det << "\n\n";
+
+	auto some_8x8_fast = EmuMath::FastMatrix<4, 4, double, true>
+	(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		1, 2, 3, 1
+	);
+	std::cout << some_8x8_fast << "\n\n"
+		<< EmuMath::Helpers::fast_matrix_inverse(some_8x8_fast, test_out_det) << "\n";
+	std::cout << "Det: " << test_out_det << "\n\n";
+	std::cout << (some_8x8_fast * EmuMath::Helpers::fast_matrix_inverse(some_8x8_fast)) << "\n\n";
 
 
 
