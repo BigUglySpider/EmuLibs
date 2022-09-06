@@ -414,6 +414,15 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region STATIC_CHECK_WRAPPERS
+	private:
+		template<std::size_t Unused_>
+		[[nodiscard]] static constexpr inline bool _is_square()
+		{
+			return Unused_ >= 0 && (num_columns == num_rows);
+		}
+#pragma endregion
+
 #pragma region CONSTRUCTORS
 	public:
 		constexpr inline FastMatrix() noexcept = default;
@@ -1153,7 +1162,51 @@ namespace EmuMath
 
 #pragma region INVERSE_AND_RELATED
 	public:
+		/// <summary>
+		/// <para> Calculates the inverse of this Matrix. </para>
+		/// <para> This can only be used if this Matrix has square dimensions (i.e. it has the same number of columns as it does rows). </para>
+		/// <para> This assumes that this Matrix has a valid inverse (i.e. it has a non-0 determinant). </para>
+		/// <para> May optionally provide a reference to a scalar or this Matrix's `register_type` to output the determinant to. </para>
+		/// </summary>
+		/// <returns>Inverse of the passed Matrix.</returns>
+		template<std::size_t Unused_ = 0>
+		[[nodiscard]] constexpr inline auto Inverse() const
+			-> std::enable_if_t<_is_square<Unused_>(), this_type>
+		{
+			return EmuMath::Helpers::fast_matrix_inverse(*this);
+		}
 
+		template<std::size_t Unused_ = 0>
+		[[nodiscard]] constexpr inline auto Inverse(register_type& out_determinant_) const
+			-> std::enable_if_t<_is_square<Unused_>(), this_type>
+		{
+			return EmuMath::Helpers::fast_matrix_inverse(*this, out_determinant_);
+		}
+
+		template<std::size_t Unused_ = 0, EmuConcepts::Arithmetic DeterminantScalar_>
+		requires (!std::is_const_v<DeterminantScalar_>)
+		[[nodiscard]] constexpr inline auto Inverse(DeterminantScalar_& out_determinant_) const
+			-> std::enable_if_t<_is_square<Unused_>(), this_type>
+		{
+			return EmuMath::Helpers::fast_matrix_inverse(*this, out_determinant_);
+		}
+#pragma endregion
+
+#pragma region TRANSLATION
+	public:
+		template<EmuConcepts::Arithmetic...Translations_>
+		[[nodiscard]] static constexpr inline auto make_translation(Translations_&&...translations_)
+			-> std::enable_if_t<(sizeof...(Translations_) < num_rows), this_type>
+		{
+			return EmuMath::Helpers::fast_matrix_make_translation<this_type>(std::forward<Translations_>(translations_)...);
+		}
+
+		template<EmuConcepts::StdTuple TranslationsTuple_>
+		[[nodiscard]] static constexpr inline auto make_translation(TranslationsTuple_&& translations_tuple_)
+			-> this_type
+		{
+			return EmuMath::Helpers::fast_matrix_make_translation<this_type>(std::forward<TranslationsTuple_>(translations_tuple_));
+		}
 #pragma endregion
 
 #pragma region DATA
