@@ -4,7 +4,7 @@
 #include "../TMPHelpers/TypeConvertors.h"
 #include <concepts>
 
-namespace EmuConcepts
+namespace EmuCore::Concepts
 {
 	template<class T_>
 	concept Arithmetic =
@@ -27,9 +27,9 @@ namespace EmuConcepts
 	);
 }
 
-namespace EmuCore::Concepts
+namespace EmuConcepts
 {
-	using namespace EmuConcepts;
+	using namespace EmuCore::Concepts;
 }
 
 #endif

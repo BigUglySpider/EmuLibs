@@ -420,12 +420,12 @@ namespace EmuMath
 		constexpr inline FastMatrix(this_type&&) noexcept = default;
 		constexpr inline FastMatrix(const this_type&) noexcept = default;
 
-		constexpr inline FastMatrix(data_type&& data_to_move_) noexcept
+		explicit constexpr inline FastMatrix(data_type&& data_to_move_) noexcept
 			: major_chunks(std::move(data_to_move_))
 		{
 		}
 
-		constexpr inline FastMatrix(const data_type& data_to_copy_) noexcept
+		explicit constexpr inline FastMatrix(const data_type& data_to_copy_) noexcept
 			: major_chunks(data_to_copy_)
 		{
 		}
@@ -447,7 +447,7 @@ namespace EmuMath
 		/// </para>
 		/// </summary>
 		/// <param name="p_data_to_load_">Pointer to at least `expected_count_for_default_load_pointer` items of this Matrix's `value_type`.</param>
-		constexpr inline FastMatrix(const value_type* p_data_to_load_) noexcept
+		explicit constexpr inline FastMatrix(const value_type* p_data_to_load_) noexcept
 			: major_chunks(_load_data_from_pointer<false>(p_data_to_load_, major_index_sequence(), major_register_sequence()))
 		{
 		}
@@ -462,7 +462,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="scalar_matrix_to_load_">EmuMath Matrix to load into the newly-constructed FastMatrix.</param>
 		template<EmuConcepts::EmuMatrix ScalarMatrix_>
-		constexpr inline FastMatrix(ScalarMatrix_&& scalar_matrix_to_load_) noexcept
+		explicit constexpr inline FastMatrix(ScalarMatrix_&& scalar_matrix_to_load_) noexcept
 			: major_chunks(EmuMath::Helpers::fast_matrix_load_data_type<this_type>(std::forward<ScalarMatrix_>(scalar_matrix_to_load_)))
 		{
 		}
@@ -483,7 +483,7 @@ namespace EmuMath
 			EmuConcepts::EmuFastVector...MajorFastVectors_,
 			typename = std::enable_if_t<_valid_major_fast_vector_construction<Unused_, MajorFastVectors_...>()>
 		>
-		constexpr inline FastMatrix(MajorFastVectors_&&...major_vectors_) noexcept
+		explicit(num_major_elements == 1) constexpr inline FastMatrix(MajorFastVectors_&&...major_vectors_) noexcept
 			: major_chunks(_make_data_from_fast_vectors(major_index_sequence(), major_register_sequence(), std::forward<MajorFastVectors_>(major_vectors_)...))
 		{
 		}
@@ -505,7 +505,7 @@ namespace EmuMath
 			EmuConcepts::KnownSIMD...MajorRegisters_,
 			typename = std::enable_if_t<_valid_major_fast_vector_construction<Unused_, MajorRegisters_...>()>
 		>
-		constexpr inline FastMatrix(MajorRegisters_&&...major_order_registers_) noexcept
+		explicit(num_major_elements == 1) constexpr inline FastMatrix(MajorRegisters_&&...major_order_registers_) noexcept
 			: major_chunks(_make_data_from_registers(major_index_sequence(), std::forward<MajorRegisters_>(major_order_registers_)...))
 		{
 		}
@@ -524,7 +524,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="args_">Variadic arguments meeting at least one of the described constraints.</param>
 		template<std::size_t Unused_ = 0, typename...Args_, typename = std::enable_if_t<_valid_variadic_construction_args<Unused_, Args_...>() >>
-		constexpr inline FastMatrix(Args_&&...args_)
+		explicit(sizeof...(Args_) == 1) constexpr inline FastMatrix(Args_&&...args_)
 			: major_chunks(_make_data_from_variadic_args(std::forward<Args_>(args_)...))
 		{
 		}
@@ -532,6 +532,23 @@ namespace EmuMath
 
 #pragma region GETS
 	public:
+		[[nodiscard]] constexpr inline register_type* RegistersPointer()
+		{
+			if constexpr (num_registers_per_major == 1)
+			{
+				return major_chunks.data();
+			}
+			else
+			{
+				return major_chunks[0].data();
+			}
+		}
+
+		[[nodiscard]] constexpr inline const register_type* RegistersPointer() const
+		{
+			return const_cast<this_type*>(this)->RegistersPointer();
+		}
+
 		/// <summary>
 		/// <para> Retrieves the register at the provided `MajorIndex_` of this Matrix's major chunks. </para>
 		/// <para> By default, the first register in the chunk will be selected. To choose a different register index, provide a second template argument. </para>
@@ -1118,6 +1135,19 @@ namespace EmuMath
 			-> typename EmuMath::TMP::fast_matrix_transpose_result<this_type, OutColumnMajor_>::type
 		{
 			return EmuMath::Helpers::fast_matrix_transpose<OutColumnMajor_>(*this);
+		}
+#pragma endregion
+
+#pragma region IDENTITY
+	public:
+		[[nodiscard]] static constexpr inline this_type make_identity()
+		{
+			return EmuMath::Helpers::fast_matrix_identity<this_type>();
+		}
+
+		constexpr inline void AssignIdentity()
+		{
+			EmuMath::Helpers::fast_matrix_assign_identity(*this);
 		}
 #pragma endregion
 

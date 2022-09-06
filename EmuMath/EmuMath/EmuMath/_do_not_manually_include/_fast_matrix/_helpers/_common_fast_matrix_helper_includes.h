@@ -10,6 +10,7 @@
 #include "../_underlying_helpers/_fast_matrix_underlying_load.h"
 #include "../_underlying_helpers/_fast_matrix_underlying_mat_mult.h"
 #include "../_underlying_helpers/_fast_matrix_underlying_store.h"
+#include "../_underlying_helpers/_fast_matrix_underlying_translate.h"
 #include "../_underlying_helpers/_fast_matrix_underlying_transpose.h"
 
 #endif

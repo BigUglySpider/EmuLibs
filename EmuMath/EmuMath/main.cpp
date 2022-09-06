@@ -1003,18 +1003,16 @@ int main()
 		<< EmuMath::Helpers::fast_matrix_inverse(some_fast_translation, test_out_det) << "\n";
 	std::cout << "Det: " << test_out_det << "\n\n";
 
-	auto some_8x8_fast = EmuMath::FastMatrix<4, 4, double, true>
-	(
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		1, 2, 3, 1
-	);
-	std::cout << some_8x8_fast << "\n\n"
-		<< EmuMath::Helpers::fast_matrix_inverse(some_8x8_fast, test_out_det) << "\n";
-	std::cout << "Det: " << test_out_det << "\n\n";
-	std::cout << (some_8x8_fast * EmuMath::Helpers::fast_matrix_inverse(some_8x8_fast)) << "\n\n";
+	std::cout << EmuMath::Helpers::fast_matrix_identity<4, 4, float, true>() << "\n\n";
+	std::cout << EmuMath::Helpers::fast_matrix_identity<3, 4, float, true>() << "\n\n";
+	std::cout << EmuMath::Helpers::fast_matrix_identity<4, 3, float, true>() << "\n\n";
+	
+	std::cout << some_8x8_fast_mat << "\n\n";
+	EmuMath::Helpers::fast_matrix_assign_identity(some_8x8_fast_mat);
+	std::cout << some_8x8_fast_mat << "\n\n";
+	std::cout << EmuMath::Helpers::fast_matrix_identity<20, 20, std::int16_t, false, 256>() << "\n\n";
 
+	std::cout << EmuMath::Helpers::fast_matrix_make_translation<float, true>(1, 2, 3) << "\n\n";
 
 
 	system("pause");

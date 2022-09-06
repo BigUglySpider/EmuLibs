@@ -419,18 +419,17 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		}
 		else
 		{
-			// Generic case; gaussian elimination
-			// --- Relatively inefficient
-
 			if constexpr(StageFlags_ == _inverse_stage_flag::INVERSE)
 			{
+				// Generic case; gaussian elimination
+				// --- Relatively inefficient
+				static_assert
+				(
+					_fast_mat_uq::num_registers_per_major == 1,
+					"Internal EmuMath Error: There is currently an issue with generic FastMatrix inverses with more than 1 register per major."
+				);
 				if constexpr (OutputDeterminant_)
 				{
-					static_assert
-					(
-						_fast_mat_uq::num_registers_per_major == 1,
-						"Internal EmuMath Error: There is currently an issue with generic FastMatrix inverses with more than 1 register per major."
-					);
 
 					return _make_inverse_gaussian
 					(
