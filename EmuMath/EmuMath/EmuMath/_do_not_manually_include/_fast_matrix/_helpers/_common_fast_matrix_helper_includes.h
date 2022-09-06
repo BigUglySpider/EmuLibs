@@ -9,6 +9,7 @@
 #include "../_underlying_helpers/_fast_matrix_underlying_inverse_and_related.h"
 #include "../_underlying_helpers/_fast_matrix_underlying_load.h"
 #include "../_underlying_helpers/_fast_matrix_underlying_mat_mult.h"
+#include "../_underlying_helpers/_fast_matrix_underlying_rotation_3d.h"
 #include "../_underlying_helpers/_fast_matrix_underlying_scale.h"
 #include "../_underlying_helpers/_fast_matrix_underlying_store.h"
 #include "../_underlying_helpers/_fast_matrix_underlying_translate.h"

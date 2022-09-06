@@ -1015,6 +1015,12 @@ int main()
 	std::cout << EmuMath::Helpers::fast_matrix_make_translation<float, true>(1, 2, 3) << "\n\n";
 	std::cout << EmuMath::Helpers::fast_matrix_make_scale<float, true>(1, 2, 3, 4, 5, 6) << "\n\n";
 
+	auto quat_for_fast_test = EmuMath::Quaternion<float>::from_euler(25, -60, 90);
+	std::cout << EmuMath::Helpers::fast_matrix_make_rotation_3d<float>(quat_for_fast_test) << "\n\n";
+	std::cout << EmuMath::Helpers::matrix_make_rotation_3d<float>(quat_for_fast_test) << "\n\n";
+
+
+
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN; 
