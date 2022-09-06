@@ -1013,7 +1013,7 @@ int main()
 	std::cout << EmuMath::Helpers::fast_matrix_identity<20, 20, std::int16_t, false, 256>() << "\n\n";
 
 	std::cout << EmuMath::Helpers::fast_matrix_make_translation<float, true>(1, 2, 3) << "\n\n";
-
+	std::cout << EmuMath::Helpers::fast_matrix_make_scale<float, true>(1, 2, 3, 4, 5, 6) << "\n\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

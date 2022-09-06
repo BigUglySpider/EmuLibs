@@ -1194,6 +1194,13 @@ namespace EmuMath
 
 #pragma region TRANSLATION
 	public:
+		/// <summary>
+		/// <para> Creates a FastMatrix of this type which can be used to perform a translation by the specified amounts. </para>
+		/// <para> May only provide a maximum number of arguments that is less than the number of rows in this Matrix type. </para>
+		/// <para> If an axis is omitted, it will be treated as 0 (i.e. no translation in that axis). </para>
+		/// </summary>
+		/// <param name="translations_">Sequential axis translations to use, starting from the X-axis.</param>
+		/// <returns>FastMatrix of this type representing the specified translation.</returns>
 		template<EmuConcepts::Arithmetic...Translations_>
 		[[nodiscard]] static constexpr inline auto make_translation(Translations_&&...translations_)
 			-> std::enable_if_t<(sizeof...(Translations_) < num_rows), this_type>
@@ -1201,11 +1208,47 @@ namespace EmuMath
 			return EmuMath::Helpers::fast_matrix_make_translation<this_type>(std::forward<Translations_>(translations_)...);
 		}
 
+		/// <summary>
+		/// <para> Creates a FastMatrix of this type which can be used to perform a translation by the specified amounts. </para>
+		/// <para> If an axis is omitted, it will be treated as 0 (i.e. no translation in that axis). Extra axis arguments will be ignored. </para>
+		/// </summary>
+		/// <param name="translations_">Tuple of sequential axis translations to use, starting from the X-axis.</param>
+		/// <returns>FastMatrix of this type representing the specified translation.</returns>
 		template<EmuConcepts::StdTuple TranslationsTuple_>
 		[[nodiscard]] static constexpr inline auto make_translation(TranslationsTuple_&& translations_tuple_)
 			-> this_type
 		{
 			return EmuMath::Helpers::fast_matrix_make_translation<this_type>(std::forward<TranslationsTuple_>(translations_tuple_));
+		}
+#pragma endregion
+
+#pragma region SCALE
+	public:
+		/// <summary>
+		/// <para> Creates a FastMatrix of this type which can be used to perform a scale by the specified amounts. </para>
+		/// <para> May only provide a maximum number of arguments that is less than the number of rows in this Matrix type. </para>
+		/// <para> If an axis is omitted, it will be treated as 1 (i.e. no scale in that axis). </para>
+		/// </summary>
+		/// <param name="translations_">Sequential axis scales to use, starting from the X-axis.</param>
+		/// <returns>FastMatrix of this type representing the specified scale.</returns>
+		template<EmuConcepts::Arithmetic...Translations_>
+		[[nodiscard]] static constexpr inline auto make_scale(Translations_&&...translations_)
+			-> std::enable_if_t<(sizeof...(Translations_) < num_rows), this_type>
+		{
+			return EmuMath::Helpers::fast_matrix_make_scale<this_type>(std::forward<Translations_>(translations_)...);
+		}
+
+		/// <summary>
+		/// <para> Creates a FastMatrix of this type which can be used to perform a scale by the specified amounts. </para>
+		/// <para> If an axis is omitted, it will be treated as 1 (i.e. no scale in that axis). Extra axis arguments will be ignored. </para>
+		/// </summary>
+		/// <param name="translations_">Tuple of sequential axis translations to use, starting from the X-axis.</param>
+		/// <returns>FastMatrix of this type representing the specified scale.</returns>
+		template<EmuConcepts::StdTuple TranslationsTuple_>
+		[[nodiscard]] static constexpr inline auto make_scale(TranslationsTuple_&& translations_tuple_)
+			-> this_type
+		{
+			return EmuMath::Helpers::fast_matrix_make_scale<this_type>(std::forward<TranslationsTuple_>(translations_tuple_));
 		}
 #pragma endregion
 
