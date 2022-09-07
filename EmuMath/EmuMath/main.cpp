@@ -22,6 +22,7 @@
 
 // Fast Vector
 #include "EmuMath/FastMatrix.h"
+#include "EmuMath/FastQuaternion.h"
 #include "EmuMath/FastVector.h"
 
 #include "EmuCore/ArithmeticHelpers/CommonAlgebra.h"
@@ -1018,6 +1019,22 @@ int main()
 	auto quat_for_fast_test = EmuMath::Quaternion<float>::from_euler(25, -60, 90);
 	std::cout << EmuMath::Helpers::fast_matrix_make_rotation_3d<float>(quat_for_fast_test) << "\n\n";
 	std::cout << EmuMath::Helpers::matrix_make_rotation_3d<float>(quat_for_fast_test) << "\n\n";
+
+
+
+	std::cout << "\n\n---Fast Quaternion Tests---\n";
+	std::cout << EmuMath::FastQuaternion<float>() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>(1, 2, 3, 4) << "\n";
+	std::cout << EmuMath::FastQuaternion<float>(4, 3, 2, 1) << "\n";
+	std::cout << EmuMath::FastQuaternion<float>(EmuMath::FastQuaternion<float>(4, 3, 2, 1)) << "\n";
+	std::cout << EmuMath::FastQuaternion<float>(EmuMath::FastQuaternion<float>(4, 3, 2, 1).data) << "\n";
+	//std::cout << EmuMath::FastQuaternion<double>(EmuSIMD::set1<__m128d, 64>(1337), EmuSIMD::set1<__m128d, 64>(-1337)) << "\n";
+	std::cout << EmuMath::FastQuaternion<float>(EmuSIMD::set1<__m128, 64>(1337)) << "\n";
+
+	EmuMath::Quaternion<float> just_a_test_quaternion_to_store_to(-1, -1, -1, -1);
+	std::cout << just_a_test_quaternion_to_store_to << "\n";
+	EmuMath::FastQuaternion<float, 256>(1, 2, 3, 4).Store(just_a_test_quaternion_to_store_to);
+	std::cout << just_a_test_quaternion_to_store_to << "\n";
 
 
 

@@ -31,10 +31,6 @@ namespace EmuMath
 		using register_type = typename EmuSIMD::TMP::register_type<value_type, register_width>::type;
 		/// <summary> Alias to the argument type used to pass an instance of this Matrix's register_type. </summary>
 		using register_arg_type = typename EmuSIMD::TMP::register_arg_type<value_type, register_width>::type;
-		/// <summary> Alias to the register type used as an argument for the number of shifts performed when a register argument is used instead of a constant. </summary>
-		using shift_register_type = __m128i;
-		/// <summary>The number of bits each element is interpreted to consume within this Matrix's shift_register_type, with 8-bit bytes regardless of CHAR_BIT. </summary>
-		static constexpr std::size_t shift_register_per_element_width = 64;
 		/// <summary> The preferred floating-point type for this Matrix, used for floating-point-based calculations using this Matrix. </summary>
 		using preferred_floating_point = typename std::conditional<(sizeof(value_type) >= 64), double, float>::type;
 

@@ -3,6 +3,7 @@
 
 #include "_underlying_template_helpers/_all_underlying_templates.h"
 #include "../../../../EmuCore/TMPHelpers/Values.h"
+#include "../../../../EmuCore/TMPHelpers/VariadicHelpers.h"
 
 namespace EmuSIMD
 {

@@ -10,7 +10,7 @@ namespace EmuMath::TMP
 {
 	/// <summary>
 	/// <para> Type to determine if the passed T_ is a type of EmuMath Colour. </para>
-	/// <para> The value will also be true if T_ is a reference to an EmuMath Colour, and ignores const/ref qualifiers. Pointers remain false. </para>
+	/// <para> The value will also be true if T_ is a reference to an EmuMath Colour, and ignores const/volatile qualifiers. Pointers remain false. </para>
 	/// </summary>
 	template<class T_>
 	struct is_emu_colour : public EmuCore::TMP::type_check_ignore_ref_cv_base<is_emu_colour, std::false_type, T_>
@@ -21,7 +21,7 @@ namespace EmuMath::TMP
 
 	/// <summary>
 	/// <para> Type to determine if the passed T_ is a type of EmuMath Fast Matrix. </para>
-	/// <para> The value will also be true if T_ is a reference to an EmuMath Fast Matrix, and ignores const/ref qualifiers. Pointers remain false. </para>
+	/// <para> The value will also be true if T_ is a reference to an EmuMath Fast Matrix, and ignores const/volatile qualifiers. Pointers remain false. </para>
 	/// </summary>
 	template<class T_>
 	struct is_emu_fast_matrix : public EmuCore::TMP::type_check_ignore_ref_cv_base<is_emu_fast_matrix, std::false_type, T_>
@@ -31,8 +31,19 @@ namespace EmuMath::TMP
 	static constexpr bool is_emu_fast_matrix_v = is_emu_fast_matrix<T_>::value;
 
 	/// <summary>
+	/// <para> Type to determine if the passed T_ is a type of EmuMath Fast Quaternion. </para>
+	/// <para> The value will also be true if T_ is a reference to an EmuMath Fast Quaternion, and ignores const/volatile qualifiers. Pointers remain false. </para>
+	/// </summary>
+	template<class T_>
+	struct is_emu_fast_quaternion : public EmuCore::TMP::type_check_ignore_ref_cv_base<is_emu_fast_quaternion, std::false_type, T_>
+	{
+	};
+	template<class T_>
+	static constexpr bool is_emu_fast_quaternion_v = is_emu_fast_quaternion<T_>::value;
+
+	/// <summary>
 	/// <para> Type to determine if the passed T_ is a type of EmuMath Fast Vector. </para>
-	/// <para> The value will also be true if T_ is a reference to an EmuMath Fast Vector, and ignores const/ref qualifiers. Pointers remain false. </para>
+	/// <para> The value will also be true if T_ is a reference to an EmuMath Fast Vector, and ignores const/volatile qualifiers. Pointers remain false. </para>
 	/// </summary>
 	template<class T_>
 	struct is_emu_fast_vector : public EmuCore::TMP::type_check_ignore_ref_cv_base<is_emu_fast_vector, std::false_type, T_>
@@ -43,7 +54,7 @@ namespace EmuMath::TMP
 
 	/// <summary>
 	/// <para> Type to determine if the passed T_ is a type of EmuMath Matrix. </para>
-	/// <para> The value will also be true if T_ is a reference to an EmuMath Matrix, and ignores const/ref qualifiers. Pointers remain false. </para>
+	/// <para> The value will also be true if T_ is a reference to an EmuMath Matrix, and ignores const/volatile qualifiers. Pointers remain false. </para>
 	/// </summary>
 	template<class T_>
 	struct is_emu_matrix : public EmuCore::TMP::type_check_ignore_ref_cv_base<is_emu_matrix, std::false_type, T_>
@@ -54,7 +65,7 @@ namespace EmuMath::TMP
 
 	/// <summary>
 	/// <para> Type to determine if the passed T_ is a type of EmuMath Quaternion. </para>
-	/// <para> The value will also be true if T_ is a reference to an EmuMath Quaternion, and ignores const/ref qualifiers. Pointers remain false. </para>
+	/// <para> The value will also be true if T_ is a reference to an EmuMath Quaternion, and ignores const/volatile qualifiers. Pointers remain false. </para>
 	/// </summary>
 	template<class T_>
 	struct is_emu_quaternion : public EmuCore::TMP::type_check_ignore_ref_cv_base<is_emu_quaternion, std::false_type, T_>
@@ -65,7 +76,7 @@ namespace EmuMath::TMP
 
 	/// <summary>
 	/// <para> Type to determine if the passed T_ is a type of EmuMath Rect. </para>
-	/// <para> The value will also be true if T_ is a reference to an EmuMath Rect, and ignores const/ref qualifiers. Pointers remain false. </para>
+	/// <para> The value will also be true if T_ is a reference to an EmuMath Rect, and ignores const/volatile qualifiers. Pointers remain false. </para>
 	/// </summary>
 	template<class T_>
 	struct is_emu_rect : public EmuCore::TMP::type_check_ignore_ref_cv_base<is_emu_rect, std::false_type, T_>
@@ -76,7 +87,7 @@ namespace EmuMath::TMP
 
 	/// <summary>
 	/// <para> Type to determine if the passed T_ is a type of EmuMath Vector. </para>
-	/// <para> The value will also be true if T_ is a reference to an EmuMath Vector, and ignores const/ref qualifiers. Pointers remain false. </para>
+	/// <para> The value will also be true if T_ is a reference to an EmuMath Vector, and ignores const/volatile qualifiers. Pointers remain false. </para>
 	/// </summary>
 	template<class T_>
 	struct is_emu_vector : public EmuCore::TMP::type_check_ignore_ref_cv_base<is_emu_vector, std::false_type, T_>
@@ -111,6 +122,15 @@ namespace EmuMath::Concepts
 		(EmuFastMatrix<T_>) &&
 		(EmuCore::TMP::remove_ref_cv_t<T_>::num_columns  == EmuCore::TMP::remove_ref_cv_t<T_>::num_rows)
 	);
+
+	/// <summary>
+	/// <para> 
+	///		Concept that determines if the passed type T_ is an EmuMath Fast Quaternion. 
+	///		Effectively a check that `is_emu_fast_quaternion::value` is true.
+	/// </para>
+	/// </summary>
+	template<class T_>
+	concept EmuFastQuaternion = EmuMath::TMP::is_emu_fast_quaternion_v<T_>;
 
 	/// <summary>
 	/// <para> Concept that determines if the passed type T_ is an EmuMath Fast Vector. Effectively a check that `is_emu_fast_vector::value` is true. </para>

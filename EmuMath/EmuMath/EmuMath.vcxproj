@@ -192,6 +192,7 @@
     <ClInclude Include="EmuMath\Fast3D.h" />
     <ClInclude Include="EmuMath\FastMatrix.h" />
     <ClInclude Include="EmuMath\FastNoise.h" />
+    <ClInclude Include="EmuMath\FastQuaternion.h" />
     <ClInclude Include="EmuMath\FastVector.h" />
     <ClInclude Include="EmuMath\Matrix.h" />
     <ClInclude Include="EmuMath\Noise.h" />
@@ -223,6 +224,12 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_underlying_helpers\_fast_matrix_underlying_store.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_underlying_helpers\_fast_matrix_underlying_translate.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_underlying_helpers\_fast_matrix_underlying_transpose.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_fast_quaternion_t.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_helpers\_all_fast_quaternion_helpers.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_helpers\_common_fast_quaternion_includes.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_helpers\_fast_quaternion_store.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_underlying_helpers\_fast_quaternion_tmp.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_underlying_helpers\_fast_quaternion_underlying_store.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_vectors\_fast_vector_t.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_projections.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_projections\_vulkan\_matrix_orthos_vulkan.h" />

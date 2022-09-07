@@ -2,6 +2,7 @@
 #define EMU_SIMD_COMMON_GENERIC_FUNC_HELPERS_H_INC_ 1
 
 #include "../_simd_helpers_underlying_aliases.h"
+#include "../../../../../../EmuCore/ArithmeticHelpers/CommonMath.h"
 
 #include <cstdint>
 #include <immintrin.h>

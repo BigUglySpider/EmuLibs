@@ -935,6 +935,27 @@ namespace EmuMath
 		{
 			return data.at<3>();
 		}
+
+		[[nodiscard]] constexpr inline stored_type* DataPointer() noexcept
+		{
+			if constexpr (!contains_ref)
+			{
+				return data.data();
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<T_>(),
+					"Attempted to access a contiguous data pointer of an EmuMath Quaternion which contains references. This behaviour is prohibited."
+				);
+			}
+		}
+
+		[[nodiscard]] constexpr inline const stored_type* DataPointer() const noexcept
+		{
+			return const_cast<this_type*>(this)->DataPointer();
+		}
 #pragma endregion
 
 #pragma region COMPARISON_FUNCS
