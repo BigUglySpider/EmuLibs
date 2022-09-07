@@ -286,7 +286,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 						}
 						else
 						{
-							return EmuSIMD::Funcs::set_f64x2(static_cast<double>(args_)...);
+							return EmuSIMD::Funcs::set_f64x4(static_cast<double>(args_)...);
 						}
 					}
 					else
@@ -297,7 +297,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 						}
 						else
 						{
-							return EmuSIMD::Funcs::set_f64x2(static_cast<double>(args_)...);
+							return EmuSIMD::Funcs::set_f64x8(static_cast<double>(args_)...);
 						}
 					}
 				}
