@@ -15,13 +15,15 @@
 #include "EmuMath/Matrix.h"
 #include "EmuMath/Vector.h"
 #include "EmuMath/Random.h"
+#include "EmuMath/Quaternion.h"
+#include "EmuMath/FastQuaternion.h"
 #include <bitset>
 #include <DirectXMath.h>
 #include <string_view>
 
 namespace EmuCore::TestingHelpers
 {
-	static constexpr std::size_t shared_num_loops = 5000000;
+	static constexpr std::size_t shared_num_loops = 500000;
 	static constexpr unsigned long long shared_fill_seed_ = 1337;
 	static constexpr unsigned long long shared_select_seed_ = -25;
 
@@ -82,7 +84,7 @@ namespace EmuCore::TestingHelpers
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr std::size_t NUM_LOOPS = shared_num_loops;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr std::string_view NAME = "Example";
 
@@ -101,6 +103,7 @@ namespace EmuCore::TestingHelpers
 		}
 	};
 
+#pragma region EMU_VS_DXM
 	struct EmuNormalMatrixTest
 	{
 		static constexpr bool DO_TEST = true;
@@ -414,13 +417,105 @@ namespace EmuCore::TestingHelpers
 		std::vector<mat_type> rhs;
 		std::vector<float> determinants;
 	};
+#pragma endregion
+
+	struct ScalarQuaternionTest
+	{
+		static constexpr bool DO_TEST = true;
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = shared_num_loops;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr std::string_view NAME = "Scalar Quaternion";
+
+		using quat_t = float;
+		using euler_type = EmuMath::Vector<3, quat_t>;
+		using quaternion_type = EmuMath::Quaternion<quat_t>;
+
+		ScalarQuaternionTest()
+		{
+		}
+		void Prepare()
+		{
+			// FILLS
+			quaternions.resize(NUM_LOOPS);
+
+			// RESERVES
+			eulers.reserve(NUM_LOOPS);
+			EmuMath::RngWrapper<true> rng(-90, 90, shared_fill_seed_);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				eulers.emplace_back(make_random_vec<euler_type, quat_t, 3>(rng));
+			}
+		}
+		void operator()(std::size_t i_)
+		{
+			quaternions[i_] = quaternion_type::from_euler<false>(eulers[i_][0], eulers[i_][1], eulers[i_][2]);
+		}
+		void OnTestsOver()
+		{
+			const std::size_t i = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
+			std::cout << eulers[i] << " -> " << quaternions[i] << "\n\n";
+		}
+
+		std::vector<euler_type> eulers;
+		std::vector<quaternion_type> quaternions;
+	};
+
+	struct FastQuaternionTest
+	{
+		static constexpr bool DO_TEST = true;
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = shared_num_loops;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr std::string_view NAME = "Fast Quaternion";
+
+		using quat_t = float;
+		using euler_type = EmuMath::Vector<3, quat_t>;
+		using quaternion_type = EmuMath::FastQuaternion<quat_t, 128>;
+
+		FastQuaternionTest()
+		{
+		}
+		void Prepare()
+		{
+			// FILLS
+			quaternions.resize(NUM_LOOPS);
+
+			// RESERVES
+			eulers.reserve(NUM_LOOPS);
+			EmuMath::RngWrapper<true> rng(-90, 90, shared_fill_seed_);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				eulers.emplace_back(make_random_vec<euler_type, quat_t, 3>(rng));
+			}
+		}
+		void operator()(std::size_t i_)
+		{
+			quaternions[i_] = EmuMath::Helpers::fast_quaternion_from_euler<quaternion_type, false>
+			(
+				eulers[i_][0],
+				eulers[i_][1],
+				eulers[i_][2]
+			);
+		}
+		void OnTestsOver()
+		{
+			const std::size_t i = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
+			std::cout << eulers[i] << " -> " << quaternions[i] << "\n\n";
+		}
+
+		std::vector<euler_type> eulers;
+		std::vector<quaternion_type> quaternions;
+	};
 
 	// ----------- TESTS SELECTION -----------
 	using AllTests = std::tuple
 	<
-		EmuNormalMatrixTest,
-		EmuFastMatrixTest,
-		DirectXSimdTest
+		//EmuNormalMatrixTest,
+		//EmuFastMatrixTest,
+		//DirectXSimdTest
+		ScalarQuaternionTest,
+		FastQuaternionTest
 	>;
 
 	// ----------- TESTS BEGIN -----------

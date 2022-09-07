@@ -43,11 +43,13 @@ namespace EmuMath::Helpers
 			// Store euler / 2 at first as it's needed for both trig ops
 			// --- May be better to multiply by 0.5, but set to /2 to avoid lossy halving and for weird cases such as integral input
 			// --- May be reasonable to give a `PreferMultiplies_` option as per normal Quaternions, should be put into consideration first
+			//_register_type sin_xyz = EmuSIMD::mul_all<width>(euler_simd_xyz, EmuSIMD::set1<_register_type, width>(0.5));
 			_register_type sin_xyz = EmuSIMD::div<width, is_signed>(euler_simd_xyz, EmuSIMD::set1<_register_type, width>(2));
 			_register_type cos_xyz = EmuSIMD::cos<width, is_signed>(sin_xyz);
 			sin_xyz = EmuSIMD::sin<width, is_signed>(sin_xyz);
 
 			// TODO: GENERALISE, CURRENTLY ONLY WORKS FOR 128-BIT REGISTER OF 32-BIT FLOATS
+			// --- Only issue is the shuffles; everything else should work
 			_register_type sin_and_cos_xy = EmuSIMD::shuffle<0, 1, 0, 1>(sin_xyz, cos_xyz);	// sin(x), sin(y), cos(x), cos(y)
 			_register_type sin_and_cos_z = EmuSIMD::shuffle<2, 2, 2, 2>(sin_xyz, cos_xyz);	// sin(z), sin(z), cos(z), cos(z)
 
