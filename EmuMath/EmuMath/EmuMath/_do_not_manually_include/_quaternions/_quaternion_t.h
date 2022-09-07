@@ -9,6 +9,7 @@ namespace EmuMath
 	/// <summary>
 	/// <para> Complex 4D number which has an imaginary 3D component, XYZ, and a real single component, W. </para>
 	/// <para> Commonly used to represent rotations in 3D space whilst minimising gimbal lock. </para>
+	/// <para> If a Quaternion type may be used contiguously, it is expected to be stored in the order XYZW. </para>
 	/// </summary>
 	template<typename T_>
 	struct Quaternion

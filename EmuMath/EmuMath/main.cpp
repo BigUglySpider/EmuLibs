@@ -1036,7 +1036,7 @@ int main()
 	EmuMath::FastQuaternion<float, 256>(1, 2, 3, 4).Store(just_a_test_quaternion_to_store_to);
 	std::cout << just_a_test_quaternion_to_store_to << "\n";
 
-
+	std::cout << EmuMath::FastQuaternion<float, 256>(EmuMath::Quaternion<float>::from_euler<false>(-45, 90, 0)) << "\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

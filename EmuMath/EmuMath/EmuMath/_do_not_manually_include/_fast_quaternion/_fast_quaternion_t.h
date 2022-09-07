@@ -316,6 +316,112 @@ namespace EmuMath
 				return EmuSIMD::load<register_type>(p_to_load_);
 			}
 		}
+
+		template<std::size_t Index_, EmuConcepts::EmuQuaternion Quaternion_>
+		[[nodiscard]] static constexpr inline decltype(auto) _get_arg_for_register_from_scalar_quaternion(Quaternion_&& in_quaternion_)
+		{
+			if constexpr (Index_ == 0)
+			{
+				return std::forward<Quaternion_>(in_quaternion_).X();
+			}
+			else if constexpr (Index_ == 1)
+			{
+				return std::forward<Quaternion_>(in_quaternion_).Y();
+			}
+			else if constexpr (Index_ == 2)
+			{
+				return std::forward<Quaternion_>(in_quaternion_).Z();
+			}
+			else if constexpr (Index_ == 3)
+			{
+				return std::forward<Quaternion_>(in_quaternion_).W();
+			}
+			else
+			{
+				return value_type(0);
+			}
+		}
+
+		template<std::size_t RegisterIndex_, EmuConcepts::EmuQuaternion Quaternion_, std::size_t...RegisterElementIndices_>
+		[[nodiscard]] static constexpr inline register_type _make_register_from_scalar_quaternion
+		(
+			Quaternion_&& in_quaternion_,
+			std::index_sequence<RegisterElementIndices_...> register_element_indices_
+		) noexcept
+		{
+			constexpr std::size_t offset = RegisterIndex_ * elements_per_register;
+			return EmuSIMD::setr<register_type, per_element_width>
+			(
+				_get_arg_for_register_from_scalar_quaternion<offset + RegisterElementIndices_>
+				(
+					std::forward<Quaternion_>(in_quaternion_)
+				)...
+			);
+		}
+
+		template<EmuConcepts::EmuQuaternion Quaternion_, std::size_t...RegisterIndices_>
+		[[nodiscard]] static constexpr inline data_type _make_data_array_from_scalar_quaternion
+		(
+			Quaternion_&& in_quaternion_,
+			std::index_sequence<RegisterIndices_...> register_indices_
+		) noexcept
+		{
+			return data_type
+			({
+				_make_register_from_scalar_quaternion<RegisterIndices_>
+				(
+					std::forward<Quaternion_>(in_quaternion_),
+					std::make_index_sequence<elements_per_register>()
+				)...
+			});
+		}
+
+		template<EmuConcepts::EmuQuaternion Quaternion_>
+		[[nodiscard]] static constexpr inline data_type _make_data_from_scalar_quaternion(Quaternion_&& in_quaternion_) noexcept
+		{
+			using _in_scalar_quat_uq = typename EmuCore::TMP::remove_ref_cv<Quaternion_>::type;
+			using _in_scalar_stored_no_cv = typename std::remove_cv<typename _in_scalar_quat_uq::stored_type>::type;
+			constexpr bool valid_width_for_load = (elements_per_register == 4) || (elements_per_register == 2);
+			if constexpr (valid_width_for_load && std::is_same_v<value_type, _in_scalar_stored_no_cv>)
+			{
+				return _load_data_from_pointer(std::forward<Quaternion_>(in_quaternion_).DataPointer());
+			}
+			else
+			{
+#pragma warning(push)
+#pragma warning(disable: 26800)
+				if constexpr (elements_per_register == 4)
+				{
+					return EmuSIMD::set<register_type>
+					(
+						std::forward<Quaternion_>(in_quaternion_).W(),
+						std::forward<Quaternion_>(in_quaternion_).Z(),
+						std::forward<Quaternion_>(in_quaternion_).Y(),
+						std::forward<Quaternion_>(in_quaternion_).X()
+					);
+				}
+				else
+				{
+					if constexpr (num_registers > 1)
+					{
+						return _make_data_array_from_scalar_quaternion
+						(
+							std::forward<Quaternion_>(in_quaternion_),
+							register_index_sequence()
+						);
+					}
+					else
+					{
+						return _make_register_from_scalar_quaternion<0>
+						(
+							std::forward<Quaternion_>(in_quaternion_),
+							std::make_index_sequence<elements_per_register>()
+						);
+					}
+				}
+#pragma warning(pop)
+			}
+		}
 #pragma endregion
 
 #pragma region CONSTRUCTORS
@@ -351,6 +457,12 @@ namespace EmuMath
 		template<EmuConcepts::KnownSIMD...Registers_, typename = std::enable_if_t<valid_args_for_variadic_register_constructor<Registers_...>()>>
 		constexpr inline FastQuaternion(Registers_&&...registers_) noexcept
 			: data({ std::forward<Registers_>(registers_)... })
+		{
+		}
+
+		template<EmuConcepts::EmuQuaternion Quaternion_>
+		explicit constexpr inline FastQuaternion(Quaternion_&& in_quaternion_) noexcept
+			: data(_make_data_from_scalar_quaternion(std::forward<Quaternion_>(in_quaternion_)))
 		{
 		}
 #pragma endregion
