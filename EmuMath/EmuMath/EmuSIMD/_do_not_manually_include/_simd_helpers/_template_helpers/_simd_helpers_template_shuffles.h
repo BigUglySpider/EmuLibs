@@ -106,6 +106,12 @@ namespace EmuSIMD
 	}
 
 #pragma region FULL_WIDTH_SHUFFLES
+	/// <summary>
+	/// <para> Performs a full-width shuffle of the passed SIMD register's indices. </para>
+	/// <para> For 128-bit registers, this is the same as a normal shuffle. </para>
+	/// </summary>
+	/// <param name="ab_">128-bit register to shuffle.</param>
+	/// <returns>Result of shuffling the passed Register with the provided indices.</returns>
 	template<std::size_t...Indices_, EmuConcepts::KnownSIMD Register_>
 	requires (EmuSIMD::TMP::simd_register_width_v<Register_> == 128)
 	[[nodiscard]] constexpr inline Register_ shuffle_full_width(Register_ ab_)
@@ -113,6 +119,13 @@ namespace EmuSIMD
 		return shuffle<Indices_...>(ab_);
 	}
 
+	/// <summary>
+	/// <para> Performs a full-width shuffle of the passed SIMD register's indices. </para>
+	/// <para> For 128-bit registers, this is the same as a normal shuffle. </para>
+	/// </summary>
+	/// <param name="a_">128-bit register to shuffle for the lo bytes of the output register.</param>
+	/// <param name="b_">128-bit register to shuffle for the hi bytes of the output register.</param>
+	/// <returns>Result of shuffling the passed Registers with the provided indices.</returns>
 	template<std::size_t...Indices_, EmuConcepts::KnownSIMD Register_>
 	requires (EmuSIMD::TMP::simd_register_width_v<Register_> == 128)
 	[[nodiscard]] constexpr inline Register_ shuffle_full_width(Register_ a_, Register_ b_)
@@ -120,6 +133,12 @@ namespace EmuSIMD
 		return shuffle<Indices_...>(a_, b_);
 	}
 
+	/// <summary>
+	/// <para> Performs a full-width shuffle of the passed SIMD register's indices, allowing shuffles between lanes unlike a normal shuffle. </para>
+	/// </summary>
+	/// <param name="a_">256-bit register to shuffle for the lo 128-bit lane of the output register.</param>
+	/// <param name="b_">256-bit register to shuffle for the hi 128-bit lane of the output register.</param>
+	/// <returns>Result of full-width-shuffling the passed Registers with the provided indices.</returns>
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, EmuConcepts::KnownSIMD Register_>
 	requires (EmuSIMD::TMP::simd_register_width_v<Register_> == 256 && EmuSIMD::TMP::register_element_count_v<Register_> == 4)
 	[[nodiscard]] constexpr inline Register_ shuffle_full_width(Register_ a_, Register_ b_)
@@ -198,6 +217,11 @@ namespace EmuSIMD
 		}
 	}
 
+	/// <summary>
+	/// <para> Performs a full-width shuffle of the passed SIMD register's indices, allowing shuffles between lanes unlike a normal shuffle. </para>
+	/// </summary>
+	/// <param name="ab_">256-bit register to shuffle.</param>
+	/// <returns>Result of full-width-shuffling the passed Register with the provided indices.</returns>
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, EmuConcepts::KnownSIMD Register_>
 	requires (EmuSIMD::TMP::simd_register_width_v<Register_> == 256 && EmuSIMD::TMP::register_element_count_v<Register_> == 4)
 	[[nodiscard]] constexpr inline Register_ shuffle_full_width(Register_ ab_)
