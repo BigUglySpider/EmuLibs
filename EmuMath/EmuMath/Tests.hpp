@@ -449,7 +449,12 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i_)
 		{
-			quaternions[i_] = quaternion_type::from_euler<false>(eulers[i_][0], eulers[i_][1], eulers[i_][2]);
+			quaternions[i_] = quaternion_type::from_euler<true>
+			(
+				EmuCore::Pi::DegsToRads(eulers[i_][0]),
+				EmuCore::Pi::DegsToRads(eulers[i_][1]),
+				EmuCore::Pi::DegsToRads(eulers[i_][2])
+			);
 		}
 		void OnTestsOver()
 		{

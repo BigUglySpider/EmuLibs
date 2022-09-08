@@ -254,6 +254,8 @@ int main()
 	srand(static_cast<unsigned int>(time(0)));
 	EmuCore::Timer<std::milli> timer_;
 
+
+
 	//*
 #pragma region PRE_TEST_BODY
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
@@ -1037,9 +1039,22 @@ int main()
 	std::cout << just_a_test_quaternion_to_store_to << "\n";
 
 
-	std::cout << EmuMath::FastQuaternion<float, 256>(EmuMath::Quaternion<float>::from_euler<false>(-45.0f, 90.0f, 0.0f)) << "\n";
-	std::cout << EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<float>, false>(-45.0f, 90.0f, 0.0f) << "\n";
-	std::cout << EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<double, 256>, false>(-45.0f, 90.0f, 0.0f) << "\n";
+	std::cout << EmuMath::FastQuaternion<float, 256>(EmuMath::Quaternion<float>::from_euler<false>(-45.0f, 90.0f, 0.0f)) << " (Scalar f32)\n";
+	std::cout << EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<float>, false>(-45.0f, 90.0f, 0.0f) << "(SIMD f32)\n";
+	std::cout << EmuMath::FastQuaternion<double, 256>(EmuMath::Quaternion<double>::from_euler<false>(-45.0f, 90.0f, 0.0f)) << " (Scalar f64)\n";
+	std::cout << EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<double, 256>, false>(-45.0f, 90.0f, 0.0f) << "(SIMD f64)\n";
+
+	std::cout << "\n\n";
+	auto some_m256d = EmuSIMD::setr<__m256d>(10, 20, 30, 40);
+	auto some_other_m256d = EmuSIMD::setr<__m256d>(50, 60, 70, 80);
+	EmuSIMD::append_simd_vector_to_stream(std::cout, some_m256d) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::shuffle_full_width<0, 1, 2, 3>(some_m256d)) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::shuffle_full_width<3, 2, 1, 0>(some_m256d)) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::shuffle_full_width<2, 3, 1, 3>(some_m256d)) << "\n";
+
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::shuffle_full_width<0, 1, 2, 3>(some_m256d, some_other_m256d)) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::shuffle_full_width<3, 2, 1, 0>(some_m256d, some_other_m256d)) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::shuffle_full_width<2, 3, 1, 3>(some_m256d, some_other_m256d)) << "\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

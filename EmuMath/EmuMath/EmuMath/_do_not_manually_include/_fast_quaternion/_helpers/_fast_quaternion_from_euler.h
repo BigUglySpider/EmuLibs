@@ -48,23 +48,23 @@ namespace EmuMath::Helpers
 			_register_type cos_xyz = EmuSIMD::cos<width, is_signed>(sin_xyz);
 			sin_xyz = EmuSIMD::sin<width, is_signed>(sin_xyz);
 
-			// TODO: GENERALISE, CURRENTLY ONLY WORKS FOR 128-BIT REGISTER OF 32-BIT FLOATS
-			// --- Only issue is the shuffles; everything else should work
-			_register_type sin_and_cos_xy = EmuSIMD::shuffle<0, 1, 0, 1>(sin_xyz, cos_xyz);	// sin(x), sin(y), cos(x), cos(y)
-			_register_type sin_and_cos_z = EmuSIMD::shuffle<2, 2, 2, 2>(sin_xyz, cos_xyz);	// sin(z), sin(z), cos(z), cos(z)
+			// NEEDS GENERALISING STILL: ONLY SUPPORTS 4-ELEMENT REGISTERS
+			_register_type sin_and_cos_xy = EmuSIMD::shuffle_full_width<0, 1, 0, 1>(sin_xyz, cos_xyz);	// sin(x), sin(y), cos(x), cos(y)
+			_register_type sin_and_cos_z = EmuSIMD::shuffle_full_width<2, 2, 2, 2>(sin_xyz, cos_xyz);	// sin(z), sin(z), cos(z), cos(z)
 
 			// Calculate the product of the sines and cosines of x and z.
-			_register_type temp_0 = EmuSIMD::shuffle<0, 2, 0, 2>(sin_and_cos_xy);		// sin(x), cos(x), sin(x), cos(x)
-			_register_type x_MUL_z = EmuSIMD::mul_all<width>(temp_0, sin_and_cos_z);	// sin(x) * sin(z), cos(x) * sin(z), sin(x) * cos(z), cos(x) * cos(z)
+			_register_type temp_0 = EmuSIMD::shuffle_full_width<0, 2, 0, 2>(sin_and_cos_xy);	// sin(x), cos(x), sin(x), cos(x)
+			_register_type x_MUL_z = EmuSIMD::mul_all<width>(temp_0, sin_and_cos_z);			// sin(x) * sin(z), cos(x) * sin(z), sin(x) * cos(z), cos(x) * cos(z)
 
 			// Initial multiplication
-			temp_0 = EmuSIMD::shuffle<1, 0, 2, 0>(x_MUL_z);
-			_register_type temp_1 = EmuSIMD::shuffle<1, 3, 1, 1>(sin_and_cos_xy);	// sin(y), cos(y), sin(y), sin(y)
+			temp_0 = EmuSIMD::shuffle_full_width<1, 0, 2, 0>(x_MUL_z);
+			_register_type temp_1 = EmuSIMD::shuffle_full_width<1, 3, 1, 1>(sin_and_cos_xy);	// sin(y), cos(y), sin(y), sin(y)
 			_register_type xyzw = EmuSIMD::mul_all<width>(temp_0, temp_1);
 
+
 			// Final multiplication with interchanging subtract/add ops
-			temp_0 = EmuSIMD::shuffle<2, 3, 1, 3>(x_MUL_z);
-			temp_1 = EmuSIMD::shuffle<3, 1, 3, 3>(sin_and_cos_xy);
+			temp_0 = EmuSIMD::shuffle_full_width<2, 3, 1, 3>(x_MUL_z);
+			temp_1 = EmuSIMD::shuffle_full_width<3, 1, 3, 3>(sin_and_cos_xy);
 			xyzw = EmuSIMD::fmaddsub<width>(temp_0, temp_1, xyzw);
 
 			// Only normalise when the user wants it
