@@ -1038,11 +1038,17 @@ int main()
 	EmuMath::FastQuaternion<float, 256>(1, 2, 3, 4).Store(just_a_test_quaternion_to_store_to);
 	std::cout << just_a_test_quaternion_to_store_to << "\n";
 
-
-	std::cout << EmuMath::FastQuaternion<float, 256>(EmuMath::Quaternion<float>::from_euler<false>(-45.0f, 90.0f, 0.0f)) << " (Scalar f32)\n";
-	std::cout << EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<float>, false>(-45.0f, 90.0f, 0.0f) << "(SIMD f32)\n";
-	std::cout << EmuMath::FastQuaternion<double, 256>(EmuMath::Quaternion<double>::from_euler<false>(-45.0f, 90.0f, 0.0f)) << " (Scalar f64)\n";
-	std::cout << EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<double, 256>, false>(-45.0f, 90.0f, 0.0f) << "(SIMD f64)\n";
+	constexpr bool r = false;
+	constexpr bool n = false;
+	constexpr float eulx = -45.0f;
+	constexpr float euly = 90.0f;
+	constexpr float eulz = 0;
+	std::cout << EmuMath::FastQuaternion<float, 256>(EmuMath::Quaternion<float>::from_euler<r, n>(eulx, euly, eulz)) << " (Scalar f32)\n";
+	std::cout << EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<float>, r, n>(eulx, euly, eulz) << "(SIMD f32)\n";
+	std::cout << EmuMath::FastQuaternion<double, 256>(EmuMath::Quaternion<double>::from_euler<r, n>(eulx, euly, eulz)) << " (Scalar f64)\n";
+	std::cout << EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<double, 256>, r, n>(eulx, euly, eulz) << "(SIMD f64)\n";
+	std::cout << EmuMath::FastQuaternion<double, 128>(EmuMath::Quaternion<double>::from_euler<r, n>(eulx, euly, eulz)) << " (Scalar f64, 128)\n";
+	std::cout << EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<double, 128>, r, n>(eulx, euly, eulz) << "(SIMD f64, 128)\n";
 
 	std::cout << "\n\n";
 	auto some_m256d = EmuSIMD::setr<__m256d>(10, 20, 30, 40);

@@ -419,6 +419,7 @@ namespace EmuCore::TestingHelpers
 	};
 #pragma endregion
 
+#pragma region EMU_VS_EMU
 	struct ScalarQuaternionTest
 	{
 		static constexpr bool DO_TEST = true;
@@ -427,7 +428,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr std::string_view NAME = "Scalar Quaternion";
 
-		using quat_t = float;
+		using quat_t = double;
 		using euler_type = EmuMath::Vector<3, quat_t>;
 		using quaternion_type = EmuMath::Quaternion<quat_t>;
 
@@ -474,7 +475,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr std::string_view NAME = "Fast Quaternion";
 
-		using quat_t = float;
+		using quat_t = double;
 		using euler_type = EmuMath::Vector<3, quat_t>;
 		using quaternion_type = EmuMath::FastQuaternion<quat_t, 128>;
 
@@ -512,6 +513,7 @@ namespace EmuCore::TestingHelpers
 		std::vector<euler_type> eulers;
 		std::vector<quaternion_type> quaternions;
 	};
+#pragma endregion
 
 	// ----------- TESTS SELECTION -----------
 	using AllTests = std::tuple

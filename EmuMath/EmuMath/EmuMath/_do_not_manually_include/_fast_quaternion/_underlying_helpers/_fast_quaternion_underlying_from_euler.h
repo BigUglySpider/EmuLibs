@@ -51,7 +51,7 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 		using _fast_quat_uq = typename EmuCore::TMP::remove_ref_cv<FastQuaternion_>::type;
 		return std::array<typename _fast_quat_uq::register_type, sizeof...(RegisterIndices_)>
 		({
-			_make_euler_register<RegisterIndices_, FastQuaternion_>
+			_make_euler_register<RegisterIndices_, FastQuaternion_, X_, Y_, Z_, 0, 1>
 			(
 				euler_xyz_
 			)...
@@ -86,6 +86,229 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 				using register_index_sequence = std::make_index_sequence<required_register_count>;
 				return _make_array_of_euler_registers<FastQuaternion_>(euler_xyz, register_index_sequence());
 			}
+		}
+	}
+
+	template<EmuConcepts::EmuFastQuaternion OutQuaternion_, bool InRads_, bool Normalise_, class EulerXYZ_>
+	[[nodiscard]] constexpr inline auto _make_fast_quat_from_euler(EulerXYZ_&& euler_xyz_)
+		-> typename EmuCore::TMP::remove_ref_cv<OutQuaternion_>::type
+	{
+		using euler_xyz_uq = typename EmuCore::TMP::remove_ref_cv<EulerXYZ_>::type;
+		if constexpr (EmuMath::TMP::is_emu_vector_v<euler_xyz_uq>)
+		{
+			// Convert EmuMath vector to register(s) and call back on this with said register(s)
+			#pragma warning(push)
+			#pragma warning(disable: 26800)
+			return _make_fast_quat_from_euler<OutQuaternion_, InRads_, Normalise_>
+			(
+				_make_euler_registers<OutQuaternion_>
+				(
+					std::forward<EulerXYZ_>(euler_xyz_).template AtTheoretical<0>(),
+					std::forward<EulerXYZ_>(euler_xyz_).template AtTheoretical<1>(),
+					std::forward<EulerXYZ_>(euler_xyz_).template AtTheoretical<2>()
+				)
+			);
+			#pragma warning(pop)
+		}
+		else if constexpr(EmuMath::TMP::is_emu_fast_vector_v<euler_xyz_uq>)
+		{
+			// Call back on this with the register(s) of the passed FastVector
+			return _make_fast_quat_from_euler<OutQuaternion_, InRads_, Normalise_>
+			(
+				std::forward<EulerXYZ_>(euler_xyz_).data
+			);
+		}
+		else if constexpr (EmuCore::TMP::is_std_array_v<euler_xyz_uq>)
+		{
+			constexpr bool is_simd_array = (EmuConcepts::KnownSIMD<typename euler_xyz_uq::value_type>);
+			if constexpr (!is_simd_array)
+			{
+				// Convert scalar array to simd register(s) and call back on this with said register(s)
+				#pragma warning(push)
+				#pragma warning(disable: 26800)
+				constexpr std::size_t array_size = euler_xyz_uq::size();
+				if constexpr (array_size >= 3)
+				{
+					return _make_fast_quat_from_euler<OutQuaternion_, InRads_, Normalise_>
+					(
+						_make_euler_registers<OutQuaternion_>
+						(
+							std::get<0>(std::forward<EulerXYZ_>(euler_xyz_)),
+							std::get<1>(std::forward<EulerXYZ_>(euler_xyz_)),
+							std::get<2>(std::forward<EulerXYZ_>(euler_xyz_))
+						)
+					);
+				}
+				else if constexpr (array_size >= 2)
+				{
+					return _make_fast_quat_from_euler<OutQuaternion_, InRads_, Normalise_>
+					(
+						_make_euler_registers<OutQuaternion_>
+						(
+							std::get<0>(std::forward<EulerXYZ_>(euler_xyz_)),
+							std::get<1>(std::forward<EulerXYZ_>(euler_xyz_)),
+							0
+						)
+					);
+				}
+				else if constexpr (array_size >= 1)
+				{
+					return _make_fast_quat_from_euler<OutQuaternion_, InRads_, Normalise_>
+					(
+						_make_euler_registers<OutQuaternion_>
+						(
+							std::get<0>(std::forward<EulerXYZ_>(euler_xyz_)),
+							0,
+							0
+						)
+					);
+				}
+				else
+				{
+					return _make_fast_quat_from_euler<OutQuaternion_, InRads_, Normalise_>
+					(
+						_make_euler_registers<OutQuaternion_>(0, 0, 0)
+					);
+				}
+				#pragma warning(pop)
+			}
+			else
+			{
+				// Array of registers collectively representing XYZ
+				using _out_fast_quat = typename EmuCore::TMP::remove_ref_cv<OutQuaternion_>::type;
+				if constexpr (EmuSIMD::TMP::register_element_count_v<typename euler_xyz_uq::value_type, _out_fast_quat::per_element_width> >= 3)
+				{
+					// Call back on this with just the first register, no need to iterate over arrays
+					return _make_fast_quat_from_euler<OutQuaternion_, InRads_, Normalise_>
+					(
+						std::get<0>(std::forward<EulerXYZ_>(euler_xyz_))
+					);
+				}
+				else
+				{
+					// Since we are SIMD, we know this is a case of 2 elements per register, as > 2 covered by single-register branch and < 2 is not SIMD
+					using _register_type = typename _out_fast_quat::register_type;
+					constexpr std::size_t width = _out_fast_quat::per_element_width;
+					constexpr bool is_signed = _out_fast_quat::is_signed;
+
+#pragma warning(push)
+#pragma warning(disable: 26800)
+					_register_type sin_xy = std::get<0>(std::forward<EulerXYZ_>(euler_xyz_));
+					_register_type sin_z = std::get<1>(std::forward<EulerXYZ_>(euler_xyz_));
+					sin_z = EmuSIMD::shuffle<0>(sin_z);
+#pragma warning(pop)
+
+					if constexpr (!InRads_)
+					{
+						_register_type pi_div_180 = EmuSIMD::set1<_register_type>(EmuCore::Pi::PI_DIV_180<typename _out_fast_quat::value_type>);
+						sin_xy = EmuSIMD::mul_all<width>(sin_xy, pi_div_180);
+						sin_z = EmuSIMD::mul_all<width>(sin_z, pi_div_180);
+					}
+
+					_register_type temp_0 = EmuSIMD::set1<_register_type, width>(2);
+					sin_xy = EmuSIMD::div<width, is_signed>(sin_xy, temp_0);
+					sin_z = EmuSIMD::div<width, is_signed>(sin_z, temp_0);
+					_register_type cos_xy = EmuSIMD::cos<width, is_signed>(sin_xy);
+					sin_xy = EmuSIMD::sin<width, is_signed>(sin_xy);
+					_register_type cos_z = EmuSIMD::cos<width, is_signed>(sin_z);
+					sin_z = EmuSIMD::sin<width, is_signed>(sin_z);
+
+					_register_type sin_and_cos_x = EmuSIMD::shuffle<0, 0>(sin_xy, cos_xy);	// sin(x), cos(x)
+					_register_type sin_and_cos_y = EmuSIMD::shuffle<1, 1>(sin_xy, cos_xy);	// sin(y), cos(y)
+
+					// Initial multiplication
+					_register_type x_MUL_sinz = EmuSIMD::mul_all<width>(EmuSIMD::shuffle<1, 0>(sin_and_cos_x), sin_z); // cos(x) * sin(z), sin(x) * sin(z)
+					_register_type xy = EmuSIMD::mul_all<width>(x_MUL_sinz, sin_and_cos_y);
+
+					temp_0 = EmuSIMD::shuffle<0>(sin_and_cos_x);
+					temp_0 = EmuSIMD::mul_all<width>(temp_0, EmuSIMD::shuffle<0, 0>(cos_z, sin_z));
+					sin_xy = EmuSIMD::shuffle<0>(sin_and_cos_y);													// sin(y), sin(y)
+					_register_type zw = EmuSIMD::mul_all<width>(temp_0, sin_xy);
+
+					// Final multiplication with interchanging subtract/add ops
+					_register_type x_MUL_cosz = EmuSIMD::mul_all<width>(sin_and_cos_x, cos_z);	// sin(x) * cos(z), cos(x) * cos(z)
+					sin_xy = EmuSIMD::shuffle<1, 0>(sin_and_cos_y);								// cos(y), sin(y)
+					xy = EmuSIMD::fmaddsub<width>(x_MUL_cosz, sin_xy, xy);
+
+					temp_0 = EmuSIMD::shuffle<1, 1>(x_MUL_sinz, x_MUL_cosz);	// cos(x) * sin(z), cos(x) * cos(z)
+					cos_xy = EmuSIMD::shuffle<1>(sin_and_cos_y);				// cos(y), cos(y)
+					zw = EmuSIMD::fmaddsub<width>(temp_0, cos_xy, zw);
+
+					if constexpr (Normalise_)
+					{
+						temp_0 = EmuSIMD::mul_all<width>(xy, xy);
+						temp_0 = EmuSIMD::fmadd<width>(zw, zw, temp_0);
+						temp_0 = EmuSIMD::horizontal_sum_fill<width>(temp_0);
+						temp_0 = EmuSIMD::rsqrt<width, is_signed>(temp_0);
+						xy = EmuSIMD::mul_all<width>(xy, temp_0);
+						zw = EmuSIMD::mul_all<width>(zw, temp_0);
+					}
+
+					return _out_fast_quat(std::move(xy), std::move(zw));
+				}
+			}
+		}
+		else if constexpr (EmuSIMD::TMP::is_simd_register_v<euler_xyz_uq>)
+		{
+			// Single register representing XYZ
+			using _out_fast_quat = typename EmuCore::TMP::remove_ref_cv<OutQuaternion_>::type;
+			using _register_type = typename _out_fast_quat::register_type;
+			constexpr std::size_t width = _out_fast_quat::per_element_width;
+			constexpr bool is_signed = _out_fast_quat::is_signed;
+			_register_type euler_simd_xyz = std::forward<EulerXYZ_>(euler_xyz_);
+
+			if constexpr (!InRads_)
+			{
+				euler_simd_xyz = EmuSIMD::mul_all<width>
+				(
+					euler_simd_xyz,
+					EmuSIMD::set1<_register_type>(EmuCore::Pi::PI_DIV_180<typename _out_fast_quat::value_type>)
+				);
+			}
+
+			// Store euler / 2 at first as it's needed for both trig ops
+			// --- May be better to multiply by 0.5, but set to /2 to avoid lossy halving and for weird cases such as integral input
+			// --- May be reasonable to give a `PreferMultiplies_` option as per normal Quaternions, should be put into consideration first
+			//_register_type sin_xyz = EmuSIMD::mul_all<width>(euler_simd_xyz, EmuSIMD::set1<_register_type, width>(0.5));
+			_register_type sin_xyz = EmuSIMD::div<width, is_signed>(euler_simd_xyz, EmuSIMD::set1<_register_type, width>(2));
+			_register_type cos_xyz = EmuSIMD::cos<width, is_signed>(sin_xyz);
+			sin_xyz = EmuSIMD::sin<width, is_signed>(sin_xyz);
+
+			// NEEDS GENERALISING STILL: ONLY SUPPORTS 4-ELEMENT REGISTERS
+			_register_type sin_and_cos_xy = EmuSIMD::shuffle_full_width<0, 1, 0, 1>(sin_xyz, cos_xyz);	// sin(x), sin(y), cos(x), cos(y)
+			_register_type sin_and_cos_z = EmuSIMD::shuffle_full_width<2, 2, 2, 2>(sin_xyz, cos_xyz);	// sin(z), sin(z), cos(z), cos(z)
+
+			// Calculate the product of the sines and cosines of x and z.
+			_register_type temp_0 = EmuSIMD::shuffle_full_width<0, 2, 0, 2>(sin_and_cos_xy);	// sin(x), cos(x), sin(x), cos(x)
+			_register_type x_MUL_z = EmuSIMD::mul_all<width>(temp_0, sin_and_cos_z);			// sin(x) * sin(z), cos(x) * sin(z), sin(x) * cos(z), cos(x) * cos(z)
+
+			// Initial multiplication
+			temp_0 = EmuSIMD::shuffle_full_width<1, 0, 2, 0>(x_MUL_z);
+			_register_type temp_1 = EmuSIMD::shuffle_full_width<1, 3, 1, 1>(sin_and_cos_xy);	// sin(y), cos(y), sin(y), sin(y)
+			_register_type xyzw = EmuSIMD::mul_all<width>(temp_0, temp_1);
+
+			// Final multiplication with interchanging subtract/add ops
+			temp_0 = EmuSIMD::shuffle_full_width<2, 3, 1, 3>(x_MUL_z);
+			temp_1 = EmuSIMD::shuffle_full_width<3, 1, 3, 3>(sin_and_cos_xy);
+			xyzw = EmuSIMD::fmaddsub<width>(temp_0, temp_1, xyzw);
+
+			// Only normalise when the user wants it
+			if constexpr (Normalise_)
+			{
+				temp_0 = EmuSIMD::dot_fill<width>(xyzw, xyzw);
+				temp_0 = EmuSIMD::rsqrt<width, is_signed>(temp_0);
+				xyzw = EmuSIMD::mul_all<width>(xyzw, temp_0);
+			}
+
+			return _out_fast_quat(std::move(xyzw));
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<EulerXYZ_>(),
+				"Unable to make an EmuMath FastQuaternion from euler angles as the input type is not supported. Supported argument types: EmuMath Vectors, EmuMath FastVectors, arrays of scalars, arrays of EmuSIMD-supported SIMD registers, or a single EmuSIMD-supported SIMD register."
+			);
 		}
 	}
 }
