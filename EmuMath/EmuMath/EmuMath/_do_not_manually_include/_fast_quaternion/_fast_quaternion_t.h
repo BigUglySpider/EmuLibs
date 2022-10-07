@@ -530,6 +530,119 @@ namespace EmuMath
 		constexpr inline this_type& operator=(this_type&&) noexcept = default;
 #pragma endregion
 
+#pragma region FROM_EULER_FUNCTIONS
+	public:
+		/// <summary>
+		/// <para> Creates a FastQuaternion from euler angles, using SIMD operations to perform the conversion. </para>
+		/// <para> If `InRads_` is `true`, euler angles will be interpreted in radians; otherwise, they will be interpreted as degrees. Defaults to `true`. </para>
+		/// <para> If `Normalise_` is `true`, a normalisation operation will be performed before returning. Defaults to `true`. </para>
+		/// </summary>
+		/// <param name="euler_x_">Euler angle in radians or degrees (based on `InRads_` template argument) in the X-axis to convert to a Quaternion.</param>
+		/// <param name="euler_y_">Euler angle in radians or degrees (based on `InRads_` template argument) in the Y-axis to convert to a Quaternion.</param>
+		/// <param name="euler_z_">Euler angle in radians or degrees (based on `InRads_` template argument) in the Z-axis to convert to a Quaternion.</param>
+		/// <returns>FastQuaternion of this type representing the provided Euler rotation in Quaternion form.</returns>
+		template<bool InRads_ = true, bool Normalise_ = true, EmuConcepts::Arithmetic X_, EmuConcepts::Arithmetic Y_, EmuConcepts::Arithmetic Z_>
+		[[nodiscard]] static constexpr inline auto from_euler(X_&& euler_x_, Y_&& euler_y_, Z_&& euler_z_) noexcept
+			-> EmuMath::FastQuaternion<T_, RegisterWidth_>
+		{
+			return EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<T_, RegisterWidth_>, InRads_, Normalise_>
+			(
+				std::forward<X_>(euler_x_),
+				std::forward<Y_>(euler_y_),
+				std::forward<Z_>(euler_z_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Creates a FastQuaternion from euler angles, using SIMD operations to perform the conversion. </para>
+		/// <para> If `InRads_` is `true`, euler angles will be interpreted in radians; otherwise, they will be interpreted as degrees. Defaults to `true`. </para>
+		/// <para> If `Normalise_` is `true`, a normalisation operation will be performed before returning. Defaults to `true`. </para>
+		/// </summary>
+		/// <param name="euler_xyz_">
+		///		Vector of Euler angles in radians or degrees (based on `InRads_` template argument) in the X-axis to convert to a Quaternion. 
+		///		If a required index is not contained, it will be interpreted as 0 (i.e. no rotation in that axis).
+		/// </param>
+		/// <returns>FastQuaternion of this type representing the provided Euler rotation in Quaternion form.</returns>
+		template<bool InRads_ = true, bool Normalise_ = true, EmuConcepts::EmuVector EulerVector_>
+		requires (EmuMath::Helpers::valid_single_arg_for_fast_quaternion_from_euler<EmuMath::FastQuaternion<T_, RegisterWidth_>, EulerVector_>())
+		[[nodiscard]] static constexpr inline auto from_euler(EulerVector_&& euler_xyz_) noexcept
+		{
+			return EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<T_, RegisterWidth_>, InRads_, Normalise_>
+			(
+				std::forward<EulerVector_>(euler_xyz_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Creates a FastQuaternion from euler angles, using SIMD operations to perform the conversion. </para>
+		/// <para>
+		///		The passed `EulerFastVector_` must be an EmuMath FastVector which contains at least 3 elements, 
+		///		and shares the same `register_type` as this FastQuaternion.
+		/// </para>
+		/// <para> If `InRads_` is `true`, euler angles will be interpreted in radians; otherwise, they will be interpreted as degrees. Defaults to `true`. </para>
+		/// <para> If `Normalise_` is `true`, a normalisation operation will be performed before returning. Defaults to `true`. </para>
+		/// </summary>
+		/// <param name="euler_xyz_">
+		///		EmuMath FastVector of Euler angles in radians or degrees (based on `InRads_` template argument) in the X-axis to convert to a Quaternion.
+		/// </param>
+		/// <returns>FastQuaternion of this type representing the provided Euler rotation in Quaternion form.</returns>
+		template<bool InRads_ = true, bool Normalise_ = true, EmuConcepts::EmuFastVector EulerFastVector_>
+		requires (EmuMath::Helpers::valid_single_arg_for_fast_quaternion_from_euler<EmuMath::FastQuaternion<T_, RegisterWidth_>, EulerFastVector_>())
+		[[nodiscard]] static constexpr inline auto from_euler(EulerFastVector_&& euler_xyz_) noexcept
+		{
+			return EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<T_, RegisterWidth_>, InRads_, Normalise_>
+			(
+				std::forward<EulerFastVector_>(euler_xyz_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Creates a FastQuaternion from euler angles, using SIMD operations to perform the conversion. </para>
+		/// <para> If `InRads_` is `true`, euler angles will be interpreted in radians; otherwise, they will be interpreted as degrees. Defaults to `true`. </para>
+		/// <para> If `Normalise_` is `true`, a normalisation operation will be performed before returning. Defaults to `true`. </para>
+		/// </summary>
+		/// <param name="euler_xyz_">
+		///		SIMD register of this FastQuaternion's `register_type`, 
+		///		containing Euler angles in radians or degrees (based on `InRads_` template argument) in the X-axis to convert to a Quaternion.
+		/// </param>
+		/// <returns>FastQuaternion of this type representing the provided Euler rotation in Quaternion form.</returns>
+		template<bool InRads_ = true, bool Normalise_ = true>
+		requires (EmuMath::Helpers::valid_single_arg_for_fast_quaternion_from_euler<EmuMath::FastQuaternion<T_, RegisterWidth_>, register_arg_type>())
+		[[nodiscard]] static constexpr inline auto from_euler(register_arg_type euler_xyz_simd_) noexcept
+		{
+			return EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<T_, RegisterWidth_>, InRads_, Normalise_>
+			(
+				std::forward<register_arg_type>(euler_xyz_simd_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Creates a FastQuaternion from euler angles, using SIMD operations to perform the conversion. </para>
+		/// <para> If `InRads_` is `true`, euler angles will be interpreted in radians; otherwise, they will be interpreted as degrees. Defaults to `true`. </para>
+		/// <para> If `Normalise_` is `true`, a normalisation operation will be performed before returning. Defaults to `true`. </para>
+		/// </summary>
+		/// <param name="euler_xyz_">
+		///		Standard array populated with any number of SIMD registers of this FastQuaternion's `register_type`, 
+		///		containing Euler angles in radians or degrees (based on `InRads_` template argument) in the X-axis to convert to a Quaternion.
+		/// </param>
+		/// <returns>FastQuaternion of this type representing the provided Euler rotation in Quaternion form.</returns>
+		template<bool InRads_ = true, bool Normalise_ = true, std::size_t ArraySize_>
+		requires (
+			EmuMath::Helpers::valid_single_arg_for_fast_quaternion_from_euler
+			<
+				EmuMath::FastQuaternion<T_, RegisterWidth_>,
+				std::array<register_type, ArraySize_>
+			>()
+		)
+		[[nodiscard]] static constexpr inline auto from_euler(const std::array<register_type, ArraySize_>& euler_xyz_simd_array_) noexcept
+		{
+			return EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<T_, RegisterWidth_>, InRads_, Normalise_>
+			(
+				euler_xyz_simd_array_
+			);
+		}
+#pragma endregion
+
 #pragma region DATA
 	public:
 		/// <summary>

@@ -431,6 +431,8 @@ namespace EmuCore::TestingHelpers
 		using quat_t = double;
 		using euler_type = EmuMath::Vector<3, quat_t>;
 		using quaternion_type = EmuMath::Quaternion<quat_t>;
+		static constexpr bool in_rads = false;
+		static constexpr bool norm_out = false;
 
 		ScalarQuaternionTest()
 		{
@@ -450,11 +452,11 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i_)
 		{
-			quaternions[i_] = quaternion_type::from_euler<true>
+			quaternions[i_] = quaternion_type::from_euler<in_rads, norm_out>
 			(
-				EmuCore::Pi::DegsToRads(eulers[i_][0]),
-				EmuCore::Pi::DegsToRads(eulers[i_][1]),
-				EmuCore::Pi::DegsToRads(eulers[i_][2])
+				eulers[i_][0],
+				eulers[i_][1],
+				eulers[i_][2]
 			);
 		}
 		void OnTestsOver()
@@ -478,6 +480,8 @@ namespace EmuCore::TestingHelpers
 		using quat_t = double;
 		using euler_type = EmuMath::Vector<3, quat_t>;
 		using quaternion_type = EmuMath::FastQuaternion<quat_t, 128>;
+		static constexpr bool in_rads = false;
+		static constexpr bool norm_out = false;
 
 		FastQuaternionTest()
 		{
@@ -497,7 +501,7 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i_)
 		{
-			quaternions[i_] = EmuMath::Helpers::fast_quaternion_from_euler<quaternion_type, false>
+			quaternions[i_] = EmuMath::Helpers::fast_quaternion_from_euler<quaternion_type, in_rads, norm_out>
 			(
 				eulers[i_][0],
 				eulers[i_][1],

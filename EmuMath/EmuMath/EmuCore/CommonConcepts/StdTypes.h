@@ -9,6 +9,9 @@ namespace EmuCore::Concepts
 {
 	template<typename T_>
 	concept StdTuple = EmuCore::TMP::is_tuple_v<typename EmuCore::TMP::remove_ref_cv<T_>::type>;
+
+	template<typename T_>
+	concept StdArray = EmuCore::TMP::is_std_array_v<typename EmuCore::TMP::remove_ref_cv<T_>::type>;
 }
 
 namespace EmuConcepts

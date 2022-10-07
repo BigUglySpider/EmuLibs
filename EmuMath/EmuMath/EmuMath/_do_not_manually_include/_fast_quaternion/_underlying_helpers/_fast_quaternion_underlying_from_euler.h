@@ -187,6 +187,7 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 				else
 				{
 					// Since we are SIMD, we know this is a case of 2 elements per register, as > 2 covered by single-register branch and < 2 is not SIMD
+					// --- This is likely quite inefficient based on speed comparisons
 					using _register_type = typename _out_fast_quat::register_type;
 					constexpr std::size_t width = _out_fast_quat::per_element_width;
 					constexpr bool is_signed = _out_fast_quat::is_signed;
@@ -205,43 +206,48 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 						sin_z = EmuSIMD::mul_all<width>(sin_z, pi_div_180);
 					}
 
-					_register_type temp_0 = EmuSIMD::set1<_register_type, width>(2);
-					sin_xy = EmuSIMD::div<width, is_signed>(sin_xy, temp_0);
-					sin_z = EmuSIMD::div<width, is_signed>(sin_z, temp_0);
+					_register_type temp_0 = EmuSIMD::set1<_register_type, width>(typename _out_fast_quat::value_type(0.5));
+					sin_xy = EmuSIMD::mul_all<width>(sin_xy, temp_0);
+					sin_z = EmuSIMD::mul_all<width>(sin_z, temp_0);
 					_register_type cos_xy = EmuSIMD::cos<width, is_signed>(sin_xy);
 					sin_xy = EmuSIMD::sin<width, is_signed>(sin_xy);
 					_register_type cos_z = EmuSIMD::cos<width, is_signed>(sin_z);
 					sin_z = EmuSIMD::sin<width, is_signed>(sin_z);
 
-					_register_type sin_and_cos_x = EmuSIMD::shuffle<0, 0>(sin_xy, cos_xy);	// sin(x), cos(x)
-					_register_type sin_and_cos_y = EmuSIMD::shuffle<1, 1>(sin_xy, cos_xy);	// sin(y), cos(y)
+					// lo
+					_register_type sinz_MUL_cosandsin_x = EmuSIMD::mul_all<width>(sin_z, EmuSIMD::shuffle<0, 0>(cos_xy, sin_xy));
+					_register_type cosz_MUL_sinandcos_x = EmuSIMD::mul_all<width>(cos_z, EmuSIMD::shuffle<0, 0>(sin_xy, cos_xy));
+					_register_type xy = EmuSIMD::mul_all<width>(sinz_MUL_cosandsin_x, EmuSIMD::shuffle<1, 1>(sin_xy, cos_xy));
+					xy = EmuSIMD::fmaddsub<width>(cosz_MUL_sinandcos_x, EmuSIMD::shuffle<1, 1>(cos_xy, sin_xy), xy);
 
-					// Initial multiplication
-					_register_type x_MUL_sinz = EmuSIMD::mul_all<width>(EmuSIMD::shuffle<1, 0>(sin_and_cos_x), sin_z); // cos(x) * sin(z), sin(x) * sin(z)
-					_register_type xy = EmuSIMD::mul_all<width>(x_MUL_sinz, sin_and_cos_y);
-
-					temp_0 = EmuSIMD::shuffle<0>(sin_and_cos_x);
-					temp_0 = EmuSIMD::mul_all<width>(temp_0, EmuSIMD::shuffle<0, 0>(cos_z, sin_z));
-					sin_xy = EmuSIMD::shuffle<0>(sin_and_cos_y);													// sin(y), sin(y)
-					_register_type zw = EmuSIMD::mul_all<width>(temp_0, sin_xy);
-
-					// Final multiplication with interchanging subtract/add ops
-					_register_type x_MUL_cosz = EmuSIMD::mul_all<width>(sin_and_cos_x, cos_z);	// sin(x) * cos(z), cos(x) * cos(z)
-					sin_xy = EmuSIMD::shuffle<1, 0>(sin_and_cos_y);								// cos(y), sin(y)
-					xy = EmuSIMD::fmaddsub<width>(x_MUL_cosz, sin_xy, xy);
-
-					temp_0 = EmuSIMD::shuffle<1, 1>(x_MUL_sinz, x_MUL_cosz);	// cos(x) * sin(z), cos(x) * cos(z)
-					cos_xy = EmuSIMD::shuffle<1>(sin_and_cos_y);				// cos(y), cos(y)
-					zw = EmuSIMD::fmaddsub<width>(temp_0, cos_xy, zw);
+					// hi
+					_register_type zw = EmuSIMD::shuffle<0, 1>(cosz_MUL_sinandcos_x, sinz_MUL_cosandsin_x);
+					zw = EmuSIMD::mul_all<width>(zw, EmuSIMD::set_all_to_index<1>(sin_xy));
+					zw = EmuSIMD::fmaddsub<width>
+					(
+						EmuSIMD::shuffle<0, 1>(sinz_MUL_cosandsin_x, cosz_MUL_sinandcos_x),
+						EmuSIMD::shuffle<1, 1>(cos_xy),
+						zw
+					);
 
 					if constexpr (Normalise_)
 					{
 						temp_0 = EmuSIMD::mul_all<width>(xy, xy);
 						temp_0 = EmuSIMD::fmadd<width>(zw, zw, temp_0);
 						temp_0 = EmuSIMD::horizontal_sum_fill<width>(temp_0);
-						temp_0 = EmuSIMD::rsqrt<width, is_signed>(temp_0);
-						xy = EmuSIMD::mul_all<width>(xy, temp_0);
-						zw = EmuSIMD::mul_all<width>(zw, temp_0);
+
+						if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<_register_type>)
+						{
+							temp_0 = EmuSIMD::sqrt<width, is_signed>(temp_0);
+							xy = EmuSIMD::div<width, is_signed>(xy, temp_0);
+							zw = EmuSIMD::div<width, is_signed>(zw, temp_0);
+						}
+						else
+						{
+							temp_0 = EmuSIMD::rsqrt<width, is_signed>(temp_0);
+							xy = EmuSIMD::mul_all<width>(xy, temp_0);
+							zw = EmuSIMD::mul_all<width>(zw, temp_0);
+						}
 					}
 
 					return _out_fast_quat(std::move(xy), std::move(zw));
@@ -296,8 +302,17 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 			if constexpr (Normalise_)
 			{
 				temp_0 = EmuSIMD::dot_fill<width>(xyzw, xyzw);
-				temp_0 = EmuSIMD::rsqrt<width, is_signed>(temp_0);
-				xyzw = EmuSIMD::mul_all<width>(xyzw, temp_0);
+
+				if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<_register_type>)
+				{
+					temp_0 = EmuSIMD::sqrt<width, is_signed>(temp_0);
+					xyzw = EmuSIMD::div<width, is_signed>(xyzw, temp_0);
+				}
+				else
+				{
+					temp_0 = EmuSIMD::rsqrt<width, is_signed>(temp_0);
+					xyzw = EmuSIMD::mul_all<width>(xyzw, temp_0);
+				}
 			}
 
 			return _out_fast_quat(std::move(xyzw));

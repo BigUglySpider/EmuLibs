@@ -1062,6 +1062,25 @@ int main()
 	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::shuffle_full_width<3, 2, 1, 0>(some_m256d, some_other_m256d)) << "\n";
 	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::shuffle_full_width<2, 3, 1, 3>(some_m256d, some_other_m256d)) << "\n";
 
+	std::cout << "\nScalar result: " << EmuMath::Quaternion<float>::from_euler<false>(eulx, euly, eulz);
+	std::cout << "\n\nSame conversion w/different args tests @FastQuaternion, f32\n";
+	std::cout << "Scalars: " << EmuMath::FastQuaternion<float, 128>::from_euler<false>(eulx, euly, eulz) << "\n";
+	std::cout << "Scalar Vector: " << EmuMath::FastQuaternion<float, 128>::from_euler<false>(EmuMath::Vector<3, float>(eulx, euly, eulz)) << "\n";
+	std::cout << "Fast Vector: " << EmuMath::FastQuaternion<float, 128>::from_euler<false>(EmuMath::FastVector<3, float>(eulx, euly, eulz)) << "\n";
+	std::cout << "SIMD: " << EmuMath::FastQuaternion<float, 128>::from_euler<false>(EmuSIMD::setr<__m128>(eulx, euly, eulz, 0)) << "\n";
+	std::cout << "SIMD Arr: " 
+		<< EmuMath::FastQuaternion<float, 128>::from_euler<false>(std::array<__m128, 2>({ EmuSIMD::setr<__m128>(eulx, euly, eulz, 0), __m128() }))
+		<< "\n";
+
+	std::cout << "\n\nSame conversion w/different args tests @FastQuaternion, f64\n";
+	std::cout << "Scalars: " << EmuMath::FastQuaternion<double, 128>::from_euler<false>(eulx, euly, eulz) << "\n";
+	std::cout << "Scalar Vector: " << EmuMath::FastQuaternion<double, 128>::from_euler<false>(EmuMath::Vector<3, double>(eulx, euly, eulz)) << "\n";
+	std::cout << "Fast Vector: " << EmuMath::FastQuaternion<double, 128>::from_euler<false>(EmuMath::FastVector<3, double>(eulx, euly, eulz)) << "\n";
+	std::cout << "SIMD: Not allowed with 128-bit f64\n";
+	std::cout << "SIMD Arr: " 
+		<< EmuMath::FastQuaternion<double, 128>::from_euler<false>(std::array<__m128d, 2>({ EmuSIMD::setr<__m128d>(eulx, euly), EmuSIMD::setr<__m128d>(eulz, 0) }))
+		<< "\n";
+
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN; 
