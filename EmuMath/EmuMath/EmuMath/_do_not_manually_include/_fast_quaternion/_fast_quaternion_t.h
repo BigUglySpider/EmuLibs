@@ -530,6 +530,57 @@ namespace EmuMath
 		constexpr inline this_type& operator=(this_type&&) noexcept = default;
 #pragma endregion
 
+#pragma region TO_EULER_FUNCTIONS
+	public:
+		/// <summary>
+		/// <para> Converts this Quaternion to euler angles XYZ, returning the result as a scalar EmuMath Vector. </para>
+		/// <para> The output Vector's contained type/size may be customised. By default, they are `preferred_floating_point`/`3`, respectively. </para>
+		/// <para> If the output Vector's contained type is `void`, it will instead use this Quaternion's `preferred_floating_point`. </para>
+		/// </summary>
+		/// <param name="epsilon_">
+		///		Arithmetic value indicating the epsilon to use for floating-point comparisons in conversions. 
+		///		This may be omitted, in which case the function will use the default epsilon of this Quaternion's `preferred_floating_point` type, 
+		///		as determined by `EmuCore::epsilon`.
+		/// </param>
+		/// <returns>Scalar EmuMath Vector containing the results of converting this Quaternion to euler angles.</returns>
+		template<bool OutRads_ = true, typename OutT_ = preferred_floating_point, std::size_t OutSize_ = 3, EmuConcepts::Arithmetic Epsilon_>
+		[[nodiscard]] constexpr inline auto ToEulerScalar(Epsilon_&& epsilon_) const noexcept
+		{
+			return EmuMath::Helpers::fast_quaternion_to_euler_scalar<OutRads_, OutT_, OutSize_>(*this, std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<bool OutRads_ = true, typename OutT_ = preferred_floating_point, std::size_t OutSize_ = 3>
+		[[nodiscard]] constexpr inline auto ToEulerScalar() const noexcept
+		{
+			return EmuMath::Helpers::fast_quaternion_to_euler_scalar<OutRads_, OutT_, OutSize_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Converts this Quaternion to euler angles XYZ, returning the result as an EmuMath FastVector. </para>
+		/// <para> The output Vector's T_ argument will always be the `preferred_floating_point` of this Quaternion. </para>
+		/// <para> The output Vector's size may be customised. By default, it is 3. </para>
+		/// <para> The output Vector's register width may be customised. By default, it is the `register_width` of this Quaternion. </para>
+		/// <para> If the output Vector's register width is 0, it will instead use the `register_width` of this Quaternion. </para>
+		/// </summary>
+		/// <param name="epsilon_">
+		///		Arithmetic value indicating the epsilon to use for floating-point comparisons in conversions. 
+		///		This may be omitted, in which case the function will use the default epsilon of the input Quaternion's `preferred_floating_point` type, 
+		///		as determined by `EmuCore::epsilon`.
+		/// </param>
+		/// <returns>EmuMath Fast Vector containing the results of converting this Quaternion to euler angles.</returns>
+		template<bool OutRads_ = true, std::size_t OutSize_ = 3, std::size_t OutRegisterWidth_ = register_width, EmuConcepts::Arithmetic Epsilon_>
+		[[nodiscard]] constexpr inline auto ToEuler(Epsilon_&& epsilon_) const noexcept
+		{
+			return EmuMath::Helpers::fast_quaternion_to_euler<OutRads_, OutSize_, OutRegisterWidth_>(*this, std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<bool OutRads_ = true, std::size_t OutSize_ = 3, std::size_t OutRegisterWidth_ = register_width>
+		[[nodiscard]] constexpr inline auto ToEuler() const noexcept
+		{
+			return EmuMath::Helpers::fast_quaternion_to_euler<OutRads_, OutSize_, OutRegisterWidth_>(*this);
+		}
+#pragma endregion
+
 #pragma region FROM_EULER_FUNCTIONS
 	public:
 		/// <summary>
@@ -627,7 +678,8 @@ namespace EmuMath
 		/// </param>
 		/// <returns>FastQuaternion of this type representing the provided Euler rotation in Quaternion form.</returns>
 		template<bool InRads_ = true, bool Normalise_ = true, std::size_t ArraySize_>
-		requires (
+		requires
+		(
 			EmuMath::Helpers::valid_single_arg_for_fast_quaternion_from_euler
 			<
 				EmuMath::FastQuaternion<T_, RegisterWidth_>,

@@ -1041,7 +1041,7 @@ int main()
 	constexpr bool r = false;
 	constexpr bool n = false;
 	constexpr float eulx = -45.0f;
-	constexpr float euly = 90.0f;
+	constexpr float euly = 93.0f;
 	constexpr float eulz = 0;
 	std::cout << EmuMath::FastQuaternion<float, 256>(EmuMath::Quaternion<float>::from_euler<r, n>(eulx, euly, eulz)) << " (Scalar f32)\n";
 	std::cout << EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<float>, r, n>(eulx, euly, eulz) << "(SIMD f32)\n";
@@ -1080,6 +1080,23 @@ int main()
 	std::cout << "SIMD Arr: " 
 		<< EmuMath::FastQuaternion<double, 128>::from_euler<false>(std::array<__m128d, 2>({ EmuSIMD::setr<__m128d>(eulx, euly), EmuSIMD::setr<__m128d>(eulz, 0) }))
 		<< "\n";
+
+
+	std::cout << "\n\nFastQuat -> Euler (Scalar)\n";
+	std::cout << "Basic scalar (rads): " << EmuMath::Quaternion<float>::from_euler<false>(eulx, euly, eulz).ToEuler<true>() << "\n";
+	std::cout << "Basic scalar (degs): " << EmuMath::Quaternion<float>::from_euler<false>(eulx, euly, eulz).ToEuler<false>() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEulerScalar() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEulerScalar<false>() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEulerScalar<true, void, 20>() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEulerScalar<true, float, 20>() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEulerScalar<true, int>() << "\n";
+
+	std::cout << "\n\nFastQuat -> Euler (Fast)\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEuler() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEuler<false>() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEuler<true, 20>() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEuler<true, 20>() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEuler<true>() << "\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

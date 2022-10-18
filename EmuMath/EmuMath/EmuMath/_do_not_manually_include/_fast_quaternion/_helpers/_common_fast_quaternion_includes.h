@@ -5,5 +5,6 @@
 #include "../_underlying_helpers/_fast_quaternion_tmp.h"
 #include "../_underlying_helpers/_fast_quaternion_underlying_from_euler.h"
 #include "../_underlying_helpers/_fast_quaternion_underlying_store.h"
+#include "../_underlying_helpers/_fast_quaternion_underlying_to_euler.h"
 
 #endif

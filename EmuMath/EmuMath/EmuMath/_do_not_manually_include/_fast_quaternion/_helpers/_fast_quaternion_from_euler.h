@@ -29,7 +29,7 @@ namespace EmuMath::Helpers
 		{
 			using _in_value_type = typename _arg_uq::value_type;
 			using _in_value_type_uq = typename EmuCore::TMP::remove_ref_cv<_in_value_type>::type;
-			return std::is_same_v<_in_value_type, _out_register>;
+			return std::is_same_v<_in_value_type_uq, _out_register>;
 		}
 		else
 		{
