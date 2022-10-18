@@ -97,13 +97,13 @@ namespace EmuMath
 		template<typename X_, typename Y_, typename Z_, typename W_>
 		[[nodiscard]] static constexpr inline bool valid_args_for_construct_by_scalars() noexcept
 		{
-			return
-			(
-				_valid_arg_for_construct_by_scalars<X_>() &&
-				_valid_arg_for_construct_by_scalars<Y_>() &&
-				_valid_arg_for_construct_by_scalars<Z_>() &&
+			return EmuCore::TMP::variadic_and_v
+			<
+				_valid_arg_for_construct_by_scalars<X_>(),
+				_valid_arg_for_construct_by_scalars<Y_>(),
+				_valid_arg_for_construct_by_scalars<Z_>(),
 				_valid_arg_for_construct_by_scalars<W_>()
-			);
+			>;
 		}
 
 		/// <summary>
