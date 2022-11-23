@@ -532,19 +532,153 @@ namespace EmuMath
 
 #pragma region CONST_ARITHMETIC_FUNCS
 	public:
+		/// <summary>
+		/// <para> Adds this Quaternion and the passed `rhs_` Quaternion. </para>
+		/// </summary>
+		/// <returns>FastQuaternion of the same type containing the results of the addition operation.</returns>
 		[[nodiscard]] constexpr inline auto Add(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_) const
 			-> EmuMath::FastQuaternion<T_, RegisterWidth_>
 		{
 			return EmuMath::Helpers::fast_quaternion_add(*this, rhs_);
 		}
 
+		/// <summary>
+		/// <para> Subtracts the passed `rhs_` Quaternion from this Quaternion. </para>
+		/// </summary>
+		/// <returns>FastQuaternion of the same type containing the results of the subtraction operation.</returns>
 		[[nodiscard]] constexpr inline auto Subtract(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_) const
 			-> EmuMath::FastQuaternion<T_, RegisterWidth_>
 		{
 			return EmuMath::Helpers::fast_quaternion_subtract(*this, rhs_);
 		}
 
-		// TODO: Write remaining arithmetic members (helper functions already exist, just need symbols for the type)
+		/// <summary>
+		/// <para> Divides this Quaternion's underlying register(s) by the passed `rhs_scalar_register_` register. </para>
+		/// <para> The passed register should contain the same value in all respective lanes for most cases of standard Quaternion division. </para>
+		/// </summary>
+		/// <returns>FastQuaternion of the same type containing the results of the division operation.</returns>
+		[[nodiscard]] constexpr inline auto Divide(register_arg_type rhs_scalar_register_) const
+			-> EmuMath::FastQuaternion<T_, RegisterWidth_>
+		{
+			return EmuMath::Helpers::fast_quaternion_divide(*this, rhs_scalar_register_);
+		}
+
+		/// <summary>
+		/// <para> Divides this Quaternion by the passed `rhs_scalar_` value. </para>
+		/// <para> An intermediate register will be created to perform this operation. </para>
+		/// </summary>
+		/// <returns>FastQuaternion of the same type containing the results of the division operation.</returns>
+		template<EmuConcepts::Arithmetic RhsScalar_>
+		[[nodiscard]] constexpr inline auto Divide(RhsScalar_&& rhs_scalar_) const
+			-> EmuMath::FastQuaternion<T_, RegisterWidth_>
+		{
+			return EmuMath::Helpers::fast_quaternion_divide(*this, std::forward<RhsScalar_>(rhs_scalar_));
+		}
+
+		/// <summary>
+		/// <para> Multiplies this Quaternion with the passed `rhs_` Quaternion. </para>
+		/// </summary>
+		/// <returns>FastQuaternion of the same type containing the results of the Quaternion multiplication operation.</returns>
+		[[nodiscard]] constexpr inline auto MultiplyQuaternion(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_) const
+			-> EmuMath::FastQuaternion<T_, RegisterWidth_>
+		{
+			return EmuMath::Helpers::fast_quaternion_multiply_quaternion(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Multiplies this Quaternion's underlying register(s) by the passed `rhs_scalar_register_` register. </para>
+		/// <para> The passed register should contain the same value in all respective lanes for most cases of standard Quaternion x Scalar multiplication. </para>
+		/// </summary>
+		/// <returns>FastQuaternion of the same type containing the results of the multiplication operation.</returns>
+		[[nodiscard]] constexpr inline auto MultiplyScalar(register_arg_type rhs_scalar_register_) const
+			-> EmuMath::FastQuaternion<T_, RegisterWidth_>
+		{
+			return EmuMath::Helpers::fast_quaternion_multiply_scalar(*this, rhs_scalar_register_);
+		}
+
+		/// <summary>
+		/// <para> Multiplies this Quaternion's underlying register(s) by the passed `rhs_scalar_register_` register. </para>
+		/// <para> An intermediate register will be created to perform this operation. </para>
+		/// </summary>
+		/// <returns>FastQuaternion of the same type containing the results of the multiplication operation.</returns>
+		template<EmuConcepts::Arithmetic RhsScalar_>
+		[[nodiscard]] constexpr inline auto MultiplyScalar(RhsScalar_&& rhs_scalar_) const
+			-> EmuMath::FastQuaternion<T_, RegisterWidth_>
+		{
+			return EmuMath::Helpers::fast_quaternion_multiply_scalar(*this, std::forward<RhsScalar_>(rhs_scalar_));
+		}
+#pragma endregion
+
+#pragma region ARITHMETIC_ASSIGN_FUNCS
+	public:
+		/// <summary>
+		/// <para> Adds this Quaternion and the passed `rhs_` Quaternion. </para>
+		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline void AddAssign(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_)
+		{
+			EmuMath::Helpers::fast_quaternion_add_assign(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Subtracts the passed `rhs_` Quaternion from this Quaternion. </para>
+		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline void SubtractAssign(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_)
+		{
+			EmuMath::Helpers::fast_quaternion_subtract_assign(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Divides this Quaternion's underlying register(s) by the passed `rhs_scalar_register_` register. </para>
+		/// <para> The passed register should contain the same value in all respective lanes for most cases of standard Quaternion division. </para>
+		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline void DivideAssign(register_arg_type rhs_scalar_register_)
+		{
+			EmuMath::Helpers::fast_quaternion_divide_assign(*this, rhs_scalar_register_);
+		}
+
+		/// <summary>
+		/// <para> Divides this Quaternion by the passed `rhs_scalar_` value. </para>
+		/// <para> An intermediate register will be created to perform this operation. </para>
+		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
+		/// </summary>
+		template<EmuConcepts::Arithmetic RhsScalar_>
+		[[nodiscard]] constexpr inline void DivideAssign(RhsScalar_&& rhs_scalar_)
+		{
+			EmuMath::Helpers::fast_quaternion_divide_assign(*this, std::forward<RhsScalar_>(rhs_scalar_));
+		}
+
+		/// <summary>
+		/// <para> Multiplies this Quaternion with the passed `rhs_` Quaternion. </para>
+		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline void MultiplyAssignQuaternion(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_)
+		{
+			EmuMath::Helpers::fast_quaternion_multiply_assign_quaternion(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Multiplies this Quaternion's underlying register(s) by the passed `rhs_scalar_register_` register. </para>
+		/// <para> The passed register should contain the same value in all respective lanes for most cases of standard Quaternion x Scalar multiplication. </para>
+		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline void MultiplyAssignScalar(register_arg_type rhs_scalar_register_)
+		{
+			EmuMath::Helpers::fast_quaternion_multiply_assign_scalar(*this, rhs_scalar_register_);
+		}
+
+		/// <summary>
+		/// <para> Multiplies this Quaternion's underlying register(s) by the passed `rhs_scalar_register_` register. </para>
+		/// <para> An intermediate register will be created to perform this operation. </para>
+		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
+		/// </summary>
+		template<EmuConcepts::Arithmetic RhsScalar_>
+		[[nodiscard]] constexpr inline void MultiplyAssignScalar(RhsScalar_&& rhs_scalar_)
+		{
+			EmuMath::Helpers::fast_quaternion_multiply_assign_scalar(*this, std::forward<RhsScalar_>(rhs_scalar_));
+		}
 #pragma endregion
 
 #pragma region TO_EULER_FUNCTIONS
