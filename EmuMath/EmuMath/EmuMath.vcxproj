@@ -224,13 +224,16 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_underlying_helpers\_fast_matrix_underlying_store.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_underlying_helpers\_fast_matrix_underlying_translate.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_underlying_helpers\_fast_matrix_underlying_transpose.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_fast_quaternion_operators.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_fast_quaternion_t.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_helpers\_all_fast_quaternion_helpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_helpers\_common_fast_quaternion_includes.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_helpers\_fast_quaternion_arithmetic.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_helpers\_fast_quaternion_from_euler.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_helpers\_fast_quaternion_store.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_helpers\_fast_quaternion_to_euler.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_underlying_helpers\_fast_quaternion_tmp.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_underlying_helpers\_fast_quaternion_underlying_arithmetic.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_underlying_helpers\_fast_quaternion_underlying_from_euler.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_underlying_helpers\_fast_quaternion_underlying_store.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_underlying_helpers\_fast_quaternion_underlying_to_euler.h" />

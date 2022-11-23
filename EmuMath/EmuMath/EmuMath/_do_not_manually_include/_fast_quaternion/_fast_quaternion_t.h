@@ -283,7 +283,7 @@ namespace EmuMath
 		}
 
 		template<std::size_t RegisterIndex_>
-		[[nodiscard]] static constexpr inline register_type _load_register_from_pointer(value_type* p_to_load_)
+		[[nodiscard]] static constexpr inline register_type _load_register_from_pointer(const value_type* p_to_load_)
 		{
 			constexpr std::size_t offset = RegisterIndex_ * elements_per_register;
 			return EmuSIMD::load<register_type>(p_to_load_ + offset);
@@ -292,7 +292,7 @@ namespace EmuMath
 		template<std::size_t...RegisterIndices_>
 		[[nodiscard]] static constexpr inline data_type _load_data_array_from_pointer
 		(
-			value_type* p_to_load_,
+			const value_type* p_to_load_,
 			std::index_sequence<RegisterIndices_...> register_indices_
 		) noexcept
 		{
@@ -305,7 +305,7 @@ namespace EmuMath
 			});
 		}
 
-		[[nodiscard]] static constexpr inline data_type _load_data_from_pointer(value_type* p_to_load_) noexcept
+		[[nodiscard]] static constexpr inline data_type _load_data_from_pointer(const value_type* p_to_load_) noexcept
 		{
 			if constexpr (num_registers > 1)
 			{
@@ -528,6 +528,23 @@ namespace EmuMath
 	public:
 		constexpr inline this_type& operator=(const this_type&) noexcept = default;
 		constexpr inline this_type& operator=(this_type&&) noexcept = default;
+#pragma endregion
+
+#pragma region CONST_ARITHMETIC_FUNCS
+	public:
+		[[nodiscard]] constexpr inline auto Add(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_) const
+			-> EmuMath::FastQuaternion<T_, RegisterWidth_>
+		{
+			return EmuMath::Helpers::fast_quaternion_add(*this, rhs_);
+		}
+
+		[[nodiscard]] constexpr inline auto Subtract(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_) const
+			-> EmuMath::FastQuaternion<T_, RegisterWidth_>
+		{
+			return EmuMath::Helpers::fast_quaternion_subtract(*this, rhs_);
+		}
+
+		// TODO: Write remaining arithmetic members (helper functions already exist, just need symbols for the type)
 #pragma endregion
 
 #pragma region TO_EULER_FUNCTIONS

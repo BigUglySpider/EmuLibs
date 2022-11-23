@@ -639,7 +639,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 			using sub_func = EmuCore::do_subtract<calc_fp, calc_fp>;
 			using mul_func = EmuCore::do_multiply<calc_fp, calc_fp>;
 
-			// Prepare x, y, z, w as first right-hand subtraction operand for respective components
+			// Prepare x, y, z, w as first right-hand subtraction operand for respective components 
 			calc_fp x = mul_func()(lhs_z, rhs_y);
 			calc_fp y = mul_func()(lhs_x, rhs_z);
 			calc_fp z = mul_func()(lhs_y, rhs_x);
