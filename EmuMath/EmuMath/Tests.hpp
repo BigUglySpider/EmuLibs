@@ -23,7 +23,7 @@
 
 namespace EmuCore::TestingHelpers
 {
-	static constexpr std::size_t shared_num_loops = 500000;
+	static constexpr std::size_t shared_num_loops = 5000000;
 	static constexpr unsigned long long shared_fill_seed_ = 1337;
 	static constexpr unsigned long long shared_select_seed_ = -25;
 
@@ -440,33 +440,34 @@ namespace EmuCore::TestingHelpers
 		void Prepare()
 		{
 			// FILLS
-			quaternions.resize(NUM_LOOPS);
+			res.resize(NUM_LOOPS);
 
 			// RESERVES
-			eulers.reserve(NUM_LOOPS);
+			lhs.reserve(NUM_LOOPS);
+			rhs.reserve(NUM_LOOPS);
 			EmuMath::RngWrapper<true> rng(-90, 90, shared_fill_seed_);
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				eulers.emplace_back(make_random_vec<euler_type, quat_t, 3>(rng));
+				auto euler = make_random_vec<euler_type, quat_t, 3>(rng);
+				lhs.emplace_back(quaternion_type::from_euler(std::move(euler)));
+				
+				euler = make_random_vec<euler_type, quat_t, 3>(rng);
+				rhs.emplace_back(quaternion_type::from_euler(std::move(euler)));
 			}
 		}
 		void operator()(std::size_t i_)
 		{
-			quaternions[i_] = quaternion_type::from_euler<in_rads, norm_out>
-			(
-				eulers[i_][0],
-				eulers[i_][1],
-				eulers[i_][2]
-			);
+			res[i_] = lhs[i_] * rhs[i_];
 		}
 		void OnTestsOver()
 		{
 			const std::size_t i = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
-			std::cout << eulers[i] << " -> " << quaternions[i] << "\n\n";
+			std::cout << lhs[i] << " * " << rhs[i] << " = " << res[i] << "\n\n";
 		}
 
-		std::vector<euler_type> eulers;
-		std::vector<quaternion_type> quaternions;
+		std::vector<quaternion_type> lhs;
+		std::vector<quaternion_type> rhs;
+		std::vector<quaternion_type> res;
 	};
 
 	struct FastQuaternionTest
@@ -480,6 +481,7 @@ namespace EmuCore::TestingHelpers
 		using quat_t = double;
 		using euler_type = EmuMath::Vector<3, quat_t>;
 		using quaternion_type = EmuMath::FastQuaternion<quat_t, 128>;
+		using scalar_quaternion_type = EmuMath::Quaternion<quat_t>;
 		static constexpr bool in_rads = false;
 		static constexpr bool norm_out = false;
 
@@ -489,33 +491,34 @@ namespace EmuCore::TestingHelpers
 		void Prepare()
 		{
 			// FILLS
-			quaternions.resize(NUM_LOOPS);
+			res.resize(NUM_LOOPS);
 
 			// RESERVES
-			eulers.reserve(NUM_LOOPS);
+			lhs.reserve(NUM_LOOPS);
+			rhs.reserve(NUM_LOOPS);
 			EmuMath::RngWrapper<true> rng(-90, 90, shared_fill_seed_);
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				eulers.emplace_back(make_random_vec<euler_type, quat_t, 3>(rng));
+				auto euler = make_random_vec<euler_type, quat_t, 3>(rng);
+				lhs.emplace_back(quaternion_type(scalar_quaternion_type::from_euler(std::move(euler))));
+
+				euler = make_random_vec<euler_type, quat_t, 3>(rng);
+				rhs.emplace_back(quaternion_type(scalar_quaternion_type::from_euler(std::move(euler))));
 			}
 		}
 		void operator()(std::size_t i_)
 		{
-			quaternions[i_] = EmuMath::Helpers::fast_quaternion_from_euler<quaternion_type, in_rads, norm_out>
-			(
-				eulers[i_][0],
-				eulers[i_][1],
-				eulers[i_][2]
-			);
+			res[i_] = lhs[i_] * rhs[i_];
 		}
 		void OnTestsOver()
 		{
 			const std::size_t i = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
-			std::cout << eulers[i] << " -> " << quaternions[i] << "\n\n";
+			std::cout << lhs[i] << " * " << rhs[i] << " = " << res[i] << "\n\n";
 		}
 
-		std::vector<euler_type> eulers;
-		std::vector<quaternion_type> quaternions;
+		std::vector<quaternion_type> lhs;
+		std::vector<quaternion_type> rhs;
+		std::vector<quaternion_type> res;
 	};
 #pragma endregion
 

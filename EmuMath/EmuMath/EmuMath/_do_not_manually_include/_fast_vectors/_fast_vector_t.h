@@ -7145,16 +7145,16 @@ namespace EmuMath
 #pragma region GENERAL_HELPERS
 	private:
 		template<std::size_t FullWidthIndex_, typename Vector_>
-		[[nodiscard]] static constexpr inline typename _vector_get_index_for_load_result<FullWidthIndex_, Vector_>::type _get_index_from_normal_vector(Vector_&& arg_)
+		[[nodiscard]] static constexpr inline decltype(auto) _get_index_from_normal_vector(Vector_&& arg_)
 		{
 			using vector_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
-			if constexpr (FullWidthIndex_ > vector_uq::size || std::is_lvalue_reference_v<Vector_>)
+			if constexpr (FullWidthIndex_ >= vector_uq::size || std::is_lvalue_reference_v<Vector_>)
 			{
-				return arg_.AtTheoretical<FullWidthIndex_>();
+				return std::forward<Vector_>(arg_).template AtTheoretical<FullWidthIndex_>();
 			}
 			else
 			{
-				return std::move(arg_.AtTheoretical<FullWidthIndex_>());
+				return std::move(std::forward<Vector_>(arg_).template at<FullWidthIndex_>());
 			}
 		}
 
