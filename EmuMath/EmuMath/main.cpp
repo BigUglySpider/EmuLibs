@@ -1148,6 +1148,31 @@ int main()
 	std::cout << "\t" << (lhs_quat_fast_runtime_c += decltype(lhs_quat_fast_runtime_c)(lhs_quat_test)) << "\n";
 	std::cout << "\t" << (lhs_quat_fast_runtime_c -= decltype(lhs_quat_fast_runtime_c)(rhs_quat_test)) << "\n]\n";
 
+	std::cout << "\n\n\n---CMP TESTS---\n";
+	std::cout << EmuMath::FastQuaternion<float>(1, 2, 3, 4).CmpEqual(EmuMath::FastQuaternion<float>(1, 2, 3, 4)) << "\n";
+	std::cout << EmuMath::FastQuaternion<float>(1, 2, 3, 4).CmpNotEqual(EmuMath::FastQuaternion<float>(1, 2, 3, 4)) << "\n";
+	std::cout << EmuMath::FastQuaternion<float>(1, 2, 3, 4).CmpNear(EmuMath::FastQuaternion<float>(1, 2, 3, 4)) << "\n";
+	std::cout << EmuMath::FastQuaternion<double>(1, 2, 3, 4).CmpEqual(EmuMath::FastQuaternion<double>(1, 2, 3, 4)) << "\n";
+	std::cout << EmuMath::FastQuaternion<double>(1, 2, 3, 4).CmpNotEqual(EmuMath::FastQuaternion<double>(1, 2, 3, 4)) << "\n";
+	std::cout << EmuMath::FastQuaternion<double>(1, 2, 3, 4).CmpNear(EmuMath::FastQuaternion<double>(1, 2, 3, 4)) << "\n";
+	auto cmptesta = EmuMath::FastQuaternion<float, 256>(EmuSIMD::setr<__m256>(1, 2, 3, 4, 5, 6, 7, 8));
+	auto cmptestb = EmuMath::FastQuaternion<float, 256>(EmuSIMD::setr<__m256>(1, 2, 3, 4, 9, 10, 11, 12));
+	std::cout << cmptesta.CmpEqual(cmptestb) << "\n";
+	std::cout << cmptesta.CmpNotEqual(cmptestb) << "\n";
+	std::cout << cmptesta.CmpNear(cmptestb) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::FastQuaternion<float>(1, 2, 3, 4).CmpEqual(EmuMath::FastQuaternion<float>(1, 2, 3, 217)) << "\n";
+	std::cout << EmuMath::FastQuaternion<float>(1, 2, 3, 4).CmpNotEqual(EmuMath::FastQuaternion<float>(1, 2, 3, 217)) << "\n";
+	std::cout << EmuMath::FastQuaternion<float>(1, 2, 3, 4).CmpNear(EmuMath::FastQuaternion<float>(1, 2, 3, 217)) << "\n";
+	std::cout << EmuMath::FastQuaternion<double>(1, 2, 3, 4).CmpEqual(EmuMath::FastQuaternion<double>(1, 2, 3, 217)) << "\n";
+	std::cout << EmuMath::FastQuaternion<double>(1, 2, 3, 4).CmpNotEqual(EmuMath::FastQuaternion<double>(1, 2, 3, 217)) << "\n";
+	std::cout << EmuMath::FastQuaternion<double>(1, 2, 3, 4).CmpNear(EmuMath::FastQuaternion<double>(1, 2, 3, 217)) << "\n";
+	auto cmptestc = EmuMath::FastQuaternion<float, 256>(EmuSIMD::setr<__m256>(1, 2, 3, 4, 5, 6, 7, 8));
+	auto cmptestd = EmuMath::FastQuaternion<float, 256>(EmuSIMD::setr<__m256>(1, 2, 3, 217, 9, 10, 11, 12));
+	std::cout << cmptestc.CmpEqual(cmptestd) << "\n";
+	std::cout << cmptestc.CmpNotEqual(cmptestd) << "\n";
+	std::cout << cmptestc.CmpNear(cmptestd) << "\n";
+
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN; 

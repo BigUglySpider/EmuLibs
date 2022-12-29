@@ -670,7 +670,7 @@ namespace EmuMath
 		}
 
 		/// <summary>
-		/// <para> Multiplies this Quaternion's underlying register(s) by the passed `rhs_scalar_register_` register. </para>
+		/// <para> Multiplies this Quaternion by the passed `rhs_scalar_` value. </para>
 		/// <para> An intermediate register will be created to perform this operation. </para>
 		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
 		/// </summary>
@@ -678,6 +678,37 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline void MultiplyAssignScalar(RhsScalar_&& rhs_scalar_)
 		{
 			EmuMath::Helpers::fast_quaternion_multiply_assign_scalar(*this, std::forward<RhsScalar_>(rhs_scalar_));
+		}
+#pragma endregion
+
+#pragma region COMPARISON_FUNCS
+		[[nodiscard]] constexpr inline bool CmpEqual(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_) const noexcept
+		{
+			return EmuMath::Helpers::fast_quaternion_cmp_equal(*this, rhs_);
+		}
+
+		[[nodiscard]] constexpr inline bool CmpNotEqual(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_) const noexcept
+		{
+			return EmuMath::Helpers::fast_quaternion_cmp_not_equal(*this, rhs_);
+		}
+
+		[[nodiscard]] constexpr inline bool CmpNear(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_) const noexcept
+		{
+			return EmuMath::Helpers::fast_quaternion_cmp_near(*this, rhs_);
+		}
+
+		[[nodiscard]] constexpr inline bool CmpNear(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_, register_arg_type epsilon_) const noexcept
+		{
+			return EmuMath::Helpers::fast_quaternion_cmp_near(*this, rhs_, epsilon_);
+		}
+
+		[[nodiscard]] constexpr inline bool CmpNear
+		(
+			const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_,
+			const EmuMath::FastQuaternion<T_, RegisterWidth_>& epsilon_
+		) const noexcept
+		{
+			return EmuMath::Helpers::fast_quaternion_cmp_near(*this, rhs_, epsilon_);
 		}
 #pragma endregion
 

@@ -3,6 +3,7 @@
 
 #include "_underlying_template_helpers/_all_underlying_templates.h"
 #include "../../../../EmuCore/TMPHelpers/Values.h"
+#include "../../../../EmuCore/TMPHelpers/VariadicHelpers.h"
 
 namespace EmuSIMD
 {
@@ -95,6 +96,34 @@ namespace EmuSIMD
 			}
 		}
 	};
+
+	template<class Register_, bool...IndexActive_>
+	[[nodiscard]] constexpr inline auto make_index_mask(EmuCore::TMP::bool_sequence<IndexActive_...> indices_active_) noexcept
+		-> typename EmuCore::TMP::remove_ref_cv<Register_>::type
+	{
+		return index_mask<Register_, IndexActive_...>::get();
+	}
+
+	template<class Register_, bool...IndexActive_>
+	[[nodiscard]] constexpr inline auto make_index_mask() noexcept
+		-> typename EmuCore::TMP::remove_ref_cv<Register_>::type
+	{
+		return index_mask<Register_, IndexActive_...>::get();
+	}
+
+	template<class Register_, bool...IndexActive_>
+	[[nodiscard]] constexpr inline auto make_index_mask_reverse(EmuCore::TMP::bool_sequence<IndexActive_...> indices_active_) noexcept
+		-> typename EmuCore::TMP::remove_ref_cv<Register_>::type
+	{
+		return make_index_mask<Register_>(EmuCore::TMP::make_inverted_integer_sequence<EmuCore::TMP::bool_sequence<IndexActive_...>>());
+	}
+
+	template<class Register_, bool...IndexActive_>
+	[[nodiscard]] constexpr inline auto make_index_mask_reverse() noexcept
+		-> typename EmuCore::TMP::remove_ref_cv<Register_>::type
+	{
+		return make_index_mask<Register_>(EmuCore::TMP::make_inverted_integer_sequence<EmuCore::TMP::bool_sequence<IndexActive_...>>());
+	}
 	
 	// NOTE FOR FUNCS: Integral functions have their adaptive nature based on arguments as _per_index_mask does, but an extra subset of _width functions are provided
 	// --- These functions are used to enforce safety and sanity checks when working with known size integral registers, if desired
