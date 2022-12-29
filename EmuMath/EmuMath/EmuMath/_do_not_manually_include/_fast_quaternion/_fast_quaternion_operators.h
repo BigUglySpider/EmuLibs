@@ -152,4 +152,26 @@ template<typename T_, std::size_t RegisterWidth_, EmuConcepts::Arithmetic RhsSca
 }
 #pragma endregion
 
+#pragma region CMP_OPERATORS
+template<typename T_, std::size_t RegisterWidth_>
+[[nodiscard]] constexpr inline bool operator==
+(
+	const EmuMath::FastQuaternion<T_, RegisterWidth_>& lhs_,
+	const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_
+) noexcept
+{
+	return EmuMath::Helpers::fast_quaternion_cmp_equal(lhs_, rhs_);
+}
+
+template<typename T_, std::size_t RegisterWidth_>
+[[nodiscard]] constexpr inline bool operator!=
+(
+	const EmuMath::FastQuaternion<T_, RegisterWidth_>& lhs_,
+	const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_
+	) noexcept
+{
+	return EmuMath::Helpers::fast_quaternion_cmp_not_equal(lhs_, rhs_);
+}
+#pragma endregion
+
 #endif
