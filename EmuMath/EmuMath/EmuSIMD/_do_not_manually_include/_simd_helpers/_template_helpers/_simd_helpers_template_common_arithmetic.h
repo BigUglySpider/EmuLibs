@@ -127,7 +127,7 @@ namespace EmuSIMD
 				{
 					return _mm256_castps128_ps256
 					(
-						horizontal_sum
+						horizontal_sum<32>
 						(
 							_mm_add_ps
 							(
@@ -150,7 +150,7 @@ namespace EmuSIMD
 					chunks_[0] = _mm_add_ps(chunks_[0], chunks_[2]);
 					return _mm512_castps128_ps512
 					(
-						horizontal_sum(_mm_add_ps(chunks_[0], chunks_[3]))
+						horizontal_sum<32>(_mm_add_ps(chunks_[0], chunks_[3]))
 					);
 				}
 				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
@@ -161,7 +161,7 @@ namespace EmuSIMD
 				{
 					return _mm256_castpd128_pd256
 					(
-						horizontal_sum
+						horizontal_sum<64>
 						(
 							_mm_add_pd
 							(
@@ -184,7 +184,7 @@ namespace EmuSIMD
 					chunks_[0] = _mm_add_pd(chunks_[0], chunks_[2]);
 					return _mm512_castpd128_pd512
 					(
-						horizontal_sum(_mm_add_pd(chunks_[0], chunks_[3]))
+						horizontal_sum<64>(_mm_add_pd(chunks_[0], chunks_[3]))
 					);
 				}
 				else
