@@ -30,10 +30,11 @@
 constexpr auto test_dot = EmuCore::dot<float>(1, 2, 6, 3, 7, 10);
 constexpr auto test_dot_2 = EmuCore::dot(5, 7);
 
-inline void universal_pause()
+inline void universal_pause(const std::string& msg = "Press enter to continue...")
 {
-	printf("Press enter to continue...\n");
-	std::ignore = getchar();
+	std::string dummy;
+	printf("%s", msg.c_str());
+	std::getline(std::cin, dummy);
 }
 
 template<typename T_, std::size_t Size_>
