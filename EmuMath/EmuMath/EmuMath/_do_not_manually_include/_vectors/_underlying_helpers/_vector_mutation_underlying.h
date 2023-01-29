@@ -328,7 +328,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		template<std::size_t...AllIndices_>
 		struct _valid_for_arg_indices
 		{
-			static constexpr bool value = false;
+			static constexpr bool value = sizeof...(AllIndices_) == 0 ? true : false;
 		};
 		template<std::size_t FirstIndex_, std::size_t...RemainingIndices_>
 		struct _valid_for_arg_indices<FirstIndex_, RemainingIndices_...>
@@ -339,11 +339,6 @@ namespace EmuMath::Helpers::_vector_underlying
 		struct _valid_for_arg_indices<Index_>
 		{
 			static constexpr bool value = _vector_mutate_is_valid_invocation_for_construction<Index_, OutVector_, Func_, Args_...>();
-		};
-		template<>
-		struct _valid_for_arg_indices<>
-		{
-			static constexpr bool value = true;
 		};
 
 	public:
