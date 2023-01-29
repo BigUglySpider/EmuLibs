@@ -1,6 +1,7 @@
 #ifndef EMU_SIMD_TEMPLATE_HELPERS_UNDERLYING_SET_H_INC_
 #define EMU_SIMD_TEMPLATE_HELPERS_UNDERLYING_SET_H_INC_ 1
 
+#include <climits>
 #include "_common_underlying_simd_template_helper_includes.h"
 #include "../../../../../EmuCore/TMPHelpers/Values.h"
 

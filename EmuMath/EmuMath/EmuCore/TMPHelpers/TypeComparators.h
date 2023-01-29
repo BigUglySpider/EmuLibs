@@ -1,6 +1,7 @@
 #ifndef EMU_CORE_TMP_HELPERS_TYPE_COMPARATORS_H_INC_
 #define EMU_CORE_TMP_HELPERS_TYPE_COMPARATORS_H_INC_ 1
 
+#include <climits>
 #include <tuple>
 #include <type_traits>
 #include "TypeConvertors.h"
