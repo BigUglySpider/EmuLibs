@@ -30,18 +30,10 @@
 constexpr auto test_dot = EmuCore::dot<float>(1, 2, 6, 3, 7, 10);
 constexpr auto test_dot_2 = EmuCore::dot(5, 7);
 
-static std::ostream& print_mat4x4(DirectX::XMFLOAT4X4 mat4x4)
+inline void universal_pause()
 {
-	for (auto i = 0; i < 4; ++i)
-	{
-		std::cout << "{ ";
-		for (auto j = 0; j < 4; ++j)
-		{
-			std::cout << mat4x4(i, j) << ", ";
-		}
-		std::cout << " }\n";
-	}
-	return std::cout;
+	printf("Press enter to continue...\n");
+	std::ignore = getchar();
 }
 
 template<typename T_, std::size_t Size_>
@@ -422,7 +414,7 @@ int main()
 	irregular_matrix.AssignRotation3DZConstexpr<12, true, false>(33);
 	std::cout << irregular_matrix << "\n\n";
 
-	system("pause");
+	universal_pause();;
 	std::cout << "\n\n\n\nQUATERNIONS\n";
 	constexpr auto rot_euler = EmuMath::Vector<3, float>
 	(
@@ -746,7 +738,7 @@ int main()
 	constexpr auto fast_mat_in_scalar_a = EmuMath::Helpers::matrix_ortho_vk<float, true>(0, 0, 1920, 1080, 0.001, 1000);
 	constexpr auto fast_mat_in_scalar_b = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 
-	
+	constexpr std::array<std::array<int, 3>, 3> matrix({ {1, 2, 3}, {4, 5, 6}, {7, 8, 9} });
 
 	//constexpr auto fast8x8_in_a = EmuMath::Matrix<8, 7, float, false>
 	//(
@@ -1175,7 +1167,7 @@ int main()
 	std::cout << (cmptestc != cmptestd) << "\n";
 	std::cout << cmptestc.CmpNear(cmptestd) << "\n";
 
-	system("pause");
+	universal_pause();;
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN; 
 	//constexpr std::size_t test_noise_dimensions = 3;
@@ -1196,7 +1188,7 @@ int main()
 	//constexpr EmuMath::Info::NoisePermutationInfo::seed_32_type noise_perm_seed_32 = 1337;
 	//constexpr EmuMath::Info::NoisePermutationInfo::seed_64_type noise_perm_seed_64 = 1337;
 	//
-	//system("pause");
+	//universal_pause();;
 	//for (std::size_t i = 0; i < num_iterations; ++i)
 	//{
 	//	std::cout << "\nNOISE BATCH " << i << "\n";
@@ -1267,7 +1259,7 @@ int main()
 	// */
 
 #pragma region TEST_HARNESS_EXECUTION
-	system("pause");
+	universal_pause();;
 	EmuCore::TestingHelpers::PerformTests();
 #pragma endregion
 	//std::cout << result.Add(rand()) << " :)";

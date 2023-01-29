@@ -18,8 +18,17 @@
 #include "EmuMath/Quaternion.h"
 #include "EmuMath/FastQuaternion.h"
 #include <bitset>
-#include <DirectXMath.h>
 #include <string_view>
+
+#if defined(WIN32) || defined(WIN64) || defined(_WIN32) || defined(_WIN64)
+#define USE_DIRECTX_TESTS 1
+#else
+#define USE_DIRECTX_TESTS 0
+#endif
+
+#if USE_DIRECTX_TESTS
+#include <DirectXMath.h>
+#endif
 
 namespace EmuCore::TestingHelpers
 {
@@ -240,6 +249,7 @@ namespace EmuCore::TestingHelpers
 		std::vector<t_arg> determinants;
 	};
 
+#if USE_DIRECTX_TESTS
 	struct DirectXSimdTest
 	{
 		static constexpr bool DO_TEST = true;
@@ -417,6 +427,7 @@ namespace EmuCore::TestingHelpers
 		std::vector<mat_type> rhs;
 		std::vector<float> determinants;
 	};
+#endif
 #pragma endregion
 
 #pragma region EMU_VS_EMU
