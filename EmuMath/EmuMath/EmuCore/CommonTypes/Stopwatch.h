@@ -142,7 +142,7 @@ namespace EmuCore
 		{
 			if (is_active)
 			{
-				current_time += timer.Pause<duration_type>();
+				current_time += timer.template Pause<duration_type>();
 				is_active = false;
 			}
 
