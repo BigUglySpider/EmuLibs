@@ -164,7 +164,7 @@ namespace EmuCore
 		{
 			if (is_active)
 			{
-				return _convert_to_output<Out_, OutRatio_>(current_time + timer.Get<duration_type>());
+				return _convert_to_output<Out_, OutRatio_>(current_time + timer.template Get<duration_type>());
 			}
 			else
 			{
@@ -195,7 +195,7 @@ namespace EmuCore
 		template<class Out_ = count_type, class OutRatio_ = ratio_default>
 		[[nodiscard]] inline Out_ GetCurrentSegment() const noexcept
 		{
-			return timer.Get<Out_, OutRatio_>();
+			return timer.template Get<Out_, OutRatio_>();
 		}
 
 		/// <summary> Returns a boolean indicating if this stopwatch is currently active. </summary>
