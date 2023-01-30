@@ -324,7 +324,6 @@ int main()
 	scale_assign_matrix.AssignScale(EmuMath::Vector<4, unsigned long long int>(1, 2, 3, 4));
 	std::cout << scale_assign_matrix << "\n\n";
 
-
 	std::cout << "MAKE_TRANSLATION TESTS\n";
 	constexpr auto translate = EmuMath::Helpers::matrix_make_translation<float>(2, 5, 10);
 	constexpr auto translate_from_tuple = EmuMath::Helpers::matrix_make_translation<double>(std::make_tuple(8, -2.0L, 0.5f));

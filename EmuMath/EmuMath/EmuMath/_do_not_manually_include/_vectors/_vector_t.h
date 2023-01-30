@@ -23,7 +23,7 @@ namespace EmuMath
 		using value_type_uq = typename vector_info::value_type_uq;
 		using preferred_floating_point = typename vector_info::preferred_floating_point;
 		using alternative_rep = typename vector_info::alternative_vector_rep;
-		friend typename alternative_rep;
+		friend alternative_rep;
 
 		/// <summary> STL-compliant random-access iterator for this Vector type. </summary>
 		using iterator = EmuMath::vector_iterator<this_type>;
@@ -6902,7 +6902,7 @@ namespace std
 			if constexpr (Index_ < EmuMath::Vector<Size_, T_>::size)
 			{
 				out_ *= MultiplierPrimeConstant_;
-				out_ += _element_hash()(vector_.at<Index_>());
+				out_ += _element_hash()(vector_.template at<Index_>());
 
 				if constexpr ((Index_ + 1) < EmuMath::Vector<Size_, T_>::size)
 				{

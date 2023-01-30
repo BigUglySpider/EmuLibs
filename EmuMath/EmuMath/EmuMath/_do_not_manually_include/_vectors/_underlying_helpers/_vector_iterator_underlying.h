@@ -13,7 +13,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	private:
 		static_assert(EmuMath::TMP::is_emu_vector_v<Vector_>, "Attempted to create an EmuMath vector_iterator with a non-EmuMath-Vector argument type.");
 		using _vector_type = EmuCore::TMP::remove_ref_cv_t<Vector_>;
-		friend typename _vector_type;
+		friend _vector_type;
 
 		static constexpr bool _is_const = std::is_const_v<Vector_>;
 		using _stored_type = typename EmuCore::TMP::conditional_const<_is_const, typename _vector_type::stored_type>::type;
