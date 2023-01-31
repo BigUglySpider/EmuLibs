@@ -513,7 +513,8 @@ namespace EmuSIMD::Funcs
 		#ifdef _mm_cos_ps
 		return _mm_cos_ps(in_);
 		#else
-		throw "NOT IMPLEMENTED: cos_f32x4";
+		return in_; // TODO: FIX!
+		// throw "NOT IMPLEMENTED: cos_f32x4";
 		#endif
 	}
 
@@ -522,7 +523,78 @@ namespace EmuSIMD::Funcs
 		#ifdef _mm_sin_ps
 		return _mm_sin_ps(in_);
 		#else
-		throw "NOT IMPLEMENTED: sin_f32x4";
+		// Alternative manual approximation, based on https://developer.download.nvidia.com/cg/sin.html implementation
+		
+		// Store constants used > once in registers to allow shuffling to them
+		EmuSIMD::f32x4 c1x_c2x_c3x_c4x = setr_f32x4(0.25f, 24.9808039603f, 85.4537887573f, 19.7392082214f);
+		EmuSIMD::f32x4 one_c2z_c3z_c4z = setr_f32x4(1.0f, -60.1458091736f, -64.9393539429f, -1.0f);
+
+		// Prepare for power series
+		EmuSIMD::f32x4 const0 = _mm_permute_ps(c1x_c2x_c3x_c4x, _MM_SHUFFLE(0, 0, 0, 0));
+		EmuSIMD::f32x4 r1x = fmsub_f32x4(set1_f32x4(0.159154943091f), in_, const0); // r1.x = c1.w * in_ - c1.x
+
+		EmuSIMD::f32x4 r1y = trunc_f32x4(r1x); // r1.y = frac(r1.x)
+		r1y = sub_f32x4(r1x, r1y);
+
+		EmuSIMD::f32x4 r2x = _mm_cmplt_ps(r1x, const0); // r2.x = r1.x < c1.x
+
+		const0 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(0, 0, 0, 0));
+		r2x = _mm_and_ps(r2x, const0);
+
+		EmuSIMD::f32x4 r2y = _mm_cmpge_ps(r1y, set1_f32x4(-9.0f)); // r2.yz = r1.yy >= c1.yz
+		EmuSIMD::f32x4 r2z = _mm_cmpge_ps(r1y, set1_f32x4(0.75f));
+		r2y = _mm_and_ps(r2y, const0);
+		r2z = _mm_and_ps(r2z, const0);
+
+		EmuSIMD::f32x4 const1 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(3, 3, 3, 3));
+		r2y = fmadd_f32x4(r2x, const1, fmadd_f32x4(r2y, const0, mul_f32x4(r2z, const1))); // dot(r2, c4.zwz)
+
+		EmuSIMD::f32x4 r0x = negate_f32x4(r1y);
+		EmuSIMD::f32x4 r0y = sub_f32x4(set1_f32x4(0.5f), r1y);
+		EmuSIMD::f32x4 r0z = sub_f32x4(const0, r1y);
+		r0x = mul_f32x4(r0x, r0x);
+		r0y = mul_f32x4(r0y, r0y);
+		r0z = mul_f32x4(r0z, r0z);
+
+		// Begin power series
+		// --- Power 1
+		const0 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(1, 1, 1, 1));
+		const1 = _mm_permute_ps(c1x_c2x_c3x_c4x, _MM_SHUFFLE(1, 1, 1, 1));
+		r1x = fmadd_f32x4(const1, r0x, const0);
+		r1y = fmadd_f32x4(set1_f32x4(-24.9808039603f), r0y, set1_f32x4(60.1458091736f));
+		auto r1z = fmadd_f32x4(const1, r0z, const0);
+
+		// --- Power 2
+		const0 = _mm_permute_ps(c1x_c2x_c3x_c4x, _MM_SHUFFLE(2, 2, 2, 2));
+		r1x = fmadd_f32x4(r1x, r0x, const0);
+		r1y = fmadd_f32x4(r1y, r0y, set1_f32x4(-85.4537887573f));
+		r1z = fmadd_f32x4(r1z, r0z, const0);
+
+		// --- Power 3
+		const0 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(2, 2, 2, 2));
+		r1x = fmadd_f32x4(r1x, r0x, const0);
+		r1y = fmadd_f32x4(r1y, r0y, set1_f32x4(64.9393539429f));
+		r1z = fmadd_f32x4(r1z, r0z, const0);
+
+		// --- Power 4
+		const0 = _mm_permute_ps(c1x_c2x_c3x_c4x, _MM_SHUFFLE(3, 3, 3, 3));
+		r1x = fmadd_f32x4(r1x, r0x, const0);
+		r1y = fmadd_f32x4(r1y, r0y, set1_f32x4(-19.7392082214f));
+		r1z = fmadd_f32x4(r1z, r0z, const0);
+
+		// --- Power 5
+		const0 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(0, 0, 0, 0));
+		const1 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(3, 3, 3, 3));
+		r1x = fmadd_f32x4(r1x, r0x, const1);
+		r1y = fmadd_f32x4(r1y, r0y, const0);
+		r1z = fmadd_f32x4(r1z, r0z, const1);
+
+		// Final dot
+		r2x = negate_f32x4(r2x);
+		r2y = negate_f32x4(r2y);
+		r2z = negate_f32x4(r2z);
+
+		return fmadd_f32x4(r1x, r2x, fmadd_f32x4(r1y, r2y, mul_f32x4(r1z, r2z)));
 		#endif
 	}
 
@@ -531,7 +603,7 @@ namespace EmuSIMD::Funcs
 		#ifdef _mm_tan_ps
 		return _mm_tan_ps(in_);
 		#else
-		throw "NOT IMPLEMENTED: tan_f32x4";
+		return div_f32x4(sin_f32x4(in_), cos_f32x4(in_));
 		#endif
 	}
 
@@ -545,14 +617,12 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f32x4 one = set1_f32x4(1.0f);
 		EmuSIMD::f32x4 negation_mult = _mm_cmplt_ps(in_, setzero_f32x4());
 		negation_mult = _mm_and_ps(one, negation_mult);
-
-		EmuSIMD::f32x4 result = mul_f32x4(set1_f32x4(-0.0187293f), in_abs);
-		result = add_f32x4(result, set1_f32x4(0.074261f));
-		result = mul_f32x4(result, in_abs);
-		result = sub_f32x4(result, set1_f32x4(0.2121144f));
-		result = mul_f32x4(result, in_abs);
-		result = add_f32x4(result, set1_f32x4(1.5707288f));
-		result = sqrt_f32x4(sub_f32x4(one, in_abs));
+		
+		auto result = set1_f32x4(-0.0187293f);
+		result = fmadd_f32x4(result, in_abs, set1_f32x4(0.074261f));
+		result = fmsub_f32x4(result, in_abs, set1_f32x4(0.2121144f));
+		result = fmadd_f32x4(result, in_abs, set1_f32x4(1.5707288f));
+		result = mul_f32x4(result, sqrt_f32x4(sub_f32x4(one, in_abs)));
 		
 		EmuSIMD::f32x4 tmp = mul_f32x4(set1_f32x4(2.0f), negation_mult);
 		tmp = mul_f32x4(tmp, result);
@@ -573,12 +643,10 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f32x4 negation_mult = _mm_cmplt_ps(in_, setzero_f32x4());
 		negation_mult = _mm_and_ps(two, negation_mult);
 
-		EmuSIMD::f32x4 result = mul_f32x4(set1_f32x4(-0.0187293f), in_abs);
-		result = add_f32x4(result, set1_f32x4(0.074261f));
-		result = mul_f32x4(result, in_abs);
-		result = sub_f32x4(result, set1_f32x4(0.2121144f));
-		result = mul_f32x4(result, in_abs);
-		result = add_f32x4(result, set1_f32x4(1.5707288f));
+		auto result = set1_f32x4(-0.0187293f);
+		result = fmadd_f32x4(result, in_abs, set1_f32x4(0.074261f));
+		result = fmsub_f32x4(result, in_abs, set1_f32x4(0.2121144f));
+		result = fmadd_f32x4(result, in_abs, set1_f32x4(1.5707288f));
 
 		EmuSIMD::f32x4 tmp = sub_f32x4(set1_f32x4(1.0f), in_abs);
 		tmp = mul_f32x4(sqrt_f32x4(tmp), result);
@@ -598,15 +666,15 @@ namespace EmuSIMD::Funcs
 		// Alternative manual approximation, based on https://developer.download.nvidia.com/cg/atan2.html implementation
 		auto abs_x = abs_f32x4(x_);
 		auto abs_y = abs_f32x4(y_);
-		auto temp2 = abs_f32x4(abs_x);
-		auto temp1 = abs_f32x4(abs_y);
+		auto temp2 = abs_x;
+		auto temp1 = abs_y;
 		auto temp0 = _mm_max_ps(temp2, temp1);
 		temp1 = _mm_min_ps(temp2, temp1);
 		temp2 = div_f32x4(set1_f32x4(1.0f), temp0);
 		temp2 = mul_f32x4(temp1, temp2);
 
 		auto t4 = mul_f32x4(temp2, temp2);
-		temp0 = set1_f32x4(0.013480470f);
+		temp0 = set1_f32x4(-0.013480470f);
 		temp0 = fmadd_f32x4(temp0, t4, set1_f32x4(0.057477314f));
 		temp0 = fmsub_f32x4(temp0, t4, set1_f32x4(0.121239071f));
 		temp0 = fmadd_f32x4(temp0, t4, set1_f32x4(0.195635925f));
@@ -638,11 +706,47 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 atan_f32x4(EmuSIMD::f32x4_arg in_)
 	{
-		#ifdef _mm_atan_ps
+		//#ifdef _mm_atan_ps
+		#if 0
 		return _mm_atan_ps(in_);
 		#else
 		// NOTE: Inefficient impl. as we check for some things that are known at compile time (such as the magnitude of 1.0f, making it absolute, etc)
-		return atan2_f32x4(in_, set1_f32x4(1.0f));
+		//return atan2_f32x4(in_, set1_f32x4(1.0f));
+
+		// Alternative manual approximation, based on https://developer.download.nvidia.com/cg/atan2.html implementation
+		auto one = set1_f32x4(1.0f);
+		auto abs_y = abs_f32x4(in_);
+		auto temp2 = one;
+		auto temp1 = abs_y;
+
+		//auto temp0 = _mm_max_ps(temp2, temp1);
+		auto cmp_mask = _mm_cmplt_ps(temp1, one);
+		auto temp0 = _mm_or_ps(_mm_and_ps(cmp_mask, one), _mm_andnot_ps(cmp_mask, temp1));
+		temp1 = _mm_or_ps(_mm_andnot_ps(cmp_mask, one), _mm_and_ps(cmp_mask, temp1));
+		temp2 = div_f32x4(one, temp0);
+		temp2 = mul_f32x4(temp1, temp2);
+
+		auto t4 = mul_f32x4(temp2, temp2);
+		temp0 = set1_f32x4(-0.013480470f);
+		temp0 = fmadd_f32x4(temp0, t4, set1_f32x4(0.057477314f));
+		temp0 = fmsub_f32x4(temp0, t4, set1_f32x4(0.121239071f));
+		temp0 = fmadd_f32x4(temp0, t4, set1_f32x4(0.195635925f));
+		temp0 = fmsub_f32x4(temp0, t4, set1_f32x4(0.332994597f));
+		temp0 = fmadd_f32x4(temp0, t4, set1_f32x4(0.999995630f));
+		temp2 = mul_f32x4(temp0, temp2);
+
+		//t3 = (abs(y) > abs(x)) ? float(1.570796327) - t3 : t3;
+		cmp_mask = _mm_cmpgt_ps(abs_y, one);
+		temp0 = _mm_and_ps(cmp_mask, set1_f32x4(1.570796327f));
+		temp0 = sub_f32x4(temp0, temp2);
+		temp2 = _mm_or_ps(_mm_andnot_ps(cmp_mask, temp2), _mm_and_ps(cmp_mask, temp0));
+
+		//t3 = (y < 0) ? -t3 : t3;
+		cmp_mask = _mm_cmplt_ps(in_, setzero_f32x4());
+		temp0 = negate_f32x4(temp2);
+		temp2 = _mm_or_ps(_mm_andnot_ps(cmp_mask, temp2), _mm_and_ps(cmp_mask, temp0));
+
+		return temp2;
 		#endif
 	}
 

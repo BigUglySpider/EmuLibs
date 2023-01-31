@@ -531,6 +531,58 @@ namespace EmuCore::TestingHelpers
 		std::vector<quaternion_type> rhs;
 		std::vector<quaternion_type> res;
 	};
+
+	struct SIMDSin
+	{
+		static constexpr bool DO_TEST = true;
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = shared_num_loops * 10;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr std::string_view NAME = "SIMD sin";
+
+		static constexpr std::size_t element_width = 32;
+		using scalar_type = float;
+		using register_type = EmuSIMD::f32x4;
+
+		static constexpr std::size_t register_size = EmuSIMD::TMP::register_element_count_v<register_type, element_width>;
+		static constexpr std::size_t NUM_SCALARS = NUM_LOOPS * register_size;
+
+		SIMDSin()
+		{
+		}
+		void Prepare()
+		{
+			// RESIZES
+			out.resize(NUM_SCALARS);
+
+			// RESERVES
+			in.reserve(NUM_SCALARS);
+
+			// EMPLACEMENTS
+			EmuMath::RngWrapper<true> rng(-90, 90, shared_fill_seed_);
+			for (std::size_t i = 0; i < NUM_SCALARS; ++i)
+			{
+				in.emplace_back(EmuCore::Pi::DegsToRads(rng.NextReal<scalar_type>()));
+			}
+		}
+		void operator()(std::size_t i_)
+		{
+			const std::size_t offset = i_ * register_size;
+			register_type data = EmuSIMD::load<register_type>(in.data() + offset);
+			data = EmuSIMD::Funcs::sin_f32x4(data);
+			EmuSIMD::store(data, out.data() + offset);
+		}
+		void OnTestsOver()
+		{
+			const std::size_t i = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
+			const std::size_t offset = i * register_size;
+			std::cout << "sin({" << in[offset] << ", " << in[offset + 1] << ", " << in[offset + 2] << ", " << in[offset + 3] << "}):\n\t";
+			std::cout << "{ " << out[offset] << ", " << out[offset + 1] << ", " << out[offset + 2] << ", " << out[offset + 3] << "}\n";
+		}
+
+		std::vector<scalar_type> in;
+		std::vector<scalar_type> out;
+	};
 #pragma endregion
 
 	// ----------- TESTS SELECTION -----------
@@ -539,8 +591,9 @@ namespace EmuCore::TestingHelpers
 		//EmuNormalMatrixTest,
 		//EmuFastMatrixTest,
 		//DirectXSimdTest
-		ScalarQuaternionTest,
-		FastQuaternionTest
+		//ScalarQuaternionTest,
+		//FastQuaternionTest,
+		SIMDSin
 	>;
 
 	// ----------- TESTS BEGIN -----------
