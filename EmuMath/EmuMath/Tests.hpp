@@ -569,7 +569,7 @@ namespace EmuCore::TestingHelpers
 		{
 			const std::size_t offset = i_ * register_size;
 			register_type data = EmuSIMD::load<register_type>(in.data() + offset);
-			data = EmuSIMD::Funcs::sin_f32x4(data);
+			data = EmuSIMD::Funcs::tan_f32x4(data);
 			EmuSIMD::store(data, out.data() + offset);
 		}
 		void OnTestsOver()

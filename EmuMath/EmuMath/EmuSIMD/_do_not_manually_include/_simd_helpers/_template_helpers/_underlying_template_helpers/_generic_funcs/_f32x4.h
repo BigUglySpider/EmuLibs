@@ -513,8 +513,78 @@ namespace EmuSIMD::Funcs
 		#ifdef _mm_cos_ps
 		return _mm_cos_ps(in_);
 		#else
-		return in_; // TODO: FIX!
-		// throw "NOT IMPLEMENTED: cos_f32x4";
+		// Alternative manual approximation, based on https://developer.download.nvidia.com/cg/cos.html implementation
+
+		// Store constants used > once in registers to allow shuffling to them
+		EmuSIMD::f32x4 c1x_c2x_c3x_c4x = setr_f32x4(0.25f, 24.9808039603f, 85.4537887573f, 19.7392082214f);
+		EmuSIMD::f32x4 one_c2z_c3z_c4z = setr_f32x4(1.0f, -60.1458091736f, -64.9393539429f, -1.0f);
+
+		// Prepare for power series
+		EmuSIMD::f32x4 r1x = mul_f32x4(set1_f32x4(0.159154943091f), in_); // r1.x = c1.w * in_;
+
+		EmuSIMD::f32x4 r1y = trunc_f32x4(r1x); // r1.y = frac(r1.x)
+		r1y = sub_f32x4(r1x, r1y);
+
+		EmuSIMD::f32x4 const0 = _mm_permute_ps(c1x_c2x_c3x_c4x, _MM_SHUFFLE(0, 0, 0, 0));
+		EmuSIMD::f32x4 r2x = _mm_cmplt_ps(r1x, const0); // r2.x = r1.x < c1.x
+
+		const0 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(0, 0, 0, 0));
+		r2x = _mm_and_ps(r2x, const0);
+
+		EmuSIMD::f32x4 r2y = _mm_cmpge_ps(r1y, set1_f32x4(-9.0f)); // r2.yz = r1.yy >= c1.yz
+		EmuSIMD::f32x4 r2z = _mm_cmpge_ps(r1y, set1_f32x4(0.75f));
+		r2y = _mm_and_ps(r2y, const0);
+		r2z = _mm_and_ps(r2z, const0);
+
+		EmuSIMD::f32x4 const1 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(3, 3, 3, 3));
+		r2y = fmadd_f32x4(r2x, const1, fmadd_f32x4(r2y, const0, mul_f32x4(r2z, const1))); // dot(r2, c4.zwz)
+
+		EmuSIMD::f32x4 r0x = negate_f32x4(r1y);
+		EmuSIMD::f32x4 r0y = sub_f32x4(set1_f32x4(0.5f), r1y);
+		EmuSIMD::f32x4 r0z = sub_f32x4(const0, r1y);
+		r0x = mul_f32x4(r0x, r0x);
+		r0y = mul_f32x4(r0y, r0y);
+		r0z = mul_f32x4(r0z, r0z);
+
+		// Begin power series
+		// --- Power 1
+		const0 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(1, 1, 1, 1));
+		const1 = _mm_permute_ps(c1x_c2x_c3x_c4x, _MM_SHUFFLE(1, 1, 1, 1));
+		r1x = fmadd_f32x4(const1, r0x, const0);
+		r1y = fmadd_f32x4(set1_f32x4(-24.9808039603f), r0y, set1_f32x4(60.1458091736f));
+		auto r1z = fmadd_f32x4(const1, r0z, const0);
+
+		// --- Power 2
+		const0 = _mm_permute_ps(c1x_c2x_c3x_c4x, _MM_SHUFFLE(2, 2, 2, 2));
+		r1x = fmadd_f32x4(r1x, r0x, const0);
+		r1y = fmadd_f32x4(r1y, r0y, set1_f32x4(-85.4537887573f));
+		r1z = fmadd_f32x4(r1z, r0z, const0);
+
+		// --- Power 3
+		const0 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(2, 2, 2, 2));
+		r1x = fmadd_f32x4(r1x, r0x, const0);
+		r1y = fmadd_f32x4(r1y, r0y, set1_f32x4(64.9393539429f));
+		r1z = fmadd_f32x4(r1z, r0z, const0);
+
+		// --- Power 4
+		const0 = _mm_permute_ps(c1x_c2x_c3x_c4x, _MM_SHUFFLE(3, 3, 3, 3));
+		r1x = fmadd_f32x4(r1x, r0x, const0);
+		r1y = fmadd_f32x4(r1y, r0y, set1_f32x4(-19.7392082214f));
+		r1z = fmadd_f32x4(r1z, r0z, const0);
+
+		// --- Power 5
+		const0 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(0, 0, 0, 0));
+		const1 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(3, 3, 3, 3));
+		r1x = fmadd_f32x4(r1x, r0x, const1);
+		r1y = fmadd_f32x4(r1y, r0y, const0);
+		r1z = fmadd_f32x4(r1z, r0z, const1);
+
+		// Final dot
+		r2x = negate_f32x4(r2x);
+		r2y = negate_f32x4(r2y);
+		r2z = negate_f32x4(r2z);
+
+		return fmadd_f32x4(r1x, r2x, fmadd_f32x4(r1y, r2y, mul_f32x4(r1z, r2z)));
 		#endif
 	}
 
@@ -603,7 +673,118 @@ namespace EmuSIMD::Funcs
 		#ifdef _mm_tan_ps
 		return _mm_tan_ps(in_);
 		#else
-		return div_f32x4(sin_f32x4(in_), cos_f32x4(in_));
+		// Alternative manual approximation using sin/cos, based on https://developer.download.nvidia.com/cg/sin.html & https://developer.download.nvidia.com/cg/cos.html impl.
+		// --- Made as a unique function instead of deferring to separate cos and sin to minimise required operations
+		
+		// Store constants used > once in registers to allow shuffling to them
+		EmuSIMD::f32x4 c1x_c2x_c3x_c4x = setr_f32x4(0.25f, 24.9808039603f, 85.4537887573f, 19.7392082214f);
+		EmuSIMD::f32x4 one_c2z_c3z_c4z = setr_f32x4(1.0f, -60.1458091736f, -64.9393539429f, -1.0f);
+
+		// Prepare for power series
+		EmuSIMD::f32x4 const0 = _mm_permute_ps(c1x_c2x_c3x_c4x, _MM_SHUFFLE(0, 0, 0, 0));
+		EmuSIMD::f32x4 r1x_cos = mul_f32x4(set1_f32x4(0.159154943091f), in_);
+		EmuSIMD::f32x4 r1x_sin = sub_f32x4(r1x_cos, const0); // r1.x = c1.w * in_ - c1.x
+
+		EmuSIMD::f32x4 r1y_sin = trunc_f32x4(r1x_sin); // r1.y = frac(r1.x)
+		r1y_sin = sub_f32x4(r1x_sin, r1y_sin);
+		EmuSIMD::f32x4 r1y_cos = trunc_f32x4(r1x_sin);
+		r1y_cos = sub_f32x4(r1x_cos, r1y_cos);
+
+		EmuSIMD::f32x4 r2x_sin = _mm_cmplt_ps(r1x_sin, const0); // r2.x = r1.x < c1.x
+		EmuSIMD::f32x4 r2x_cos = _mm_cmplt_ps(r1x_cos, const0);
+
+		const0 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(0, 0, 0, 0));
+		r2x_sin = _mm_and_ps(r2x_sin, const0);
+		r2x_cos = _mm_and_ps(r2x_cos, const0);
+
+		EmuSIMD::f32x4 r2y_sin = _mm_cmpge_ps(r1y_sin, set1_f32x4(-9.0f)); // r2.yz = r1.yy >= c1.yz
+		EmuSIMD::f32x4 r2z_sin = _mm_cmpge_ps(r1y_sin, set1_f32x4(0.75f));
+		r2y_sin = _mm_and_ps(r2y_sin, const0);
+		r2z_sin = _mm_and_ps(r2z_sin, const0);
+		EmuSIMD::f32x4 r2y_cos = _mm_cmpge_ps(r1y_cos, set1_f32x4(-9.0f));
+		EmuSIMD::f32x4 r2z_cos = _mm_cmpge_ps(r1y_cos, set1_f32x4(0.75f));
+		r2y_cos = _mm_and_ps(r2y_cos, const0);
+		r2z_cos = _mm_and_ps(r2z_cos, const0);
+
+		EmuSIMD::f32x4 const1 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(3, 3, 3, 3));
+		r2y_sin = fmadd_f32x4(r2x_sin, const1, fmadd_f32x4(r2y_sin, const0, mul_f32x4(r2z_sin, const1))); // dot(r2, c4.zwz)
+		r2y_cos = fmadd_f32x4(r2x_cos, const1, fmadd_f32x4(r2y_cos, const0, mul_f32x4(r2z_cos, const1)));
+
+		EmuSIMD::f32x4 r0x_sin = negate_f32x4(r1y_sin);
+		EmuSIMD::f32x4 r0y_sin = sub_f32x4(set1_f32x4(0.5f), r1y_sin);
+		EmuSIMD::f32x4 r0z_sin = sub_f32x4(const0, r1y_sin);
+		r0x_sin = mul_f32x4(r0x_sin, r0x_sin);
+		r0y_sin = mul_f32x4(r0y_sin, r0y_sin);
+		r0z_sin = mul_f32x4(r0z_sin, r0z_sin);
+		EmuSIMD::f32x4 r0x_cos = negate_f32x4(r1y_cos);
+		EmuSIMD::f32x4 r0y_cos = sub_f32x4(set1_f32x4(0.5f), r1y_cos);
+		EmuSIMD::f32x4 r0z_cos = sub_f32x4(const0, r1y_cos);
+		r0x_cos = mul_f32x4(r0x_cos, r0x_cos);
+		r0y_cos = mul_f32x4(r0y_cos, r0y_cos);
+		r0z_cos = mul_f32x4(r0z_cos, r0z_cos);
+
+		// Begin power series
+		// --- Power 1
+		const0 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(1, 1, 1, 1));
+		const1 = _mm_permute_ps(c1x_c2x_c3x_c4x, _MM_SHUFFLE(1, 1, 1, 1));
+		r1x_sin = fmadd_f32x4(const1, r0x_sin, const0);
+		r1y_sin = fmadd_f32x4(set1_f32x4(-24.9808039603f), r0y_sin, set1_f32x4(60.1458091736f));
+		EmuSIMD::f32x4 r1z_sin = fmadd_f32x4(const1, r0z_sin, const0);
+		r1x_cos = fmadd_f32x4(const1, r0x_cos, const0);
+		r1y_cos = fmadd_f32x4(set1_f32x4(-24.9808039603f), r0y_cos, set1_f32x4(60.1458091736f));
+		EmuSIMD::f32x4 r1z_cos = fmadd_f32x4(const1, r0z_cos, const0);
+
+		// --- Power 2
+		const0 = _mm_permute_ps(c1x_c2x_c3x_c4x, _MM_SHUFFLE(2, 2, 2, 2));
+		const1 = set1_f32x4(-85.4537887573f);
+		r1x_sin = fmadd_f32x4(r1x_sin, r0x_sin, const0);
+		r1y_sin = fmadd_f32x4(r1y_sin, r0y_sin, const1);
+		r1z_sin = fmadd_f32x4(r1z_sin, r0z_sin, const0);
+		r1x_cos = fmadd_f32x4(r1x_cos, r0x_cos, const0);
+		r1y_cos = fmadd_f32x4(r1y_cos, r0y_cos, const1);
+		r1z_cos = fmadd_f32x4(r1z_cos, r0z_cos, const0);
+
+		// --- Power 3
+		const0 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(2, 2, 2, 2));
+		const1 = set1_f32x4(64.9393539429f);
+		r1x_sin = fmadd_f32x4(r1x_sin, r0x_sin, const0);
+		r1y_sin = fmadd_f32x4(r1y_sin, r0y_sin, const1);
+		r1z_sin = fmadd_f32x4(r1z_sin, r0z_sin, const0);
+		r1x_cos = fmadd_f32x4(r1x_cos, r0x_cos, const0);
+		r1y_cos = fmadd_f32x4(r1y_cos, r0y_cos, const1);
+		r1z_cos = fmadd_f32x4(r1z_cos, r0z_cos, const0);
+
+		// --- Power 4
+		const0 = _mm_permute_ps(c1x_c2x_c3x_c4x, _MM_SHUFFLE(3, 3, 3, 3));
+		const1 = set1_f32x4(-19.7392082214f);
+		r1x_sin = fmadd_f32x4(r1x_sin, r0x_sin, const0);
+		r1y_sin = fmadd_f32x4(r1y_sin, r0y_sin, const1);
+		r1z_sin = fmadd_f32x4(r1z_sin, r0z_sin, const0);
+		r1x_cos = fmadd_f32x4(r1x_cos, r0x_cos, const0);
+		r1y_cos = fmadd_f32x4(r1y_cos, r0y_cos, const1);
+		r1z_cos = fmadd_f32x4(r1z_cos, r0z_cos, const0);
+
+		// --- Power 5
+		const0 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(0, 0, 0, 0));
+		const1 = _mm_permute_ps(one_c2z_c3z_c4z, _MM_SHUFFLE(3, 3, 3, 3));
+		r1x_sin = fmadd_f32x4(r1x_sin, r0x_sin, const1);
+		r1y_sin = fmadd_f32x4(r1y_sin, r0y_sin, const0);
+		r1z_sin = fmadd_f32x4(r1z_sin, r0z_sin, const1);
+		r1x_cos = fmadd_f32x4(r1x_cos, r0x_cos, const1);
+		r1y_cos = fmadd_f32x4(r1y_cos, r0y_cos, const0);
+		r1z_cos = fmadd_f32x4(r1z_cos, r0z_cos, const1);
+
+		// Final dot - store the sins in r2x
+		r2x_sin = negate_f32x4(r2x_sin);
+		r2y_sin = negate_f32x4(r2y_sin);
+		r2z_sin = negate_f32x4(r2z_sin);
+		r2x_sin = fmadd_f32x4(r1x_sin, r2x_sin, fmadd_f32x4(r1y_sin, r2y_sin, mul_f32x4(r1z_sin, r2z_sin)));
+		r2x_cos = negate_f32x4(r2x_cos);
+		r2y_cos = negate_f32x4(r2y_cos);
+		r2z_cos = negate_f32x4(r2z_cos);
+		r2x_cos = fmadd_f32x4(r1x_cos, r2x_cos, fmadd_f32x4(r1y_cos, r2y_cos, mul_f32x4(r1z_cos, r2z_cos)));
+
+		return div_f32x4(r2x_sin, r2x_cos);
 		#endif
 	}
 

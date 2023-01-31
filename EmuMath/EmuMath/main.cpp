@@ -253,7 +253,7 @@ int main()
 		for (std::size_t i = 0; i < 180; i += 4)
 		{
 			auto acos_res = EmuSIMD::setr<EmuSIMD::f32x4, 32>(func(i), func(i + 1), func(i + 2), func(i + 3));
-			acos_res = EmuSIMD::Funcs::sin_f32x4(acos_res);
+			acos_res = EmuSIMD::Funcs::tan_f32x4(acos_res);
 			std::cout << "[" << i << "]: ";
 			EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, acos_res) << "\n";
 		}
