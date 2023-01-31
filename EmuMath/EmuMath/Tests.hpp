@@ -532,13 +532,13 @@ namespace EmuCore::TestingHelpers
 		std::vector<quaternion_type> res;
 	};
 
-	struct SIMDSin
+	struct SIMDTan
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = shared_num_loops * 10;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "SIMD sin";
+		static constexpr std::string_view NAME = "SIMD tan";
 
 		static constexpr std::size_t element_width = 32;
 		using scalar_type = float;
@@ -547,7 +547,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr std::size_t register_size = EmuSIMD::TMP::register_element_count_v<register_type, element_width>;
 		static constexpr std::size_t NUM_SCALARS = NUM_LOOPS * register_size;
 
-		SIMDSin()
+		SIMDTan()
 		{
 		}
 		void Prepare()
@@ -593,7 +593,7 @@ namespace EmuCore::TestingHelpers
 		//DirectXSimdTest
 		//ScalarQuaternionTest,
 		//FastQuaternionTest,
-		SIMDSin
+		SIMDTan
 	>;
 
 	// ----------- TESTS BEGIN -----------
