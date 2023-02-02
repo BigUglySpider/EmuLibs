@@ -3,6 +3,7 @@
 
 #include "../_simd_helpers_underlying_aliases.h"
 #include "../../../../../../EmuCore/ArithmeticHelpers/CommonMath.h"
+#include "../../../../../../EmuCore/CommonPreprocessor/All.h"
 
 #include <cstdint>
 #include <immintrin.h>

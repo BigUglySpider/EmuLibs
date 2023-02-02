@@ -7,9 +7,12 @@ EMU_CORE_ROOT = EmuCore/
 EMU_CORE_SRCS = $(EMU_CORE)*.cpp
 
 COMPILER = g++
+WARNINGS =
 STD = -std=c++20
 EXTRA_LIBS = -lstdc++fs
-COMMON_COMPILER_ARGS = $(STD) $(EXTRA_LIBS)
+SIMD = -mavx2
+INSTRUCTION_SETS = $(SIMD)
+COMMON_COMPILER_ARGS = $(WARNINGS) $(STD) $(INSTRUCTION_SETS) $(EXTRA_LIBS)
 SOURCES = $(MAIN_SRCS) $(EMU_CORE_SRCS)
 OUTPUT_BASE = ./build/emu_math_tests
 
@@ -40,5 +43,5 @@ dbg:
 	$(DBG_COMPILE) $(SOURCES)
 
 dbg_rebuild: clean_dbg dbg
-
+	
 
