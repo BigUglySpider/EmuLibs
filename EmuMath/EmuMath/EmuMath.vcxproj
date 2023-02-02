@@ -157,6 +157,10 @@
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonValues.h" />
     <ClInclude Include="EmuCore\CommonConcepts\Arithmetic.h" />
     <ClInclude Include="EmuCore\CommonConcepts\StdTypes.h" />
+    <ClInclude Include="EmuCore\CommonPreprocessor\All.h" />
+    <ClInclude Include="EmuCore\CommonPreprocessor\Architecture.h" />
+    <ClInclude Include="EmuCore\CommonPreprocessor\Compiler.h" />
+    <ClInclude Include="EmuCore\CommonPreprocessor\Warning.h" />
     <ClInclude Include="EmuCore\CommonTypes\ComparisonEnum.h" />
     <ClInclude Include="EmuCore\CommonTypes\Stopwatch.h" />
     <ClInclude Include="EmuCore\CommonTypes\Timer.h" />

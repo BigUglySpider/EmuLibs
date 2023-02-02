@@ -7481,18 +7481,18 @@ namespace EmuMath
 			}
 			else
 			{
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 				return EmuSIMD::setr<register_type, per_element_byte_size>(_get_index_from_normal_vector<FullWidthIndices_>(std::forward<Vector_>(vector_))...);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 			}
 		}
 
 		template<class Vector_, std::size_t...RegisterIndices_>
 		static constexpr inline data_type _make_array_as_normal_vector_conversion(Vector_&& vector_, std::index_sequence<RegisterIndices_...> register_indices_)
 		{
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 			return data_type
 			({ 
 				_make_register_from_normal_vector
@@ -7501,7 +7501,7 @@ namespace EmuMath
 					EmuCore::TMP::make_offset_index_sequence<RegisterIndices_ * elements_per_register, elements_per_register>()
 				)...
 			});
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 
 		template<class Vector_>

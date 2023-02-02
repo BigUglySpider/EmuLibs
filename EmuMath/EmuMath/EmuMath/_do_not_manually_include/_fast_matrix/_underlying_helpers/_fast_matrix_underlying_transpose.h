@@ -89,11 +89,11 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 			using out_major_indices = typename std::conditional<_fast_mat_uq::is_column_major, row_indices, column_indices>::type;
 			using out_non_major_indices = typename std::conditional<_fast_mat_uq::is_column_major, column_indices, row_indices>::type;
 
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 			// We pass major and non-major in reverse since that will be the case for the output Matrix
 			return _make_transpose_from_stored_data<FastMatrix_>(data_dump, out_major_indices(), out_non_major_indices());
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 	}
 }

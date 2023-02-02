@@ -27,6 +27,8 @@
 
 #include "EmuCore/ArithmeticHelpers/CommonAlgebra.h"
 
+#include "EmuCore/CommonPreprocessor/All.h"
+
 constexpr auto test_dot = EmuCore::dot<float>(1, 2, 6, 3, 7, 10);
 constexpr auto test_dot_2 = EmuCore::dot(5, 7);
 

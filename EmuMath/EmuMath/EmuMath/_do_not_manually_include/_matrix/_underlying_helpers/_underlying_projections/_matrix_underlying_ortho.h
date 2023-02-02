@@ -111,8 +111,8 @@ namespace EmuMath::Helpers::_matrix_underlying
 		out_11 = div_func()(CalcType_(2), out_11);
 		out_22 = div_func()(CalcType_(1), out_22);
 
-#pragma warning(push) // Silence duplicate move warnings here as no input value will be used twice
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK // Silence duplicate move warnings here as no input value will be used twice
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		return OutMatrix_
 		(
 			_make_orth_vk_arg_for_index<ColumnIndices_, RowIndices_, OutMatrix_>
@@ -125,7 +125,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 				std::move(out_32)
 			)...
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 	template<EmuConcepts::EmuMatrix OutMatrix_, typename Left_, typename Top_, typename Right_, typename Bottom_, typename Near_, typename Far_>
@@ -185,13 +185,13 @@ namespace EmuMath::Helpers::_matrix_underlying
 
 		return _make_ortho_vk<calc_fp, OutMatrix_>
 		(
-#pragma warning(push) // Specifically silence the rect retrieval functions since we know there are no duplicate moves happening there
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK // Specifically silence the rect retrieval functions since we know there are no duplicate moves happening there
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 			std::forward<get_left_result>(rect_get_left(std::forward<ViewRect_>(view_rect_))),
 			std::forward<get_top_result>(rect_get_top(std::forward<ViewRect_>(view_rect_))),
 			std::forward<get_right_result>(rect_get_right(std::forward<ViewRect_>(view_rect_))),
 			std::forward<get_bottom_result>(rect_get_bottom(std::forward<ViewRect_>(view_rect_))),
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 			std::forward<Near_>(near_),
 			std::forward<Far_>(far_),
 			out_column_indices(),

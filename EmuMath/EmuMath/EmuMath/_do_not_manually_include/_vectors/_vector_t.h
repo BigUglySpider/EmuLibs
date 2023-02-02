@@ -885,10 +885,10 @@ namespace EmuMath
 			{
 				constexpr bool allow_move_between_depths_ = depth <= EmuCore::TMP::remove_ref_cv_t<Arg_>::depth;
 				// Disable Visual Studio warning about using moved-from object, as repeated moves are not allowed here due to the Vector depth requirement
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 				return data_storage_type({ _make_stored_type_from_arg<Indices_, ReadOffset_, allow_move_between_depths_>(std::forward<Arg_>(arg_))... });
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 			}
 			else
 			{
@@ -899,10 +899,10 @@ namespace EmuMath
 				else
 				{
 					// Disable Visual Studio warning about using moved-from object, as we aren't even moving here, but repeated forwarding draws a false positive
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 					return data_storage_type({ _make_stored_type_from_arg<Indices_, ReadOffset_, false>(std::forward<Arg_>(arg_))... });
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 				}
 			}
 		}

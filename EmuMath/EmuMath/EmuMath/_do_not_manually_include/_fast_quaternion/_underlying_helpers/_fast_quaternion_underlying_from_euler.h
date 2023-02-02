@@ -97,8 +97,8 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 		if constexpr (EmuMath::TMP::is_emu_vector_v<euler_xyz_uq>)
 		{
 			// Convert EmuMath vector to register(s) and call back on this with said register(s)
-			#pragma warning(push)
-			#pragma warning(disable: 26800)
+			EMU_CORE_MSVC_PUSH_WARNING_STACK
+			EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 			return _make_fast_quat_from_euler<OutQuaternion_, InRads_, Normalise_>
 			(
 				_make_euler_registers<OutQuaternion_>
@@ -108,7 +108,7 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 					std::forward<EulerXYZ_>(euler_xyz_).template AtTheoretical<2>()
 				)
 			);
-			#pragma warning(pop)
+			EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 		else if constexpr(EmuMath::TMP::is_emu_fast_vector_v<euler_xyz_uq>)
 		{
@@ -124,8 +124,8 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 			if constexpr (!is_simd_array)
 			{
 				// Convert scalar array to simd register(s) and call back on this with said register(s)
-				#pragma warning(push)
-				#pragma warning(disable: 26800)
+				EMU_CORE_MSVC_PUSH_WARNING_STACK
+				EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 				constexpr std::size_t array_size = euler_xyz_uq::size();
 				if constexpr (array_size >= 3)
 				{
@@ -170,7 +170,7 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 						_make_euler_registers<OutQuaternion_>(0, 0, 0)
 					);
 				}
-				#pragma warning(pop)
+				EMU_CORE_MSVC_POP_WARNING_STACK
 			}
 			else
 			{
@@ -192,12 +192,12 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 					constexpr std::size_t width = _out_fast_quat::per_element_width;
 					constexpr bool is_signed = _out_fast_quat::is_signed;
 
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 					_register_type sin_xy = std::get<0>(std::forward<EulerXYZ_>(euler_xyz_));
 					_register_type sin_z = std::get<1>(std::forward<EulerXYZ_>(euler_xyz_));
 					sin_z = EmuSIMD::shuffle<0>(sin_z);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 
 					if constexpr (!InRads_)
 					{

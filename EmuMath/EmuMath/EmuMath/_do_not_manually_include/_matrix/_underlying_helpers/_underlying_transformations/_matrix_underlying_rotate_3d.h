@@ -171,8 +171,8 @@ namespace EmuMath::Helpers::_matrix_underlying
 			using out_value_uq = typename out_mat_uq::value_type_uq;
 			// 6287 silenced here as there is a warning for function calls due to potential side-effects
 			// --- In this context, side-effects are not expected. If there are any, it will be due to an ill-formed specialisation
-#pragma warning(push)
-#pragma warning(disable: 6287)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(6287)
 			return
 			(
 				... &&
@@ -183,7 +183,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 					decltype(std::declval<OutMatrix_>().template at<ColumnIndices_, RowIndices_>())
 				>()
 			);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 		else
 		{
@@ -204,8 +204,8 @@ namespace EmuMath::Helpers::_matrix_underlying
 			using out_value_uq = typename out_mat_uq::value_type_uq;
 			// 6287 silenced here as there is a warning for function calls due to potential side-effects
 			// --- In this context, side-effects are not expected. If there are any, it will be due to an ill-formed specialisation
-#pragma warning(push)
-#pragma warning(disable: 6287)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(6287)
 			return
 			(
 				... &&
@@ -216,7 +216,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 					decltype(std::declval<OutMatrix_>().template at<ColumnIndices_, RowIndices_>())
 				>()
 			);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 		else
 		{
@@ -237,8 +237,8 @@ namespace EmuMath::Helpers::_matrix_underlying
 			using out_value_uq = typename out_mat_uq::value_type_uq;
 			// 6287 silenced here as there is a warning for function calls due to potential side-effects
 			// --- In this context, side-effects are not expected. If there are any, it will be due to an ill-formed specialisation
-#pragma warning(push)
-#pragma warning(disable: 6287)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(6287)
 			return
 			(
 				... &&
@@ -249,7 +249,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 					decltype(std::declval<OutMatrix_>().template at<ColumnIndices_, RowIndices_>())
 				>()
 			);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 		else
 		{

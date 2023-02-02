@@ -60,8 +60,8 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 		std::index_sequence<RegisterIndices_...> register_indices_
 	) noexcept
 	{
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		(
 			_store_quaternion_register_to_pointer<RegisterIndices_>
 			(
@@ -69,7 +69,7 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 				std::forward<FastQuaternion_>(fast_quaternion_)
 			), ...
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 }
 

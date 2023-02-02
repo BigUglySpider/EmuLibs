@@ -388,8 +388,8 @@ namespace EmuMath
 			}
 			else
 			{
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 				if constexpr (elements_per_register == 4)
 				{
 					return EmuSIMD::set<register_type>
@@ -419,7 +419,7 @@ namespace EmuMath
 						);
 					}
 				}
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 			}
 		}
 #pragma endregion

@@ -22,15 +22,15 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline bool is_valid_noise_type(const NoiseType noise_type_)
 		{
 			// Disable this warning as we want exact matches, not specific bits
-#pragma warning(push)
-#pragma warning(disable: 26813)
+			EMU_CORE_MSVC_PUSH_WARNING_STACK
+			EMU_CORE_MSVC_DISABLE_WARNING(26813)
 			return
 			(
 				noise_type_ == NoiseType::PERLIN ||
 				noise_type_ == NoiseType::VALUE ||
 				noise_type_ == NoiseType::VALUE_SMOOTH
 			);
-#pragma warning(pop)
+			EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 
 		template<NoiseType NoiseType_>
