@@ -20,6 +20,15 @@
 #define EMU_SIMD_CMP_GE_FLAG _CMP_GE_OS
 #define EMU_SIMD_CMP_LE_FLAG _CMP_LE_OS
 
+namespace EmuSIMD::Funcs
+{
+	using shuffle_mask_type = unsigned int;
 
+	template<shuffle_mask_type I0_, shuffle_mask_type I1_, shuffle_mask_type I2_, shuffle_mask_type I3_>
+	[[nodiscard]] constexpr inline shuffle_mask_type make_shuffle_mask()
+	{
+		return ((I3_ << 6) | (I2_ << 4) | (I1_ << 2) | (I0_));
+	}
+}
 
 #endif
