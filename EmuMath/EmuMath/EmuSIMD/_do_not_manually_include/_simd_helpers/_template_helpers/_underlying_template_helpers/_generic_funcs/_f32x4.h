@@ -426,15 +426,22 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region MINMAX_FUNCS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 min_f32x4(EmuSIMD::f32x4_arg a_, EmuSIMD::f32x4_arg b_)
+	{
+		return _mm_min_ps(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 max_f32x4(EmuSIMD::f32x4_arg a_, EmuSIMD::f32x4_arg b_)
+	{
+		return _mm_max_ps(a_, b_);
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 mul_all_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
 		return _mm_mul_ps(lhs_, rhs_);
-	}
-
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 negate_f32x4(EmuSIMD::f32x4_arg to_negate_)
-	{
-		return _mm_sub_ps(_mm_setzero_ps(), to_negate_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 add_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
@@ -445,6 +452,19 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 sub_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
 		return _mm_sub_ps(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 negate_f32x4(EmuSIMD::f32x4_arg to_negate_)
+	{
+		if constexpr (std::numeric_limits<float>::is_iec559)
+		{
+			// IEEE-754 std, value is identical when negative except left-most bit, so just flip msb
+			return xor_f32x4(to_negate_, set1_f32x4(-0.0f));
+		}
+		else
+		{
+			return sub_f32x4(setzero_f32x4(), to_negate_);
+		}
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 mul_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
@@ -504,7 +524,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 trunc_f32x4(EmuSIMD::f32x4_arg to_trunc_)
 	{
-		return _mm_round_ps(to_trunc_, _MM_FROUND_TRUNC);
+		return _mm_round_ps(to_trunc_, EMU_SIMD_FLAG_TRUNC);
 	}
 
 	template<int RoundingFlag_>
@@ -885,8 +905,8 @@ namespace EmuSIMD::Funcs
 		auto abs_x = abs_f32x4(x_);
 		auto abs_y = abs_f32x4(y_);
 		
-		EmuSIMD::f32x4 temp0 = _mm_max_ps(abs_x, abs_y);
-		EmuSIMD::f32x4 temp1 = _mm_min_ps(abs_x, abs_y);
+		EmuSIMD::f32x4 temp0 = max_f32x4(abs_x, abs_y);
+		EmuSIMD::f32x4 temp1 = min_f32x4(abs_x, abs_y);
 		EmuSIMD::f32x4 temp2 = div_f32x4(set1_f32x4(1.0f), temp0);
 		temp2 = mul_f32x4(temp1, temp2);
 
@@ -960,8 +980,6 @@ namespace EmuSIMD::Funcs
 		return temp2;
 		#endif
 	}
-
-	// TODO: Test efficiency, apply alternatives for all trig/trunc funcs
 #pragma endregion
 }
 

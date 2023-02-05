@@ -36,7 +36,14 @@ inline void universal_pause(const std::string& msg = "Press enter to continue...
 {
 	std::string dummy;
 	printf("%s", msg.c_str());
-	std::getline(std::cin, dummy);
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
+inline void universal_pause(const std::streamsize max_char_count, const std::string& msg = "Press enter to continue...")
+{
+	std::string dummy;
+	printf("%s", msg.c_str());
+	std::cin.ignore(max_char_count, '\n');
 }
 
 template<typename T_, std::size_t Size_>
@@ -250,12 +257,14 @@ int main()
 	EmuCore::Timer<std::milli> timer_;
 
 	{
+		constexpr std::size_t len = 240;
+		constexpr std::size_t inc = 8;
 		using EmuCore::Pi;
 		auto func = [](auto val) { return Pi::DegsToRads<float>(val * 0.333333333333333f); };
-		for (std::size_t i = 0; i < 180; i += 4)
+		for (std::size_t i = 0; i < len; i += inc)
 		{
-			auto acos_res = EmuSIMD::setr<EmuSIMD::f32x4, 32>(func(i), func(i + 1), func(i + 2), func(i + 3));
-			acos_res = EmuSIMD::Funcs::tan_f32x4(acos_res);
+			auto acos_res = EmuSIMD::setr<EmuSIMD::f32x8, 32>(func(i), func(i + 1), func(i + 2), func(i + 3), func(i + 4), func(i + 5), func(i + 6), func(i + 7));
+			acos_res = EmuSIMD::Funcs::tan_f32x8(acos_res);
 			std::cout << "[" << i << "]: ";
 			EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, acos_res) << "\n";
 		}
