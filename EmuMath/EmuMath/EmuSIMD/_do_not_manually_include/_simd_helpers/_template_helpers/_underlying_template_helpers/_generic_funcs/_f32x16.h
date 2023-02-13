@@ -536,7 +536,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 trunc_f32x16(EmuSIMD::f32x16_arg to_trunc_)
 	{
-		return _mm512_trunc_ps(to_trunc_);
+		return _mm512_roundscale_ps(to_trunc_, EMU_SIMD_FLAG_TRUNC);
 	}
 
 	template<int RoundingFlag_>
