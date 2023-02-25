@@ -29,6 +29,9 @@
 
 #include "EmuCore/CommonPreprocessor/All.h"
 
+// Tuple stuff
+#include "EmuCore/TMPHelpers/RuntimeTupleTable.h"
+
 constexpr auto test_dot = EmuCore::dot<float>(1, 2, 6, 3, 7, 10);
 constexpr auto test_dot_2 = EmuCore::dot(5, 7);
 
@@ -251,8 +254,43 @@ constexpr inline bool variadic_and_test(Args_&&...args_)
 	return (... && args_);
 }
 
+template<typename T>
+struct test_func
+{
+	constexpr void operator()(T in_) const
+	{
+		std::cout << in_ << "\n";
+	}
+};
+
+template<>
+struct test_func<void>
+{
+	template<typename T>
+	constexpr void operator()(T&& in_) const
+	{
+		return test_func<T>()(std::forward<T>(in_));
+	}
+};
+
 int main()
 {
+	try
+	{
+		using tuple_test_type = std::tuple<int, char, float, bool, double, std::string>;
+		EmuCore::TMP::runtime_tuple_table<tuple_test_type, test_func<void>> table;
+		tuple_test_type in_tuple(42, 'L', 2.1f, false, -42.09, "It worked!");
+		for (std::size_t i = 0; i < std::tuple_size_v<tuple_test_type> + 1; ++i)
+		{
+			table(in_tuple, test_func<void>(), i);
+		}
+	}
+	catch (std::exception& except)
+	{
+		std::cout << except.what() << "\n";
+	}
+
+	universal_pause();
 	srand(static_cast<unsigned int>(time(0)));
 	EmuCore::Timer<std::milli> timer_;
 
