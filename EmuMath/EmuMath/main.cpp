@@ -273,6 +273,26 @@ struct test_func<void>
 	}
 };
 
+struct boolifier
+{
+	template<typename T>
+	[[nodiscard]] constexpr inline bool operator()(T&& val) const
+	{
+		if constexpr (std::is_same_v<std::string, std::remove_cvref_t<T>>)
+		{
+			return std::forward<T>(val).length() > 5;
+		}
+		else if constexpr (std::is_same_v<bool, std::remove_cvref_t<T>>)
+		{
+			return val;
+		}
+		else
+		{
+			return val < 42;
+		}
+	}
+};
+
 int main()
 {
 	try
@@ -288,6 +308,16 @@ int main()
 	catch (std::exception& except)
 	{
 		std::cout << except.what() << "\n";
+	}
+
+	{
+		using tuple_test_type = std::tuple<int, char, float, bool, double, std::string>;
+		EmuCore::TMP::runtime_tuple_table<tuple_test_type, boolifier> table;
+		tuple_test_type in_tuple(42, 'L', 2.1f, false, -42.09, "It worked!");
+		for (std::size_t i = 0; i < std::tuple_size_v<tuple_test_type>; ++i)
+		{
+			std::cout << table(in_tuple, boolifier(), i) << "\n";
+		}
 	}
 
 	universal_pause();
