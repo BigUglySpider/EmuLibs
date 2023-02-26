@@ -293,16 +293,56 @@ struct boolifier
 	}
 };
 
+struct get_string_array
+{
+	template<typename T>
+	[[nodiscard]] constexpr inline decltype(auto) operator()(T&& val) const
+	{
+		return val.get_string_array();
+	}
+};
+
+namespace std
+{
+	template<std::size_t Size_, typename T_>
+	std::string to_string(const EmuMath::Vector<Size_, T_>& vec)
+	{
+		std::ostringstream str;
+		EmuMath::Helpers::vector_stream_append(str, vec);
+		return str.str();
+	}
+}
+
+template<typename T>
+struct tester_of_array
+{
+	std::array<std::string, 10> data;
+	constexpr tester_of_array() : 
+		data()
+	{
+		for (std::size_t i = 0; i < 10; ++i)
+		{
+			data[i] = std::to_string(T(10) / T(i+1));
+		}
+	}
+
+	constexpr const std::array<std::string, 10>& get_string_array() const noexcept
+	{
+		return data;
+	}
+};
+
 int main()
 {
 	try
 	{
 		using tuple_test_type = std::tuple<int, char, float, bool, double, std::string>;
-		EmuCore::TMP::runtime_tuple_table<tuple_test_type, test_func<void>> table;
+		EmuCore::TMP::runtime_tuple_table<const tuple_test_type, test_func<void>> table;
 		tuple_test_type in_tuple(42, 'L', 2.1f, false, -42.09, "It worked!");
+		auto j = test_func<void>();
 		for (std::size_t i = 0; i < std::tuple_size_v<tuple_test_type> + 1; ++i)
 		{
-			table(in_tuple, test_func<void>(), i);
+			table.Execute(i, in_tuple);
 		}
 	}
 	catch (std::exception& except)
@@ -311,12 +351,35 @@ int main()
 	}
 
 	{
-		using tuple_test_type = std::tuple<int, char, float, bool, double, std::string>;
+		using tuple_test_type = std::tuple<int, char, float, bool, double, std::string, bool>;
 		EmuCore::TMP::runtime_tuple_table<tuple_test_type, boolifier> table;
-		tuple_test_type in_tuple(42, 'L', 2.1f, false, -42.09, "It worked!");
+		tuple_test_type in_tuple(42, 'L', 2.1f, false, -42.09, "It worked!", true);
 		for (std::size_t i = 0; i < std::tuple_size_v<tuple_test_type>; ++i)
 		{
-			std::cout << table(in_tuple, boolifier(), i) << "\n";
+			std::cout << table(i, in_tuple, boolifier()) << " | ";
+			std::cout << table[i](in_tuple, boolifier()) << "\n";
+		}
+
+		std::cout << "\n---\n";
+		for (auto& func : table)
+		{
+			std::cout << func(in_tuple, boolifier()) << "\n";
+		}
+		std::cout << "\n---\n";
+		for (auto it = table.rbegin(), end = table.rend(); it != end; ++it)
+		{
+			std::cout <<  (*it)(in_tuple, boolifier()) << "\n";
+		}
+	}
+	std::cout << "\n---###---\n";
+	{
+		using tuple_test_type = std::tuple<tester_of_array<float>, tester_of_array<int>, tester_of_array<char>, tester_of_array<long double>, tester_of_array<EmuMath::Vector<20, float>>>;
+		tuple_test_type in_tuple = tuple_test_type();
+		EmuCore::TMP::runtime_tuple_table<tuple_test_type, get_string_array> table;
+		for (auto& func : table)
+		{
+			PrintIndexable<10>(func(in_tuple, get_string_array()));
+			std::cout << "\n";
 		}
 	}
 
