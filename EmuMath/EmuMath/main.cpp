@@ -334,70 +334,73 @@ struct tester_of_array
 
 int main()
 {
-	try
-	{
-		using tuple_test_type = std::tuple<int, char, float, bool, double, std::string>;
-		EmuCore::TMP::runtime_tuple_table<const tuple_test_type, test_func<void>> table;
-		tuple_test_type in_tuple(42, 'L', 2.1f, false, -42.09, "It worked!");
-		auto j = test_func<void>();
-		for (std::size_t i = 0; i < std::tuple_size_v<tuple_test_type> + 1; ++i)
-		{
-			table.Execute(i, in_tuple);
-		}
-	}
-	catch (std::exception& except)
-	{
-		std::cout << except.what() << "\n";
-	}
+	//try
+	//{
+	//	using tuple_test_type = std::tuple<int, char, float, bool, double, std::string>;
+	//	EmuCore::TMP::RuntimeTupleTable<const tuple_test_type, test_func<void>> table;
+	//	tuple_test_type in_tuple(42, 'L', 2.1f, false, -42.09, "It worked!");
+	//	auto j = test_func<void>();
+	//	for (std::size_t i = 0; i < std::tuple_size_v<tuple_test_type> + 1; ++i)
+	//	{
+	//		table.Execute(i, in_tuple);
+	//	}
+	//}
+	//catch (std::exception& except)
+	//{
+	//	std::cout << except.what() << "\n";
+	//}
+	//
+	//{
+	//	using tuple_test_type = std::tuple<int, char, float, bool, double, std::string, bool>;
+	//	EmuCore::TMP::RuntimeTupleTable<tuple_test_type, boolifier> table;
+	//	tuple_test_type in_tuple(42, 'L', 2.1f, false, -42.09, "It worked!", true);
+	//	for (std::size_t i = 0; i < std::tuple_size_v<tuple_test_type>; ++i)
+	//	{
+	//		std::cout << table(i, in_tuple, boolifier()) << " | ";
+	//		std::cout << table[i](in_tuple, boolifier()) << "\n";
+	//	}
+	//
+	//	std::cout << "\n---\n";
+	//	for (auto& func : table)
+	//	{
+	//		std::cout << func(in_tuple, boolifier()) << "\n";
+	//	}
+	//	std::cout << "\n---\n";
+	//	for (auto it = table.rbegin(), end = table.rend(); it != end; ++it)
+	//	{
+	//		std::cout <<  (*it)(in_tuple, boolifier()) << "\n";
+	//	}
+	//}
+	//std::cout << "\n---###---\n";
+	//{
+	//	using tuple_test_type = std::tuple<tester_of_array<float>, tester_of_array<int>, tester_of_array<char>, tester_of_array<long double>, tester_of_array<EmuMath::Vector<20, float>>>;
+	//	tuple_test_type in_tuple = tuple_test_type();
+	//	EmuCore::TMP::RuntimeTupleTable<tuple_test_type, get_string_array> table;
+	//	for (auto& func : table)
+	//	{
+	//		PrintIndexable<10>(func(in_tuple, get_string_array()));
+	//		std::cout << "\n";
+	//	}
+	//}
+	// 
+	//universal_pause();
 
-	{
-		using tuple_test_type = std::tuple<int, char, float, bool, double, std::string, bool>;
-		EmuCore::TMP::runtime_tuple_table<tuple_test_type, boolifier> table;
-		tuple_test_type in_tuple(42, 'L', 2.1f, false, -42.09, "It worked!", true);
-		for (std::size_t i = 0; i < std::tuple_size_v<tuple_test_type>; ++i)
-		{
-			std::cout << table(i, in_tuple, boolifier()) << " | ";
-			std::cout << table[i](in_tuple, boolifier()) << "\n";
-		}
-
-		std::cout << "\n---\n";
-		for (auto& func : table)
-		{
-			std::cout << func(in_tuple, boolifier()) << "\n";
-		}
-		std::cout << "\n---\n";
-		for (auto it = table.rbegin(), end = table.rend(); it != end; ++it)
-		{
-			std::cout <<  (*it)(in_tuple, boolifier()) << "\n";
-		}
-	}
-	std::cout << "\n---###---\n";
-	{
-		using tuple_test_type = std::tuple<tester_of_array<float>, tester_of_array<int>, tester_of_array<char>, tester_of_array<long double>, tester_of_array<EmuMath::Vector<20, float>>>;
-		tuple_test_type in_tuple = tuple_test_type();
-		EmuCore::TMP::runtime_tuple_table<tuple_test_type, get_string_array> table;
-		for (auto& func : table)
-		{
-			PrintIndexable<10>(func(in_tuple, get_string_array()));
-			std::cout << "\n";
-		}
-	}
-
-	universal_pause();
 	srand(static_cast<unsigned int>(time(0)));
 	EmuCore::Timer<std::milli> timer_;
 
 	{
+		using register_type = EmuSIMD::f64x2;
+		constexpr std::size_t width = 64;
 		constexpr std::size_t len = 240;
-		constexpr std::size_t inc = 8;
+		constexpr std::size_t inc = 2;
 		using EmuCore::Pi;
-		auto func = [](auto val) { return Pi::DegsToRads<float>(val * 0.333333333333333f); };
+		auto func = [](auto val) { return Pi::DegsToRads<double>(val * 0.333333333333333); };
 		for (std::size_t i = 0; i < len; i += inc)
 		{
-			auto acos_res = EmuSIMD::setr<EmuSIMD::f32x8, 32>(func(i), func(i + 1), func(i + 2), func(i + 3), func(i + 4), func(i + 5), func(i + 6), func(i + 7));
-			acos_res = EmuSIMD::Funcs::tan_f32x8(acos_res);
+			auto acos_res = EmuSIMD::setr<register_type, width>(func(i), func(i + 1));
+			acos_res = EmuSIMD::Funcs::sin_f64x2(acos_res);
 			std::cout << "[" << i << "]: ";
-			EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, acos_res) << "\n";
+			EmuSIMD::append_simd_vector_to_stream<width, true>(std::cout, acos_res) << "\n";
 		}
 		universal_pause();
 	}

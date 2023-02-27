@@ -391,13 +391,13 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 
 #pragma region SHUFFLES
-	template<unsigned int ShuffleMask>
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 shuffle_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
 		return _mm_shuffle_ps(lhs_, rhs_, ShuffleMask);
 	}
 
-	template<int ShuffleMask>
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 permute_f32x4(EmuSIMD::f32x4_arg in_)
 	{
 		return _mm_permute_ps(in_, ShuffleMask);

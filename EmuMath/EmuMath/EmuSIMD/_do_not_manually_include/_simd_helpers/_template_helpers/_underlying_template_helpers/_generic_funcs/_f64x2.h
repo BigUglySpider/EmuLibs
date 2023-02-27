@@ -388,6 +388,54 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region SHUFFLES
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 shuffle_f64x2(EmuSIMD::f64x2_arg lhs_, EmuSIMD::f64x2_arg rhs_)
+	{
+		return _mm_shuffle_pd(lhs_, rhs_, ShuffleMask);
+	}
+
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 permute_f64x2(EmuSIMD::f64x2_arg in_)
+	{
+		return _mm_permute_pd(in_, ShuffleMask);
+	}
+#pragma endregion
+
+#pragma region BITWISE_ARITHMETIC
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 and_f64x2(EmuSIMD::f64x2_arg lhs_, EmuSIMD::f64x2_arg rhs_)
+	{
+		return _mm_and_pd(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 or_f64x2(EmuSIMD::f64x2_arg lhs_, EmuSIMD::f64x2_arg rhs_)
+	{
+		return _mm_or_pd(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 xor_f64x2(EmuSIMD::f64x2_arg lhs_, EmuSIMD::f64x2_arg rhs_)
+	{
+		return _mm_xor_pd(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 andnot_f64x2(EmuSIMD::f64x2_arg not_lhs_, EmuSIMD::f64x2_arg rhs_)
+	{
+		return _mm_andnot_pd(not_lhs_, rhs_);
+	}
+#pragma endregion
+
+#pragma region MINMAX_FUNCS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 min_f64x2(EmuSIMD::f64x2_arg a_, EmuSIMD::f64x2_arg b_)
+	{
+		return _mm_min_pd(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 max_f64x2(EmuSIMD::f64x2_arg a_, EmuSIMD::f64x2_arg b_)
+	{
+		return _mm_max_pd(a_, b_);
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 mul_all_f64x2(EmuSIMD::f64x2_arg lhs_, EmuSIMD::f64x2_arg rhs_)
 	{
@@ -466,7 +514,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 trunc_f64x2(EmuSIMD::f64x2_arg to_trunc_)
 	{
-		return _mm_trunc_pd(to_trunc_);
+		return _mm_round_pd(to_trunc_, EMU_SIMD_FLAG_TRUNC);
 	}
 
 	template<int RoundingFlag_>
@@ -510,12 +558,160 @@ namespace EmuSIMD::Funcs
 #pragma region TRIG
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cos_f64x2(EmuSIMD::f64x2_arg in_)
 	{
+		#if EMU_CORE_IS_INTEL_COMPILER && EMU_CORE_X86_X64 // Only tends to score better on Intel platforms
 		return _mm_cos_pd(in_);
+		#else
+		// Alternative manual approximation, based on https://developer.download.nvidia.com/cg/cos.html implementation
+		
+		// Store constants used > once in registers to allow shuffling them instead of multiple sets of the same
+		EmuSIMD::f64x2 one_c4z = setr_f64x2(1.0, -1.0);
+
+		// Prepare for power series
+		EmuSIMD::f64x2 r1x = mul_f64x2(set1_f64x2(0.159154943091), in_); // r1.x = c1.w * in_;
+
+		EmuSIMD::f64x2 r1y = trunc_f64x2(r1x); // r1.y = frac(r1.x)
+		r1y = sub_f64x2(r1x, r1y);
+
+		EmuSIMD::f64x2 const0 = set1_f64x2(0.25f);
+		EmuSIMD::f64x2 r2x = cmplt_f64x2(r1x, const0); // r2.x = r1.x < c1.x
+
+		const0 = permute_f64x2<make_shuffle_mask<0, 0>()>(one_c4z);
+		r2x = and_f64x2(r2x, const0);
+
+		EmuSIMD::f64x2 r2y = cmpge_f64x2(r1y, set1_f64x2(-9.0)); // r2.yz = r1.yy >= c1.yz
+		EmuSIMD::f64x2 r2z = cmpge_f64x2(r1y, set1_f64x2(0.75));
+		r2y = and_f64x2(r2y, const0);
+		r2z = and_f64x2(r2z, const0);
+
+		EmuSIMD::f64x2 const1 = permute_f64x2<make_shuffle_mask<1, 1>()>(one_c4z);
+		r2y = fmadd_f64x2(r2x, const1, fmadd_f64x2(r2y, const0, mul_f64x2(r2z, const1))); // dot(r2, c4.zwz)
+
+		EmuSIMD::f64x2 r0x = negate_f64x2(r1y);
+		EmuSIMD::f64x2 r0y = sub_f64x2(set1_f64x2(0.5), r1y);
+		EmuSIMD::f64x2 r0z = sub_f64x2(const0, r1y);
+		r0x = mul_f64x2(r0x, r0x);
+		r0y = mul_f64x2(r0y, r0y);
+		r0z = mul_f64x2(r0z, r0z);
+
+		// Begin power series
+		// --- Power 1
+		const0 = set1_f64x2(-60.1458091736);
+		const1 = set1_f64x2(24.9808039603);
+		r1x = fmadd_f64x2(const1, r0x, const0);
+		r1y = fmadd_f64x2(set1_f64x2(-24.9808039603), r0y, set1_f64x2(60.1458091736));
+		EmuSIMD::f64x2 r1z = fmadd_f64x2(const1, r0z, const0);
+
+		// --- Power 2
+		const0 = set1_f64x2(85.4537887573f);
+		r1x = fmadd_f64x2(r1x, r0x, const0);
+		r1y = fmadd_f64x2(r1y, r0y, set1_f64x2(-85.4537887573));
+		r1z = fmadd_f64x2(r1z, r0z, const0);
+
+		// --- Power 3
+		const0 = set1_f64x2(-64.9393539429f);
+		r1x = fmadd_f64x2(r1x, r0x, const0);
+		r1y = fmadd_f64x2(r1y, r0y, set1_f64x2(64.9393539429));
+		r1z = fmadd_f64x2(r1z, r0z, const0);
+
+		// --- Power 4
+		const0 = set1_f64x2(19.7392082214f);
+		r1x = fmadd_f64x2(r1x, r0x, const0);
+		r1y = fmadd_f64x2(r1y, r0y, set1_f64x2(-19.7392082214));
+		r1z = fmadd_f64x2(r1z, r0z, const0);
+
+		// --- Power 5
+		const0 = permute_f64x2<make_shuffle_mask<0, 0>()>(one_c4z);
+		const1 = permute_f64x2<make_shuffle_mask<1, 1>()>(one_c4z);
+		r1x = fmadd_f64x2(r1x, r0x, const1);
+		r1y = fmadd_f64x2(r1y, r0y, const0);
+		r1z = fmadd_f64x2(r1z, r0z, const1);
+
+		// Final dot
+		r2x = negate_f64x2(r2x);
+		r2y = negate_f64x2(r2y);
+		r2z = negate_f64x2(r2z);
+
+		return fmadd_f64x2(r1x, r2x, fmadd_f64x2(r1y, r2y, mul_f64x2(r1z, r2z)));
+		#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 sin_f64x2(EmuSIMD::f64x2_arg in_)
 	{
+#if EMU_CORE_IS_INTEL_COMPILER && EMU_CORE_X86_X64 // Only tends to score better on Intel platforms
 		return _mm_sin_pd(in_);
+#else
+		// Alternative manual approximation, based on https://developer.download.nvidia.com/cg/sin.html implementation
+
+		// Store constants used > once in registers to allow shuffling to them
+		EmuSIMD::f64x2 one_c4z = setr_f64x2(1.0, -1.0);
+
+		// Prepare for power series
+		EmuSIMD::f64x2 const0 = set1_f64x2(0.25);
+		EmuSIMD::f64x2 r1x = fmsub_f64x2(set1_f64x2(0.159154943091), in_, const0); // r1.x = c1.w * in_ - c1.x
+
+		EmuSIMD::f64x2 r1y = trunc_f64x2(r1x); // r1.y = frac(r1.x)
+		r1y = sub_f64x2(r1x, r1y);
+
+		EmuSIMD::f64x2 r2x = cmplt_f64x2(r1x, const0); // r2.x = r1.x < c1.x
+
+		const0 = permute_f64x2<make_shuffle_mask<0, 0>()>(one_c4z);
+		r2x = and_f64x2(r2x, const0);
+
+		EmuSIMD::f64x2 r2y = cmpge_f64x2(r1y, set1_f64x2(-9.0)); // r2.yz = r1.yy >= c1.yz
+		EmuSIMD::f64x2 r2z = cmpge_f64x2(r1y, set1_f64x2(0.75));
+		r2y = and_f64x2(r2y, const0);
+		r2z = and_f64x2(r2z, const0);
+
+		EmuSIMD::f64x2 const1 = permute_f64x2<make_shuffle_mask<1, 1>()>(one_c4z);
+		r2y = fmadd_f64x2(r2x, const1, fmadd_f64x2(r2y, const0, mul_f64x2(r2z, const1))); // dot(r2, c4.zwz)
+
+		EmuSIMD::f64x2 r0x = negate_f64x2(r1y);
+		EmuSIMD::f64x2 r0y = sub_f64x2(set1_f64x2(0.5), r1y);
+		EmuSIMD::f64x2 r0z = sub_f64x2(const0, r1y);
+		r0x = mul_f64x2(r0x, r0x);
+		r0y = mul_f64x2(r0y, r0y);
+		r0z = mul_f64x2(r0z, r0z);
+
+		// Begin power series
+		// --- Power 1
+		const0 = set1_f64x2(-60.1458091736);
+		const1 = set1_f64x2(24.9808039603);
+		r1x = fmadd_f64x2(const1, r0x, const0);
+		r1y = fmadd_f64x2(set1_f64x2(-24.9808039603), r0y, set1_f64x2(60.1458091736));
+		EmuSIMD::f64x2 r1z = fmadd_f64x2(const1, r0z, const0);
+
+		// --- Power 2
+		const0 = set1_f64x2(85.4537887573);
+		r1x = fmadd_f64x2(r1x, r0x, const0);
+		r1y = fmadd_f64x2(r1y, r0y, set1_f64x2(-85.4537887573));
+		r1z = fmadd_f64x2(r1z, r0z, const0);
+
+		// --- Power 3
+		const0 = set1_f64x2(-64.9393539429);
+		r1x = fmadd_f64x2(r1x, r0x, const0);
+		r1y = fmadd_f64x2(r1y, r0y, set1_f64x2(64.9393539429));
+		r1z = fmadd_f64x2(r1z, r0z, const0);
+
+		// --- Power 4
+		const0 = set1_f64x2(19.7392082214);
+		r1x = fmadd_f64x2(r1x, r0x, const0);
+		r1y = fmadd_f64x2(r1y, r0y, set1_f64x2(-19.7392082214));
+		r1z = fmadd_f64x2(r1z, r0z, const0);
+
+		// --- Power 5
+		const0 = permute_f64x2<make_shuffle_mask<0, 0>()>(one_c4z);
+		const1 = permute_f64x2<make_shuffle_mask<1, 1>()>(one_c4z);
+		r1x = fmadd_f64x2(r1x, r0x, const1);
+		r1y = fmadd_f64x2(r1y, r0y, const0);
+		r1z = fmadd_f64x2(r1z, r0z, const1);
+
+		// Final dot
+		r2x = negate_f64x2(r2x);
+		r2y = negate_f64x2(r2y);
+		r2z = negate_f64x2(r2z);
+
+		return fmadd_f64x2(r1x, r2x, fmadd_f64x2(r1y, r2y, mul_f64x2(r1z, r2z)));
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 tan_f64x2(EmuSIMD::f64x2_arg in_)

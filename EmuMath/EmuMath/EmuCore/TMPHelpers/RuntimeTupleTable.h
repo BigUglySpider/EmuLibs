@@ -12,7 +12,7 @@
 namespace EmuCore::TMP
 {
     /// <summary>
-    /// <para> Executes the passed function with an argument of the element at index Index_ within the passed tuple/ </para>
+    /// <para> Executes the passed function with an argument of the element at index Index_ within the passed tuple. </para>
     /// </summary>
     /// <param name="tuple_">Tuple to pass the selected index of.</param>
     /// <param name="func_">Function to invoke, with an argument of the element at the provided index within `tuple_`.</param>
@@ -30,14 +30,15 @@ namespace EmuCore::TMP
     ///     The function may return a non-void type, however all invocations must return the same type (e.g. index 0 cannot return int whilst index 2 returns float). 
     ///     As such, this cannot be used as a runtime version of `get`.
     /// </para>
+    /// <para> Additionally, the function must be able to take any of the tuple elements as a single argument (if it cannot take at least 1 argument, it will be invalid). </para>
     /// </summary>
     template<EmuConcepts::StdTuple Tuple_, class Func_>
-    class runtime_tuple_table
+    class RuntimeTupleTable
     {
 #pragma region COMMON_BASIC_INFO
     public:
         /// <summary> The instantiated runtime_tuple_type that represents this type. </summary>
-        using this_type = runtime_tuple_table<Tuple_, Func_>;
+        using this_type = RuntimeTupleTable<Tuple_, Func_>;
         /// <summary> The type of tuple that this table is constructed for. </summary>
         using tuple_type = Tuple_;
         /// <summary> The number of elements contained within the target tuple type. </summary>
@@ -46,7 +47,7 @@ namespace EmuCore::TMP
 
 #pragma region COMMON_FUNC_TYPE_INFO
     private:
-        static_assert(num_elements > 0, "Invalid tuple type passed to EmuCore::TMP::runtime_tuple_table: The tuple must contain at least 1 element, but the passed tuple type is empty.");
+        static_assert(num_elements > 0, "Invalid tuple type passed to EmuCore::TMP::RuntimeTupleTable: The tuple must contain at least 1 element, but the passed tuple type is empty.");
         using _tuple_element_0_type = typename std::tuple_element<0, typename std::remove_cvref<tuple_type>::type>::type;
 
     public:
@@ -105,11 +106,11 @@ namespace EmuCore::TMP
         /// <para> Initialises this table to support input of runtime index arguments to perform functions on the target tuple. </para>
         /// <para> This constructor does not require explicit invocation. </para>
         /// </summary>
-        constexpr inline runtime_tuple_table() noexcept : _func_table(_make_underlying_func_table(_index_sequence()))
+        constexpr inline RuntimeTupleTable() noexcept : _func_table(_make_underlying_func_table(_index_sequence()))
         {
         }
-        constexpr inline runtime_tuple_table(const this_type&) = delete;
-        constexpr inline runtime_tuple_table(this_type&&) = delete;
+        constexpr inline RuntimeTupleTable(const this_type&) = delete;
+        constexpr inline RuntimeTupleTable(this_type&&) = delete;
 
         constexpr inline this_type& operator=(const this_type&) = delete;
         constexpr inline this_type& operator=(this_type&&) = delete;
@@ -137,7 +138,7 @@ namespace EmuCore::TMP
                 static_assert
                 (
                     EmuCore::TMP::get_false<std::size_t, Index_>(),
-                    "Invalid Index_ argument to EmuCore::TMP::runtime_tuple_table::Execute with compile-time index argument: The index is greater than the highest index within the tuple."
+                    "Invalid Index_ argument to EmuCore::TMP::RuntimeTupleTable::Execute with compile-time index argument: The index is greater than the highest index within the tuple."
                 );
             }
         }
@@ -161,7 +162,7 @@ namespace EmuCore::TMP
                 static_assert
                 (
                     EmuCore::TMP::get_false<std::size_t, Index_>(),
-                    "Invalid Index_ argument to EmuCore::TMP::runtime_tuple_table::Execute with compile-time index argument: The index is greater than the highest index within the tuple."
+                    "Invalid Index_ argument to EmuCore::TMP::RuntimeTupleTable::Execute with compile-time index argument: The index is greater than the highest index within the tuple."
                 );
             }
         }
@@ -182,7 +183,7 @@ namespace EmuCore::TMP
             }
             else
             {
-                throw std::out_of_range("Invalid index_ argument to EmuCore::TMP::runtime_tuple_table::Execute with runtime index argument: The index is greater than the highest index within the tuple.");
+                throw std::out_of_range("Invalid index_ argument to EmuCore::TMP::RuntimeTupleTable::Execute with runtime index argument: The index is greater than the highest index within the tuple.");
             }
         }
 
@@ -203,7 +204,7 @@ namespace EmuCore::TMP
             }
             else
             {
-                throw std::out_of_range("Invalid index_ argument to EmuCore::TMP::runtime_tuple_table::Execute with runtime index argument: The index is greater than the highest index within the tuple.");
+                throw std::out_of_range("Invalid index_ argument to EmuCore::TMP::RuntimeTupleTable::Execute with runtime index argument: The index is greater than the highest index within the tuple.");
             }
         }
 
@@ -249,7 +250,7 @@ namespace EmuCore::TMP
             }
             else
             {
-                throw std::out_of_range("Invalid index_ argument to EmuCore::TMP::runtime_tuple_table::operator() with runtime index argument: The index is greater than the highest index within the tuple.");
+                throw std::out_of_range("Invalid index_ argument to EmuCore::TMP::RuntimeTupleTable::operator() with runtime index argument: The index is greater than the highest index within the tuple.");
             }
         }
 
@@ -269,7 +270,7 @@ namespace EmuCore::TMP
             }
             else
             {
-                throw std::out_of_range("Invalid index_ argument to EmuCore::TMP::runtime_tuple_table::operator() with runtime index argument: The index is greater than the highest index within the tuple.");
+                throw std::out_of_range("Invalid index_ argument to EmuCore::TMP::RuntimeTupleTable::operator() with runtime index argument: The index is greater than the highest index within the tuple.");
             }
         }
 #pragma endregion
@@ -293,7 +294,7 @@ namespace EmuCore::TMP
                 static_assert
                 (
                     EmuCore::TMP::get_false<std::size_t, Index_>(),
-                    "Invalid Index_ argument to EmuCore::TMP::runtime_tuple_table::at with compile-time index argument: The index is greater than the highest index within the tuple."
+                    "Invalid Index_ argument to EmuCore::TMP::RuntimeTupleTable::at with compile-time index argument: The index is greater than the highest index within the tuple."
                 );
             }
         }
@@ -302,8 +303,9 @@ namespace EmuCore::TMP
         /// <para> Directly access the arbitrating function for the specified index within the target tuple. </para>
         /// <para> A `std::out_of_range` exception will be thrown if `index_` is greater than the number of elements in the tuple type. </para>
         /// </summary>
+        /// <param name="index_">Index of the target tuple type to retrieve the arbitrating function for.</param>
         /// <returns>Constant reference to the arbitrating function for the specified index within the target tuple.</returns>
-        constexpr inline const arbitrating_func_type& at(const std::size_t index_) const
+        [[nodiscard]] constexpr inline const arbitrating_func_type& at(const std::size_t index_) const
         {
             if (index_ < num_elements)
             {
@@ -311,7 +313,7 @@ namespace EmuCore::TMP
             }
             else
             {
-                throw std::out_of_range("Invalid index_ argument to EmuCore::TMP::runtime_tuple_table::at with runtime index argument: The index is greater than the highest index within the tuple.");
+                throw std::out_of_range("Invalid index_ argument to EmuCore::TMP::RuntimeTupleTable::at with runtime index argument: The index is greater than the highest index within the tuple.");
             }
         }
 
@@ -319,8 +321,9 @@ namespace EmuCore::TMP
         /// <para> Directly access the arbitrating function for the specified index within the target tuple. </para>
         /// <para> No safety bounds checks are performed. </para>
         /// </summary>
+        /// <param name="index_">Index of the target tuple type to retrieve the arbitrating function for.</param>
         /// <returns>Constant reference to the arbitrating function for the specified index within the target tuple.</returns>
-        constexpr inline const arbitrating_func_type& operator[](const std::size_t index_) const noexcept
+        [[nodiscard]] constexpr inline const arbitrating_func_type& operator[](const std::size_t index_) const noexcept
         {
             return _func_table[index_];
         }
