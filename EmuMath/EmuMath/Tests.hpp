@@ -540,9 +540,9 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr std::string_view NAME = "SIMD tan";
 
-		static constexpr std::size_t element_width = 32;
-		using scalar_type = float;
-		using register_type = EmuSIMD::f32x4;
+		static constexpr std::size_t element_width = 64;
+		using scalar_type = double;
+		using register_type = EmuSIMD::f64x2;
 
 		static constexpr std::size_t register_size = EmuSIMD::TMP::register_element_count_v<register_type, element_width>;
 		static constexpr std::size_t NUM_SCALARS = NUM_LOOPS * register_size;
@@ -569,15 +569,15 @@ namespace EmuCore::TestingHelpers
 		{
 			const std::size_t offset = i_ * register_size;
 			register_type data = EmuSIMD::load<register_type>(in.data() + offset);
-			data = EmuSIMD::Funcs::tan_f32x4(data);
+			data = EmuSIMD::Funcs::atan_f64x2(data);
 			EmuSIMD::store(data, out.data() + offset);
 		}
 		void OnTestsOver()
 		{
 			const std::size_t i = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
 			const std::size_t offset = i * register_size;
-			std::cout << "sin({" << in[offset] << ", " << in[offset + 1] << ", " << in[offset + 2] << ", " << in[offset + 3] << "}):\n\t";
-			std::cout << "{ " << out[offset] << ", " << out[offset + 1] << ", " << out[offset + 2] << ", " << out[offset + 3] << "}\n";
+			std::cout << "tan({" << in[offset] << ", " << in[offset + 1] /* << ", " << in[offset + 2] << ", " << in[offset + 3] */ << "}):\n\t";
+			std::cout << "{ " << out[offset] << ", " << out[offset + 1] /* << ", " << out[offset + 2] << ", " << out[offset + 3] */ << "}\n";
 		}
 
 		std::vector<scalar_type> in;

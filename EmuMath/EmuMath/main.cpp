@@ -398,7 +398,7 @@ int main()
 		for (std::size_t i = 0; i < len; i += inc)
 		{
 			auto acos_res = EmuSIMD::setr<register_type, width>(func(i), func(i + 1));
-			acos_res = EmuSIMD::Funcs::sin_f64x2(acos_res);
+			acos_res = EmuSIMD::Funcs::tan_f64x2(acos_res);
 			std::cout << "[" << i << "]: ";
 			EmuSIMD::append_simd_vector_to_stream<width, true>(std::cout, acos_res) << "\n";
 		}

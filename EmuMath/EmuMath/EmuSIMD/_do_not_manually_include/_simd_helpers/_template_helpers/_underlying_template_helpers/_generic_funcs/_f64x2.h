@@ -716,22 +716,263 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 tan_f64x2(EmuSIMD::f64x2_arg in_)
 	{
+#if (EMU_CORE_IS_INTEL_COMPILER || EMU_CORE_IS_MSVC) && EMU_CORE_X86_X64 // Better on both Intel and AMD x86/x64 builds, so use where available
 		return _mm_tan_pd(in_);
+#else
+		// Alternative manual approximation using sin/cos, based on https://developer.download.nvidia.com/cg/sin.html & https://developer.download.nvidia.com/cg/cos.html impl.
+		// --- Made as a unique function instead of deferring to separate cos and sin to minimise required operations
+
+		// Store constants used > once in registers to allow shuffling to them
+		EmuSIMD::f64x2 one_c4z = setr_f64x2(1.0, -1.0);
+
+		// Prepare for power series
+		EmuSIMD::f64x2 const0 = set1_f64x2(0.25);
+		EmuSIMD::f64x2 r1x_cos = mul_f64x2(set1_f64x2(0.159154943091), in_);
+		EmuSIMD::f64x2 r1x_sin = sub_f64x2(r1x_cos, const0); // r1.x = c1.w * in_ - c1.x
+
+		EmuSIMD::f64x2 r1y_sin = trunc_f64x2(r1x_sin); // r1.y = frac(r1.x)
+		r1y_sin = sub_f64x2(r1x_sin, r1y_sin);
+		EmuSIMD::f64x2 r1y_cos = trunc_f64x2(r1x_sin);
+		r1y_cos = sub_f64x2(r1x_cos, r1y_cos);
+
+		EmuSIMD::f64x2 r2x_sin = cmplt_f64x2(r1x_sin, const0); // r2.x = r1.x < c1.x
+		EmuSIMD::f64x2 r2x_cos = cmplt_f64x2(r1x_cos, const0);
+
+		const0 = permute_f64x2<make_shuffle_mask<0, 0>()>(one_c4z);
+		r2x_sin = and_f64x2(r2x_sin, const0);
+		r2x_cos = and_f64x2(r2x_cos, const0);
+
+		EmuSIMD::f64x2 const1 = set1_f64x2(-9.0);
+		EmuSIMD::f64x2 const2 = set1_f64x2(0.75);
+		EmuSIMD::f64x2 r2y_sin = cmpge_f64x2(r1y_sin, const1); // r2.yz = r1.yy >= c1.yz
+		EmuSIMD::f64x2 r2z_sin = cmpge_f64x2(r1y_sin, const2);
+		r2y_sin = and_f64x2(r2y_sin, const0);
+		r2z_sin = and_f64x2(r2z_sin, const0);
+		EmuSIMD::f64x2 r2y_cos = cmpge_f64x2(r1y_cos, const1);
+		EmuSIMD::f64x2 r2z_cos = cmpge_f64x2(r1y_cos, const2);
+		r2y_cos = and_f64x2(r2y_cos, const0);
+		r2z_cos = and_f64x2(r2z_cos, const0);
+
+		const1 = permute_f64x2<make_shuffle_mask<1, 1>()>(one_c4z);
+		r2y_sin = fmadd_f64x2(r2x_sin, const1, fmadd_f64x2(r2y_sin, const0, mul_f64x2(r2z_sin, const1))); // dot(r2, c4.zwz)
+		r2y_cos = fmadd_f64x2(r2x_cos, const1, fmadd_f64x2(r2y_cos, const0, mul_f64x2(r2z_cos, const1)));
+
+		const1 = set1_f64x2(0.5);
+		EmuSIMD::f64x2 r0x_sin = negate_f64x2(r1y_sin);
+		EmuSIMD::f64x2 r0y_sin = sub_f64x2(const1, r1y_sin);
+		EmuSIMD::f64x2 r0z_sin = sub_f64x2(const0, r1y_sin);
+		r0x_sin = mul_f64x2(r0x_sin, r0x_sin);
+		r0y_sin = mul_f64x2(r0y_sin, r0y_sin);
+		r0z_sin = mul_f64x2(r0z_sin, r0z_sin);
+		EmuSIMD::f64x2 r0x_cos = negate_f64x2(r1y_cos);
+		EmuSIMD::f64x2 r0y_cos = sub_f64x2(const1, r1y_cos);
+		EmuSIMD::f64x2 r0z_cos = sub_f64x2(const0, r1y_cos);
+		r0x_cos = mul_f64x2(r0x_cos, r0x_cos);
+		r0y_cos = mul_f64x2(r0y_cos, r0y_cos);
+		r0z_cos = mul_f64x2(r0z_cos, r0z_cos);
+
+		// Begin power series
+		// --- Power 1
+		const0 = set1_f64x2(-60.1458091736);
+		EmuSIMD::f64x2 const3 = negate_f64x2(const0);
+		const1 = set1_f64x2(24.9808039603);
+		const2 = negate_f64x2(const1);
+		r1x_sin = fmadd_f64x2(const1, r0x_sin, const0);
+		r1y_sin = fmadd_f64x2(const2, r0y_sin, const3);
+		EmuSIMD::f64x2 r1z_sin = fmadd_f64x2(const1, r0z_sin, const0);
+		r1x_cos = fmadd_f64x2(const1, r0x_cos, const0);
+		r1y_cos = fmadd_f64x2(const2, r0y_cos, const3);
+		EmuSIMD::f64x2 r1z_cos = fmadd_f64x2(const1, r0z_cos, const0);
+
+		// --- Power 2
+		const0 = set1_f64x2(85.4537887573);
+		const1 = negate_f64x2(const0);
+		r1x_sin = fmadd_f64x2(r1x_sin, r0x_sin, const0);
+		r1y_sin = fmadd_f64x2(r1y_sin, r0y_sin, const1);
+		r1z_sin = fmadd_f64x2(r1z_sin, r0z_sin, const0);
+		r1x_cos = fmadd_f64x2(r1x_cos, r0x_cos, const0);
+		r1y_cos = fmadd_f64x2(r1y_cos, r0y_cos, const1);
+		r1z_cos = fmadd_f64x2(r1z_cos, r0z_cos, const0);
+
+		// --- Power 3
+		const0 = set1_f64x2(-64.9393539429);
+		const1 = negate_f64x2(const0);
+		r1x_sin = fmadd_f64x2(r1x_sin, r0x_sin, const0);
+		r1y_sin = fmadd_f64x2(r1y_sin, r0y_sin, const1);
+		r1z_sin = fmadd_f64x2(r1z_sin, r0z_sin, const0);
+		r1x_cos = fmadd_f64x2(r1x_cos, r0x_cos, const0);
+		r1y_cos = fmadd_f64x2(r1y_cos, r0y_cos, const1);
+		r1z_cos = fmadd_f64x2(r1z_cos, r0z_cos, const0);
+
+		// --- Power 4
+		const0 = set1_f64x2(19.7392082214);
+		const1 = negate_f64x2(const0);
+		r1x_sin = fmadd_f64x2(r1x_sin, r0x_sin, const0);
+		r1y_sin = fmadd_f64x2(r1y_sin, r0y_sin, const1);
+		r1z_sin = fmadd_f64x2(r1z_sin, r0z_sin, const0);
+		r1x_cos = fmadd_f64x2(r1x_cos, r0x_cos, const0);
+		r1y_cos = fmadd_f64x2(r1y_cos, r0y_cos, const1);
+		r1z_cos = fmadd_f64x2(r1z_cos, r0z_cos, const0);
+
+		// --- Power 5
+		const0 = permute_f64x2<make_shuffle_mask<0, 0>()>(one_c4z);
+		const1 = permute_f64x2<make_shuffle_mask<1, 1>()>(one_c4z);
+		r1x_sin = fmadd_f64x2(r1x_sin, r0x_sin, const1);
+		r1y_sin = fmadd_f64x2(r1y_sin, r0y_sin, const0);
+		r1z_sin = fmadd_f64x2(r1z_sin, r0z_sin, const1);
+		r1x_cos = fmadd_f64x2(r1x_cos, r0x_cos, const1);
+		r1y_cos = fmadd_f64x2(r1y_cos, r0y_cos, const0);
+		r1z_cos = fmadd_f64x2(r1z_cos, r0z_cos, const1);
+
+		// Final dot - store the sins in r2x
+		r2x_sin = negate_f64x2(r2x_sin);
+		r2y_sin = negate_f64x2(r2y_sin);
+		r2z_sin = negate_f64x2(r2z_sin);
+		r2x_sin = fmadd_f64x2(r1x_sin, r2x_sin, fmadd_f64x2(r1y_sin, r2y_sin, mul_f64x2(r1z_sin, r2z_sin)));
+		r2x_cos = negate_f64x2(r2x_cos);
+		r2y_cos = negate_f64x2(r2y_cos);
+		r2z_cos = negate_f64x2(r2z_cos);
+		r2x_cos = fmadd_f64x2(r1x_cos, r2x_cos, fmadd_f64x2(r1y_cos, r2y_cos, mul_f64x2(r1z_cos, r2z_cos)));
+
+		return div_f64x2(r2x_sin, r2x_cos);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 acos_f64x2(EmuSIMD::f64x2_arg in_)
 	{
+#if EMU_CORE_IS_INTEL_COMPILER && EMU_CORE_X86_X64 // Only tends to score better on Intel platforms
 		return _mm_acos_pd(in_);
+#else
+		// Alternative manual approximation, based on https://developer.download.nvidia.com/cg/acos.html implementation
+		EmuSIMD::f64x2 in_abs = abs_f64x2(in_);
+		EmuSIMD::f64x2 one = set1_f64x2(1.0);
+		EmuSIMD::f64x2 negation_mult = cmple_f64x2(in_, setzero_f64x2());
+		negation_mult = and_f64x2(one, negation_mult);
+
+		EmuSIMD::f64x2 result = set1_f64x2(-0.0187293);
+		result = fmadd_f64x2(result, in_abs, set1_f64x2(0.074261));
+		result = fmsub_f64x2(result, in_abs, set1_f64x2(0.2121144));
+		result = fmadd_f64x2(result, in_abs, set1_f64x2(1.5707288));
+		result = mul_f64x2(result, sqrt_f64x2(sub_f64x2(one, in_abs)));
+
+		EmuSIMD::f64x2 tmp = mul_f64x2(set1_f64x2(2.0), negation_mult);
+		tmp = mul_f64x2(tmp, result);
+		result = sub_f64x2(result, tmp);
+
+		return fmadd_f64x2(negation_mult, set1_f64x2(3.14159265358979), result);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 asin_f64x2(EmuSIMD::f64x2_arg in_)
 	{
+#if EMU_CORE_IS_INTEL_COMPILER && EMU_CORE_X86_X64 // Only tends to score better on Intel platforms
 		return _mm_asin_pd(in_);
+#else
+		// Alternative manual approximation, based on https://developer.download.nvidia.com/cg/asin.html implementation
+		EmuSIMD::f64x2 in_abs = abs_f64x2(in_);
+		EmuSIMD::f64x2 two = set1_f64x2(2.0);
+		EmuSIMD::f64x2 negation_mult = cmplt_f64x2(in_, setzero_f64x2());
+		negation_mult = and_f64x2(two, negation_mult);
+
+		EmuSIMD::f64x2 result = set1_f64x2(-0.0187293);
+		result = fmadd_f64x2(result, in_abs, set1_f64x2(0.074261));
+		result = fmsub_f64x2(result, in_abs, set1_f64x2(0.2121144));
+		result = fmadd_f64x2(result, in_abs, set1_f64x2(1.5707288));
+
+		EmuSIMD::f64x2 tmp = sub_f64x2(set1_f64x2(1.0), in_abs);
+		tmp = mul_f64x2(sqrt_f64x2(tmp), result);
+		result = set1_f64x2(3.14159265358979 * 0.5);
+		result = sub_f64x2(result, tmp);
+
+		tmp = mul_f64x2(negation_mult, result);
+		return sub_f64x2(result, tmp);
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 atan2_f64x2(EmuSIMD::f64x2_arg y_, EmuSIMD::f64x2_arg x_)
+	{
+		#if EMU_CORE_IS_INTEL_COMPILER && EMU_CORE_X86_X64 // Only tends to score better on Intel platforms
+		return _mm_atan2_pd(y_, x_);
+		#else		
+		// Alternative manual approximation, based on https://developer.download.nvidia.com/cg/atan2.html implementation
+
+		auto abs_x = abs_f64x2(x_);
+		auto abs_y = abs_f64x2(y_);
+		
+		EmuSIMD::f64x2 temp0 = max_f64x2(abs_x, abs_y);
+		EmuSIMD::f64x2 temp1 = min_f64x2(abs_x, abs_y);
+		EmuSIMD::f64x2 temp2 = div_f64x2(set1_f64x2(1.0), temp0);
+		temp2 = mul_f64x2(temp1, temp2);
+
+		EmuSIMD::f64x2 t4 = mul_f64x2(temp2, temp2);
+		temp0 = set1_f64x2(-0.013480470);
+		temp0 = fmadd_f64x2(temp0, t4, set1_f64x2(0.057477314));
+		temp0 = fmsub_f64x2(temp0, t4, set1_f64x2(0.121239071));
+		temp0 = fmadd_f64x2(temp0, t4, set1_f64x2(0.195635925));
+		temp0 = fmsub_f64x2(temp0, t4, set1_f64x2(0.332994597));
+		temp0 = fmadd_f64x2(temp0, t4, set1_f64x2(0.999995630));
+		temp2 = mul_f64x2(temp0, temp2);
+
+		//t3 = (abs(y) > abs(x)) ? float(1.570796327) - t3 : t3;
+		EmuSIMD::f64x2 cmp_mask = cmpgt_f64x2(abs_y, abs_x);
+		temp0 = and_f64x2(cmp_mask, set1_f64x2(1.570796327));
+		temp0 = sub_f64x2(temp0, temp2);
+		temp2 = or_f64x2(andnot_f64x2(cmp_mask, temp2), and_f64x2(cmp_mask, temp0));
+
+		// t3 = (x < 0) ?  float(3.141592654) - t3 : t3;
+		EmuSIMD::f64x2 zero = setzero_f64x2();
+		cmp_mask = cmplt_f64x2(x_, zero);
+		temp0 = and_f64x2(cmp_mask, set1_f64x2(3.141592654));
+		temp0 = sub_f64x2(temp0, temp2);
+		temp2 = or_f64x2(andnot_f64x2(cmp_mask, temp2), and_f64x2(cmp_mask, temp0));
+
+		//t3 = (y < 0) ? -t3 : t3;
+		cmp_mask = cmplt_f64x2(y_, zero);
+		temp0 = negate_f64x2(temp2);
+		temp2 = or_f64x2(andnot_f64x2(cmp_mask, temp2), and_f64x2(cmp_mask, temp0));
+
+		return temp2;
+		#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 atan_f64x2(EmuSIMD::f64x2_arg in_)
 	{
+#if EMU_CORE_IS_INTEL_COMPILER && EMU_CORE_X86_X64 // Only tends to score better on Intel platforms
 		return _mm_atan_pd(in_);
+#else
+		// Alternative manual approximation, based on https://developer.download.nvidia.com/cg/atan2.html implementation with a constant x_ argument of 1
+		EmuSIMD::f64x2 one = set1_f64x2(1.0);
+		EmuSIMD::f64x2 abs_y = abs_f64x2(in_);
+
+		//auto temp0 = _mm_max_ps(temp2, temp1);
+		EmuSIMD::f64x2 cmp_mask = cmplt_f64x2(abs_y, one);
+		EmuSIMD::f64x2 temp0 = or_f64x2(and_f64x2(cmp_mask, one), andnot_f64x2(cmp_mask, abs_y));
+		EmuSIMD::f64x2 temp1 = or_f64x2(andnot_f64x2(cmp_mask, one), and_f64x2(cmp_mask, abs_y));
+		EmuSIMD::f64x2 temp2 = div_f64x2(one, temp0);
+		temp2 = mul_f64x2(temp1, temp2);
+
+		EmuSIMD::f64x2 t4 = mul_f64x2(temp2, temp2);
+		temp0 = set1_f64x2(-0.013480470);
+		temp0 = fmadd_f64x2(temp0, t4, set1_f64x2(0.057477314));
+		temp0 = fmsub_f64x2(temp0, t4, set1_f64x2(0.121239071));
+		temp0 = fmadd_f64x2(temp0, t4, set1_f64x2(0.195635925));
+		temp0 = fmsub_f64x2(temp0, t4, set1_f64x2(0.332994597));
+		temp0 = fmadd_f64x2(temp0, t4, set1_f64x2(0.999995630));
+		temp2 = mul_f64x2(temp0, temp2);
+
+		//t3 = (abs(y) > abs(x)) ? float(1.570796327) - t3 : t3;
+		cmp_mask = cmpgt_f64x2(abs_y, one);
+		temp0 = and_f64x2(cmp_mask, set1_f64x2(1.570796327));
+		temp0 = sub_f64x2(temp0, temp2);
+		temp2 = or_f64x2(andnot_f64x2(cmp_mask, temp2), and_f64x2(cmp_mask, temp0));
+
+		//t3 = (y < 0) ? -t3 : t3;
+		cmp_mask = cmplt_f64x2(in_, setzero_f64x2());
+		temp0 = negate_f64x2(temp2);
+		temp2 = or_f64x2(andnot_f64x2(cmp_mask, temp2), and_f64x2(cmp_mask, temp0));
+
+		return temp2;
+#endif
 	}
 #pragma endregion
 }
