@@ -575,7 +575,7 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f64x2 const0 = set1_f64x2(0.25f);
 		EmuSIMD::f64x2 r2x = cmplt_f64x2(r1x, const0); // r2.x = r1.x < c1.x
 
-		const0 = permute_f64x2<make_shuffle_mask<0, 0>()>(one_c4z);
+		const0 = permute_f64x2<make_shuffle_mask_64<0, 0>()>(one_c4z);
 		r2x = and_f64x2(r2x, const0);
 
 		EmuSIMD::f64x2 r2y = cmpge_f64x2(r1y, set1_f64x2(-9.0)); // r2.yz = r1.yy >= c1.yz
@@ -583,7 +583,7 @@ namespace EmuSIMD::Funcs
 		r2y = and_f64x2(r2y, const0);
 		r2z = and_f64x2(r2z, const0);
 
-		EmuSIMD::f64x2 const1 = permute_f64x2<make_shuffle_mask<1, 1>()>(one_c4z);
+		EmuSIMD::f64x2 const1 = permute_f64x2<make_shuffle_mask_64<1, 1>()>(one_c4z);
 		r2y = fmadd_f64x2(r2x, const1, fmadd_f64x2(r2y, const0, mul_f64x2(r2z, const1))); // dot(r2, c4.zwz)
 
 		EmuSIMD::f64x2 r0x = negate_f64x2(r1y);
@@ -620,8 +620,8 @@ namespace EmuSIMD::Funcs
 		r1z = fmadd_f64x2(r1z, r0z, const0);
 
 		// --- Power 5
-		const0 = permute_f64x2<make_shuffle_mask<0, 0>()>(one_c4z);
-		const1 = permute_f64x2<make_shuffle_mask<1, 1>()>(one_c4z);
+		const0 = permute_f64x2<make_shuffle_mask_64<0, 0>()>(one_c4z);
+		const1 = permute_f64x2<make_shuffle_mask_64<1, 1>()>(one_c4z);
 		r1x = fmadd_f64x2(r1x, r0x, const1);
 		r1y = fmadd_f64x2(r1y, r0y, const0);
 		r1z = fmadd_f64x2(r1z, r0z, const1);
@@ -654,7 +654,7 @@ namespace EmuSIMD::Funcs
 
 		EmuSIMD::f64x2 r2x = cmplt_f64x2(r1x, const0); // r2.x = r1.x < c1.x
 
-		const0 = permute_f64x2<make_shuffle_mask<0, 0>()>(one_c4z);
+		const0 = permute_f64x2<make_shuffle_mask_64<0, 0>()>(one_c4z);
 		r2x = and_f64x2(r2x, const0);
 
 		EmuSIMD::f64x2 r2y = cmpge_f64x2(r1y, set1_f64x2(-9.0)); // r2.yz = r1.yy >= c1.yz
@@ -662,7 +662,7 @@ namespace EmuSIMD::Funcs
 		r2y = and_f64x2(r2y, const0);
 		r2z = and_f64x2(r2z, const0);
 
-		EmuSIMD::f64x2 const1 = permute_f64x2<make_shuffle_mask<1, 1>()>(one_c4z);
+		EmuSIMD::f64x2 const1 = permute_f64x2<make_shuffle_mask_64<1, 1>()>(one_c4z);
 		r2y = fmadd_f64x2(r2x, const1, fmadd_f64x2(r2y, const0, mul_f64x2(r2z, const1))); // dot(r2, c4.zwz)
 
 		EmuSIMD::f64x2 r0x = negate_f64x2(r1y);
@@ -699,8 +699,8 @@ namespace EmuSIMD::Funcs
 		r1z = fmadd_f64x2(r1z, r0z, const0);
 
 		// --- Power 5
-		const0 = permute_f64x2<make_shuffle_mask<0, 0>()>(one_c4z);
-		const1 = permute_f64x2<make_shuffle_mask<1, 1>()>(one_c4z);
+		const0 = permute_f64x2<make_shuffle_mask_64<0, 0>()>(one_c4z);
+		const1 = permute_f64x2<make_shuffle_mask_64<1, 1>()>(one_c4z);
 		r1x = fmadd_f64x2(r1x, r0x, const1);
 		r1y = fmadd_f64x2(r1y, r0y, const0);
 		r1z = fmadd_f64x2(r1z, r0z, const1);
@@ -716,7 +716,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 tan_f64x2(EmuSIMD::f64x2_arg in_)
 	{
-#if (EMU_CORE_IS_INTEL_COMPILER || EMU_CORE_IS_MSVC) && EMU_CORE_X86_X64 // Better on both Intel and AMD x86/x64 builds, so use where available
+#if 0 && (EMU_CORE_IS_INTEL_COMPILER || EMU_CORE_IS_MSVC) && EMU_CORE_X86_X64 // Better on both Intel and AMD x86/x64 builds, so use where available
 		return _mm_tan_pd(in_);
 #else
 		// Alternative manual approximation using sin/cos, based on https://developer.download.nvidia.com/cg/sin.html & https://developer.download.nvidia.com/cg/cos.html impl.
@@ -738,7 +738,7 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f64x2 r2x_sin = cmplt_f64x2(r1x_sin, const0); // r2.x = r1.x < c1.x
 		EmuSIMD::f64x2 r2x_cos = cmplt_f64x2(r1x_cos, const0);
 
-		const0 = permute_f64x2<make_shuffle_mask<0, 0>()>(one_c4z);
+		const0 = permute_f64x2<make_shuffle_mask_64<0, 0>()>(one_c4z);
 		r2x_sin = and_f64x2(r2x_sin, const0);
 		r2x_cos = and_f64x2(r2x_cos, const0);
 
@@ -753,7 +753,7 @@ namespace EmuSIMD::Funcs
 		r2y_cos = and_f64x2(r2y_cos, const0);
 		r2z_cos = and_f64x2(r2z_cos, const0);
 
-		const1 = permute_f64x2<make_shuffle_mask<1, 1>()>(one_c4z);
+		const1 = permute_f64x2<make_shuffle_mask_64<1, 1>()>(one_c4z);
 		r2y_sin = fmadd_f64x2(r2x_sin, const1, fmadd_f64x2(r2y_sin, const0, mul_f64x2(r2z_sin, const1))); // dot(r2, c4.zwz)
 		r2y_cos = fmadd_f64x2(r2x_cos, const1, fmadd_f64x2(r2y_cos, const0, mul_f64x2(r2z_cos, const1)));
 
@@ -815,8 +815,8 @@ namespace EmuSIMD::Funcs
 		r1z_cos = fmadd_f64x2(r1z_cos, r0z_cos, const0);
 
 		// --- Power 5
-		const0 = permute_f64x2<make_shuffle_mask<0, 0>()>(one_c4z);
-		const1 = permute_f64x2<make_shuffle_mask<1, 1>()>(one_c4z);
+		const0 = permute_f64x2<make_shuffle_mask_64<0, 0>()>(one_c4z);
+		const1 = permute_f64x2<make_shuffle_mask_64<1, 1>()>(one_c4z);
 		r1x_sin = fmadd_f64x2(r1x_sin, r0x_sin, const1);
 		r1y_sin = fmadd_f64x2(r1y_sin, r0y_sin, const0);
 		r1z_sin = fmadd_f64x2(r1z_sin, r0z_sin, const1);

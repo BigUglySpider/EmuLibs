@@ -332,6 +332,12 @@ struct tester_of_array
 	}
 };
 
+template<class VecType_, std::size_t ElementWidth_, class Func_, typename Val_, std::size_t...Indices_>
+constexpr inline decltype(auto) setr_test_helper(Func_&& func_, std::index_sequence<Indices_...> indices_, const Val_& val_)
+{
+	return EmuSIMD::setr<VecType_, ElementWidth_>(std::forward<Func_>(func_)(val_ + Indices_)...);
+}
+
 int main()
 {
 	//try
@@ -389,16 +395,17 @@ int main()
 	EmuCore::Timer<std::milli> timer_;
 
 	{
-		using register_type = EmuSIMD::f64x2;
-		constexpr std::size_t width = 64;
-		constexpr std::size_t len = 240;
-		constexpr std::size_t inc = 2;
+		constexpr std::size_t vec_len = 2;
+		using vec_elem_type = double;
+		static constexpr std::size_t iterations = 240;
+		constexpr std::size_t width = sizeof(vec_elem_type) * 8;
+		using register_type = typename EmuSIMD::TMP::register_type<vec_elem_type, width* vec_len>::type;
 		using EmuCore::Pi;
 		auto func = [](auto val) { return Pi::DegsToRads<double>(val * 0.333333333333333); };
-		for (std::size_t i = 0; i < len; i += inc)
+		for (std::size_t i = 0; i < iterations; i += vec_len)
 		{
-			auto acos_res = EmuSIMD::setr<register_type, width>(func(i), func(i + 1));
-			acos_res = EmuSIMD::Funcs::tan_f64x2(acos_res);
+			auto acos_res = setr_test_helper<register_type, width>(func, std::make_index_sequence<vec_len>(), i);
+			acos_res = EmuSIMD::Funcs::cos_f64x2(acos_res);
 			std::cout << "[" << i << "]: ";
 			EmuSIMD::append_simd_vector_to_stream<width, true>(std::cout, acos_res) << "\n";
 		}

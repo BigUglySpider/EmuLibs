@@ -43,11 +43,17 @@ namespace EmuSIMD::Funcs
 	/// <summary>
 	/// <para> Creates a shuffle mask for a 64-bit-element SIMD register with the same semantics as the x86/x64 _MM_SHUFFLE2 macro. </para>
 	/// </summary>
-	/// <returns>Shuffle mask that would result from a call to _MM_SHUFFLE(I0_, I1_) when building under x86/x64.</returns>
+	/// <returns>Shuffle mask that would result from a call to _MM_SHUFFLE2(I0_, I1_) when building under x86/x64.</returns>
 	template<shuffle_mask_type I0_, shuffle_mask_type I1_>
-	[[nodiscard]] constexpr inline shuffle_mask_type make_shuffle_mask()
+	[[nodiscard]] constexpr inline shuffle_mask_type make_shuffle_mask_64()
 	{
-		return ((I0_ << 1) | I1_);
+		return ((I0_ << 1) | (I1_));
+	}
+
+	template<shuffle_mask_type I0_, shuffle_mask_type I1_, shuffle_mask_type I2_, shuffle_mask_type I3_>
+	[[nodiscard]] constexpr inline shuffle_mask_type make_shuffle_mask_64()
+	{
+		return ((I0_ << 3) | (I1_ << 2) | (I2_ << 1) | (I3_));
 	}
 
 	/// <summary>
@@ -55,9 +61,9 @@ namespace EmuSIMD::Funcs
 	/// </summary>
 	/// <returns>Shuffle mask that would result from a call to _MM_SHUFFLE(I0_, I1_, I2_, I3_) when building under x86/x64.</returns>
 	template<shuffle_mask_type I0_, shuffle_mask_type I1_, shuffle_mask_type I2_, shuffle_mask_type I3_>
-	[[nodiscard]] constexpr inline shuffle_mask_type make_shuffle_mask()
+	[[nodiscard]] constexpr inline shuffle_mask_type make_shuffle_mask_32()
 	{
-		return ((I3_ << 6) | (I2_ << 4) | (I1_ << 2) | (I0_));
+		return ((I0_ << 6) | (I1_ << 4) | (I2_ << 2) | (I3_));
 	}
 }
 

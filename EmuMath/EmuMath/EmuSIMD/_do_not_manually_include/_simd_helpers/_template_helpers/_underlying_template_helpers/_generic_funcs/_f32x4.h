@@ -581,10 +581,10 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f32x4 r1y = trunc_f32x4(r1x); // r1.y = frac(r1.x)
 		r1y = sub_f32x4(r1x, r1y);
 
-		EmuSIMD::f32x4 const0 = permute_f32x4<make_shuffle_mask<0, 0, 0, 0>()>(c1x_c2x_c3x_c4x);
+		EmuSIMD::f32x4 const0 = permute_f32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(c1x_c2x_c3x_c4x);
 		EmuSIMD::f32x4 r2x = cmplt_f32x4(r1x, const0); // r2.x = r1.x < c1.x
 
-		const0 = permute_f32x4<make_shuffle_mask<0, 0, 0, 0>()>(one_c2z_c3z_c4z);
+		const0 = permute_f32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(one_c2z_c3z_c4z);
 		r2x = and_f32x4(r2x, const0);
 
 		EmuSIMD::f32x4 r2y = cmpge_f32x4(r1y, set1_f32x4(-9.0f)); // r2.yz = r1.yy >= c1.yz
@@ -592,7 +592,7 @@ namespace EmuSIMD::Funcs
 		r2y = and_f32x4(r2y, const0);
 		r2z = and_f32x4(r2z, const0);
 
-		EmuSIMD::f32x4 const1 = permute_f32x4<make_shuffle_mask<3, 3, 3, 3>()>(one_c2z_c3z_c4z);
+		EmuSIMD::f32x4 const1 = permute_f32x4<make_shuffle_mask_32<3, 3, 3, 3>()>(one_c2z_c3z_c4z);
 		r2y = fmadd_f32x4(r2x, const1, fmadd_f32x4(r2y, const0, mul_f32x4(r2z, const1))); // dot(r2, c4.zwz)
 
 		EmuSIMD::f32x4 r0x = negate_f32x4(r1y);
@@ -604,33 +604,33 @@ namespace EmuSIMD::Funcs
 
 		// Begin power series
 		// --- Power 1
-		const0 = permute_f32x4<make_shuffle_mask<1, 1, 1, 1>()>(one_c2z_c3z_c4z);
-		const1 = permute_f32x4<make_shuffle_mask<1, 1, 1, 1>()>(c1x_c2x_c3x_c4x);
+		const0 = permute_f32x4<make_shuffle_mask_32<1, 1, 1, 1>()>(one_c2z_c3z_c4z);
+		const1 = permute_f32x4<make_shuffle_mask_32<1, 1, 1, 1>()>(c1x_c2x_c3x_c4x);
 		r1x = fmadd_f32x4(const1, r0x, const0);
 		r1y = fmadd_f32x4(set1_f32x4(-24.9808039603f), r0y, set1_f32x4(60.1458091736f));
 		EmuSIMD::f32x4 r1z = fmadd_f32x4(const1, r0z, const0);
 
 		// --- Power 2
-		const0 = permute_f32x4<make_shuffle_mask<2, 2, 2, 2>()>(c1x_c2x_c3x_c4x);
+		const0 = permute_f32x4<make_shuffle_mask_32<2, 2, 2, 2>()>(c1x_c2x_c3x_c4x);
 		r1x = fmadd_f32x4(r1x, r0x, const0);
 		r1y = fmadd_f32x4(r1y, r0y, set1_f32x4(-85.4537887573f));
 		r1z = fmadd_f32x4(r1z, r0z, const0);
 
 		// --- Power 3
-		const0 = permute_f32x4<make_shuffle_mask<2, 2, 2, 2>()>(one_c2z_c3z_c4z);
+		const0 = permute_f32x4<make_shuffle_mask_32<2, 2, 2, 2>()>(one_c2z_c3z_c4z);
 		r1x = fmadd_f32x4(r1x, r0x, const0);
 		r1y = fmadd_f32x4(r1y, r0y, set1_f32x4(64.9393539429f));
 		r1z = fmadd_f32x4(r1z, r0z, const0);
 
 		// --- Power 4
-		const0 = permute_f32x4<make_shuffle_mask<3, 3, 3, 3>()>(c1x_c2x_c3x_c4x);
+		const0 = permute_f32x4<make_shuffle_mask_32<3, 3, 3, 3>()>(c1x_c2x_c3x_c4x);
 		r1x = fmadd_f32x4(r1x, r0x, const0);
 		r1y = fmadd_f32x4(r1y, r0y, set1_f32x4(-19.7392082214f));
 		r1z = fmadd_f32x4(r1z, r0z, const0);
 
 		// --- Power 5
-		const0 = permute_f32x4<make_shuffle_mask<0, 0, 0, 0>()>(one_c2z_c3z_c4z);
-		const1 = permute_f32x4<make_shuffle_mask<3, 3, 3, 3>()>(one_c2z_c3z_c4z);
+		const0 = permute_f32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(one_c2z_c3z_c4z);
+		const1 = permute_f32x4<make_shuffle_mask_32<3, 3, 3, 3>()>(one_c2z_c3z_c4z);
 		r1x = fmadd_f32x4(r1x, r0x, const1);
 		r1y = fmadd_f32x4(r1y, r0y, const0);
 		r1z = fmadd_f32x4(r1z, r0z, const1);
@@ -656,7 +656,7 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f32x4 one_c2z_c3z_c4z = setr_f32x4(1.0f, -60.1458091736f, -64.9393539429f, -1.0f);
 
 		// Prepare for power series
-		EmuSIMD::f32x4 const0 = permute_f32x4<make_shuffle_mask<0, 0, 0, 0>()>(c1x_c2x_c3x_c4x);
+		EmuSIMD::f32x4 const0 = permute_f32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(c1x_c2x_c3x_c4x);
 		EmuSIMD::f32x4 r1x = fmsub_f32x4(set1_f32x4(0.159154943091f), in_, const0); // r1.x = c1.w * in_ - c1.x
 
 		EmuSIMD::f32x4 r1y = trunc_f32x4(r1x); // r1.y = frac(r1.x)
@@ -664,7 +664,7 @@ namespace EmuSIMD::Funcs
 
 		EmuSIMD::f32x4 r2x = cmplt_f32x4(r1x, const0); // r2.x = r1.x < c1.x
 
-		const0 = permute_f32x4<make_shuffle_mask<0, 0, 0, 0>()>(one_c2z_c3z_c4z);
+		const0 = permute_f32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(one_c2z_c3z_c4z);
 		r2x = and_f32x4(r2x, const0);
 
 		EmuSIMD::f32x4 r2y = cmpge_f32x4(r1y, set1_f32x4(-9.0f)); // r2.yz = r1.yy >= c1.yz
@@ -672,7 +672,7 @@ namespace EmuSIMD::Funcs
 		r2y = and_f32x4(r2y, const0);
 		r2z = and_f32x4(r2z, const0);
 
-		EmuSIMD::f32x4 const1 = permute_f32x4<make_shuffle_mask<3, 3, 3, 3>()>(one_c2z_c3z_c4z);
+		EmuSIMD::f32x4 const1 = permute_f32x4<make_shuffle_mask_32<3, 3, 3, 3>()>(one_c2z_c3z_c4z);
 		r2y = fmadd_f32x4(r2x, const1, fmadd_f32x4(r2y, const0, mul_f32x4(r2z, const1))); // dot(r2, c4.zwz)
 
 		EmuSIMD::f32x4 r0x = negate_f32x4(r1y);
@@ -684,33 +684,33 @@ namespace EmuSIMD::Funcs
 
 		// Begin power series
 		// --- Power 1
-		const0 = permute_f32x4<make_shuffle_mask<1, 1, 1, 1>()>(one_c2z_c3z_c4z);
-		const1 = permute_f32x4<make_shuffle_mask<1, 1, 1, 1>()>(c1x_c2x_c3x_c4x);
+		const0 = permute_f32x4<make_shuffle_mask_32<1, 1, 1, 1>()>(one_c2z_c3z_c4z);
+		const1 = permute_f32x4<make_shuffle_mask_32<1, 1, 1, 1>()>(c1x_c2x_c3x_c4x);
 		r1x = fmadd_f32x4(const1, r0x, const0);
 		r1y = fmadd_f32x4(set1_f32x4(-24.9808039603f), r0y, set1_f32x4(60.1458091736f));
 		EmuSIMD::f32x4 r1z = fmadd_f32x4(const1, r0z, const0);
 
 		// --- Power 2
-		const0 = permute_f32x4<make_shuffle_mask<2, 2, 2, 2>()>(c1x_c2x_c3x_c4x);
+		const0 = permute_f32x4<make_shuffle_mask_32<2, 2, 2, 2>()>(c1x_c2x_c3x_c4x);
 		r1x = fmadd_f32x4(r1x, r0x, const0);
 		r1y = fmadd_f32x4(r1y, r0y, set1_f32x4(-85.4537887573f));
 		r1z = fmadd_f32x4(r1z, r0z, const0);
 
 		// --- Power 3
-		const0 = permute_f32x4<make_shuffle_mask<2, 2, 2, 2>()>(one_c2z_c3z_c4z);
+		const0 = permute_f32x4<make_shuffle_mask_32<2, 2, 2, 2>()>(one_c2z_c3z_c4z);
 		r1x = fmadd_f32x4(r1x, r0x, const0);
 		r1y = fmadd_f32x4(r1y, r0y, set1_f32x4(64.9393539429f));
 		r1z = fmadd_f32x4(r1z, r0z, const0);
 
 		// --- Power 4
-		const0 = permute_f32x4<make_shuffle_mask<3, 3, 3, 3>()>(c1x_c2x_c3x_c4x);
+		const0 = permute_f32x4<make_shuffle_mask_32<3, 3, 3, 3>()>(c1x_c2x_c3x_c4x);
 		r1x = fmadd_f32x4(r1x, r0x, const0);
 		r1y = fmadd_f32x4(r1y, r0y, set1_f32x4(-19.7392082214f));
 		r1z = fmadd_f32x4(r1z, r0z, const0);
 
 		// --- Power 5
-		const0 = permute_f32x4<make_shuffle_mask<0, 0, 0, 0>()>(one_c2z_c3z_c4z);
-		const1 = permute_f32x4<make_shuffle_mask<3, 3, 3, 3>()>(one_c2z_c3z_c4z);
+		const0 = permute_f32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(one_c2z_c3z_c4z);
+		const1 = permute_f32x4<make_shuffle_mask_32<3, 3, 3, 3>()>(one_c2z_c3z_c4z);
 		r1x = fmadd_f32x4(r1x, r0x, const1);
 		r1y = fmadd_f32x4(r1y, r0y, const0);
 		r1z = fmadd_f32x4(r1z, r0z, const1);
@@ -726,7 +726,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 tan_f32x4(EmuSIMD::f32x4_arg in_)
 	{
-		#if (EMU_CORE_IS_INTEL_COMPILER || EMU_CORE_IS_MSVC) && EMU_CORE_X86_X64 // Better on both Intel and AMD x86/x64 builds, so use where available
+		#if 0 && (EMU_CORE_IS_INTEL_COMPILER || EMU_CORE_IS_MSVC) && EMU_CORE_X86_X64 // Better on both Intel and AMD x86/x64 builds, so use where available
 		return _mm_tan_ps(in_);
 		#else
 		// Alternative manual approximation using sin/cos, based on https://developer.download.nvidia.com/cg/sin.html & https://developer.download.nvidia.com/cg/cos.html impl.
@@ -737,7 +737,7 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f32x4 one_c2z_c3z_c4z = setr_f32x4(1.0f, -60.1458091736f, -64.9393539429f, -1.0f);
 
 		// Prepare for power series
-		EmuSIMD::f32x4 const0 = permute_f32x4<make_shuffle_mask<0, 0, 0, 0>()>(c1x_c2x_c3x_c4x);
+		EmuSIMD::f32x4 const0 = permute_f32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(c1x_c2x_c3x_c4x);
 		EmuSIMD::f32x4 r1x_cos = mul_f32x4(set1_f32x4(0.159154943091f), in_);
 		EmuSIMD::f32x4 r1x_sin = sub_f32x4(r1x_cos, const0); // r1.x = c1.w * in_ - c1.x
 
@@ -749,7 +749,7 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f32x4 r2x_sin = cmplt_f32x4(r1x_sin, const0); // r2.x = r1.x < c1.x
 		EmuSIMD::f32x4 r2x_cos = cmplt_f32x4(r1x_cos, const0);
 
-		const0 = permute_f32x4<make_shuffle_mask<0, 0, 0, 0>()>(one_c2z_c3z_c4z);
+		const0 = permute_f32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(one_c2z_c3z_c4z);
 		r2x_sin = and_f32x4(r2x_sin, const0);
 		r2x_cos = and_f32x4(r2x_cos, const0);
 
@@ -762,7 +762,7 @@ namespace EmuSIMD::Funcs
 		r2y_cos = and_f32x4(r2y_cos, const0);
 		r2z_cos = and_f32x4(r2z_cos, const0);
 
-		EmuSIMD::f32x4 const1 = permute_f32x4<make_shuffle_mask<3, 3, 3, 3>()>(one_c2z_c3z_c4z);
+		EmuSIMD::f32x4 const1 = permute_f32x4<make_shuffle_mask_32<3, 3, 3, 3>()>(one_c2z_c3z_c4z);
 		r2y_sin = fmadd_f32x4(r2x_sin, const1, fmadd_f32x4(r2y_sin, const0, mul_f32x4(r2z_sin, const1))); // dot(r2, c4.zwz)
 		r2y_cos = fmadd_f32x4(r2x_cos, const1, fmadd_f32x4(r2y_cos, const0, mul_f32x4(r2z_cos, const1)));
 
@@ -781,8 +781,8 @@ namespace EmuSIMD::Funcs
 
 		// Begin power series
 		// --- Power 1
-		const0 = permute_f32x4<make_shuffle_mask<1, 1, 1, 1>()>(one_c2z_c3z_c4z);
-		const1 = permute_f32x4<make_shuffle_mask<1, 1, 1, 1>()>(c1x_c2x_c3x_c4x);
+		const0 = permute_f32x4<make_shuffle_mask_32<1, 1, 1, 1>()>(one_c2z_c3z_c4z);
+		const1 = permute_f32x4<make_shuffle_mask_32<1, 1, 1, 1>()>(c1x_c2x_c3x_c4x);
 		r1x_sin = fmadd_f32x4(const1, r0x_sin, const0);
 		r1y_sin = fmadd_f32x4(set1_f32x4(-24.9808039603f), r0y_sin, set1_f32x4(60.1458091736f));
 		EmuSIMD::f32x4 r1z_sin = fmadd_f32x4(const1, r0z_sin, const0);
@@ -791,7 +791,7 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f32x4 r1z_cos = fmadd_f32x4(const1, r0z_cos, const0);
 
 		// --- Power 2
-		const0 = permute_f32x4<make_shuffle_mask<2, 2, 2, 2>()>(c1x_c2x_c3x_c4x);
+		const0 = permute_f32x4<make_shuffle_mask_32<2, 2, 2, 2>()>(c1x_c2x_c3x_c4x);
 		const1 = set1_f32x4(-85.4537887573f);
 		r1x_sin = fmadd_f32x4(r1x_sin, r0x_sin, const0);
 		r1y_sin = fmadd_f32x4(r1y_sin, r0y_sin, const1);
@@ -801,7 +801,7 @@ namespace EmuSIMD::Funcs
 		r1z_cos = fmadd_f32x4(r1z_cos, r0z_cos, const0);
 
 		// --- Power 3
-		const0 = permute_f32x4<make_shuffle_mask<2, 2, 2, 2>()>(one_c2z_c3z_c4z);
+		const0 = permute_f32x4<make_shuffle_mask_32<2, 2, 2, 2>()>(one_c2z_c3z_c4z);
 		const1 = set1_f32x4(64.9393539429f);
 		r1x_sin = fmadd_f32x4(r1x_sin, r0x_sin, const0);
 		r1y_sin = fmadd_f32x4(r1y_sin, r0y_sin, const1);
@@ -811,7 +811,7 @@ namespace EmuSIMD::Funcs
 		r1z_cos = fmadd_f32x4(r1z_cos, r0z_cos, const0);
 
 		// --- Power 4
-		const0 = permute_f32x4<make_shuffle_mask<3, 3, 3, 3>()>(c1x_c2x_c3x_c4x);
+		const0 = permute_f32x4<make_shuffle_mask_32<3, 3, 3, 3>()>(c1x_c2x_c3x_c4x);
 		const1 = set1_f32x4(-19.7392082214f);
 		r1x_sin = fmadd_f32x4(r1x_sin, r0x_sin, const0);
 		r1y_sin = fmadd_f32x4(r1y_sin, r0y_sin, const1);
@@ -821,8 +821,8 @@ namespace EmuSIMD::Funcs
 		r1z_cos = fmadd_f32x4(r1z_cos, r0z_cos, const0);
 
 		// --- Power 5
-		const0 = permute_f32x4<make_shuffle_mask<0, 0, 0, 0>()>(one_c2z_c3z_c4z);
-		const1 = permute_f32x4<make_shuffle_mask<3, 3, 3, 3>()>(one_c2z_c3z_c4z);
+		const0 = permute_f32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(one_c2z_c3z_c4z);
+		const1 = permute_f32x4<make_shuffle_mask_32<3, 3, 3, 3>()>(one_c2z_c3z_c4z);
 		r1x_sin = fmadd_f32x4(r1x_sin, r0x_sin, const1);
 		r1y_sin = fmadd_f32x4(r1y_sin, r0y_sin, const0);
 		r1z_sin = fmadd_f32x4(r1z_sin, r0z_sin, const1);
