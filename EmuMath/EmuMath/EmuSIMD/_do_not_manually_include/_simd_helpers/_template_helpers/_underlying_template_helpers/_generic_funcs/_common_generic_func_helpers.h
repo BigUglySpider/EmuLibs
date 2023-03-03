@@ -56,6 +56,12 @@ namespace EmuSIMD::Funcs
 		return ((I0_ << 3) | (I1_ << 2) | (I2_ << 1) | (I3_));
 	}
 
+	template<shuffle_mask_type I0_, shuffle_mask_type I1_, shuffle_mask_type I2_, shuffle_mask_type I3_, shuffle_mask_type I4_, shuffle_mask_type I5_, shuffle_mask_type I6_, shuffle_mask_type I7_>
+	[[nodiscard]] constexpr inline shuffle_mask_type make_shuffle_mask_64()
+	{
+		return ((I0_ << 7) | (I1_ << 6) | (I2_ << 5) | (I3_ << 4) | (I4_ << 3) | (I5_ << 2) | (I6_ << 1) | (I7_));
+	}
+
 	/// <summary>
 	/// <para> Creates a shuffle mask for a 32-bit-element SIMD register with the same semantics as the x86/x64 _MM_SHUFFLE macro. </para>
 	/// </summary>

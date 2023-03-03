@@ -561,7 +561,7 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cos_f64x4(EmuSIMD::f64x4_arg in_)
 	{
 #if EMU_CORE_IS_INTEL_COMPILER && EMU_CORE_X86_X64 // Only tends to score better on Intel platforms
-		return _mm_cos_pd(in_);
+		return _mm256_cos_pd(in_);
 #else
 		// Alternative manual approximation, based on https://developer.download.nvidia.com/cg/cos.html implementation
 
@@ -640,7 +640,7 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 sin_f64x4(EmuSIMD::f64x4_arg in_)
 	{
 #if EMU_CORE_IS_INTEL_COMPILER && EMU_CORE_X86_X64 // Only tends to score better on Intel platforms
-		return _mm_sin_pd(in_);
+		return _mm256_sin_pd(in_);
 #else
 		// Alternative manual approximation, based on https://developer.download.nvidia.com/cg/sin.html implementation
 
@@ -894,7 +894,7 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 atan2_f64x4(EmuSIMD::f64x4_arg y_, EmuSIMD::f64x4_arg x_)
 	{
 #if EMU_CORE_IS_INTEL_COMPILER && EMU_CORE_X86_X64 // Only tends to score better on Intel platforms
-		return _mm_atan2_pd(y_, x_);
+		return _mm256_atan2_pd(y_, x_);
 #else		
 		// Alternative manual approximation, based on https://developer.download.nvidia.com/cg/atan2.html implementation
 
@@ -940,7 +940,7 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 atan_f64x4(EmuSIMD::f64x4_arg in_)
 	{
 #if EMU_CORE_IS_INTEL_COMPILER && EMU_CORE_X86_X64 // Only tends to score better on Intel platforms
-		return _mm_atan_pd(in_);
+		return _mm256_atan_pd(in_);
 #else
 		// Alternative manual approximation, based on https://developer.download.nvidia.com/cg/atan2.html implementation with a constant x_ argument of 1
 		EmuSIMD::f64x4 one = set1_f64x4(1.0);
