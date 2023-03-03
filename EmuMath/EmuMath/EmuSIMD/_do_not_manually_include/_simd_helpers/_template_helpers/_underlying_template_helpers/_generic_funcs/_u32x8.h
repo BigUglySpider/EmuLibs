@@ -2,6 +2,7 @@
 #define EMU_SIMD_GENERIC_FUNCS_U32X8_H_INC_ 1
 
 #include "_common_generic_func_helpers.h"
+#include "_f32x8.h"
 
 namespace EmuSIMD::Funcs
 {
@@ -380,9 +381,9 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC auto emulate_fp_u32x8(Func_ func_, EmuSIMD::u32x8_arg in_)
 		-> std::enable_if_t<std::is_invocable_r_v<EmuSIMD::f32x8, decltype(func_), EmuSIMD::f32x8>, EmuSIMD::u32x8>
 	{
-		return _mm256_cvtps_epu32
+		return cvt_f32x8_u32x8
 		(
-			func_(_mm256_cvtepu32_ps(in_))
+			func_(cvt_u32x8_f32x8(in_))
 		);
 	}
 #pragma endregion
@@ -532,12 +533,12 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 sqrt_u32x8(EmuSIMD::u32x8_arg in_)
 	{
-		return emulate_fp_u32x8([](EmuSIMD::f32x8_arg in_fp_) { return _mm256_sqrt_ps(in_fp_); }, in_);
+		return emulate_fp_u32x8([](EmuSIMD::f32x8_arg in_fp_) { return sqrt_f32x8(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 rsqrt_u32x8(EmuSIMD::u32x8_arg in_)
 	{
-		return emulate_fp_u32x8([](EmuSIMD::f32x8_arg in_fp_) { return _mm256_rsqrt_ps(in_fp_); }, in_);
+		return emulate_fp_u32x8([](EmuSIMD::f32x8_arg in_fp_) { return rsqrt_f32x8(in_fp_); }, in_);
 	}
 #pragma endregion
 
@@ -556,32 +557,32 @@ namespace EmuSIMD::Funcs
 #pragma region TRIG
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 cos_u32x8(EmuSIMD::u32x8_arg in_)
 	{
-		return emulate_fp_u32x8([](EmuSIMD::f32x8_arg in_fp_) { return _mm256_cos_ps(in_fp_); }, in_);
+		return emulate_fp_u32x8([](EmuSIMD::f32x8_arg in_fp_) { return cos_f32x8(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 sin_u32x8(EmuSIMD::u32x8_arg in_)
 	{
-		return emulate_fp_u32x8([](EmuSIMD::f32x8_arg in_fp_) { return _mm256_sin_ps(in_fp_); }, in_);
+		return emulate_fp_u32x8([](EmuSIMD::f32x8_arg in_fp_) { return sin_f32x8(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 tan_u32x8(EmuSIMD::u32x8_arg in_)
 	{
-		return emulate_fp_u32x8([](EmuSIMD::f32x8_arg in_fp_) { return _mm256_tan_ps(in_fp_); }, in_);
+		return emulate_fp_u32x8([](EmuSIMD::f32x8_arg in_fp_) { return tan_f32x8(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 acos_u32x8(EmuSIMD::u32x8_arg in_)
 	{
-		return emulate_fp_u32x8([](EmuSIMD::f32x8_arg in_fp_) { return _mm256_acos_ps(in_fp_); }, in_);
+		return emulate_fp_u32x8([](EmuSIMD::f32x8_arg in_fp_) { return acos_f32x8(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 asin_u32x8(EmuSIMD::u32x8_arg in_)
 	{
-		return emulate_fp_u32x8([](EmuSIMD::f32x8_arg in_fp_) { return _mm256_asin_ps(in_fp_); }, in_);
+		return emulate_fp_u32x8([](EmuSIMD::f32x8_arg in_fp_) { return asin_f32x8(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 atan_u32x8(EmuSIMD::u32x8_arg in_)
 	{
-		return emulate_fp_u32x8([](EmuSIMD::f32x8_arg in_fp_) { return _mm256_atan_ps(in_fp_); }, in_);
+		return emulate_fp_u32x8([](EmuSIMD::f32x8_arg in_fp_) { return atan_f32x8(in_fp_); }, in_);
 	}
 #pragma endregion
 }

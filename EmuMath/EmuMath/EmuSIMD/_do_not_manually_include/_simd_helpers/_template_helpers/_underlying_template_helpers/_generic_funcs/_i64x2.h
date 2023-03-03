@@ -2,6 +2,7 @@
 #define EMU_SIMD_GENERIC_FUNCS_I64X2_H_INC_ 1
 
 #include "_common_generic_func_helpers.h"
+#include "_f64x2.h"
 
 namespace EmuSIMD::Funcs
 {
@@ -368,9 +369,9 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC auto emulate_fp_i64x2(Func_ func_, EmuSIMD::i64x2_arg in_)
 		-> std::enable_if_t<std::is_invocable_r_v<EmuSIMD::f64x2, decltype(func_), EmuSIMD::f64x2>, EmuSIMD::i64x2>
 	{
-		return _mm_cvtpd_epi64
+		return cvt_f64x2_i64x2
 		(
-			func_(_mm_cvtepi64_pd(in_))
+			func_(cvt_i64x2_f64x2(in_))
 		);
 	}
 #pragma endregion
@@ -518,12 +519,12 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 sqrt_i64x2(EmuSIMD::i64x2_arg in_)
 	{
-		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return _mm_sqrt_pd(in_fp_); }, in_);
+		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return sqrt_f64x2(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 rsqrt_i64x2(EmuSIMD::i64x2_arg in_)
 	{
-		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return _mm_div_pd(_mm_set1_pd(1.0), _mm_sqrt_pd(in_fp_)); }, in_);
+		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return rsqrt_f64x2(in_fp_); }, in_);
 	}
 #pragma endregion
 
@@ -542,32 +543,32 @@ namespace EmuSIMD::Funcs
 #pragma region TRIG
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 cos_i64x2(EmuSIMD::i64x2_arg in_)
 	{
-		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return _mm_cos_pd(in_fp_); }, in_);
+		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return cos_f64x2(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 sin_i64x2(EmuSIMD::i64x2_arg in_)
 	{
-		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return _mm_sin_pd(in_fp_); }, in_);
+		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return sin_f64x2(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 tan_i64x2(EmuSIMD::i64x2_arg in_)
 	{
-		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return _mm_tan_pd(in_fp_); }, in_);
+		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return tan_f64x2(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 acos_i64x2(EmuSIMD::i64x2_arg in_)
 	{
-		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return _mm_acos_pd(in_fp_); }, in_);
+		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return acos_f64x2(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 asin_i64x2(EmuSIMD::i64x2_arg in_)
 	{
-		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return _mm_asin_pd(in_fp_); }, in_);
+		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return asin_f64x2(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 atan_i64x2(EmuSIMD::i64x2_arg in_)
 	{
-		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return _mm_atan_pd(in_fp_); }, in_);
+		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return atan_f64x2(in_fp_); }, in_);
 	}
 #pragma endregion
 }

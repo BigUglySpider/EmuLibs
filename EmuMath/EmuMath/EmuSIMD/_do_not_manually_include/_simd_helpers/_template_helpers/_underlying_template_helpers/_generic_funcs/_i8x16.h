@@ -2,6 +2,7 @@
 #define EMU_SIMD_GENERIC_FUNCS_I8X16_H_INC_ 1
 
 #include "_common_generic_func_helpers.h"
+#include "_f32x4.h"
 
 namespace EmuSIMD::Funcs
 {
@@ -568,12 +569,12 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 sqrt_i8x16(EmuSIMD::i8x16_arg in_)
 	{
-		return emulate_fp_i8x16([](EmuSIMD::f32x4_arg in_fp_) { return EmuSIMD::Funcs::sqrt_f32x4(in_fp_); }, in_);
+		return emulate_fp_i8x16([](EmuSIMD::f32x4_arg in_fp_) { return sqrt_f32x4(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 rsqrt_i8x16(EmuSIMD::i8x16_arg in_)
 	{
-		return emulate_fp_i8x16([](EmuSIMD::f32x4_arg in_fp_) { return EmuSIMD::Funcs::rsqrt_f32x4(in_fp_); }, in_);
+		return emulate_fp_i8x16([](EmuSIMD::f32x4_arg in_fp_) { return rsqrt_f32x4(in_fp_); }, in_);
 	}
 #pragma endregion
 
@@ -600,7 +601,7 @@ namespace EmuSIMD::Funcs
 		store_i8x16(data, in_);
 		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
 		{
-			_mm_store_ps(results + i, _mm_cos_ps(_mm_set_ps(data[i + 3], data[i + 2], data[i + 1], data[i])));
+			store_f32x4(results + i, cos_f32x4(set_f32x4(static_cast<float>(data[i + 3]), static_cast<float>(data[i + 2]), static_cast<float>(data[i + 1]), static_cast<float>(data[i]))));
 		}
 
 		return set_i8x16
@@ -634,7 +635,7 @@ namespace EmuSIMD::Funcs
 		store_i8x16(data, in_);
 		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
 		{
-			_mm_store_ps(results + i, _mm_sin_ps(_mm_set_ps(data[i + 3], data[i + 2], data[i + 1], data[i])));
+			store_f32x4(results + i, sin_f32x4(set_f32x4(static_cast<float>(data[i + 3]), static_cast<float>(data[i + 2]), static_cast<float>(data[i + 1]), static_cast<float>(data[i]))));
 		}
 
 		return set_i8x16
@@ -668,7 +669,7 @@ namespace EmuSIMD::Funcs
 		store_i8x16(data, in_);
 		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
 		{
-			_mm_store_ps(results + i, _mm_tan_ps(_mm_set_ps(data[i + 3], data[i + 2], data[i + 1], data[i])));
+			store_f32x4(results + i, tan_f32x4(set_f32x4(static_cast<float>(data[i + 3]), static_cast<float>(data[i + 2]), static_cast<float>(data[i + 1]), static_cast<float>(data[i]))));
 		}
 
 		return set_i8x16
@@ -702,7 +703,7 @@ namespace EmuSIMD::Funcs
 		store_i8x16(data, in_);
 		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
 		{
-			_mm_store_ps(results + i, _mm_acos_ps(_mm_set_ps(data[i + 3], data[i + 2], data[i + 1], data[i])));
+			store_f32x4(results + i, acos_f32x4(set_f32x4(static_cast<float>(data[i + 3]), static_cast<float>(data[i + 2]), static_cast<float>(data[i + 1]), static_cast<float>(data[i]))));
 		}
 
 		return set_i8x16
@@ -736,7 +737,7 @@ namespace EmuSIMD::Funcs
 		store_i8x16(data, in_);
 		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
 		{
-			_mm_store_ps(results + i, _mm_asin_ps(_mm_set_ps(data[i + 3], data[i + 2], data[i + 1], data[i])));
+			store_f32x4(results + i, asin_f32x4(set_f32x4(static_cast<float>(data[i + 3]), static_cast<float>(data[i + 2]), static_cast<float>(data[i + 1]), static_cast<float>(data[i]))));
 		}
 
 		return set_i8x16
@@ -770,7 +771,7 @@ namespace EmuSIMD::Funcs
 		store_i8x16(data, in_);
 		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
 		{
-			_mm_store_ps(results + i, _mm_atan_ps(_mm_set_ps(data[i + 3], data[i + 2], data[i + 1], data[i])));
+			store_f32x4(results + i, atan_f32x4(set_f32x4(static_cast<float>(data[i + 3]), static_cast<float>(data[i + 2]), static_cast<float>(data[i + 1]), static_cast<float>(data[i]))));
 		}
 
 		return set_i8x16
