@@ -280,8 +280,8 @@ namespace EmuSIMD::TMP
 		<
 			is_floating_point_simd_register_v<Register_>,
 			floating_point_register_element_count<typename EmuCore::TMP::remove_ref_cv<Register_>::type>,
-			0
-		>;
+			std::integral_constant<std::size_t, 0>
+		>::value;
 	};
 	template<>
 	struct floating_point_register_element_count<EmuSIMD::f32x4>
