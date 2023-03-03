@@ -531,8 +531,8 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 mod_f64x8(EmuSIMD::f64x8_arg lhs_, EmuSIMD::f64x8_arg rhs_)
 	{
-		EmuSIMD::f64x8 res = _mm512_div_pd(lhs_, rhs_);
-		res = _mm512_trunc_pd(res);
+		EmuSIMD::f64x8 res = div_f64x8(lhs_, rhs_);
+		res = trunc_f64x8(res);
 		return _mm512_fnmadd_pd(res, rhs_, lhs_);
 	}
 
