@@ -3,6 +3,7 @@
 
 #include "_common_generic_func_helpers.h"
 #include "_f32x4.h"
+#include "_i16x8.h"
 
 namespace EmuSIMD::Funcs
 {
@@ -262,7 +263,31 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 cvt_i16x8_i8x16(i16x8_arg a_)
 	{
+#if 0 // Need a test for if this is legal
 		return _mm_cvtepi16_epi8(a_);
+#else
+		std::int16_t dump[8];
+		store_i16x8(dump, a_);
+		return setr_i8x16
+		(
+			static_cast<signed char>(dump[0]),
+			static_cast<signed char>(dump[1]),
+			static_cast<signed char>(dump[2]),
+			static_cast<signed char>(dump[3]),
+			static_cast<signed char>(dump[4]),
+			static_cast<signed char>(dump[5]),
+			static_cast<signed char>(dump[6]),
+			static_cast<signed char>(dump[7]),
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0
+		);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 cvt_i32x4_i8x16(i32x4_arg a_)
@@ -457,6 +482,70 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region BLENDS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 blendv_i8x16(EmuSIMD::i8x16_arg a_, EmuSIMD::i8x16_arg b_, EmuSIMD::i8x16_arg shuffle_mask_vec_)
+	{
+		return _mm_blendv_epi8(a_, b_, shuffle_mask_vec_);
+	}
+
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 blend_i8x16(EmuSIMD::i8x16_arg a_, EmuSIMD::i8x16_arg b_)
+	{
+		constexpr bool is_reverse_set = false;
+		using target_element_type = signed char;
+
+		return _mm_blendv_epi8
+		(
+			a_,
+			b_,
+			EmuSIMD::Funcs::blend_mask_to_vector<BlendMask, is_reverse_set, target_element_type>
+			(
+				std::make_index_sequence<16>(),
+				[](auto&&...args_) { return set_i8x16(std::forward<decltype(args_)>(args_)...); }
+				)
+		);
+	}
+#pragma endregion
+
+#pragma region SHUFFLES
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 permute_i8x16(EmuSIMD::i8x16_arg a_)
+	{
+		constexpr bool is_reverse_set = false;
+		using target_element_type = signed char;
+		constexpr std::size_t argument_width = 4; // Max value of 15 (0b1111), per index
+		constexpr std::size_t num_128_lanes = 1;
+
+		return _mm_shuffle_epi8
+		(
+			a_,
+			EmuSIMD::Funcs::shuffle_mask_to_vector<ShuffleMask_, is_reverse_set, argument_width, num_128_lanes, target_element_type>
+			(
+				std::make_index_sequence<16>(),
+				[](auto&&...args_) { return set_i8x16(std::forward<decltype(args_)>(args_)...); }
+			)
+		);
+	}
+
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 shuffle_i8x16(EmuSIMD::i8x16_arg a_, EmuSIMD::i8x16_arg b_)
+	{
+		constexpr std::size_t a_permute_mask = duplicate_32bit_shuffle_mask_lane<ShuffleMask_, true>();
+		constexpr std::size_t b_permute_mask = duplicate_32bit_shuffle_mask_lane<ShuffleMask_, false>();
+
+		EmuSIMD::i8x16 a_permuted = permute_i8x16<a_permute_mask>(a_);
+		EmuSIMD::i8x16 b_permuted = permute_i8x16<b_permute_mask>(b_);
+
+		// Use f32x4 reinterpretation to take the lo bits of permuted a and the lo bits of permuted b and combine them into one register, 
+		// where result[0:63]=a[0:63], result[64:127]=b[0:63]
+		// --- We take this approach as each permutation has been duplicated across 64-bit lanes within the respective permuted register
+		EmuSIMD::f32x4 tmp_cast = cast_i8x16_f32x4(a_permuted);
+		tmp_cast = _mm_movelh_ps(tmp_cast, cast_i8x16_f32x4(b_permuted));
+
+		return cast_f32x4_i8x16(tmp_cast);
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 mul_all_i8x16(EmuSIMD::i8x16_arg lhs_, EmuSIMD::i8x16_arg rhs_)
 	{
@@ -487,7 +576,26 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 div_i8x16(EmuSIMD::i8x16_arg lhs_, EmuSIMD::i8x16_arg rhs_)
 	{
-		return _mm_div_epi8(lhs_, rhs_);
+		// lo
+		EmuSIMD::i16x8 lane64_a = cvt_i8x16_i16x8(lhs_);
+		EmuSIMD::i16x8 lane64_b = cvt_i8x16_i16x8(rhs_);
+		EmuSIMD::i8x16 lo = cvt_i16x8_i8x16(div_i16x8(lane64_a, lane64_b));
+
+		// hi - move hi bits to lo via f32 reinterpretation of this width register
+		EmuSIMD::f32x4 tmp_cast = cast_i8x16_f32x4(lhs_);
+		tmp_cast = _mm_movehl_ps(tmp_cast, tmp_cast);
+		lane64_a = cvt_i8x16_i16x8(cast_f32x4_i8x16(tmp_cast));
+
+		tmp_cast = cast_i8x16_f32x4(rhs_);
+		tmp_cast = _mm_movehl_ps(tmp_cast, tmp_cast);
+		lane64_b = cvt_i8x16_i16x8(cast_f32x4_i8x16(tmp_cast));
+
+		// Move hi and lo into the same register, using the same f32 reinterpretation for moving hi and lo bits
+		EmuSIMD::i8x16 hi = cvt_i16x8_i8x16(div_i16x8(lane64_a, lane64_b));
+		tmp_cast = cast_i8x16_f32x4(lo);
+		tmp_cast = _mm_movelh_ps(tmp_cast, cast_i8x16_f32x4(hi));
+
+		return cast_f32x4_i8x16(tmp_cast);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 addsub_i8x16(EmuSIMD::i8x16_arg lhs_, EmuSIMD::i8x16_arg rhs_)

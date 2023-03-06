@@ -411,6 +411,54 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region SHUFFLES
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 shuffle_i32x4(EmuSIMD::i32x4_arg lhs_, EmuSIMD::i32x4_arg rhs_)
+	{
+		return cast_f32x4_i32x4(shuffle_f32x4<ShuffleMask>(cast_i32x4_f32x4(lhs_), cast_i32x4_f32x4(rhs_)));
+	}
+
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 permute_i32x4(EmuSIMD::i32x4_arg in_)
+	{
+		return _mm_shuffle_epi32(in_, ShuffleMask);
+	}
+#pragma endregion
+
+#pragma region BITWISE_ARITHMETIC
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 and_i32x4(EmuSIMD::i32x4_arg lhs_, EmuSIMD::i32x4_arg rhs_)
+	{
+		return _mm_and_si128(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 or_i32x4(EmuSIMD::i32x4_arg lhs_, EmuSIMD::i32x4_arg rhs_)
+	{
+		return _mm_or_si128(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 xor_i32x4(EmuSIMD::i32x4_arg lhs_, EmuSIMD::i32x4_arg rhs_)
+	{
+		return _mm_xor_si128(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 andnot_i32x4(EmuSIMD::i32x4_arg not_lhs_, EmuSIMD::i32x4_arg rhs_)
+	{
+		return _mm_andnot_si128(not_lhs_, rhs_);
+	}
+#pragma endregion
+
+#pragma region MINMAX_FUNCS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 min_i32x4(EmuSIMD::i32x4_arg a_, EmuSIMD::i32x4_arg b_)
+	{
+		return _mm_min_epi32(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 max_i32x4(EmuSIMD::i32x4_arg a_, EmuSIMD::i32x4_arg b_)
+	{
+		return _mm_max_epi32(a_, b_);
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 mul_all_i32x4(EmuSIMD::i32x4_arg lhs_, EmuSIMD::i32x4_arg rhs_)
 	{

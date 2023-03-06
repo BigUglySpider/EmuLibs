@@ -391,6 +391,30 @@ int main()
 	// 
 	//universal_pause();
 
+	{
+		// TODO: Look at blend mask order
+		constexpr auto blend_mask = EmuSIMD::Funcs::make_blend_mask<1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0>();
+		std::cout << std::bitset<sizeof(EmuSIMD::Funcs::blend_mask_type)* CHAR_BIT>(blend_mask) << "\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::blend_mask_to_vector<blend_mask, false, signed char>(std::make_index_sequence<16>(), [](auto&&...vals_) { return EmuSIMD::Funcs::set_i8x16(std::forward<decltype(vals_)>(vals_)...); })) << "\n";
+		__m128i a = EmuSIMD::set1<__m128i, 8>(50);
+		__m128i b = EmuSIMD::setr<__m128i, 8>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+		__m128i c = EmuSIMD::mul_all<8>(b, EmuSIMD::set1<__m128i, 8>(5));
+		std::cout << "---\n";
+
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, a) << " DIV\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, b) << " EQ:\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::div_i8x16(a, b)) << "\n";
+
+		std::cout << "---\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::permute_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15>()>(b)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::permute_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0>()>(b)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::permute_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15>()>(c)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::permute_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0>()>(c)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::shuffle_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7>()>(b, c)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::shuffle_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0>()>(b, c)) << "\n";
+	}
+
+	universal_pause();
 	srand(static_cast<unsigned int>(time(0)));
 	EmuCore::Timer<std::milli> timer_;
 

@@ -4,9 +4,12 @@
 #include "../_simd_helpers_underlying_aliases.h"
 #include "../../../../../../EmuCore/ArithmeticHelpers/CommonMath.h"
 #include "../../../../../../EmuCore/CommonPreprocessor/All.h"
+#include "../../../../../../EmuCore/TMPHelpers/Values.h"
+#include "../../../../../../EmuCore/TMPHelpers/VariadicHelpers.h"
 
 #include <cstdint>
 #include <immintrin.h>
+#include <utility>
 
 /// <summary>
 /// <para> Specifiers used by most - if not all - common functions defined within the EmuSIMD::Funcs namespace. </para>
@@ -37,8 +40,43 @@ namespace EmuSIMD::Funcs
 {
 	/// <summary>
 	/// <para> Type used as a template argument for basic shuffle masks with EmuSIMD's underlying functions. </para>
+	/// <para> Guaranteed to be 64-bit. </para>
 	/// </summary>
-	using shuffle_mask_type = unsigned int;
+	using shuffle_mask_type = std::uint64_t;
+
+	/// <summary>
+	/// <para> Duplicates one of the 32-bit lanes from the 64-bit ShuffleMask_ and places it in the other lane. </para>
+	/// <para> If `HiLane_` is `true`, the hi lane will be duplicated into the lo lane; otherwise, the lo lane will be duplicated into the hi lane. </para>
+	/// </summary>
+	/// <returns>The passed ShuffleMask_ with the designated lane duplicated to replace the other lane.</returns>
+	template<shuffle_mask_type ShuffleMask_, bool HiLane_>
+	[[nodiscard]] constexpr inline shuffle_mask_type duplicate_32bit_shuffle_mask_lane()
+	{
+		if constexpr (HiLane_)
+		{
+			constexpr shuffle_mask_type hi_as_lo = ShuffleMask_ >> 32;
+			constexpr shuffle_mask_type hi_only = hi_as_lo << 32;
+			return hi_as_lo | hi_only;
+		}
+		else
+		{
+			constexpr shuffle_mask_type lo_as_hi = ShuffleMask_ << 32;
+			constexpr shuffle_mask_type lo_only = lo_as_hi >> 32;
+			return lo_as_hi | lo_only;
+		}
+	}
+
+	namespace _underlying_funcs
+	{
+		template<std::size_t PerIndexWidth_, shuffle_mask_type...IndexArgs_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline shuffle_mask_type _create_generic_shuffle_mask(std::integer_sequence<shuffle_mask_type, IndexArgs_...> index_args_, std::index_sequence<Indices_...> indices_)
+		{
+			constexpr std::size_t num_index_args = sizeof...(IndexArgs_);
+			constexpr std::size_t end_index_shift = (PerIndexWidth_ * num_index_args) - PerIndexWidth_;
+
+			return (shuffle_mask_type(0) | ... | (IndexArgs_ << (end_index_shift - (PerIndexWidth_ * Indices_))));
+		}
+	}
 
 	/// <summary>
 	/// <para> Creates a shuffle mask for a 64-bit-element SIMD register with the same semantics as the x86/x64 _MM_SHUFFLE2 macro. </para>
@@ -47,19 +85,31 @@ namespace EmuSIMD::Funcs
 	template<shuffle_mask_type I0_, shuffle_mask_type I1_>
 	[[nodiscard]] constexpr inline shuffle_mask_type make_shuffle_mask_64()
 	{
-		return ((I0_ << 1) | (I1_));
+		return _underlying_funcs::_create_generic_shuffle_mask<1>
+		(
+			std::integer_sequence<shuffle_mask_type, I0_, I1_>(),
+			std::make_index_sequence<2>()
+		);
 	}
 
 	template<shuffle_mask_type I0_, shuffle_mask_type I1_, shuffle_mask_type I2_, shuffle_mask_type I3_>
 	[[nodiscard]] constexpr inline shuffle_mask_type make_shuffle_mask_64()
 	{
-		return ((I0_ << 3) | (I1_ << 2) | (I2_ << 1) | (I3_));
+		return _underlying_funcs::_create_generic_shuffle_mask<1>
+		(
+			std::integer_sequence<shuffle_mask_type, I0_, I1_, I2_, I3_>(),
+			std::make_index_sequence<4>()
+		);
 	}
 
 	template<shuffle_mask_type I0_, shuffle_mask_type I1_, shuffle_mask_type I2_, shuffle_mask_type I3_, shuffle_mask_type I4_, shuffle_mask_type I5_, shuffle_mask_type I6_, shuffle_mask_type I7_>
 	[[nodiscard]] constexpr inline shuffle_mask_type make_shuffle_mask_64()
 	{
-		return ((I0_ << 7) | (I1_ << 6) | (I2_ << 5) | (I3_ << 4) | (I4_ << 3) | (I5_ << 2) | (I6_ << 1) | (I7_));
+		return _underlying_funcs::_create_generic_shuffle_mask<1>
+		(
+			std::integer_sequence<shuffle_mask_type, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>(),
+			std::make_index_sequence<8>()
+		);
 	}
 
 	/// <summary>
@@ -69,7 +119,181 @@ namespace EmuSIMD::Funcs
 	template<shuffle_mask_type I0_, shuffle_mask_type I1_, shuffle_mask_type I2_, shuffle_mask_type I3_>
 	[[nodiscard]] constexpr inline shuffle_mask_type make_shuffle_mask_32()
 	{
-		return ((I0_ << 6) | (I1_ << 4) | (I2_ << 2) | (I3_));
+		return _underlying_funcs::_create_generic_shuffle_mask<2>
+		(
+			std::integer_sequence<shuffle_mask_type, I0_, I1_, I2_, I3_>(),
+			std::make_index_sequence<4>()
+		);
+	}
+
+	template
+	<
+		shuffle_mask_type I0_,  shuffle_mask_type I1_,  shuffle_mask_type I2_,  shuffle_mask_type I3_,
+		shuffle_mask_type I4_,  shuffle_mask_type I5_,  shuffle_mask_type I6_,  shuffle_mask_type I7_,
+		shuffle_mask_type I8_,  shuffle_mask_type I9_,  shuffle_mask_type I10_, shuffle_mask_type I11_,
+		shuffle_mask_type I12_, shuffle_mask_type I13_, shuffle_mask_type I14_, shuffle_mask_type I15_
+	>
+		[[nodiscard]] constexpr inline shuffle_mask_type make_shuffle_mask_8()
+	{
+		return _underlying_funcs::_create_generic_shuffle_mask<4>
+		(
+			std::integer_sequence<shuffle_mask_type, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>(),
+			std::make_index_sequence<16>()
+		);
+	}
+
+	constexpr auto ndgfj = make_shuffle_mask_32<2, 3, 3, 0>();
+	constexpr auto ngdn = _underlying_funcs::_create_generic_shuffle_mask<2>(std::integer_sequence<shuffle_mask_type, 2, 3, 3, 0>(), std::make_index_sequence<4>());
+
+	namespace _underlying_funcs
+	{
+		template<shuffle_mask_type ShuffleMask, bool Reverse_, std::size_t ArgumentWidth_, std::size_t IndicesPerLane_, typename TargetType_, std::size_t...LoopedIndices_, class SettingFunc_>
+		[[nodiscard]] constexpr inline decltype(auto) _shuffle_mask_to_vector(std::index_sequence<LoopedIndices_...> looped_indices_, SettingFunc_&& setter_) noexcept
+		{
+			constexpr shuffle_mask_type all_element_bits = (shuffle_mask_type(1) << ArgumentWidth_) - 1;
+
+			if constexpr (Reverse_)
+			{
+				return std::forward<SettingFunc_>(setter_)
+				(
+					std::integral_constant<TargetType_, static_cast<TargetType_>((ShuffleMask >> (ArgumentWidth_ * LoopedIndices_)) & all_element_bits)>::value...
+				);
+			}
+			else
+			{
+				constexpr std::size_t final_index = IndicesPerLane_ - 1;
+				return std::forward<SettingFunc_>(setter_)
+				(
+					std::integral_constant<TargetType_, static_cast<TargetType_>((ShuffleMask >> (ArgumentWidth_ * (final_index - LoopedIndices_)))) & all_element_bits>::value...
+				);
+			}
+		}
+	}
+
+	template<shuffle_mask_type ShuffleMask, bool Reverse_, std::size_t ArgumentWidth_, std::size_t Num128Lanes_, typename TargetType_, std::size_t...SingleLaneIndices_, class SettingFunc_>
+	[[nodiscard]] constexpr inline decltype(auto) shuffle_mask_to_vector(std::index_sequence<SingleLaneIndices_...> indices_, SettingFunc_&& setter_) noexcept
+	{
+		constexpr std::size_t num_indices_per_lane = sizeof...(SingleLaneIndices_);
+		static_assert
+		(
+			(num_indices_per_lane * ArgumentWidth_) <= (sizeof(shuffle_mask_type) * 8),
+			"Error with EmuSIMD::Funcs::shuffle_mask_to_vector: The number of indices per lane multiplied by the width for an individual argument is greater than the width of the shuffle_mask_type, meaning all indices cannot be accounted for within a 128-bit lane."
+		);
+
+		if constexpr (Num128Lanes_ <= 1)
+		{
+			return _underlying_funcs::_shuffle_mask_to_vector<ShuffleMask, Reverse_, ArgumentWidth_, num_indices_per_lane, TargetType_>(std::index_sequence<SingleLaneIndices_...>(), std::forward<SettingFunc_>(setter_));
+		}
+		else
+		{
+			using looping_indices = EmuCore::TMP::make_looped_integer_sequence<std::index_sequence<SingleLaneIndices_...>, Num128Lanes_ - 1>;
+			return _underlying_funcs::_shuffle_mask_to_vector<ShuffleMask, Reverse_, ArgumentWidth_, num_indices_per_lane, TargetType_>(looping_indices(), std::forward<SettingFunc_>(setter_));
+		}
+	}
+
+	using blend_mask_type = std::uint64_t;
+
+	namespace _underlying_funcs
+	{
+		template<bool ThisBit_, std::size_t Pos_>
+		[[nodiscard]] constexpr inline blend_mask_type _shift_blend_mask_bit()
+		{
+			return static_cast<blend_mask_type>(ThisBit_) << Pos_;
+		}
+
+		template<bool...Bits_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline blend_mask_type _make_blend_mask(EmuCore::TMP::bool_sequence<Bits_...> bits_, std::index_sequence<Indices_...> indices_)
+		{
+			constexpr std::size_t num_bits = sizeof...(Bits_);
+			constexpr std::size_t num_indices = sizeof...(Indices_);
+			static_assert(num_bits == num_indices, "Error with EmuSIMD::Funcs::_underlying_funcs::_make_blend_mask: The number of boolean bits passed is not equal to the number of indices in the passed index sequence.");
+
+			if constexpr (num_bits == sizeof...(Indices_))
+			{
+				constexpr std::size_t end_shift = num_indices - 1;
+				return (... | _shift_blend_mask_bit<Bits_, end_shift - Indices_>());
+			}
+		}
+	}
+
+	template<blend_mask_type BlendMask, bool Reverse_, typename TargetType_, std::size_t...Indices_, class SettingFunc_>
+	[[nodiscard]] constexpr inline decltype(auto) blend_mask_to_vector(std::index_sequence<Indices_...> indices_, SettingFunc_&& setter_)
+	{
+		constexpr TargetType_ all_bits = std::is_signed_v<TargetType_> ? TargetType_(-1) : std::numeric_limits<TargetType_>::max();
+
+		if constexpr (Reverse_)
+		{
+			return std::forward<SettingFunc_>(setter_)
+			(
+				std::integral_constant<TargetType_, static_cast<TargetType_>((BlendMask >> Indices_) & TargetType_(1)) * all_bits>::value...
+			);
+		}
+		else
+		{
+			constexpr std::size_t end_index = sizeof...(Indices_) - 1;
+			return std::forward<SettingFunc_>(setter_)
+			(
+				std::integral_constant<TargetType_, static_cast<TargetType_>((BlendMask >> (end_index - Indices_)) & TargetType_(1)) * all_bits>::value...
+			);
+		}
+	}
+
+	template<bool I0_, bool I1_>
+	[[nodiscard]] constexpr inline blend_mask_type make_blend_mask()
+	{
+		return EmuSIMD::Funcs::_underlying_funcs::_make_blend_mask(EmuCore::TMP::bool_sequence<I0_, I1_>(), std::make_index_sequence<2>());
+	}
+
+	template<bool I0_, bool I1_, bool I2_, bool I3_>
+	[[nodiscard]] constexpr inline blend_mask_type make_blend_mask()
+	{
+		return EmuSIMD::Funcs::_underlying_funcs::_make_blend_mask(EmuCore::TMP::bool_sequence<I0_, I1_, I2_, I3_>(), std::make_index_sequence<4>());
+	}
+
+	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_>
+	[[nodiscard]] constexpr inline blend_mask_type make_blend_mask()
+	{
+		return EmuSIMD::Funcs::_underlying_funcs::_make_blend_mask(EmuCore::TMP::bool_sequence<I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>(), std::make_index_sequence<8>());
+	}
+
+	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_, bool I8_, bool I9_, bool I10_, bool I11_, bool I12_, bool I13_, bool I14_, bool I15_>
+	[[nodiscard]] constexpr inline blend_mask_type make_blend_mask()
+	{
+		return EmuSIMD::Funcs::_underlying_funcs::_make_blend_mask(EmuCore::TMP::bool_sequence<I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>(), std::make_index_sequence<16>());
+	}
+
+	template
+	<
+		bool I0_,  bool I1_,  bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_,  bool I8_,  bool I9_,  bool I10_, bool I11_ ,bool I12_, bool I13_, bool I14_, bool I15_,
+		bool I16_, bool I17_, bool I18_, bool I19_, bool I20_, bool I21_, bool I22_, bool I23_, bool I24_, bool I25_, bool I26_, bool I27_, bool I28_, bool I29_, bool I30_, bool I31_
+	>
+	[[nodiscard]] constexpr inline blend_mask_type make_blend_mask()
+	{
+		return EmuSIMD::Funcs::_underlying_funcs::_make_blend_mask
+		(
+			EmuCore::TMP::bool_sequence<I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_, I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_>(),
+			std::make_index_sequence<32>()
+		);
+	}
+
+	template
+	<
+		bool I0_,  bool I1_,  bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_,  bool I8_,  bool I9_,  bool I10_, bool I11_ ,bool I12_, bool I13_, bool I14_, bool I15_,
+		bool I16_, bool I17_, bool I18_, bool I19_, bool I20_, bool I21_, bool I22_, bool I23_, bool I24_, bool I25_, bool I26_, bool I27_, bool I28_, bool I29_, bool I30_, bool I31_,
+		bool I32_, bool I33_, bool I34_, bool I35_, bool I36_, bool I37_, bool I38_, bool I39_, bool I40_, bool I41_, bool I42_, bool I43_, bool I44_, bool I45_, bool I46_, bool I47_,
+		bool I48_, bool I49_, bool I50_, bool I51_, bool I52_, bool I53_, bool I54_, bool I55_, bool I56_, bool I57_, bool I58_, bool I59_, bool I60_, bool I61_, bool I62_, bool I63_
+	>
+	[[nodiscard]] constexpr inline blend_mask_type make_blend_mask()
+	{
+		return EmuSIMD::Funcs::_underlying_funcs::_make_blend_mask
+		(
+			EmuCore::TMP::bool_sequence
+			<
+				I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_, I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_,
+				I32_, I33_, I34_, I35_, I36_, I37_, I38_, I39_, I40_, I41_, I42_, I43_, I44_, I45_, I46_, I47_, I48_, I49_, I50_, I51_, I52_, I53_, I54_, I55_, I56_, I57_, I58_, I59_, I60_, I61_, I62_, I63_
+			>(),
+			std::make_index_sequence<64>()
+		);
 	}
 }
 
