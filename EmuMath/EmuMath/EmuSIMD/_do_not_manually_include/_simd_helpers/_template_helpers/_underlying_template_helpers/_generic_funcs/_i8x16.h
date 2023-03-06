@@ -537,7 +537,7 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::i8x16 b_permuted = permute_i8x16<b_permute_mask>(b_);
 
 		// Use f32x4 reinterpretation to take the lo bits of permuted a and the lo bits of permuted b and combine them into one register, 
-		// where result[0:63]=a[0:63], result[64:127]=b[0:63]
+		// where lo(result) = lo(a), hi(result) = lo(b)
 		// --- We take this approach as each permutation has been duplicated across 64-bit lanes within the respective permuted register
 		EmuSIMD::f32x4 tmp_cast = cast_i8x16_f32x4(a_permuted);
 		tmp_cast = _mm_movelh_ps(tmp_cast, cast_i8x16_f32x4(b_permuted));
