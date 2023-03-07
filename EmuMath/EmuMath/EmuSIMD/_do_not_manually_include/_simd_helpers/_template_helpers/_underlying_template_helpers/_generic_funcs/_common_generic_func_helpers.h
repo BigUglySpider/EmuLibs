@@ -2,11 +2,14 @@
 #define EMU_SIMD_COMMON_GENERIC_FUNC_HELPERS_H_INC_ 1
 
 #include "../_simd_helpers_underlying_aliases.h"
+#include "../../../../../../EmuCore/ArithmeticHelpers/BitHelpers.h"
 #include "../../../../../../EmuCore/ArithmeticHelpers/CommonMath.h"
 #include "../../../../../../EmuCore/CommonPreprocessor/All.h"
+#include "../../../../../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include "../../../../../../EmuCore/TMPHelpers/Values.h"
 #include "../../../../../../EmuCore/TMPHelpers/VariadicHelpers.h"
 
+#include <bit>
 #include <cstdint>
 #include <immintrin.h>
 #include <utility>
@@ -219,22 +222,57 @@ namespace EmuSIMD::Funcs
 	template<blend_mask_type BlendMask, bool Reverse_, typename TargetType_, std::size_t...Indices_, class SettingFunc_>
 	[[nodiscard]] constexpr inline decltype(auto) blend_mask_to_vector(std::index_sequence<Indices_...> indices_, SettingFunc_&& setter_)
 	{
-		constexpr TargetType_ all_bits = std::is_signed_v<TargetType_> ? TargetType_(-1) : std::numeric_limits<TargetType_>::max();
-
-		if constexpr (Reverse_)
+		if constexpr (std::is_integral_v<TargetType_>)
 		{
-			return std::forward<SettingFunc_>(setter_)
-			(
-				std::integral_constant<TargetType_, static_cast<TargetType_>((BlendMask >> Indices_) & TargetType_(1)) * all_bits>::value...
-			);
+			constexpr TargetType_ all_bits = EmuCore::ArithmeticHelpers::set_all_bits_one<TargetType_>();
+			constexpr TargetType_ one = TargetType_(1);
+			if constexpr (Reverse_)
+			{
+				return std::forward<SettingFunc_>(setter_)
+				(
+					std::integral_constant<TargetType_, static_cast<TargetType_>((BlendMask >> Indices_) & one) * all_bits>::value...
+				);
+			}
+			else
+			{
+				constexpr std::size_t end_index = sizeof...(Indices_) - 1;
+				return std::forward<SettingFunc_>(setter_)
+				(
+					std::integral_constant<TargetType_, static_cast<TargetType_>((BlendMask >> (end_index - Indices_)) & one) * all_bits>::value...
+				);
+			}
 		}
 		else
 		{
-			constexpr std::size_t end_index = sizeof...(Indices_) - 1;
-			return std::forward<SettingFunc_>(setter_)
-			(
-				std::integral_constant<TargetType_, static_cast<TargetType_>((BlendMask >> (end_index - Indices_)) & TargetType_(1)) * all_bits>::value...
-			);
+			using _int_type = EmuCore::TMP::uint_of_size_t<sizeof(TargetType_)>;
+			if constexpr (!std::is_same_v<_int_type, EmuCore::TMP::emu_tmp_err>)
+			{
+				constexpr _int_type all_bits = EmuCore::ArithmeticHelpers::set_all_bits_one<_int_type>();
+				constexpr _int_type one = _int_type(1);
+				if constexpr (Reverse_)
+				{
+					return std::forward<SettingFunc_>(setter_)
+					(
+						std::bit_cast<TargetType_>(_int_type(((BlendMask >> Indices_) & one) * all_bits))...
+					);
+				}
+				else
+				{
+					constexpr std::size_t end_index = sizeof...(Indices_) - 1;
+					return std::forward<SettingFunc_>(setter_)
+					(
+						std::bit_cast<TargetType_>(_int_type(((BlendMask >> (end_index - Indices_)) & one) * all_bits))...
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<TargetType_>(),
+					"Error calling EmuSIMD::Funcs::blend_mask_to_vector: The input TargetType_ is not integral, and is not of a size with a matching unsigned integral type."
+				);
+			}
 		}
 	}
 

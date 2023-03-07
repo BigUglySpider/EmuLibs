@@ -176,6 +176,7 @@
     <ClInclude Include="EmuCore\Functors\MiscMath.h" />
     <ClInclude Include="EmuCore\Functors\StdOps.h" />
     <ClInclude Include="EmuCore\TestingHelpers\LoopingTestHarness.h" />
+    <ClInclude Include="EmuCore\TMPHelpers\CommonTMPHelpers.h" />
     <ClInclude Include="EmuCore\TMPHelpers\DefaultItemBases.h" />
     <ClInclude Include="EmuCore\TMPHelpers\DescriptiveEnableIf.h" />
     <ClInclude Include="EmuCore\TMPHelpers\OperatorChecks.h" />

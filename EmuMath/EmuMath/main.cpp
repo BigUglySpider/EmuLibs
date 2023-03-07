@@ -416,6 +416,20 @@ int main()
 		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::permute_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0>()>(c)) << "\n";
 		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::shuffle_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7>()>(b, c)) << "\n";
 		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::shuffle_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0>()>(b, c)) << "\n";
+
+		std::cout << "---\n";
+		__m128 af = EmuSIMD::set1<__m128, 32>(5.0f);
+		__m128 bf = EmuSIMD::setr<__m128, 32>(1.0f, 2.0f, 3.0f, 4.0f);
+		constexpr auto blend_mask_f = EmuSIMD::Funcs::make_blend_mask<0, 1, 0, 1>();
+		constexpr auto all_one_f = EmuCore::ArithmeticHelpers::set_all_bits_one<float>();
+		auto maskvf = EmuSIMD::Funcs::blend_mask_to_vector<blend_mask_f, false, float>
+		(
+			std::make_index_sequence<4>(),
+			[](auto&&...args_) { return EmuSIMD::Funcs::set_f32x4(std::forward<decltype(args_)>(args_)...); }
+		);
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::blend_f32x4<blend_mask_f>(af, bf)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::blendv_f32x4(af, bf, maskvf)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::blendv_f32x4(af, bf, EmuSIMD::set<__m128, 32>(0, all_one_f, 0, all_one_f))) << "\n";
 	}
 
 	universal_pause();
