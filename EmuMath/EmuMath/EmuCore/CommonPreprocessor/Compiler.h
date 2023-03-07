@@ -1,6 +1,8 @@
 #ifndef EMU_CORE_COMMON_PREPROCESSOR_COMPILER_H_INC_
 #define EMU_CORE_COMMON_PREPROCESSOR_COMPILER_H_INC_ 1
 
+#include "Architecture.h"
+
 // All EMU_CORE_IS_[COMPILER] macros are defined to a boolean of either 1 or 0. Only one macro will ever be defined as 1.
 // --- All macros will always be present; this is to allow for `if constexpr(EMU_CORE_IS_[COMPILER])` checks where preprocessor #if blocks are not required.
 // --- Checks are performed in a hierarchical order based on which platforms could create other platform defines
@@ -41,4 +43,11 @@
 		#endif
 	#endif
 #endif
+#endif
+
+// SVML
+#if EMU_CORE_X86_X64 && (EMU_CORE_IS_INTEL_COMPILER)
+	#define EMU_CORE_X86_X64_SVML 1
+#else
+	#define EMU_CORE_X86_X64_SVML 0
 #endif

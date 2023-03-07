@@ -405,6 +405,10 @@ int main()
 		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, b) << " EQ:\n";
 		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::div_i8x16(a, b)) << "\n";
 
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, a) << " MOD\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, b) << " EQ:\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::mod_i8x16(a, b)) << "\n";
+
 		std::cout << "---\n";
 		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::permute_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15>()>(b)) << "\n";
 		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::permute_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0>()>(b)) << "\n";
@@ -1356,8 +1360,8 @@ int main()
 
 	universal_pause();
 
+	/*
 	{
-		/*
 		// ##### SCALAR vs SIMD NOISE #####
 		constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN; 
 		constexpr std::size_t test_noise_dimensions = 3;
