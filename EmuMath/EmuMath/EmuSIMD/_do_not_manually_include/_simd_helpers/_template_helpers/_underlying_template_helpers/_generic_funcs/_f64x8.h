@@ -405,7 +405,7 @@ namespace EmuSIMD::Funcs
 	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 blend_f64x8(EmuSIMD::f64x8_arg a_, EmuSIMD::f64x8_arg b_)
 	{
-		return _mm512_mask_blend_ps(BlendMask, a_, b_);
+		return _mm512_mask_blend_pd(BlendMask, a_, b_);
 	}
 #pragma endregion
 
