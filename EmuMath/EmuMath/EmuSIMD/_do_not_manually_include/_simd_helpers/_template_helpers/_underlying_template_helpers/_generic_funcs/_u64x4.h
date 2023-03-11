@@ -453,7 +453,13 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 div_u64x4(EmuSIMD::u64x4_arg lhs_, EmuSIMD::u64x4_arg rhs_)
 	{
-		return _mm256_div_epu64(lhs_, rhs_);
+#if EMU_CORE_X86_X64_SVML
+		return _mm256_div_epi64(lhs_, rhs_);
+#else
+		EmuSIMD::f64x4 result_f64 = cvt_u64x4_f64x4(lhs_);
+		result_f64 = div_f64x4(result_f64, cvt_u64x4_f64x4(rhs_));
+		return cvt_f64x4_u64x4(trunc_f64x4(result_f64));
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 addsub_u64x4(EmuSIMD::u64x4_arg lhs_, EmuSIMD::u64x4_arg rhs_)
@@ -525,7 +531,13 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 mod_u64x4(EmuSIMD::u64x4_arg lhs_, EmuSIMD::u64x4_arg rhs_)
 	{
+#if EMU_CORE_X86_X64_SVML
 		return _mm256_rem_epu64(lhs_, rhs_);
+#else
+		EmuSIMD::u64x4 to_subtract = div_u64x4(lhs_, rhs_);
+		to_subtract = mul_all_u64x4(to_subtract, rhs_);
+		return sub_u64x4(lhs_, to_subtract);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 abs_u64x4(EmuSIMD::u64x4_arg in_)

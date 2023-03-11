@@ -650,20 +650,15 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::i8x16 lo = cvt_i16x8_i8x16(div_i16x8(lane64_a, lane64_b));
 		
 		// hi - move hi bits to lo via f32 reinterpretation of this width register
-		EmuSIMD::f32x4 tmp_cast = cast_i8x16_f32x4(lhs_);
-		tmp_cast = _mm_movehl_ps(tmp_cast, tmp_cast);
-		lane64_a = cvt_i8x16_i16x8(cast_f32x4_i8x16(tmp_cast));
+		EmuSIMD::i8x16 tmp_lane = movehl_i8x16(lhs_, lhs_);
+		lane64_a = cvt_i8x16_i16x8(tmp_lane);
 		
-		tmp_cast = cast_i8x16_f32x4(rhs_);
-		tmp_cast = _mm_movehl_ps(tmp_cast, tmp_cast);
-		lane64_b = cvt_i8x16_i16x8(cast_f32x4_i8x16(tmp_cast));
+		tmp_lane = movehl_i8x16(rhs_, rhs_);
+		lane64_b = cvt_i8x16_i16x8(tmp_lane);
 		
-		// Move hi and lo into the same register, using the same f32 reinterpretation for moving hi and lo bits
+		// Move hi and lo into the same register, in their respective 64-bit lanes
 		EmuSIMD::i8x16 hi = cvt_i16x8_i8x16(div_i16x8(lane64_a, lane64_b));
-		tmp_cast = cast_i8x16_f32x4(lo);
-		tmp_cast = _mm_movelh_ps(tmp_cast, cast_i8x16_f32x4(hi));
-		
-		return cast_f32x4_i8x16(tmp_cast);
+		return movelh_i8x16(lo, hi);
 	#endif
 	}
 

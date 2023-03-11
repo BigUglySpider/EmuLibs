@@ -323,7 +323,29 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 cvt_u16x8_u8x16(u16x8_arg a_)
 	{
-		return _mm_cvtepi16_epi8(a_);
+		//return _mm_cvtepi16_epi8(a_);
+
+		std::uint16_t data_dump[8];
+		_mm_store_si128(reinterpret_cast<__m128i*>(data_dump), a_);
+		return setr_u8x16
+		(
+			static_cast<std::uint8_t>(data_dump[0]),
+			static_cast<std::uint8_t>(data_dump[1]),
+			static_cast<std::uint8_t>(data_dump[2]),
+			static_cast<std::uint8_t>(data_dump[3]),
+			static_cast<std::uint8_t>(data_dump[4]),
+			static_cast<std::uint8_t>(data_dump[5]),
+			static_cast<std::uint8_t>(data_dump[6]),
+			static_cast<std::uint8_t>(data_dump[7]),
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0
+		);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 cvt_u32x4_u8x16(u32x4_arg a_)
@@ -511,20 +533,15 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::u8x16 lo = cvt_u16x8_u8x16(div_u16x8(lane64_a, lane64_b));
 
 		// hi - move hi bits to lo via f32 reinterpretation of this width register
-		EmuSIMD::f32x4 tmp_cast = cast_u8x16_f32x4(lhs_);
-		tmp_cast = _mm_movehl_ps(tmp_cast, tmp_cast);
-		lane64_a = cvt_u8x16_u16x8(cast_f32x4_u8x16(tmp_cast));
+		EmuSIMD::u8x16 tmp_lane = movehl_u8x16(lhs_, lhs_);
+		lane64_a = cvt_u8x16_u16x8(tmp_lane);
 
-		tmp_cast = cast_i8x16_f32x4(rhs_);
-		tmp_cast = _mm_movehl_ps(tmp_cast, tmp_cast);
-		lane64_b = cvt_i8x16_i16x8(cast_f32x4_i8x16(tmp_cast));
+		tmp_lane = movehl_u8x16(rhs_, rhs_);
+		lane64_b = cvt_u8x16_u16x8(tmp_lane);
 
-		// Move hi and lo into the same register, using the same f32 reinterpretation for moving hi and lo bits
-		EmuSIMD::u8x16 hi = cvt_i16x8_i8x16(div_i16x8(lane64_a, lane64_b));
-		tmp_cast = cast_i8x16_f32x4(lo);
-		tmp_cast = _mm_movelh_ps(tmp_cast, cast_i8x16_f32x4(hi));
-
-		return cast_f32x4_i8x16(tmp_cast);
+		// Move hi and lo into the same register, in their respective 64-bit lanes
+		EmuSIMD::i8x16 hi = cvt_u16x8_u8x16(div_u16x8(lane64_a, lane64_b));
+		return movelh_u8x16(lo, hi);
 #endif
 	}
 
@@ -597,7 +614,13 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 mod_u8x16(EmuSIMD::u8x16_arg lhs_, EmuSIMD::u8x16_arg rhs_)
 	{
+#if EMU_CORE_X86_X64_SVML
 		return _mm_rem_epu8(lhs_, rhs_);
+#else
+		EmuSIMD::u8x16 to_subtract = div_u8x16(lhs_, rhs_);
+		to_subtract = mul_all_u8x16(to_subtract, rhs_);
+		return sub_u8x16(lhs_, to_subtract);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 abs_u8x16(EmuSIMD::u8x16_arg in_)

@@ -3,6 +3,7 @@
 
 #include "_common_generic_func_helpers.h"
 #include "_f32x16.h"
+#include "_u16x32.h"
 
 namespace EmuSIMD::Funcs
 {
@@ -627,7 +628,25 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 div_u8x64(EmuSIMD::u8x64_arg lhs_, EmuSIMD::u8x64_arg rhs_)
 	{
+#if EMU_CORE_X86_X64_SVML
 		return _mm512_div_epu8(lhs_, rhs_);
+#else
+		// lo
+		EmuSIMD::i16x32 lane64_a = cvt_i8x64_i16x32(lhs_);
+		EmuSIMD::i16x32 lane64_b = cvt_i8x64_i16x32(rhs_);
+		EmuSIMD::i8x64 lo = cvt_i16x32_i8x64(div_i16x32(lane64_a, lane64_b));
+
+		// hi - move hi bits to lo
+		EmuSIMD::i8x64 tmp_lane = movehl_i8x64(lhs_, lhs_);
+		lane64_a = cvt_i8x64_i16x32(tmp_lane);
+
+		tmp_lane = movehl_i8x64(rhs_, rhs_);
+		lane64_b = cvt_i8x64_i16x32(tmp_lane);
+
+		// Move hi and lo into the same register, in their respective 64-bit lanes
+		EmuSIMD::i8x64 hi = cvt_i16x32_i8x64(div_i16x32(lane64_a, lane64_b));
+		return movelh_i8x64(lo, hi);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 addsub_u8x64(EmuSIMD::u8x64_arg lhs_, EmuSIMD::u8x64_arg rhs_)
@@ -711,7 +730,13 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 mod_u8x64(EmuSIMD::u8x64_arg lhs_, EmuSIMD::u8x64_arg rhs_)
 	{
+#if EMU_CORE_X86_X64_SVML
 		return _mm512_rem_epu8(lhs_, rhs_);
+#else
+		EmuSIMD::u8x64 to_subtract = div_u8x64(lhs_, rhs_);
+		to_subtract = mul_all_u8x64(to_subtract, rhs_);
+		return sub_u8x64(lhs_, to_subtract);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 abs_u8x64(EmuSIMD::u8x64_arg in_)

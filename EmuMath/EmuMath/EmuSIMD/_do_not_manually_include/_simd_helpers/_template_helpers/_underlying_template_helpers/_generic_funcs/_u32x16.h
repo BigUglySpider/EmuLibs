@@ -470,7 +470,13 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x16 div_u32x16(EmuSIMD::u32x16_arg lhs_, EmuSIMD::u32x16_arg rhs_)
 	{
-		return _mm512_div_epu32(lhs_, rhs_);
+#if EMU_CORE_X86_X64_SVML
+		return _mm512_div_epi32(lhs_, rhs_);
+#else
+		EmuSIMD::f32x16 result_f32 = cvt_u32x16_f32x16(lhs_);
+		result_f32 = div_f32x16(result_f32, cvt_u32x16_f32x16(rhs_));
+		return cvt_f32x16_u32x16(trunc_f32x16(result_f32));
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x16 addsub_u32x16(EmuSIMD::u32x16_arg lhs_, EmuSIMD::u32x16_arg rhs_)
@@ -542,7 +548,13 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x16 mod_u32x16(EmuSIMD::u32x16_arg lhs_, EmuSIMD::u32x16_arg rhs_)
 	{
+#if EMU_CORE_X86_X64_SVML
 		return _mm512_rem_epu32(lhs_, rhs_);
+#else
+		EmuSIMD::u32x16 to_subtract = div_u32x16(lhs_, rhs_);
+		to_subtract = mul_all_u32x16(to_subtract, rhs_);
+		return sub_u32x16(lhs_, to_subtract);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x16 abs_u32x16(EmuSIMD::u32x16_arg in_)
