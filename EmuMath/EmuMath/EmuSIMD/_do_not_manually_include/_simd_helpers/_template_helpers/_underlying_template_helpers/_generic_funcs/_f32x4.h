@@ -13,7 +13,8 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 setr_f32x4(float e0, float e1, float e2, float e3)
 	{
-		return _mm_setr_ps(e0, e1, e2, e3);
+		//return _mm_setr_ps(e0, e1, e2, e3);
+		return _mm_set_ps(e3, e2, e1, e0);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 set1_f32x4(float all_)

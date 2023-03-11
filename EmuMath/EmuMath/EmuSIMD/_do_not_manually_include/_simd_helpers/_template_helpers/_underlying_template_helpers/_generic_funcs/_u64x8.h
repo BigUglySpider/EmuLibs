@@ -20,7 +20,8 @@ namespace EmuSIMD::Funcs
 		std::uint64_t e0, std::uint64_t e1, std::uint64_t e2, std::uint64_t e3, std::uint64_t e4, std::uint64_t e5, std::uint64_t e6, std::uint64_t e7
 	)
 	{
-		return _mm512_setr_epi64(e0, e1, e2, e3, e4, e5, e6, e7);
+		//return _mm512_setr_epi64(e0, e1, e2, e3, e4, e5, e6, e7);
+		return _mm512_set_epi64(e7, e6, e5, e4, e3, e2, e1, e0);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x8 set1_u64x8(std::uint64_t all_)

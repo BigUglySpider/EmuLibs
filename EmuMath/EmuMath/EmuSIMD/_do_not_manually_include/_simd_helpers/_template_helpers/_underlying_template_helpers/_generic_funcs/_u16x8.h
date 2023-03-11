@@ -15,7 +15,8 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 setr_u16x8(std::uint16_t e0, std::uint16_t e1, std::uint16_t e2, std::uint16_t e3, std::uint16_t e4, std::uint16_t e5, std::uint16_t e6, std::uint16_t e7)
 	{
-		return _mm_setr_epi16(e0, e1, e2, e3, e4, e5, e6, e7);
+		//return _mm_setr_epi16(e0, e1, e2, e3, e4, e5, e6, e7);
+		return _mm_set_epi16(e7, e6, e5, e4, e3, e2, e1, e0);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 set1_u16x8(std::uint16_t all_)

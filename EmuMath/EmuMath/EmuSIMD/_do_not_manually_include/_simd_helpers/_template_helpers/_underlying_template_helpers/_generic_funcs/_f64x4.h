@@ -13,7 +13,8 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 setr_f64x4(double e0, double e1, double e2, double e3)
 	{
-		return _mm256_setr_pd(e0, e1, e2, e3);
+		//return _mm256_setr_pd(e0, e1, e2, e3);
+		return _mm256_set_pd(e3, e2, e1, e0);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 set1_f64x4(double all_)

@@ -14,7 +14,8 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 setr_f32x8(float e0, float e1, float e2, float e3, float e4, float e5, float e6, float e7)
 	{
-		return _mm256_setr_ps(e0, e1, e2, e3, e4, e5, e6, e7);
+		//return _mm256_setr_ps(e0, e1, e2, e3, e4, e5, e6, e7);
+		return _mm256_set_ps(e7, e6, e5, e4, e3, e2, e1, e0);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 set1_f32x8(float all_)

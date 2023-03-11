@@ -14,7 +14,8 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 setr_i32x4(std::int32_t e0, std::int32_t e1, std::int32_t e2, std::int32_t e3)
 	{
-		return _mm_setr_epi32(e0, e1, e2, e3);
+		// return _mm_setr_epi32(e0, e1, e2, e3);
+		return _mm_set_epi32(e3, e2, e1, e0);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 set1_i32x4(std::int32_t all_)

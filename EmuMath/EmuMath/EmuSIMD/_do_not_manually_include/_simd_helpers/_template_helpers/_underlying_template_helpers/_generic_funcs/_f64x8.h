@@ -13,7 +13,8 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 setr_f64x8(double e0, double e1, double e2, double e3, double e4, double e5, double e6, double e7)
 	{
-		return _mm512_setr_pd(e0, e1, e2, e3, e4, e5, e6, e7);
+		//return _mm512_setr_pd(e0, e1, e2, e3, e4, e5, e6, e7);
+		return _mm512_set_pd(e7, e6, e5, e4, e3, e2, e1, e0);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 set1_f64x8(double all_)
