@@ -145,9 +145,6 @@ namespace EmuSIMD::Funcs
 		);
 	}
 
-	constexpr auto ndgfj = make_shuffle_mask_32<2, 3, 3, 0>();
-	constexpr auto ngdn = _underlying_funcs::_create_generic_shuffle_mask<2>(std::integer_sequence<shuffle_mask_type, 2, 3, 3, 0>(), std::make_index_sequence<4>());
-
 	namespace _underlying_funcs
 	{
 		template<shuffle_mask_type ShuffleMask, bool Reverse_, std::size_t ArgumentWidth_, std::size_t IndicesPerLane_, typename TargetType_, std::size_t...LoopedIndices_, class SettingFunc_>

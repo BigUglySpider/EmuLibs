@@ -413,6 +413,18 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region MOVES
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 movehl_u64x4(EmuSIMD::u64x4_arg lhs_, EmuSIMD::u64x4_arg rhs_)
+	{
+		return cast_f64x4_u64x4(movehl_f64x4(cast_u64x4_f64x4(lhs_), cast_u64x4_f64x4(rhs_)));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 movelh_u64x4(EmuSIMD::u64x4_arg lhs_, EmuSIMD::u64x4_arg rhs_)
+	{
+		return cast_f64x4_u64x4(movelh_f64x4(cast_u64x4_f64x4(lhs_), cast_u64x4_f64x4(rhs_)));
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 mul_all_u64x4(EmuSIMD::u64x4_arg lhs_, EmuSIMD::u64x4_arg rhs_)
 	{

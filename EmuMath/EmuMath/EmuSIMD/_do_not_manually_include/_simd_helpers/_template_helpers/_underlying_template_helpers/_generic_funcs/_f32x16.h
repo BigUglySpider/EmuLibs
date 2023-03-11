@@ -2,6 +2,7 @@
 #define EMU_SIMD_GENERIC_FUNCS_F32X16_H_INC_ 1
 
 #include "_common_generic_func_helpers.h"
+#include "_f32x8.h"
 
 namespace EmuSIMD::Funcs
 {
@@ -407,6 +408,35 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 cmple_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
 	{
 		return setmasked_f32x16(_mm512_cmple_ps_mask(lhs_, rhs_));
+	}
+#pragma endregion
+
+#pragma region BLENDS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 blendv_f32x16(EmuSIMD::f32x16_arg a_, EmuSIMD::f32x16_arg b_, EmuSIMD::f32x16_arg shuffle_mask_vec_)
+	{
+		EmuSIMD::f32x8 lo = blendv_f32x8(cast_f32x16_f32x8(a_), cast_f32x16_f32x8(b_), cast_f32x16_f32x8(shuffle_mask_vec_));
+		EmuSIMD::f32x8 hi = blendv_f32x8(_mm512_extractf32x8_ps(a_, 1), _mm512_extractf32x8_ps(b_, 1), _mm512_extractf32x8_ps(shuffle_mask_vec_, 1));
+		return _mm512_insertf32x8(cast_f32x8_f32x16(lo), hi, 1);
+	}
+
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 blend_f32x16(EmuSIMD::f32x16_arg a_, EmuSIMD::f32x16_arg b_)
+	{
+		return _mm512_mask_blend_ps(BlendMask, a_, b_);
+	}
+#pragma endregion
+
+#pragma region MOVES
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 movehl_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
+	{
+		constexpr auto permute_mask = EmuSIMD::Funcs::make_shuffle_mask_32<3, 2, 3, 2>(); // Mask for { b[hi] a[hi] }
+		return _mm512_shuffle_f32x4(rhs_, lhs_, permute_mask);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 movelh_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
+	{
+		constexpr auto permute_mask = EmuSIMD::Funcs::make_shuffle_mask_32<1, 0, 1, 0>(); // Mask for { a[lo] b[lo] }
+		return _mm512_shuffle_f32x4(lhs_, rhs_, permute_mask);
 	}
 #pragma endregion
 

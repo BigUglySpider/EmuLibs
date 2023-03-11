@@ -507,6 +507,18 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region MOVES
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 movehl_u8x32(EmuSIMD::u8x32_arg lhs_, EmuSIMD::u8x32_arg rhs_)
+	{
+		return cast_f32x8_u8x32(movehl_f32x8(cast_u8x32_f32x8(lhs_), cast_u8x32_f32x8(rhs_)));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 movelh_u8x32(EmuSIMD::u8x32_arg lhs_, EmuSIMD::u8x32_arg rhs_)
+	{
+		return cast_f32x8_u8x32(movelh_f32x8(cast_u8x32_f32x8(lhs_), cast_u8x32_f32x8(rhs_)));
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 mul_all_u8x32(EmuSIMD::u8x32_arg lhs_, EmuSIMD::u8x32_arg rhs_)
 	{

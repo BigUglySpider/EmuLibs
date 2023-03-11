@@ -3,6 +3,7 @@
 
 #include "_common_generic_func_helpers.h"
 #include "_f32x4.h"
+#include "_u16x8.h"
 
 namespace EmuSIMD::Funcs
 {
@@ -459,6 +460,18 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region MOVES
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 movehl_u8x16(EmuSIMD::u8x16_arg lhs_, EmuSIMD::u8x16_arg rhs_)
+	{
+		return cast_f32x4_u8x16(movehl_f32x4(cast_u8x16_f32x4(lhs_), cast_u8x16_f32x4(rhs_)));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 movelh_u8x16(EmuSIMD::u8x16_arg lhs_, EmuSIMD::u8x16_arg rhs_)
+	{
+		return cast_f32x4_u8x16(movelh_f32x4(cast_u8x16_f32x4(lhs_), cast_u8x16_f32x4(rhs_)));
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 mul_all_u8x16(EmuSIMD::u8x16_arg lhs_, EmuSIMD::u8x16_arg rhs_)
 	{
@@ -489,7 +502,30 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 div_u8x16(EmuSIMD::u8x16_arg lhs_, EmuSIMD::u8x16_arg rhs_)
 	{
+#if EMU_CORE_X86_X64_SVML
 		return _mm_div_epu8(lhs_, rhs_);
+#else
+		// lo
+		EmuSIMD::u16x8 lane64_a = cvt_u8x16_u16x8(lhs_);
+		EmuSIMD::u16x8 lane64_b = cvt_u8x16_u16x8(rhs_);
+		EmuSIMD::u8x16 lo = cvt_u16x8_u8x16(div_u16x8(lane64_a, lane64_b));
+
+		// hi - move hi bits to lo via f32 reinterpretation of this width register
+		EmuSIMD::f32x4 tmp_cast = cast_u8x16_f32x4(lhs_);
+		tmp_cast = _mm_movehl_ps(tmp_cast, tmp_cast);
+		lane64_a = cvt_u8x16_u16x8(cast_f32x4_u8x16(tmp_cast));
+
+		tmp_cast = cast_i8x16_f32x4(rhs_);
+		tmp_cast = _mm_movehl_ps(tmp_cast, tmp_cast);
+		lane64_b = cvt_i8x16_i16x8(cast_f32x4_i8x16(tmp_cast));
+
+		// Move hi and lo into the same register, using the same f32 reinterpretation for moving hi and lo bits
+		EmuSIMD::u8x16 hi = cvt_i16x8_i8x16(div_i16x8(lane64_a, lane64_b));
+		tmp_cast = cast_i8x16_f32x4(lo);
+		tmp_cast = _mm_movelh_ps(tmp_cast, cast_i8x16_f32x4(hi));
+
+		return cast_f32x4_i8x16(tmp_cast);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 addsub_u8x16(EmuSIMD::u8x16_arg lhs_, EmuSIMD::u8x16_arg rhs_)

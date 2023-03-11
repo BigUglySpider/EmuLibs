@@ -3,6 +3,7 @@
 
 #include "_common_generic_func_helpers.h"
 #include "_f32x8.h"
+#include "_i16x16.h"
 
 namespace EmuSIMD::Funcs
 {
@@ -502,6 +503,18 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 cmple_i8x32(EmuSIMD::i8x32_arg lhs_, EmuSIMD::i8x32_arg rhs_)
 	{
 		return _mm256_or_si256(_mm256_cmpgt_epi8(rhs_, lhs_), _mm256_cmpeq_epi8(lhs_, rhs_));
+	}
+#pragma endregion
+
+#pragma region MOVES
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 movehl_i8x32(EmuSIMD::i8x32_arg lhs_, EmuSIMD::i8x32_arg rhs_)
+	{
+		return cast_f32x8_i8x32(movehl_f32x8(cast_i8x32_f32x8(lhs_), cast_i8x32_f32x8(rhs_)));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 movelh_i8x32(EmuSIMD::i8x32_arg lhs_, EmuSIMD::i8x32_arg rhs_)
+	{
+		return cast_f32x8_i8x32(movelh_f32x8(cast_i8x32_f32x8(lhs_), cast_i8x32_f32x8(rhs_)));
 	}
 #pragma endregion
 

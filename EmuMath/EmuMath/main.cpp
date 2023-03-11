@@ -392,7 +392,6 @@ int main()
 	//universal_pause();
 
 	{
-		// TODO: Look at blend mask order
 		constexpr auto blend_mask = EmuSIMD::Funcs::make_blend_mask<1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0>();
 		std::cout << std::bitset<sizeof(EmuSIMD::Funcs::blend_mask_type)* CHAR_BIT>(blend_mask) << "\n";
 		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::blend_mask_to_vector<blend_mask, false, signed char>(std::make_index_sequence<16>(), [](auto&&...vals_) { return EmuSIMD::Funcs::set_i8x16(std::forward<decltype(vals_)>(vals_)...); })) << "\n";
@@ -418,8 +417,8 @@ int main()
 		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::shuffle_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0>()>(b, c)) << "\n";
 
 		std::cout << "---\n";
-		__m128 af = EmuSIMD::set1<__m128, 32>(5.0f);
-		__m128 bf = EmuSIMD::setr<__m128, 32>(1.0f, 2.0f, 3.0f, 4.0f);
+		__m128 af = EmuSIMD::setr<__m128, 32>(1, 2, 3, 4);
+		__m128 bf = EmuSIMD::setr<__m128, 32>(5, 6, 7, 8);
 		constexpr auto blend_mask_f = EmuSIMD::Funcs::make_blend_mask<0, 1, 0, 1>();
 		constexpr auto all_one_f = EmuCore::ArithmeticHelpers::set_all_bits_one<float>();
 		auto maskvf = EmuSIMD::Funcs::blend_mask_to_vector<blend_mask_f, false, float>
@@ -430,6 +429,24 @@ int main()
 		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::blend_f32x4<blend_mask_f>(af, bf)) << "\n";
 		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::blendv_f32x4(af, bf, maskvf)) << "\n";
 		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::blendv_f32x4(af, bf, EmuSIMD::set<__m128, 32>(0, all_one_f, 0, all_one_f))) << "\n";
+
+		std::cout << "---\n";
+		EmuSIMD::f32x8 a256 = EmuSIMD::setr<EmuSIMD::f32x8, 32>(1, 2, 3, 4, 5, 6, 7, 8);
+		EmuSIMD::f32x8 b256 = EmuSIMD::setr<EmuSIMD::f32x8, 32>(9, 10, 11, 12, 13, 14, 15, 16);
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::movelh_f32x4(af, bf)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::movehl_f32x4(af, bf)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::movelh_f32x8(a256, b256)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::movehl_f32x8(a256, b256)) << "\n";
+
+		std::cout << "---\n";
+		EmuSIMD::f64x2 a64_128 = EmuSIMD::setr<EmuSIMD::f64x2, 64>(1, 2);
+		EmuSIMD::f64x2 b64_128 = EmuSIMD::setr<EmuSIMD::f64x2, 64>(3, 4);
+		EmuSIMD::f64x4 a64_256 = EmuSIMD::setr<EmuSIMD::f64x4, 64>(1, 2, 3, 4);
+		EmuSIMD::f64x4 b64_256 = EmuSIMD::setr<EmuSIMD::f64x4, 64>(5, 6, 7, 8);
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::movelh_f64x2(a64_128, b64_128)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::movehl_f64x2(a64_128, b64_128)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::movelh_f64x4(a64_256, b64_256)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::movehl_f64x4(a64_256, b64_256)) << "\n";
 	}
 
 	universal_pause();

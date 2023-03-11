@@ -394,6 +394,35 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region BLENDS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 blendv_f64x8(EmuSIMD::f64x8_arg a_, EmuSIMD::f64x8_arg b_, EmuSIMD::f64x8_arg shuffle_mask_vec_)
+	{
+		EmuSIMD::f64x4 lo = blendv_f64x4(cast_f64x8_f64x4(a_), cast_f64x8_f64x4(b_), cast_f64x8_f64x4(shuffle_mask_vec_));
+		EmuSIMD::f64x4 hi = blendv_f64x4(_mm512_extractf64x4_pd(a_, 1), _mm512_extractf64x4_pd(b_, 1), _mm512_extractf64x4_pd(shuffle_mask_vec_, 1));
+		return _mm512_insertf64x4(cast_f64x4_f64x8(lo), hi, 1);
+	}
+
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 blend_f64x8(EmuSIMD::f64x8_arg a_, EmuSIMD::f64x8_arg b_)
+	{
+		return _mm512_mask_blend_ps(BlendMask, a_, b_);
+	}
+#pragma endregion
+
+#pragma region MOVES
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 movehl_f64x8(EmuSIMD::f64x8_arg lhs_, EmuSIMD::f64x8_arg rhs_)
+	{
+		constexpr auto permute_mask = EmuSIMD::Funcs::make_shuffle_mask_32<3, 2, 3, 2>(); // Mask for { b[hi] a[hi] } - Uses 32-bit mask maker as the format used is the same
+		return _mm512_shuffle_f64x2(rhs_, lhs_, permute_mask);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 movelh_f64x8(EmuSIMD::f64x8_arg lhs_, EmuSIMD::f64x8_arg rhs_)
+	{
+		constexpr auto permute_mask = EmuSIMD::Funcs::make_shuffle_mask_32<1, 0, 1, 0>(); // Mask for { a[lo] b[lo] } - Uses 32-bit mask maker as the format used is the same
+		return _mm512_shuffle_f64x2(lhs_, rhs_, permute_mask);
+	}
+#pragma endregion
+
 #pragma region SHUFFLES
 	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 shuffle_f64x8(EmuSIMD::f64x8_arg lhs_, EmuSIMD::f64x8_arg rhs_)

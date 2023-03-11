@@ -391,15 +391,27 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 
 #pragma region BLENDS
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 blendv_f32x4(EmuSIMD::f32x4 a_, EmuSIMD::f32x4 b_, EmuSIMD::f32x4 shuffle_mask_vec_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 blendv_f32x4(EmuSIMD::f32x4_arg a_, EmuSIMD::f32x4_arg b_, EmuSIMD::f32x4_arg shuffle_mask_vec_)
 	{
 		return _mm_blendv_ps(a_, b_, shuffle_mask_vec_);
 	}
 
 	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 blend_f32x4(EmuSIMD::f32x4 a_, EmuSIMD::f32x4 b_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 blend_f32x4(EmuSIMD::f32x4_arg a_, EmuSIMD::f32x4_arg b_)
 	{
 		return _mm_blend_ps(a_, b_, BlendMask);
+	}
+#pragma endregion
+
+#pragma region MOVES
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 movehl_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
+	{
+		return _mm_movehl_ps(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 movelh_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
+	{
+		return _mm_movelh_ps(lhs_, rhs_);
 	}
 #pragma endregion
 

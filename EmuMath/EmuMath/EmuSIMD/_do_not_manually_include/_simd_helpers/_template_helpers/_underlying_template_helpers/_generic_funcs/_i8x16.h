@@ -507,6 +507,18 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region MOVES
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 movehl_i8x16(EmuSIMD::i8x16_arg lhs_, EmuSIMD::i8x16_arg rhs_)
+	{
+		return cast_f32x4_i8x16(movehl_f32x4(cast_i8x16_f32x4(lhs_), cast_i8x16_f32x4(rhs_)));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 movelh_i8x16(EmuSIMD::i8x16_arg lhs_, EmuSIMD::i8x16_arg rhs_)
+	{
+		return cast_f32x4_i8x16(movelh_f32x4(cast_i8x16_f32x4(lhs_), cast_i8x16_f32x4(rhs_)));
+	}
+#pragma endregion
+
 #pragma region SHUFFLES
 	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 permute_i8x16(EmuSIMD::i8x16_arg a_)

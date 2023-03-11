@@ -2,6 +2,7 @@
 #define EMU_SIMD_GENERIC_FUNCS_F32X8_H_INC_ 1
 
 #include "_common_generic_func_helpers.h"
+#include "_f32x4.h"
 
 namespace EmuSIMD::Funcs
 {
@@ -391,6 +392,33 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 cmple_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_)
 	{
 		return _mm256_cmp_ps(lhs_, rhs_, EMU_SIMD_CMP_LE_FLAG);
+	}
+#pragma endregion
+
+#pragma region BLENDS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 blendv_f32x8(EmuSIMD::f32x8_arg a_, EmuSIMD::f32x8_arg b_, EmuSIMD::f32x8_arg shuffle_mask_vec_)
+	{
+		return _mm256_blendv_ps(a_, b_, shuffle_mask_vec_);
+	}
+
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 blend_f32x8(EmuSIMD::f32x8_arg a_, EmuSIMD::f32x8_arg b_)
+	{
+		return _mm256_blend_ps(a_, b_, BlendMask);
+	}
+#pragma endregion
+
+#pragma region MOVES
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 movehl_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_)
+	{
+		constexpr int permute_mask = (1 << 4) | 3; // Mask for { b[hi] a[hi] }
+		return _mm256_permute2f128_ps(lhs_, rhs_, permute_mask);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 movelh_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_)
+	{
+		constexpr int permute_mask = (2 << 4) | 0; // Mask for { a[lo] b[lo] }
+		return _mm256_permute2f128_ps(lhs_, rhs_, permute_mask);
 	}
 #pragma endregion
 

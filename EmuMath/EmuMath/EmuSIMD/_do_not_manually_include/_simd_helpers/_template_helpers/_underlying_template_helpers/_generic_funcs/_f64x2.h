@@ -2,6 +2,7 @@
 #define EMU_SIMD_GENERIC_FUNCS_F64X2_H_INC_ 1
 
 #include "_common_generic_func_helpers.h"
+#include "_f32x4.h"
 
 namespace EmuSIMD::Funcs
 {
@@ -385,6 +386,31 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cmple_f64x2(EmuSIMD::f64x2_arg lhs_, EmuSIMD::f64x2_arg rhs_)
 	{
 		return _mm_cmple_pd(lhs_, rhs_);
+	}
+#pragma endregion
+
+#pragma region BLENDS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 blendv_f64x2(EmuSIMD::f64x2_arg a_, EmuSIMD::f64x2_arg b_, EmuSIMD::f64x2_arg shuffle_mask_vec_)
+	{
+		return _mm_blendv_pd(a_, b_, shuffle_mask_vec_);
+	}
+
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 blend_f64x2(EmuSIMD::f64x2_arg a_, EmuSIMD::f64x2_arg b_)
+	{
+		return _mm_blend_pd(a_, b_, BlendMask);
+	}
+#pragma endregion
+
+#pragma region MOVES
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 movehl_f64x2(EmuSIMD::f64x2_arg lhs_, EmuSIMD::f64x2_arg rhs_)
+	{
+		return cast_f32x4_f64x2(movehl_f32x4(cast_f64x2_f32x4(lhs_), cast_f64x2_f32x4(rhs_)));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 movelh_f64x2(EmuSIMD::f64x2_arg lhs_, EmuSIMD::f64x2_arg rhs_)
+	{
+		return cast_f32x4_f64x2(movelh_f32x4(cast_f64x2_f32x4(lhs_), cast_f64x2_f32x4(rhs_)));
 	}
 #pragma endregion
 
