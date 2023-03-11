@@ -579,7 +579,13 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 mod_u16x8(EmuSIMD::u16x8_arg lhs_, EmuSIMD::u16x8_arg rhs_)
 	{
-		return _mm_rem_epu16(lhs_, rhs_);
+#if EMU_CORE_X86_X64_SVML
+		return _mm256_rem_epu16(lhs_, rhs_);
+#else
+		EmuSIMD::u16x8 to_subtract = div_u16x8(lhs_, rhs_);
+		to_subtract = mul_all_u16x8(to_subtract, rhs_);
+		return sub_u16x8(lhs_, to_subtract);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 abs_u16x8(EmuSIMD::u16x8_arg in_)
