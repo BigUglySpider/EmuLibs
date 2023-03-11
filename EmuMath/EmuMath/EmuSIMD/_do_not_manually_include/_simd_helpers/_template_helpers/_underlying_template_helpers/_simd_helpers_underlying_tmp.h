@@ -404,7 +404,7 @@ namespace EmuSIMD::TMP
 		static constexpr bool value = std::conditional_t
 		<
 			is_simd_register_v<Register_> && !std::is_same_v<Register_, typename EmuCore::TMP::remove_ref_cv<Register_>::type>,
-			valid_register_index<typename EmuCore::TMP::remove_ref_cv<Register_>::type>,
+			valid_register_index<typename EmuCore::TMP::remove_ref_cv<Register_>::type, Index_, PerElementWidthIfIntegral_>,
 			std::false_type
 		>::value;
 	};
