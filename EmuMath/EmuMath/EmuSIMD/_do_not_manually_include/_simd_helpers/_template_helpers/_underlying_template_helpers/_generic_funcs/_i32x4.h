@@ -448,18 +448,6 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
-#pragma region MINMAX_FUNCS
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 min_i32x4(EmuSIMD::i32x4_arg a_, EmuSIMD::i32x4_arg b_)
-	{
-		return _mm_min_epi32(a_, b_);
-	}
-
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 max_i32x4(EmuSIMD::i32x4_arg a_, EmuSIMD::i32x4_arg b_)
-	{
-		return _mm_max_epi32(a_, b_);
-	}
-#pragma endregion
-
 #pragma region MOVES
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 movehl_i32x4(EmuSIMD::i32x4_arg lhs_, EmuSIMD::i32x4_arg rhs_)
 	{
@@ -469,6 +457,18 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 movelh_i32x4(EmuSIMD::i32x4_arg lhs_, EmuSIMD::i32x4_arg rhs_)
 	{
 		return cast_f32x4_i32x4(movelh_f32x4(cast_i32x4_f32x4(lhs_), cast_i32x4_f32x4(rhs_)));
+	}
+#pragma endregion
+
+#pragma region MINMAX_FUNCS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 min_i32x4(EmuSIMD::i32x4_arg a_, EmuSIMD::i32x4_arg b_)
+	{
+		return _mm_min_epi32(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 max_i32x4(EmuSIMD::i32x4_arg a_, EmuSIMD::i32x4_arg b_)
+	{
+		return _mm_max_epi32(a_, b_);
 	}
 #pragma endregion
 

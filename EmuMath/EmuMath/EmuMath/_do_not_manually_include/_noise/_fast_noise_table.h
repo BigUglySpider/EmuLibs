@@ -385,7 +385,7 @@ namespace EmuMath
 				{
 					Register_ start_x_ = EmuSIMD::add(points_x_, EmuSIMD::mul_all(step_x_, EmuSIMD::setr_incrementing<Register_, 0>()));
 					Register_ start_z_ = points_z_;
-					step_x_ = EmuSIMD::mul(step_x_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
+					step_x_ = EmuSIMD::mul_all(step_x_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
 
 					for (std::size_t y = 0; y < end_y_; ++y)
 					{
@@ -413,7 +413,7 @@ namespace EmuMath
 				{
 					Register_ start_y_ = EmuSIMD::add(points_y_, EmuSIMD::mul_all(step_y_, EmuSIMD::setr_incrementing<Register_, 0>()));
 					Register_ start_z_ = points_z_;
-					step_y_ = EmuSIMD::mul(step_y_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
+					step_y_ = EmuSIMD::mul_all(step_y_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
 
 					for (std::size_t x = 0; x < end_x_; ++x)
 					{
@@ -440,8 +440,8 @@ namespace EmuMath
 				else
 				{
 					Register_ start_y_ = points_y_;
-					Register_ start_z_ = EmuSIMD::add(points_z_, EmuSIMD::mul(step_z_, EmuSIMD::setr_incrementing<Register_, 0>()));
-					step_z_ = EmuSIMD::mul(step_z_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
+					Register_ start_z_ = EmuSIMD::add(points_z_, EmuSIMD::mul_all(step_z_, EmuSIMD::setr_incrementing<Register_, 0>()));
+					step_z_ = EmuSIMD::mul_all(step_z_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
 
 					for (std::size_t x = 0; x < end_x_; ++x)
 					{
@@ -482,7 +482,7 @@ namespace EmuMath
 				if constexpr (major_dimension == 0)
 				{
 					Register_ start_x_ = EmuSIMD::add(points_x_, EmuSIMD::mul_all(step_x_, EmuSIMD::setr_incrementing<Register_, 0>()));
-					step_x_ = EmuSIMD::mul(step_x_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
+					step_x_ = EmuSIMD::mul_all(step_x_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
 					for (std::size_t y = 0; y < end_y_; ++y)
 					{
 						auto& layer_ = samples[y];
@@ -500,7 +500,7 @@ namespace EmuMath
 				else
 				{
 					Register_ start_y_ = EmuSIMD::add(points_y_, EmuSIMD::mul_all(step_y_, EmuSIMD::setr_incrementing<Register_, 0>()));
-					step_y_ = EmuSIMD::mul(step_y_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
+					step_y_ = EmuSIMD::mul_all(step_y_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
 					for (std::size_t x = 0; x < end_x_; ++x)
 					{
 						auto& layer_ = samples[x];
@@ -526,7 +526,7 @@ namespace EmuMath
 				Register_ points_simd_ = EmuSIMD::set1<Register_>(start_.at<0>());
 				Register_ step_simd_ = EmuSIMD::set1<Register_>(step_.at<0>());
 				points_simd_ = EmuSIMD::add(points_simd_, EmuSIMD::mul_all(step_simd_, EmuSIMD::setr_incrementing<Register_, 0>()));
-				step_simd_ = EmuSIMD::mul(step_simd_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
+				step_simd_ = EmuSIMD::mul_all(step_simd_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
 
 				std::size_t i = 0;
 				for (; i < end_store_batch_; i += num_elements_per_batch)

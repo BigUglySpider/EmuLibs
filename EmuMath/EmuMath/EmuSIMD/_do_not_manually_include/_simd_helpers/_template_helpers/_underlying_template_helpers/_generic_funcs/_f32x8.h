@@ -537,6 +537,11 @@ namespace EmuSIMD::Funcs
 		return _mm256_fmsubadd_ps(a_, b_, c_);
 	}
 
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 subadd_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_)
+	{
+		return fmsubadd_f32x8(set1_f32x8(1.0f), lhs_, rhs_);
+	}
+
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 floor_f32x8(EmuSIMD::f32x8_arg to_floor_)
 	{
 		return _mm256_floor_ps(to_floor_);

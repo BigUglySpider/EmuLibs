@@ -495,6 +495,18 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region MINMAX_FUNCS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 min_u8x16(EmuSIMD::u8x16_arg a_, EmuSIMD::u8x16_arg b_)
+	{
+		return _mm_min_epu8(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 max_u8x16(EmuSIMD::u8x16_arg a_, EmuSIMD::u8x16_arg b_)
+	{
+		return _mm_max_epu8(a_, b_);
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 mul_all_u8x16(EmuSIMD::u8x16_arg lhs_, EmuSIMD::u8x16_arg rhs_)
 	{

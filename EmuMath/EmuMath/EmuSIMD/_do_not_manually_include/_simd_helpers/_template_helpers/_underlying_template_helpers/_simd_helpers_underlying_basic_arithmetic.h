@@ -16,29 +16,30 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_add_ps(lhs_, rhs_);
+				return add_f32x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_add_ps(lhs_, rhs_);
+				return add_f32x8(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _mm512_add_ps(lhs_, rhs_);
+				return add_f32x16(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_add_pd(lhs_, rhs_);
+				return add_f64x2(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_add_pd(lhs_, rhs_);
+				return add_f64x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _mm512_add_pd(lhs_, rhs_);
+				return add_f64x8(lhs_, rhs_);
 			}
 			else
 			{
@@ -59,61 +60,62 @@ namespace EmuSIMD::_underlying_simd_helpers
 		{
 			if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
 			{
+				using namespace EmuSIMD::Funcs;
 				if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 				{
 					if constexpr (PerElementWidth_ == 8)
 					{
-						return _mm_add_epi8(lhs_, rhs_);
+						return add_i8x16(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 16)
 					{
-						return _mm_add_epi16(lhs_, rhs_);
+						return add_i16x8(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 32)
 					{
-						return _mm_add_epi32(lhs_, rhs_);
+						return add_i32x4(lhs_, rhs_);
 					}
 					else
 					{
-						return _mm_add_epi64(lhs_, rhs_);
+						return add_i64x2(lhs_, rhs_);
 					}
 				}
 				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 				{
 					if constexpr (PerElementWidth_ == 8)
 					{
-						return _mm256_add_epi8(lhs_, rhs_);
+						return add_i8x32(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 16)
 					{
-						return _mm256_add_epi16(lhs_, rhs_);
+						return add_i16x16(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 32)
 					{
-						return _mm256_add_epi32(lhs_, rhs_);
+						return add_i32x8(lhs_, rhs_);
 					}
 					else
 					{
-						return _mm256_add_epi64(lhs_, rhs_);
+						return add_i64x4(lhs_, rhs_);
 					}
 				}
 				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
 				{
 					if constexpr (PerElementWidth_ == 8)
 					{
-						return _mm512_add_epi8(lhs_, rhs_);
+						return add_i8x64(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 16)
 					{
-						return _mm512_add_epi16(lhs_, rhs_);
+						return add_i16x32(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 32)
 					{
-						return _mm512_add_epi32(lhs_, rhs_);
+						return add_i32x16(lhs_, rhs_);
 					}
 					else
 					{
-						return _mm512_add_epi64(lhs_, rhs_);
+						return add_i64x8(lhs_, rhs_);
 					}
 				}
 				else
@@ -140,29 +142,30 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_sub_ps(lhs_, rhs_);
+				return sub_f32x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_sub_ps(lhs_, rhs_);
+				return sub_f32x8(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _mm512_sub_ps(lhs_, rhs_);
+				return sub_f32x16(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_sub_pd(lhs_, rhs_);
+				return sub_f64x2(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_sub_pd(lhs_, rhs_);
+				return sub_f64x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _mm512_sub_pd(lhs_, rhs_);
+				return sub_f64x8(lhs_, rhs_);
 			}
 			else
 			{
@@ -183,61 +186,62 @@ namespace EmuSIMD::_underlying_simd_helpers
 		{
 			if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
 			{
+				using namespace EmuSIMD::Funcs;
 				if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 				{
 					if constexpr (PerElementWidth_ == 8)
 					{
-						return _mm_sub_epi8(lhs_, rhs_);
+						return sub_i8x16(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 16)
 					{
-						return _mm_sub_epi16(lhs_, rhs_);
+						return sub_i16x8(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 32)
 					{
-						return _mm_sub_epi32(lhs_, rhs_);
+						return sub_i32x4(lhs_, rhs_);
 					}
 					else
 					{
-						return _mm_sub_epi64(lhs_, rhs_);
+						return sub_i64x2(lhs_, rhs_);
 					}
 				}
 				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 				{
 					if constexpr (PerElementWidth_ == 8)
 					{
-						return _mm256_sub_epi8(lhs_, rhs_);
+						return sub_i8x32(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 16)
 					{
-						return _mm256_sub_epi16(lhs_, rhs_);
+						return sub_i16x16(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 32)
 					{
-						return _mm256_sub_epi32(lhs_, rhs_);
+						return sub_i32x8(lhs_, rhs_);
 					}
 					else
 					{
-						return _mm256_sub_epi64(lhs_, rhs_);
+						return sub_i64x4(lhs_, rhs_);
 					}
 				}
 				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
 				{
 					if constexpr (PerElementWidth_ == 8)
 					{
-						return _mm512_sub_epi8(lhs_, rhs_);
+						return sub_i8x64(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 16)
 					{
-						return _mm512_sub_epi16(lhs_, rhs_);
+						return sub_i16x32(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 32)
 					{
-						return _mm512_sub_epi32(lhs_, rhs_);
+						return sub_i32x16(lhs_, rhs_);
 					}
 					else
 					{
-						return _mm512_sub_epi64(lhs_, rhs_);
+						return sub_i64x8(lhs_, rhs_);
 					}
 				}
 				else
@@ -264,29 +268,30 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_mul_ps(lhs_, rhs_);
+				return mul_f32x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_mul_ps(lhs_, rhs_);
+				return mul_f32x8(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _mm512_mul_ps(lhs_, rhs_);
+				return mul_f32x16(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_mul_pd(lhs_, rhs_);
+				return mul_f64x2(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_mul_pd(lhs_, rhs_);
+				return mul_f64x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _mm512_mul_pd(lhs_, rhs_);
+				return mul_f64x8(lhs_, rhs_);
 			}
 			else
 			{
@@ -296,140 +301,6 @@ namespace EmuSIMD::_underlying_simd_helpers
 		else
 		{
 			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform multiplication of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type is not a supported SIMD register.");
-		}
-	}
-
-	// UNIQUE CASE: Integer _mul_ operations are not per-element returns.
-	// --- _mul_all_int can be used for similar behaviour to FP mutliplication
-	template<bool Signed_, class Register_>
-	[[nodiscard]] inline Register_ _mul_int(Register_ lhs_, Register_ rhs_)
-	{
-		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
-		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
-		{
-			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
-			{
-				if constexpr (Signed_)
-				{
-					return _mm_mul_epi32(lhs_, rhs_);
-				}
-				else
-				{
-					return _mm_mul_epu32(lhs_, rhs_);
-				}
-			}
-			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
-			{
-				if constexpr (Signed_)
-				{
-					return _mm256_mul_epi32(lhs_, rhs_);
-				}
-				else
-				{
-					return _mm256_mul_epu32(lhs_, rhs_);
-				}
-			}
-			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
-			{
-				if constexpr (Signed_)
-				{
-					return _mm512_mul_epi32(lhs_, rhs_);
-				}
-				else
-				{
-					return _mm512_mul_epu32(lhs_, rhs_);
-				}
-			}
-			else
-			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform multiplication of integral SIMD registers via EmuSIMD helpers, but provided an unsupported integral SIMD register.");
-			}
-		}
-		else
-		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform multiplication of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
-		}
-	}
-
-	/// <summary> Performs correct _mullo_ SIMD operations, and emulates the behaviour for 8-bits if width is 8. </summary>
-	template<std::size_t PerElementWidth_, class Register_>
-	[[nodiscard]] inline Register_ _mullo_int(Register_ lhs_, Register_ rhs_)
-	{
-		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
-		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
-		{
-			if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
-			{
-				if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
-				{
-					if constexpr (PerElementWidth_ == 8)
-					{
-						return EmuSIMD::Funcs::mul_all_i8x16(lhs_, rhs_);
-					}
-					else if constexpr (PerElementWidth_ == 16)
-					{
-						return EmuSIMD::Funcs::mul_all_i16x8(lhs_, rhs_);
-					}
-					else if constexpr (PerElementWidth_ == 32)
-					{
-						return EmuSIMD::Funcs::mul_all_i32x4(lhs_, rhs_);
-					}
-					else
-					{
-						return EmuSIMD::Funcs::mul_all_i64x2(lhs_, rhs_);
-					}
-				}
-				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
-				{
-					if constexpr (PerElementWidth_ == 8)
-					{
-						return EmuSIMD::Funcs::mul_all_i8x32(lhs_, rhs_);
-					}
-					else if constexpr (PerElementWidth_ == 16)
-					{
-						return EmuSIMD::Funcs::mul_all_i16x16(lhs_, rhs_);
-					}
-					else if constexpr (PerElementWidth_ == 32)
-					{
-						return EmuSIMD::Funcs::mul_all_i32x8(lhs_, rhs_);
-					}
-					else
-					{
-						return EmuSIMD::Funcs::mul_all_i64x4(lhs_, rhs_);
-					}
-				}
-				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
-				{
-					if constexpr (PerElementWidth_ == 8)
-					{
-						return EmuSIMD::Funcs::mul_all_i8x64(lhs_, rhs_);
-					}
-					else if constexpr (PerElementWidth_ == 16)
-					{
-						return EmuSIMD::Funcs::mul_all_i16x32(lhs_, rhs_);
-					}
-					else if constexpr (PerElementWidth_ == 32)
-					{
-						return EmuSIMD::Funcs::mul_all_i32x16(lhs_, rhs_);
-					}
-					else
-					{
-						return EmuSIMD::Funcs::mul_all_i64x8(lhs_, rhs_);
-					}
-				}
-				else
-				{
-					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform lo multiplication of integral SIMD registers via EmuSIMD helpers, but provided an unsupported integral SIMD register.");
-				}
-			}
-			else
-			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform lo multiplication of integral SIMD registers via EmuSIMD helpers, but provided an invalid PerElementWidth_.");
-			}
-		}
-		else
-		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform lo multiplication of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
 		}
 	}
 
@@ -443,7 +314,68 @@ namespace EmuSIMD::_underlying_simd_helpers
 			{
 				if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<Register_>)
 				{
-					return _mullo_int<PerElementWidth_>(lhs_, rhs_);
+					using namespace EmuSIMD::Funcs;
+					if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
+					{
+						if constexpr (PerElementWidth_ == 8)
+						{
+							return mul_all_i8x16(lhs_, rhs_);
+						}
+						else if constexpr (PerElementWidth_ == 16)
+						{
+							return mul_all_i16x8(lhs_, rhs_);
+						}
+						else if constexpr (PerElementWidth_ == 32)
+						{
+							return mul_all_i32x4(lhs_, rhs_);
+						}
+						else
+						{
+							return mul_all_i64x2(lhs_, rhs_);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+					{
+						if constexpr (PerElementWidth_ == 8)
+						{
+							return mul_all_i8x32(lhs_, rhs_);
+						}
+						else if constexpr (PerElementWidth_ == 16)
+						{
+							return mul_all_i16x16(lhs_, rhs_);
+						}
+						else if constexpr (PerElementWidth_ == 32)
+						{
+							return mul_all_i32x8(lhs_, rhs_);
+						}
+						else
+						{
+							return mul_all_i64x4(lhs_, rhs_);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
+					{
+						if constexpr (PerElementWidth_ == 8)
+						{
+							return mul_all_i8x64(lhs_, rhs_);
+						}
+						else if constexpr (PerElementWidth_ == 16)
+						{
+							return mul_all_i16x32(lhs_, rhs_);
+						}
+						else if constexpr (PerElementWidth_ == 32)
+						{
+							return mul_all_i32x16(lhs_, rhs_);
+						}
+						else
+						{
+							return mul_all_i64x8(lhs_, rhs_);
+						}
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform all-element multiplication of integral SIMD registers via EmuSIMD helpers, but provided an unsupported integral SIMD register.");
+					}
 				}
 				else
 				{
@@ -469,29 +401,30 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_div_ps(lhs_, rhs_);
+				return div_f32x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_div_ps(lhs_, rhs_);
+				return div_f32x8(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _mm512_div_ps(lhs_, rhs_);
+				return div_f32x16(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_div_pd(lhs_, rhs_);
+				return div_f64x2(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_div_pd(lhs_, rhs_);
+				return div_f64x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _mm512_div_pd(lhs_, rhs_);
+				return div_f64x8(lhs_, rhs_);
 			}
 			else
 			{
@@ -512,50 +445,51 @@ namespace EmuSIMD::_underlying_simd_helpers
 		{
 			if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
 			{
+				using namespace EmuSIMD::Funcs;
 				if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 				{
 					if constexpr (PerElementWidth_ == 8)
 					{
 						if constexpr (Signed_)
 						{
-							return _mm_div_epi8(lhs_, rhs_);
+							return div_i8x16(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm_div_epu8(lhs_, rhs_);
+							return div_u8x16(lhs_, rhs_);
 						}
 					}
 					else if constexpr (PerElementWidth_ == 16)
 					{
 						if constexpr (Signed_)
 						{
-							return _mm_div_epi16(lhs_, rhs_);
+							return div_i16x8(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm_div_epu16(lhs_, rhs_);
+							return div_u16x8(lhs_, rhs_);
 						}
 					}
 					else if constexpr (PerElementWidth_ == 32)
 					{
 						if constexpr (Signed_)
 						{
-							return _mm_div_epi32(lhs_, rhs_);
+							return div_i32x4(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm_div_epu32(lhs_, rhs_);
+							return div_u32x4(lhs_, rhs_);
 						}
 					}
 					else
 					{
 						if constexpr (Signed_)
 						{
-							return _mm_div_epi64(lhs_, rhs_);
+							return div_i64x2(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm_div_epu64(lhs_, rhs_);
+							return div_u64x2(lhs_, rhs_);
 						}
 					}
 				}
@@ -565,44 +499,44 @@ namespace EmuSIMD::_underlying_simd_helpers
 					{
 						if constexpr (Signed_)
 						{
-							return _mm256_div_epi8(lhs_, rhs_);
+							return div_i8x32(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm256_div_epu8(lhs_, rhs_);
+							return div_u8x32(lhs_, rhs_);
 						}
 					}
 					else if constexpr (PerElementWidth_ == 16)
 					{
 						if constexpr (Signed_)
 						{
-							return _mm256_div_epi16(lhs_, rhs_);
+							return div_i16x16(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm256_div_epu16(lhs_, rhs_);
+							return div_u16x16(lhs_, rhs_);
 						}
 					}
 					else if constexpr (PerElementWidth_ == 32)
 					{
 						if constexpr (Signed_)
 						{
-							return _mm256_div_epi32(lhs_, rhs_);
+							return div_i32x8(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm256_div_epu32(lhs_, rhs_);
+							return div_u32x8(lhs_, rhs_);
 						}
 					}
 					else
 					{
 						if constexpr (Signed_)
 						{
-							return _mm256_div_epi64(lhs_, rhs_);
+							return div_i64x4(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm256_div_epu64(lhs_, rhs_);
+							return div_u64x4(lhs_, rhs_);
 						}
 					}
 				}
@@ -612,44 +546,44 @@ namespace EmuSIMD::_underlying_simd_helpers
 					{
 						if constexpr (Signed_)
 						{
-							return _mm512_div_epi8(lhs_, rhs_);
+							return div_i8x64(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm512_div_epu8(lhs_, rhs_);
+							return div_u8x64(lhs_, rhs_);
 						}
 					}
 					else if constexpr (PerElementWidth_ == 16)
 					{
 						if constexpr (Signed_)
 						{
-							return _mm512_div_epi16(lhs_, rhs_);
+							return div_i16x32(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm512_div_epu16(lhs_, rhs_);
+							return div_u16x32(lhs_, rhs_);
 						}
 					}
 					else if constexpr (PerElementWidth_ == 32)
 					{
 						if constexpr (Signed_)
 						{
-							return _mm512_div_epi32(lhs_, rhs_);
+							return div_i32x16(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm512_div_epu32(lhs_, rhs_);
+							return div_u32x16(lhs_, rhs_);
 						}
 					}
 					else
 					{
 						if constexpr (Signed_)
 						{
-							return _mm512_div_epi64(lhs_, rhs_);
+							return div_i64x8(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm512_div_epu64(lhs_, rhs_);
+							return div_u64x8(lhs_, rhs_);
 						}
 					}
 				}
@@ -677,41 +611,42 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				EmuSIMD::f32x4 res = _mm_div_ps(lhs_, rhs_);
-				res = _mm_trunc_ps(res);
-				return _mm_fnmadd_ps(res, rhs_, lhs_);
+				EmuSIMD::f32x4 res = div_f32x4(lhs_, rhs_);
+				res = trunc_f32x4(res);
+				return fnmadd_f32x4(res, rhs_, lhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				EmuSIMD::f32x8 res = _mm256_div_ps(lhs_, rhs_);
-				res = _mm256_trunc_ps(res);
-				return _mm256_fnmadd_ps(res, rhs_, lhs_);
+				EmuSIMD::f32x8 res = div_f32x8(lhs_, rhs_);
+				res = trunc_f32x8(res);
+				return fnmadd_f32x8(res, rhs_, lhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				EmuSIMD::f32x16 res = _mm512_div_ps(lhs_, rhs_);
-				res = _mm512_trunc_ps(res);
-				return _mm512_fnmadd_ps(res, rhs_, lhs_);
+				EmuSIMD::f32x16 res = div_f32x16(lhs_, rhs_);
+				res = trunc_f32x16(res);
+				return fnmadd_f32x16(res, rhs_, lhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				EmuSIMD::f64x2 res = _mm_div_pd(lhs_, rhs_);
-				res = _mm_trunc_pd(res);
-				return _mm_fnmadd_pd(res, rhs_, lhs_);
+				EmuSIMD::f64x2 res = div_f64x2(lhs_, rhs_);
+				res = trunc_f64x2(res);
+				return fnmadd_f64x2(res, rhs_, lhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				EmuSIMD::f64x4 res = _mm256_div_pd(lhs_, rhs_);
-				res = _mm256_trunc_pd(res);
-				return _mm256_fnmadd_pd(res, rhs_, lhs_);
+				EmuSIMD::f64x4 res = div_f64x4(lhs_, rhs_);
+				res = trunc_f64x4(res);
+				return fnmadd_f64x4(res, rhs_, lhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				EmuSIMD::f64x8 res = _mm512_div_pd(lhs_, rhs_);
-				res = _mm512_trunc_pd(res);
-				return _mm512_fnmadd_pd(res, rhs_, lhs_);
+				EmuSIMD::f64x8 res = div_f64x8(lhs_, rhs_);
+				res = trunc_f64x8(res);
+				return fnmadd_f64x8(res, rhs_, lhs_);
 			}
 			else
 			{
@@ -725,57 +660,58 @@ namespace EmuSIMD::_underlying_simd_helpers
 	}
 
 	template<std::size_t PerElementWidth_, bool Signed_, class Register_>
-	[[nodiscard]] inline Register_ _rem_int(Register_ lhs_, Register_ rhs_)
+	[[nodiscard]] inline Register_ _mod_int(Register_ lhs_, Register_ rhs_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
 			{
+				using namespace EmuSIMD::Funcs;
 				if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 				{
 					if constexpr (PerElementWidth_ == 8)
 					{
 						if constexpr (Signed_)
 						{
-							return _mm_rem_epi8(lhs_, rhs_);
+							return mod_i8x16(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm_rem_epu8(lhs_, rhs_);
+							return mod_u8x16(lhs_, rhs_);
 						}
 					}
 					else if constexpr (PerElementWidth_ == 16)
 					{
 						if constexpr (Signed_)
 						{
-							return _mm_rem_epi16(lhs_, rhs_);
+							return mod_i16x8(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm_rem_epu16(lhs_, rhs_);
+							return mod_u16x8(lhs_, rhs_);
 						}
 					}
 					else if constexpr (PerElementWidth_ == 32)
 					{
 						if constexpr (Signed_)
 						{
-							return _mm_rem_epi32(lhs_, rhs_);
+							return mod_i32x4(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm_rem_epu32(lhs_, rhs_);
+							return mod_u32x4(lhs_, rhs_);
 						}
 					}
 					else
 					{
 						if constexpr (Signed_)
 						{
-							return _mm_rem_epi64(lhs_, rhs_);
+							return mod_i64x2(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm_rem_epu64(lhs_, rhs_);
+							return mod_u64x2(lhs_, rhs_);
 						}
 					}
 				}
@@ -785,44 +721,44 @@ namespace EmuSIMD::_underlying_simd_helpers
 					{
 						if constexpr (Signed_)
 						{
-							return _mm256_rem_epi8(lhs_, rhs_);
+							return mod_i8x32(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm256_rem_epu8(lhs_, rhs_);
+							return mod_u8x32(lhs_, rhs_);
 						}
 					}
 					else if constexpr (PerElementWidth_ == 16)
 					{
 						if constexpr (Signed_)
 						{
-							return _mm256_rem_epi16(lhs_, rhs_);
+							return mod_i16x16(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm256_rem_epu16(lhs_, rhs_);
+							return mod_u16x16(lhs_, rhs_);
 						}
 					}
 					else if constexpr (PerElementWidth_ == 32)
 					{
 						if constexpr (Signed_)
 						{
-							return _mm256_rem_epi32(lhs_, rhs_);
+							return mod_i32x8(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm256_rem_epu32(lhs_, rhs_);
+							return mod_u32x8(lhs_, rhs_);
 						}
 					}
 					else
 					{
 						if constexpr (Signed_)
 						{
-							return _mm256_rem_epi64(lhs_, rhs_);
+							return mod_i64x4(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm256_rem_epu64(lhs_, rhs_);
+							return mod_u64x4(lhs_, rhs_);
 						}
 					}
 				}
@@ -832,67 +768,61 @@ namespace EmuSIMD::_underlying_simd_helpers
 					{
 						if constexpr (Signed_)
 						{
-							return _mm512_rem_epi8(lhs_, rhs_);
+							return mod_i8x64(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm512_rem_epu8(lhs_, rhs_);
+							return mod_u8x64(lhs_, rhs_);
 						}
 					}
 					else if constexpr (PerElementWidth_ == 16)
 					{
 						if constexpr (Signed_)
 						{
-							return _mm512_rem_epi16(lhs_, rhs_);
+							return mod_i16x32(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm512_rem_epu16(lhs_, rhs_);
+							return mod_u16x32(lhs_, rhs_);
 						}
 					}
 					else if constexpr (PerElementWidth_ == 32)
 					{
 						if constexpr (Signed_)
 						{
-							return _mm512_rem_epi32(lhs_, rhs_);
+							return mod_i32x16(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm512_rem_epu32(lhs_, rhs_);
+							return mod_u32x16(lhs_, rhs_);
 						}
 					}
 					else
 					{
 						if constexpr (Signed_)
 						{
-							return _mm512_rem_epi64(lhs_, rhs_);
+							return mod_i64x8(lhs_, rhs_);
 						}
 						else
 						{
-							return _mm512_rem_epu64(lhs_, rhs_);
+							return mod_u64x8(lhs_, rhs_);
 						}
 					}
 				}
 				else
 				{
-					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform remainder division of integral SIMD registers via EmuSIMD helpers, but provided an unsupported integral SIMD register.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform mod of integral SIMD registers via EmuSIMD helpers, but provided an unsupported integral SIMD register.");
 				}
 			}
 			else
 			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform remainder division of integral SIMD registers via EmuSIMD helpers, but provided an invalid PerElementWidth_.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform mod of integral SIMD registers via EmuSIMD helpers, but provided an invalid PerElementWidth_.");
 			}
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform remainder division of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform mod of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
 		}
-	}
-
-	template<std::size_t PerElementWidth_, bool Signed_, class Register_>
-	[[nodiscard]] inline Register_ _mod_int(Register_ lhs_, Register_ rhs_)
-	{
-		return _rem_int<PerElementWidth_, Signed_, Register_>(lhs_, rhs_);
 	}
 #pragma endregion
 
@@ -903,13 +833,209 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
 			{
-				return _sub_fp(_setzero<register_type_uq>(), register_);
+				if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
+				{
+					return negate_f32x4(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
+				{
+					return negate_f32x8(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
+				{
+					return negate_f32x16(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
+				{
+					return negate_f64x2(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
+				{
+					return negate_f64x4(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
+				{
+					return negate_f64x8(register_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform negation of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported floating-point SIMD register.");
+				}
 			}
 			else if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<register_type_uq>)
 			{
-				return _sub_int<PerElementWidthIfInt_>(_setzero<register_type_uq>(), register_);
+				if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
+				{
+					if constexpr (PerElementWidthIfInt_ == 8)
+					{
+						return negate_i8x16(register_);
+					}
+					else if constexpr (PerElementWidthIfInt_ == 16)
+					{
+						return negate_i16x8(register_);
+					}
+					else if constexpr (PerElementWidthIfInt_ == 32)
+					{
+						return negate_i32x4(register_);
+					}
+					else if constexpr (PerElementWidthIfInt_ == 64)
+					{
+						return negate_i64x2(register_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidthIfInt_>(), "Attempted to negate a generic 128-bit integral SIMD register via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+				{
+					if constexpr (PerElementWidthIfInt_ == 8)
+					{
+						return negate_i8x32(register_);
+					}
+					else if constexpr (PerElementWidthIfInt_ == 16)
+					{
+						return negate_i16x16(register_);
+					}
+					else if constexpr (PerElementWidthIfInt_ == 32)
+					{
+						return negate_i32x8(register_);
+					}
+					else if constexpr (PerElementWidthIfInt_ == 64)
+					{
+						return negate_i64x4(register_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidthIfInt_>(), "Attempted to negate a generic 256-bit integral SIMD register via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
+				{
+					if constexpr (PerElementWidthIfInt_ == 8)
+					{
+						return negate_i8x64(register_);
+					}
+					else if constexpr (PerElementWidthIfInt_ == 16)
+					{
+						return negate_i16x32(register_);
+					}
+					else if constexpr (PerElementWidthIfInt_ == 32)
+					{
+						return negate_i32x16(register_);
+					}
+					else if constexpr (PerElementWidthIfInt_ == 64)
+					{
+						return negate_i64x8(register_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidthIfInt_>(), "Attempted to negate a generic 512-bit integral SIMD register via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+				{
+					return negate_i8x16(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+				{
+					return negate_i8x32(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+				{
+					return negate_i8x64(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+				{
+					return negate_u8x16(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+				{
+					return negate_u8x32(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+				{
+					return negate_u8x64(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+				{
+					return negate_i16x8(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+				{
+					return negate_i16x16(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+				{
+					return negate_i16x32(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+				{
+					return negate_u16x8(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+				{
+					return negate_u16x16(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+				{
+					return negate_u16x32(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+				{
+					return negate_i32x4(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+				{
+					return negate_i32x8(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+				{
+					return negate_i32x16(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+				{
+					return negate_u32x4(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+				{
+					return negate_u32x8(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+				{
+					return negate_u32x16(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+				{
+					return negate_i64x2(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+				{
+					return negate_i64x4(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+				{
+					return negate_i64x8(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+				{
+					return negate_u64x2(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+				{
+					return negate_u64x4(register_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+				{
+					return negate_u64x8(register_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to negate an integral SIMD register via EmuSIMD helpers, but the provided integral SIMD register is not supported for this operation.");
+				}
 			}
 			else
 			{
@@ -930,36 +1056,30 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_addsub_ps(lhs_, rhs_);
+				return addsub_f32x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_addsub_ps(lhs_, rhs_);
+				return addsub_f32x8(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
+			{
+				return addsub_f32x16(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_addsub_pd(lhs_, rhs_);
+				return addsub_f64x2(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_addsub_pd(lhs_, rhs_);
+				return addsub_f64x4(lhs_, rhs_);
 			}
-			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::f32x16, EmuSIMD::f64x8>::value)
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				// Covers both EmuSIMD::f32x16 and EmuSIMD::f64x8 without needing any register-specific functionality thanks to previously created functions
-				using mask_generator = _underlying_simd_helpers::_alternating_index_mask<register_type_uq, true>;
-				if constexpr (_underlying_simd_helpers::_is_valid_alternating_index_mask_instance<mask_generator>::value)
-				{
-					register_type_uq mask_ = mask_generator::get();
-					register_type_uq out_ = _add_fp(lhs_, _and(mask_, rhs_));
-					return _sub_fp(out_, _andnot(mask_, rhs_));
-				}
-				else
-				{
-					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate add/subtract operation of two floating-point SIMD registers which do not have a built-in addsub operation, but a mask could not be successfully generated to perform alternating operations.");
-				}
+				return addsub_f64x8(lhs_, rhs_);
 			}
 			else
 			{
@@ -980,26 +1100,185 @@ namespace EmuSIMD::_underlying_simd_helpers
 		{
 			if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
 			{
-				using mask_generator = _underlying_simd_helpers::_alternating_index_mask<register_type_uq, true, PerElementWidth_>;
-				if constexpr (_underlying_simd_helpers::_is_valid_alternating_index_mask_instance<mask_generator>::value)
+				using namespace EmuSIMD::Funcs;
+				if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 				{
-					register_type_uq mask_ = mask_generator::get();
-					register_type_uq out_ = _add_int<PerElementWidth_>(lhs_, _and(mask_, rhs_));
-					return _sub_int<PerElementWidth_>(out_, _andnot(mask_, rhs_));
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return addsub_i8x16(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return addsub_i16x8(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return addsub_i32x4(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return addsub_i64x2(lhs_, rhs_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to add/subtract (addsub) two generic 128-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+				{
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return addsub_i8x32(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return addsub_i16x16(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return addsub_i32x8(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return addsub_i64x4(lhs_, rhs_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to add/subtract (addsub) two generic 256-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
+				{
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return addsub_i8x64(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return addsub_i16x32(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return addsub_i32x16(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return addsub_i64x8(lhs_, rhs_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to add/subtract (addsub) two generic 512-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+				{
+					return addsub_i8x16(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+				{
+					return addsub_i8x32(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+				{
+					return addsub_i8x64(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+				{
+					return addsub_u8x16(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+				{
+					return addsub_u8x32(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+				{
+					return addsub_u8x64(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+				{
+					return addsub_i16x8(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+				{
+					return addsub_i16x16(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+				{
+					return addsub_i16x32(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+				{
+					return addsub_u16x8(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+				{
+					return addsub_u16x16(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+				{
+					return addsub_u16x32(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+				{
+					return addsub_i32x4(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+				{
+					return addsub_i32x8(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+				{
+					return addsub_i32x16(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+				{
+					return addsub_u32x4(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+				{
+					return addsub_u32x8(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+				{
+					return addsub_u32x16(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+				{
+					return addsub_i64x2(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+				{
+					return addsub_i64x4(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+				{
+					return addsub_i64x8(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+				{
+					return addsub_u64x2(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+				{
+					return addsub_u64x4(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+				{
+					return addsub_u64x8(lhs_, rhs_);
 				}
 				else
 				{
-					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a add/subtract (addsub) operation of two integral SIMD registers via EmuSIMD helpers, but a mask could not be successfully created to perform alternating operations.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to add/subtract (addsub) two integral SIMD registers via EmuSIMD helpers, but the provided integral SIMD register type is not supported for this operation.");
 				}
 			}
 			else
 			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a add/subtract (addsub) operation of two integral SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported integral SIMD register for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to add/subtract (addsub) two integral SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported integral SIMD register for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a add/subtract (addsub) operation of two integral SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to add/subtract (addsub) two integral SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -1009,21 +1288,39 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
-			using mask_generator = _underlying_simd_helpers::_alternating_index_mask<register_type_uq, true>;
-			if constexpr (_underlying_simd_helpers::_is_valid_alternating_index_mask_instance<mask_generator>::value)
+			using namespace EmuSIMD::Funcs;
+			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				register_type_uq mask_ = mask_generator::get();
-				register_type_uq out_ = _sub_fp(lhs_, _and(mask_, rhs_));
-				return _add_fp(out_, _andnot(mask_, rhs_));
+				return subadd_f32x4(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
+			{
+				return subadd_f32x8(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
+			{
+				return subadd_f32x16(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
+			{
+				return subadd_f64x2(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
+			{
+				return subadd_f64x4(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
+			{
+				return subadd_f64x8(lhs_, rhs_);
 			}
 			else
 			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a subtract/add (subadd) operation of two floating-point SIMD registers via EmuSIMD helpers, but a mask could not be successfully created to perform alternating operations.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to subtract/add (subadd) two SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported floating-point SIMD register.");
 			}
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a subtract/add (subadd) operation of two floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to subtract/add (subadd) two SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -1035,26 +1332,185 @@ namespace EmuSIMD::_underlying_simd_helpers
 		{
 			if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
 			{
-				using mask_generator = _underlying_simd_helpers::_alternating_index_mask<register_type_uq, true, PerElementWidth_>;
-				if constexpr (_underlying_simd_helpers::_is_valid_alternating_index_mask_instance<mask_generator>::value)
+				using namespace EmuSIMD::Funcs;
+				if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 				{
-					register_type_uq mask_ = mask_generator::get();
-					register_type_uq out_ = _sub_int<PerElementWidth_>(lhs_, _and(mask_, rhs_));
-					return _add_int<PerElementWidth_>(out_, _andnot(mask_, rhs_));
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return subadd_i8x16(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return subadd_i16x8(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return subadd_i32x4(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return subadd_i64x2(lhs_, rhs_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to subtract/add (subadd) two generic 128-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+				{
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return subadd_i8x32(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return subadd_i16x16(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return subadd_i32x8(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return subadd_i64x4(lhs_, rhs_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to subtract/add (subadd) two generic 256-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
+				{
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return subadd_i8x64(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return subadd_i16x32(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return subadd_i32x16(lhs_, rhs_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return subadd_i64x8(lhs_, rhs_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to subtract/add (subadd) two generic 512-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+				{
+					return subadd_i8x16(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+				{
+					return subadd_i8x32(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+				{
+					return subadd_i8x64(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+				{
+					return subadd_u8x16(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+				{
+					return subadd_u8x32(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+				{
+					return subadd_u8x64(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+				{
+					return subadd_i16x8(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+				{
+					return subadd_i16x16(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+				{
+					return subadd_i16x32(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+				{
+					return subadd_u16x8(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+				{
+					return subadd_u16x16(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+				{
+					return subadd_u16x32(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+				{
+					return subadd_i32x4(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+				{
+					return subadd_i32x8(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+				{
+					return subadd_i32x16(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+				{
+					return subadd_u32x4(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+				{
+					return subadd_u32x8(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+				{
+					return subadd_u32x16(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+				{
+					return subadd_i64x2(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+				{
+					return subadd_i64x4(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+				{
+					return subadd_i64x8(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+				{
+					return subadd_u64x2(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+				{
+					return subadd_u64x4(lhs_, rhs_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+				{
+					return subadd_u64x8(lhs_, rhs_);
 				}
 				else
 				{
-					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a subtract/add (subadd) operation of two integral SIMD registers via EmuSIMD helpers, but a mask could not be successfully created to perform alternating operations.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to subtract/add (subadd) two integral SIMD registers via EmuSIMD helpers, but the provided integral SIMD register type is not supported for this operation.");
 				}
 			}
 			else
 			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a subtract/add (subadd) operation of two integral SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported integral SIMD register for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to subtract/add (subadd) two integral SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported integral SIMD register for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a subtract/add (subadd) operation of two integral SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to subtract/add (subadd) two integral SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 #pragma endregion
@@ -1066,29 +1522,30 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_fmadd_ps(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				return fmadd_f32x4(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_fmadd_ps(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				return fmadd_f32x8(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _mm512_fmadd_ps(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				return fmadd_f32x16(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_fmadd_pd(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				return fmadd_f64x2(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_fmadd_pd(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				return fmadd_f64x4(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _mm512_fmadd_pd(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				return fmadd_f64x8(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
 			}
 			else
 			{
@@ -1104,21 +1561,189 @@ namespace EmuSIMD::_underlying_simd_helpers
 	[[nodiscard]] inline Register_ _fmadd_int(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_add_after_mult_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
-		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
 			{
-				return _add_int<PerElementWidth_>(_mul_all_int<PerElementWidth_>(to_mult_lhs_, to_mult_rhs_), to_add_after_mult_);
+				using namespace EmuSIMD::Funcs;
+				if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
+				{
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return fmadd_i8x16(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return fmadd_i16x8(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return fmadd_i32x4(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return fmadd_i64x2(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to fused multiply add (fmadd) generic 128-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+				{
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return fmadd_i8x32(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return fmadd_i16x16(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return fmadd_i32x8(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return fmadd_i64x4(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to fused multiply add (fmadd) generic 256-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
+				{
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return fmadd_i8x64(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return fmadd_i16x32(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return fmadd_i32x16(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return fmadd_i64x8(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to fused multiply add (fmadd) generic 512-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+				{
+					return fmadd_i8x16(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+				{
+					return fmadd_i8x32(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+				{
+					return fmadd_i8x64(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+				{
+					return fmadd_u8x16(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+				{
+					return fmadd_u8x32(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+				{
+					return fmadd_u8x64(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+				{
+					return fmadd_i16x8(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+				{
+					return fmadd_i16x16(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+				{
+					return fmadd_i16x32(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+				{
+					return fmadd_u16x8(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+				{
+					return fmadd_u16x16(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+				{
+					return fmadd_u16x32(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+				{
+					return fmadd_i32x4(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+				{
+					return fmadd_i32x8(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+				{
+					return fmadd_i32x16(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+				{
+					return fmadd_u32x4(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+				{
+					return fmadd_u32x8(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+				{
+					return fmadd_u32x16(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+				{
+					return fmadd_i64x2(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+				{
+					return fmadd_i64x4(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+				{
+					return fmadd_i64x8(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+				{
+					return fmadd_u64x2(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+				{
+					return fmadd_u64x4(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+				{
+					return fmadd_u64x8(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply add (fmadd) integral SIMD registers via EmuSIMD helpers, but the provided integral SIMD register type is not supported for this operation.");
+				}
 			}
 			else
 			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a fused multiply add (fmadd) of three integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply add (fmadd) integral SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported integral SIMD register for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply add (fmadd) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply add (fmadd) integral SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -1128,29 +1753,30 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_fmsub_ps(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				return fmsub_f32x4(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_fmsub_ps(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				return fmsub_f32x8(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _mm512_fmsub_ps(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				return fmsub_f32x16(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_fmsub_pd(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				return fmsub_f64x2(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_fmsub_pd(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				return fmsub_f64x4(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _mm512_fmsub_pd(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				return fmsub_f64x8(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
 			}
 			else
 			{
@@ -1166,21 +1792,189 @@ namespace EmuSIMD::_underlying_simd_helpers
 	[[nodiscard]] inline Register_ _fmsub_int(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_sub_after_mult_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
-		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
 			{
-				return _sub_int<PerElementWidth_>(_mul_all_int<PerElementWidth_>(to_mult_lhs_, to_mult_rhs_), to_sub_after_mult_);
+				using namespace EmuSIMD::Funcs;
+				if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
+				{
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return fmsub_i8x16(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return fmsub_i16x8(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return fmsub_i32x4(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return fmsub_i64x2(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to fused multiply subtract (fmsub) generic 128-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+				{
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return fmsub_i8x32(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return fmsub_i16x16(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return fmsub_i32x8(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return fmsub_i64x4(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to fused multiply subtract (fmsub) generic 256-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
+				{
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return fmsub_i8x64(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return fmsub_i16x32(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return fmsub_i32x16(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return fmsub_i64x8(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to fused multiply subtract (fmsub) generic 512-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+				{
+					return fmsub_i8x16(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+				{
+					return fmsub_i8x32(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+				{
+					return fmsub_i8x64(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+				{
+					return fmsub_u8x16(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+				{
+					return fmsub_u8x32(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+				{
+					return fmsub_u8x64(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+				{
+					return fmsub_i16x8(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+				{
+					return fmsub_i16x16(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+				{
+					return fmsub_i16x32(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+				{
+					return fmsub_u16x8(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+				{
+					return fmsub_u16x16(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+				{
+					return fmsub_u16x32(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+				{
+					return fmsub_i32x4(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+				{
+					return fmsub_i32x8(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+				{
+					return fmsub_i32x16(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+				{
+					return fmsub_u32x4(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+				{
+					return fmsub_u32x8(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+				{
+					return fmsub_u32x16(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+				{
+					return fmsub_i64x2(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+				{
+					return fmsub_i64x4(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+				{
+					return fmsub_i64x8(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+				{
+					return fmsub_u64x2(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+				{
+					return fmsub_u64x4(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+				{
+					return fmsub_u64x8(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply subtract (fmsub) integral SIMD registers via EmuSIMD helpers, but the provided integral SIMD register type is not supported for this operation.");
+				}
 			}
 			else
 			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a fused multiply subtract (fmsub) of three integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply subtract (fmsub) integral SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported integral SIMD register for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply subtract (fmsub) integral SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -1190,29 +1984,30 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_fmaddsub_ps(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				return fmaddsub_f32x4(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_fmaddsub_ps(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				return fmaddsub_f32x8(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _mm512_fmaddsub_ps(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				return fmaddsub_f32x16(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_fmaddsub_pd(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				return fmaddsub_f64x2(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_fmaddsub_pd(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				return fmaddsub_f64x4(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _mm512_fmaddsub_pd(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				return fmaddsub_f64x8(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
 			}
 			else
 			{
@@ -1228,33 +2023,189 @@ namespace EmuSIMD::_underlying_simd_helpers
 	[[nodiscard]] inline Register_ _fmaddsub_int(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_add_sub_after_mult_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
-		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
 			{
-				using mask_generator = _underlying_simd_helpers::_alternating_index_mask<register_type_uq, true, PerElementWidth_>;
-				if constexpr(_underlying_simd_helpers::_is_valid_alternating_index_mask_instance<mask_generator>::value)
+				using namespace EmuSIMD::Funcs;
+				if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 				{
-					register_type_uq out_ = _mul_all_int<PerElementWidth_>(to_mult_lhs_, to_mult_rhs_);
-					register_type_uq mask_ = mask_generator::get();
-					out_ = _add_int<PerElementWidth_>(out_, _and(mask_, to_add_sub_after_mult_));
-					return _sub_int<PerElementWidth_>(out_, _andnot(mask_, to_add_sub_after_mult_));
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return fmaddsub_i8x16(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return fmaddsub_i16x8(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return fmaddsub_i32x4(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return fmaddsub_i64x2(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to fused multiply add/subtract (fmaddsub) generic 128-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+				{
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return fmaddsub_i8x32(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return fmaddsub_i16x16(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return fmaddsub_i32x8(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return fmaddsub_i64x4(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to fused multiply add/subtract (fmaddsub) generic 256-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
+				{
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return fmaddsub_i8x64(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return fmaddsub_i16x32(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return fmaddsub_i32x16(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return fmaddsub_i64x8(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to fused multiply add/subtract (fmaddsub) generic 512-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+				{
+					return fmaddsub_i8x16(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+				{
+					return fmaddsub_i8x32(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+				{
+					return fmaddsub_i8x64(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+				{
+					return fmaddsub_u8x16(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+				{
+					return fmaddsub_u8x32(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+				{
+					return fmaddsub_u8x64(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+				{
+					return fmaddsub_i16x8(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+				{
+					return fmaddsub_i16x16(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+				{
+					return fmaddsub_i16x32(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+				{
+					return fmaddsub_u16x8(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+				{
+					return fmaddsub_u16x16(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+				{
+					return fmaddsub_u16x32(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+				{
+					return fmaddsub_i32x4(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+				{
+					return fmaddsub_i32x8(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+				{
+					return fmaddsub_i32x16(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+				{
+					return fmaddsub_u32x4(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+				{
+					return fmaddsub_u32x8(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+				{
+					return fmaddsub_u32x16(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+				{
+					return fmaddsub_i64x2(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+				{
+					return fmaddsub_i64x4(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+				{
+					return fmaddsub_i64x8(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+				{
+					return fmaddsub_u64x2(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+				{
+					return fmaddsub_u64x4(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+				{
+					return fmaddsub_u64x8(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
 				}
 				else
 				{
-					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a fused multiply add/subtract (fmaddsub) of three integral SIMD registers via EmuSIMD helpers, but an alternating mask could not be formed successfully.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply add/subtract (fmaddsub) integral SIMD registers via EmuSIMD helpers, but the provided integral SIMD register type is not supported for this operation.");
 				}
-
 			}
 			else
 			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a fused multiply add/subtract (fmaddsub) of three integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply add/subtract (fmaddsub) integral SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported integral SIMD register for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply add/subtract (fmaddsub) integral SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -1264,29 +2215,30 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_fmsubadd_ps(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				return fmsubadd_f32x4(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_fmsubadd_ps(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				return fmsubadd_f32x8(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _mm512_fmsubadd_ps(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				return fmsubadd_f32x16(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_fmsubadd_pd(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				return fmsubadd_f64x2(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_fmsubadd_pd(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				return fmsubadd_f64x4(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _mm512_fmsubadd_pd(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				return fmsubadd_f64x8(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
 			}
 			else
 			{
@@ -1299,35 +2251,192 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	}
 	template<std::size_t PerElementWidth_, class Register_>
-	[[nodiscard]] inline Register_ _fmsubadd_int(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_add_sub_after_mult_)
+	[[nodiscard]] inline Register_ _fmsubadd_int(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_sub_add_after_mult_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
 			{
-				using mask_generator = _underlying_simd_helpers::_alternating_index_mask<register_type_uq, true, PerElementWidth_>;
-				if constexpr(_underlying_simd_helpers::_is_valid_alternating_index_mask_instance<mask_generator>::value)
+				using namespace EmuSIMD::Funcs;
+				if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 				{
-					register_type_uq out_ = _mul_all_int<PerElementWidth_>(to_mult_lhs_, to_mult_rhs_);
-					register_type_uq mask_ = mask_generator::get();
-					out_ = _sub_int<PerElementWidth_>(out_, _and(mask_, to_add_sub_after_mult_));
-					return _add_int<PerElementWidth_>(out_, _andnot(mask_, to_add_sub_after_mult_));
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return fmsubadd_i8x16(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return fmsubadd_i16x8(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return fmsubadd_i32x4(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return fmsubadd_i64x2(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to fused multiply subtract/add (fmsubadd) generic 128-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+				{
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return fmsubadd_i8x32(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return fmsubadd_i16x16(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return fmsubadd_i32x8(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return fmsubadd_i64x4(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to fused multiply subtract/add (fmsubadd) generic 256-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
+				{
+					if constexpr (PerElementWidth_ == 8)
+					{
+						return fmsubadd_i8x64(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						return fmsubadd_i16x32(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						return fmsubadd_i32x16(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+					}
+					else if constexpr (PerElementWidth_ == 64)
+					{
+						return fmsubadd_i64x8(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Attempted to fused multiply subtract/add (fmsubadd) generic 512-bit integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth is invalid. Valid values are: 8, 16, 32, 64.");
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+				{
+					return fmsubadd_i8x16(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+				{
+					return fmsubadd_i8x32(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+				{
+					return fmsubadd_i8x64(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+				{
+					return fmsubadd_u8x16(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+				{
+					return fmsubadd_u8x32(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+				{
+					return fmsubadd_u8x64(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+				{
+					return fmsubadd_i16x8(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+				{
+					return fmsubadd_i16x16(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+				{
+					return fmsubadd_i16x32(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+				{
+					return fmsubadd_u16x8(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+				{
+					return fmsubadd_u16x16(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+				{
+					return fmsubadd_u16x32(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+				{
+					return fmsubadd_i32x4(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+				{
+					return fmsubadd_i32x8(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+				{
+					return fmsubadd_i32x16(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+				{
+					return fmsubadd_u32x4(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+				{
+					return fmsubadd_u32x8(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+				{
+					return fmsubadd_u32x16(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+				{
+					return fmsubadd_i64x2(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+				{
+					return fmsubadd_i64x4(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+				{
+					return fmsubadd_i64x8(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+				{
+					return fmsubadd_u64x2(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+				{
+					return fmsubadd_u64x4(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+				}
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+				{
+					return fmsubadd_u64x8(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
 				}
 				else
 				{
-					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a fused multiply subtract/add (fmsubadd) of three integral SIMD registers via EmuSIMD helpers, but an alternating mask could not be formed successfully.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply subtract/add (fmsubadd) integral SIMD registers via EmuSIMD helpers, but the provided integral SIMD register type is not supported for this operation.");
 				}
-
 			}
 			else
 			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a fused multiply subtract/add (fmsubadd) of three integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply subtract/add (fmsubadd) integral SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported integral SIMD register for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply subtract/add (fmsubadd) integral SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 #pragma endregion
@@ -1339,29 +2448,30 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_round_ps(register_, RoundingMode_);
+				return round_f32x4<RoundingMode_>(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_round_ps(register_, RoundingMode_);
+				return round_f32x8<RoundingMode_>(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to call a non-specific round function (round) on a EmuSIMD::f32x16 SIMD register via EmuSIMD helpers. These registers are not supported for this operation. Consider the floor, trunc, or ceil operations instead.");
+				return round_f64x8<RoundingMode_>(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_round_pd(register_, RoundingMode_);
+				return round_f64x2<RoundingMode_>(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_round_pd(register_, RoundingMode_);
+				return round_f64x4<RoundingMode_>(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to call a non-specific round function (round) on a EmuSIMD::f64x8 SIMD register via EmuSIMD helpers. These registers are not supported for this operation. Consider the floor, trunc, or ceil operations instead.");
+				return round_f64x8<RoundingMode_>(register_);
 			}
 			else if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<register_type_uq>)
 			{
@@ -1371,12 +2481,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			else
 			{
 				// Potentially requires a round but we don't know how to do it
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to floor a SIMD register via EmuSIMD helpers, but the provided non-integral SIMD register is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to round a SIMD register via EmuSIMD helpers, but the provided non-integral SIMD register is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to floor a SIMD register via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to round a SIMD register via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -1386,29 +2496,30 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_floor_ps(register_);
+				return floor_f32x4(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_floor_ps(register_);
+				return floor_f32x8(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _mm512_floor_ps(register_);
+				return floor_f32x16(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_floor_pd(register_);
+				return floor_f64x2(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_floor_pd(register_);
+				return floor_f64x4(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _mm512_floor_pd(register_);
+				return floor_f64x8(register_);
 			}
 			else if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<register_type_uq>)
 			{
@@ -1433,29 +2544,30 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_ceil_ps(register_);
+				return ceil_f32x4(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_ceil_ps(register_);
+				return ceil_f32x8(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _mm512_ceil_ps(register_);
+				return ceil_f32x16(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_ceil_pd(register_);
+				return ceil_f64x2(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_ceil_pd(register_);
+				return ceil_f64x4(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _mm512_ceil_pd(register_);
+				return ceil_f64x8(register_);
 			}
 			else if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<register_type_uq>)
 			{
@@ -1480,29 +2592,30 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_trunc_ps(register_);
+				return trunc_f32x4(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_trunc_ps(register_);
+				return trunc_f32x8(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _mm512_trunc_ps(register_);
+				return trunc_f32x16(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_trunc_pd(register_);
+				return trunc_f64x2(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_trunc_pd(register_);
+				return trunc_f64x4(register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _mm512_trunc_pd(register_);
+				return trunc_f64x8(register_);
 			}
 			else if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<register_type_uq>)
 			{
@@ -1529,29 +2642,30 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_min_ps(a_, b_);
+				return min_f32x4(a_, b_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_min_ps(a_, b_);
+				return min_f32x8(a_, b_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _mm512_min_ps(a_, b_);
+				return min_f32x16(a_, b_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_min_pd(a_, b_);
+				return min_f64x2(a_, b_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_min_pd(a_, b_);
+				return min_f64x4(a_, b_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _mm512_min_pd(a_, b_);
+				return min_f64x8(a_, b_);
 			}
 			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::i128_generic, EmuSIMD::i256_generic, EmuSIMD::i512_generic>::value)
 			{
@@ -1563,44 +2677,44 @@ namespace EmuSIMD::_underlying_simd_helpers
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm_min_epi8(a_, b_);
+								return min_i8x16(a_, b_);
 							}
 							else
 							{
-								return _mm_min_epu8(a_, b_);
+								return min_u8x16(a_, b_);
 							}
 						}
 						else if constexpr (PerElementWidthIfInt_ == 16)
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm_min_epi16(a_, b_);
+								return min_i16x8(a_, b_);
 							}
 							else
 							{
-								return _mm_min_epu16(a_, b_);
+								return min_u16x8(a_, b_);
 							}
 						}
 						else if constexpr (PerElementWidthIfInt_ == 32)
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm_min_epi32(a_, b_);
+								return min_i32x4(a_, b_);
 							}
 							else
 							{
-								return _mm_min_epu32(a_, b_);
+								return min_u32x4(a_, b_);
 							}
 						}
 						else
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm_min_epi64(a_, b_);
+								return min_i64x2(a_, b_);
 							}
 							else
 							{
-								return _mm_min_epu64(a_, b_);
+								return min_u64x2(a_, b_);
 							}
 						}
 					}
@@ -1610,44 +2724,44 @@ namespace EmuSIMD::_underlying_simd_helpers
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm256_min_epi8(a_, b_);
+								return min_i8x32(a_, b_);
 							}
 							else
 							{
-								return _mm256_min_epu8(a_, b_);
+								return min_u8x32(a_, b_);
 							}
 						}
 						else if constexpr (PerElementWidthIfInt_ == 16)
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm256_min_epi16(a_, b_);
+								return min_i16x16(a_, b_);
 							}
 							else
 							{
-								return _mm256_min_epu16(a_, b_);
+								return min_u16x16(a_, b_);
 							}
 						}
 						else if constexpr (PerElementWidthIfInt_ == 32)
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm256_min_epi32(a_, b_);
+								return min_i32x8(a_, b_);
 							}
 							else
 							{
-								return _mm256_min_epu32(a_, b_);
+								return min_u32x8(a_, b_);
 							}
 						}
 						else
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm256_min_epi64(a_, b_);
+								return min_i64x4(a_, b_);
 							}
 							else
 							{
-								return _mm256_min_epu64(a_, b_);
+								return min_u64x4(a_, b_);
 							}
 						}
 					}
@@ -1657,44 +2771,44 @@ namespace EmuSIMD::_underlying_simd_helpers
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm512_min_epi8(a_, b_);
+								return min_i8x64(a_, b_);
 							}
 							else
 							{
-								return _mm512_min_epu8(a_, b_);
+								return min_u8x64(a_, b_);
 							}
 						}
 						else if constexpr (PerElementWidthIfInt_ == 16)
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm512_min_epi16(a_, b_);
+								return min_i16x32(a_, b_);
 							}
 							else
 							{
-								return _mm512_min_epu16(a_, b_);
+								return min_u16x32(a_, b_);
 							}
 						}
 						else if constexpr (PerElementWidthIfInt_ == 32)
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm512_min_epi32(a_, b_);
+								return min_i32x16(a_, b_);
 							}
 							else
 							{
-								return _mm512_min_epu32(a_, b_);
+								return min_u32x16(a_, b_);
 							}
 						}
 						else
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm512_min_epi64(a_, b_);
+								return min_i64x8(a_, b_);
 							}
 							else
 							{
-								return _mm512_min_epu64(a_, b_);
+								return min_u64x8(a_, b_);
 							}
 						}
 					}
@@ -1703,6 +2817,102 @@ namespace EmuSIMD::_underlying_simd_helpers
 				{
 					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to find the minimum elements in two SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
 				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+			{
+				return min_i8x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+			{
+				return min_i8x32(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+			{
+				return min_i8x64(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+			{
+				return min_u8x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+			{
+				return min_u8x32(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+			{
+				return min_u8x64(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+			{
+				return min_i16x8(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+			{
+				return min_i16x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+			{
+				return min_i16x32(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+			{
+				return min_u16x8(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+			{
+				return min_u16x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+			{
+				return min_u16x32(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+			{
+				return min_i32x4(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+			{
+				return min_i32x8(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+			{
+				return min_i32x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+			{
+				return min_u32x4(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+			{
+				return min_u32x8(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+			{
+				return min_u32x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+			{
+				return min_i64x2(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+			{
+				return min_i64x4(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+			{
+				return min_i64x8(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+			{
+				return min_u64x2(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+			{
+				return min_u64x4(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+			{
+				return min_u64x8(a_, b_);
 			}
 			else
 			{
@@ -1721,29 +2931,30 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_max_ps(a_, b_);
+				return max_f32x4(a_, b_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_max_ps(a_, b_);
+				return max_f32x8(a_, b_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _mm512_max_ps(a_, b_);
+				return max_f32x16(a_, b_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_max_pd(a_, b_);
+				return max_f64x2(a_, b_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_max_pd(a_, b_);
+				return max_f64x4(a_, b_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _mm512_max_pd(a_, b_);
+				return max_f64x8(a_, b_);
 			}
 			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::i128_generic, EmuSIMD::i256_generic, EmuSIMD::i512_generic>::value)
 			{
@@ -1755,44 +2966,44 @@ namespace EmuSIMD::_underlying_simd_helpers
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm_max_epi8(a_, b_);
+								return max_i8x16(a_, b_);
 							}
 							else
 							{
-								return _mm_max_epu8(a_, b_);
+								return max_u8x16(a_, b_);
 							}
 						}
 						else if constexpr (PerElementWidthIfInt_ == 16)
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm_max_epi16(a_, b_);
+								return max_i16x8(a_, b_);
 							}
 							else
 							{
-								return _mm_max_epu16(a_, b_);
+								return max_u16x8(a_, b_);
 							}
 						}
 						else if constexpr (PerElementWidthIfInt_ == 32)
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm_max_epi32(a_, b_);
+								return max_i32x4(a_, b_);
 							}
 							else
 							{
-								return _mm_max_epu32(a_, b_);
+								return max_u32x4(a_, b_);
 							}
 						}
 						else
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm_max_epi64(a_, b_);
+								return max_i64x2(a_, b_);
 							}
 							else
 							{
-								return _mm_max_epu64(a_, b_);
+								return max_u64x2(a_, b_);
 							}
 						}
 					}
@@ -1802,44 +3013,44 @@ namespace EmuSIMD::_underlying_simd_helpers
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm256_max_epi8(a_, b_);
+								return max_i8x32(a_, b_);
 							}
 							else
 							{
-								return _mm256_max_epu8(a_, b_);
+								return max_u8x32(a_, b_);
 							}
 						}
 						else if constexpr (PerElementWidthIfInt_ == 16)
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm256_max_epi16(a_, b_);
+								return max_i16x16(a_, b_);
 							}
 							else
 							{
-								return _mm256_max_epu16(a_, b_);
+								return max_u16x16(a_, b_);
 							}
 						}
 						else if constexpr (PerElementWidthIfInt_ == 32)
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm256_max_epi32(a_, b_);
+								return max_i32x8(a_, b_);
 							}
 							else
 							{
-								return _mm256_max_epu32(a_, b_);
+								return max_u32x8(a_, b_);
 							}
 						}
 						else
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm256_max_epi64(a_, b_);
+								return max_i64x4(a_, b_);
 							}
 							else
 							{
-								return _mm256_max_epu64(a_, b_);
+								return max_u64x4(a_, b_);
 							}
 						}
 					}
@@ -1849,52 +3060,148 @@ namespace EmuSIMD::_underlying_simd_helpers
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm512_max_epi8(a_, b_);
+								return max_i8x64(a_, b_);
 							}
 							else
 							{
-								return _mm512_max_epu8(a_, b_);
+								return max_u8x64(a_, b_);
 							}
 						}
 						else if constexpr (PerElementWidthIfInt_ == 16)
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm512_max_epi16(a_, b_);
+								return max_i16x32(a_, b_);
 							}
 							else
 							{
-								return _mm512_max_epu16(a_, b_);
+								return max_u16x32(a_, b_);
 							}
 						}
 						else if constexpr (PerElementWidthIfInt_ == 32)
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm512_max_epi32(a_, b_);
+								return max_i32x16(a_, b_);
 							}
 							else
 							{
-								return _mm512_max_epu32(a_, b_);
+								return max_u32x16(a_, b_);
 							}
 						}
 						else
 						{
 							if constexpr (SignedIfInt_)
 							{
-								return _mm512_max_epi64(a_, b_);
+								return max_i64x8(a_, b_);
 							}
 							else
 							{
-								return _mm512_max_epu64(a_, b_);
+								return max_u64x8(a_, b_);
 							}
 						}
 					}
 				}
 				else
 				{
-					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to find the maximum elements in two SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to find the minimum elements in two SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
 				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+			{
+				return max_i8x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+			{
+				return max_i8x32(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+			{
+				return max_i8x64(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+			{
+				return max_u8x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+			{
+				return max_u8x32(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+			{
+				return max_u8x64(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+			{
+				return max_i16x8(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+			{
+				return max_i16x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+			{
+				return max_i16x32(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+			{
+				return max_u16x8(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+			{
+				return max_u16x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+			{
+				return max_u16x32(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+			{
+				return max_i32x4(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+			{
+				return max_i32x8(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+			{
+				return max_i32x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+			{
+				return max_u32x4(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+			{
+				return max_u32x8(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+			{
+				return max_u32x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+			{
+				return max_i64x2(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+			{
+				return max_i64x4(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+			{
+				return max_i64x8(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+			{
+				return max_u64x2(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+			{
+				return max_u64x4(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+			{
+				return max_u64x8(a_, b_);
 			}
 			else
 			{
@@ -1904,34 +3211,6 @@ namespace EmuSIMD::_underlying_simd_helpers
 		else
 		{
 			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to find the maximum elements in two SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
-		}
-	}
-
-	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
-	[[nodiscard]] inline Register_ _clamp_min(Register_ register_, Register_ min_)
-	{
-		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
-		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
-		{
-			return _max<PerElementWidthIfInt_, SignedIfInt_>(register_, min_);
-		}
-		else
-		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to clamp the values in a SIMD register to a minimum amount, but the provided Register_ type is not recognised as a supported SIMD register.");
-		}
-	}
-
-	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
-	[[nodiscard]] inline Register_ _clamp_max(Register_ register_, Register_ max_)
-	{
-		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
-		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
-		{
-			return _min<PerElementWidthIfInt_, SignedIfInt_>(register_, max_);
-		}
-		else
-		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to clamp the values in a SIMD register to a maximum amount, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 

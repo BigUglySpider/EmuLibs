@@ -520,11 +520,6 @@ namespace EmuSIMD::Funcs
 		return _mm512_div_ps(lhs_, rhs_);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 addsub_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
-	{
-		return _mm512_fmaddsub_ps(_mm512_set1_ps(1.0f), lhs_, rhs_);
-	}
-
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 fmadd_f32x16(EmuSIMD::f32x16_arg a_, EmuSIMD::f32x16_arg b_, EmuSIMD::f32x16_arg c_)
 	{
 		return _mm512_fmadd_ps(a_, b_, c_);
@@ -550,9 +545,19 @@ namespace EmuSIMD::Funcs
 		return _mm512_fmaddsub_ps(a_, b_, c_);
 	}
 
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 addsub_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
+	{
+		return fmaddsub_f32x16(set1_f32x16(1.0f), lhs_, rhs_);
+	}
+
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 fmsubadd_f32x16(EmuSIMD::f32x16_arg a_, EmuSIMD::f32x16_arg b_, EmuSIMD::f32x16_arg c_)
 	{
 		return _mm512_fmsubadd_ps(a_, b_, c_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 subadd_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
+	{
+		return fmsubadd_f32x16(set1_f32x16(1.0f), lhs_, rhs_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 floor_f32x16(EmuSIMD::f32x16_arg to_floor_)

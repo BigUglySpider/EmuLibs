@@ -529,6 +529,11 @@ namespace EmuSIMD::Funcs
 		return _mm_fmsubadd_pd(a_, b_, c_);
 	}
 
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 subadd_f64x2(EmuSIMD::f64x2_arg lhs_, EmuSIMD::f64x2_arg rhs_)
+	{
+		return fmsubadd_f64x2(set1_f64x2(1.0), lhs_, rhs_);
+	}
+
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 floor_f64x2(EmuSIMD::f64x2_arg to_floor_)
 	{
 		return _mm_floor_pd(to_floor_);
