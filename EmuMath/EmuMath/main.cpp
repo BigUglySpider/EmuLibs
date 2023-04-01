@@ -35,18 +35,28 @@
 constexpr auto test_dot = EmuCore::dot<float>(1, 2, 6, 3, 7, 10);
 constexpr auto test_dot_2 = EmuCore::dot(5, 7);
 
-inline void universal_pause(const std::string& msg = "Press enter to continue...")
+inline void universal_pause(const std::string& msg)
 {
 	std::string dummy;
 	printf("%s", msg.c_str());
 	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-inline void universal_pause(const std::streamsize max_char_count, const std::string& msg = "Press enter to continue...")
+inline void universal_pause(const std::streamsize max_char_count, const std::string& msg)
 {
 	std::string dummy;
 	printf("%s", msg.c_str());
 	std::cin.ignore(max_char_count, '\n');
+}
+
+inline void universal_pause(const std::streamsize max_char_count)
+{
+	universal_pause(max_char_count, "Press Enter to continue...");
+}
+
+inline void universal_pause()
+{
+	universal_pause("Press Enter to continue...");
 }
 
 template<typename T_, std::size_t Size_>
@@ -390,6 +400,26 @@ int main()
 	//}
 	// 
 	//universal_pause();
+
+	{
+		__m128 a = EmuSIMD::setr<__m128, 32>(1, 2, 3, 4);
+		__m128 b = EmuSIMD::setr<__m128, 32>(5, 6, 7, 8);
+		__m128 res_old_ab = EmuSIMD::shuffle<0, 3, 2, 1>(a, b);
+		__m128 res_old_aa = EmuSIMD::shuffle<0, 3, 2, 1>(a, a);
+		__m128 res_new_ab = EmuSIMD::Funcs::shuffle_f32x4<EmuSIMD::Funcs::make_shuffle_mask_32<0, 3, 2, 1>()>(a, b);
+		__m128 res_new_aa = EmuSIMD::Funcs::shuffle_f32x4<EmuSIMD::Funcs::make_shuffle_mask_32<0, 3, 2, 1>()>(a, a);
+
+		std::cout << "Old ab: ";
+		EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, res_old_ab) << "\n";
+		std::cout << "Old aa: ";
+		EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, res_old_aa) << "\n";
+
+		std::cout << "New ab: ";
+		EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, res_new_ab) << "\n";
+		std::cout << "New aa: ";
+		EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, res_new_aa) << "\n";
+		universal_pause();
+	}
 
 	{
 		constexpr auto blend_mask = EmuSIMD::Funcs::make_blend_mask<1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0>();
