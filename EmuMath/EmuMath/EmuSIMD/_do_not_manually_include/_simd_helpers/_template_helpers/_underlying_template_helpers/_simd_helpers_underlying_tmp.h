@@ -316,6 +316,43 @@ namespace EmuSIMD::TMP
 	template<class Register_>
 	static constexpr std::size_t floating_point_register_element_count_v = floating_point_register_element_count<Register_>::value;
 
+	template<class Register_>
+	struct floating_point_register_element_width : EmuCore::TMP::type_check_ignore_ref_cv_base<floating_point_register_element_width, std::integral_constant<std::size_t, 0>, Register_>
+	{
+	};
+	template<>
+	struct floating_point_register_element_width<EmuSIMD::f32x4>
+	{
+		static constexpr std::size_t value = 32;
+	};
+	template<>
+	struct floating_point_register_element_width<EmuSIMD::f32x8>
+	{
+		static constexpr std::size_t value = 32;
+	};
+	template<>
+	struct floating_point_register_element_width<EmuSIMD::f32x16>
+	{
+		static constexpr std::size_t value = 32;
+	};
+	template<>
+	struct floating_point_register_element_width<EmuSIMD::f64x2>
+	{
+		static constexpr std::size_t value = 64;
+	};
+	template<>
+	struct floating_point_register_element_width<EmuSIMD::f64x4>
+	{
+		static constexpr std::size_t value = 64;
+	};
+	template<>
+	struct floating_point_register_element_width<EmuSIMD::f64x8>
+	{
+		static constexpr std::size_t value = 64;
+	};
+	template<class Register_>
+	static constexpr std::size_t floating_point_register_element_width_v = floating_point_register_element_width<Register_>::value;
+
 	template<class Register_, std::size_t PerElementWidthIfInt_ = 32>
 	struct register_element_count
 	{

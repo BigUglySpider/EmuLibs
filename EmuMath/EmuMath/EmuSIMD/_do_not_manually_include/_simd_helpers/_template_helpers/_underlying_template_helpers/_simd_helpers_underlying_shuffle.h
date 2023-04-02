@@ -10,6 +10,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<std::size_t...Indices_, class Register_>
 	[[nodiscard]] inline Register_ _execute_shuffle(Register_ a_, Register_ b_)
 	{
+		// TODO
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<Register_>)
 		{
 			using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -62,15 +63,126 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<std::size_t...Indices_, class Register_>
 	[[nodiscard]] inline Register_ _execute_shuffle(Register_ ab_)
 	{
-		if constexpr (EmuSIMD::TMP::is_simd_register_v<Register_>)
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
-			using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 			if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
 			{
-				return _execute_shuffle<Indices_...>(ab_, ab_);
-			}
+				using namespace EmuSIMD::Funcs;
+				constexpr std::size_t num_register_indices = EmuSIMD::TMP::register_element_count_v<register_type_uq>;
+				constexpr std::size_t per_element_width = EmuSIMD::TMP::floating_point_register_element_width_v<register_type_uq>;
+				static_assert(per_element_width != 0, "Error executing templatised floating-point SIMD shuffle: per_element_width is 0, meaning that the passed register type is unsupported.");
+
+				constexpr std::size_t num_index_args = sizeof...(Indices_);
+				constexpr std::size_t expected_num_index_args = per_element_width == 32 ? 4 : num_register_indices;
+
+				if constexpr (num_index_args == expected_num_index_args)
+				{
+					if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
+					{
+						constexpr auto determined_mask = make_reverse_shuffle_mask_32<Indices_...>();
+						return permute_f32x4<determined_mask>(ab_);
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
+					{
+						constexpr auto determined_mask = make_reverse_shuffle_mask_32<Indices_...>();
+						return permute_f32x8<determined_mask>(ab_);
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
+					{
+						constexpr auto determined_mask = make_reverse_shuffle_mask_32<Indices_...>();
+						return permute_f32x16<determined_mask>(ab_);
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
+					{
+						constexpr auto determined_mask = make_reverse_shuffle_mask_64<Indices_...>();
+						return permute_f64x2<determined_mask>(ab_);
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
+					{
+						constexpr auto determined_mask = make_reverse_shuffle_mask_64<0>();
+						return permute_f64x4<determined_mask>(ab_);
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
+					{
+						constexpr auto determined_mask = make_reverse_shuffle_mask_64<Indices_...>();
+						return permute_f64x8<determined_mask>(ab_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<Register_>(), "Error executing templatised floating-point SIMD shuffle: The passed floating-point register type is not supported for this operation.");
+					}
+				}
+				else if constexpr(num_index_args == 1)
+				{
+					// Support for shuffling all to a single index
+					if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
+					{
+						constexpr auto determined_mask = make_looping_shuffle_mask_32x4<Indices_...>();
+						return permute_f32x4<determined_mask>(ab_);
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
+					{
+						constexpr auto determined_mask = make_looping_shuffle_mask_32x4<Indices_...>();
+						return permute_f32x8<determined_mask>(ab_);
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
+					{
+						constexpr auto determined_mask = make_looping_shuffle_mask_32x4<Indices_...>();
+						return permute_f32x16<determined_mask>(ab_);
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
+					{
+						constexpr auto determined_mask = make_looping_shuffle_mask_64x2<Indices_...>();
+						return permute_f64x2<determined_mask>(ab_);
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
+					{
+						constexpr auto determined_mask = make_looping_shuffle_mask_64x4<0>();
+						return permute_f64x4<determined_mask>(ab_);
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
+					{
+						constexpr auto determined_mask = make_looping_shuffle_mask_64x8<Indices_...>();
+						return permute_f64x8<determined_mask>(ab_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<Register_>(), "Error executing templatised floating-point SIMD shuffle with a single index argument: The passed floating-point register type is not supported for this operation.");
+					}
+				}
+				else if constexpr (num_index_args == 2 && per_element_width == 64)
+				{
+					// Support for formatting 64-bit shuffle masks in the same way as a 32-bit shuffle mask (i.e. same number of index args for any register width)
+					if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
+					{
+						constexpr auto determined_mask = make_reverse_shuffle_mask_64x2<Indices_...>();
+						return permute_f64x2<determined_mask>(ab_);
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
+					{
+						constexpr auto determined_mask = make_reverse_shuffle_mask_64x4<Indices_...>();
+						return permute_f64x4<determined_mask>(ab_);
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
+					{
+						constexpr auto determined_mask = make_reverse_shuffle_mask_64x8<Indices_...>();
+						return permute_f64x8<determined_mask>(ab_);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<Register_>(), "Error executing templatised 64-bit-floating-point SIMD shuffle with two index arguments: The passed 64-bit-floating-point register type is not supported for this operation.");
+					}
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_index_args>(), "Error executing templatised EmuSIMD shuffle: attempted to shuffle a floating-point register with a number of elements not equal to either the number of elements in the register, or 1.");
+				}
+			} // END OF FLOATING-POINT SHUFFLE HANDLING
 			else
 			{
+				// START OF INTEGRAL SHUFFLE HANDLING
+				// --- TODO
 				using shuffle_mask_inst = EmuSIMD::_underlying_simd_helpers::_shuffle_mask<register_type_uq, Indices_...>;
 				if constexpr (EmuSIMD::_underlying_simd_helpers::is_valid_shuffle_mask_instance<shuffle_mask_inst>::value)
 				{
