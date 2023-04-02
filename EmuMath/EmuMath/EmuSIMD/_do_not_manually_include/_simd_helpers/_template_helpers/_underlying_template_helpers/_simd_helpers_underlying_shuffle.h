@@ -213,7 +213,42 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else if constexpr (EmuCore::TMP::is_any_same_v<register_type_uq, EmuSIMD::i8x16, EmuSIMD::u8x16, EmuSIMD::i8x32, EmuSIMD::u8x32, EmuSIMD::i8x64, EmuSIMD::u8x64>)
 				{
-					// TODO
+					if constexpr (num_index_args == 16)
+					{
+						constexpr auto determined_mask = make_reverse_shuffle_mask_8<Indices_...>();
+						if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+						{
+							return permute_i8x16<determined_mask>(ab_);
+						}
+						else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+						{
+							return permute_u8x16<determined_mask>(ab_);
+						}
+						else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+						{
+							return permute_i8x32<determined_mask>(ab_);
+						}
+						else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+						{
+							return permute_u8x32<determined_mask>(ab_);
+						}
+						else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+						{
+							return permute_i8x64<determined_mask>(ab_);
+						}
+						else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+						{
+							return permute_u8x64<determined_mask>(ab_);
+						}
+						else
+						{
+							static_assert(EmuCore::TMP::get_false<Register_>(), "INTERNAL EMUSIMD ERROR: Reached impossible point whilst instantiating template shuffle for an integral register of 8-bit elements.");
+						}
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<num_index_args>(), "Error executing templatised shuffle of an integral SIMD register with 8-bit elements: Invalid number of index arguments. The number of arguments must be equal to the number of elements within a 128-bit lane (16).");
+					}
 				}
 				else if constexpr (EmuCore::TMP::is_any_same_v<register_type_uq, EmuSIMD::i16x8, EmuSIMD::u16x8, EmuSIMD::i16x16, EmuSIMD::u16x16, EmuSIMD::i16x32, EmuSIMD::u16x32>)
 				{

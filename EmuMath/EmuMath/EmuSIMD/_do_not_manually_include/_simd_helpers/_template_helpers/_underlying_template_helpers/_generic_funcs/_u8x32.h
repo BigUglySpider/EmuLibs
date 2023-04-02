@@ -571,6 +571,45 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region SHUFFLES
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 permute_u8x32(EmuSIMD::u8x32_arg a_)
+	{
+		constexpr bool is_reverse_set = false;
+		using target_element_type = unsigned char;
+		constexpr std::size_t argument_width = 4; // Max value of 15 (0b1111), per index
+		constexpr std::size_t num_128_lanes = 2;
+
+		return _mm256_shuffle_epi8
+		(
+			a_,
+			EmuSIMD::Funcs::shuffle_mask_to_vector<ShuffleMask_, is_reverse_set, argument_width, num_128_lanes, target_element_type>
+			(
+				std::make_index_sequence<32>(),
+				[](auto&&...args_) { return set_u8x32(std::forward<decltype(args_)>(args_)...); }
+			)
+		);
+	}
+
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 shuffle_u8x32(EmuSIMD::u8x32_arg a_, EmuSIMD::u8x32_arg b_)
+	{
+		constexpr std::size_t a_permute_mask = duplicate_shuffle_mask_32bit_lane<ShuffleMask_, true>();
+		constexpr std::size_t b_permute_mask = duplicate_shuffle_mask_32bit_lane<ShuffleMask_, false>();
+
+		EmuSIMD::u8x32 a_permuted = permute_u8x32<a_permute_mask>(a_);
+		EmuSIMD::u8x32 b_permuted = permute_u8x32<b_permute_mask>(b_);
+
+		// Use f32x8 reinterpretation to take the lo bits of permuted a and the lo bits of permuted b and combine them into one register, 
+		// where lo(result) = lo(a), hi(result) = lo(b)
+		// --- We take this approach as each permutation has been duplicated across 64-bit lanes within the respective permuted register
+		EmuSIMD::f32x8 tmp_cast = cast_u8x32_f32x8(a_permuted);
+		tmp_cast = movelh_f32x8(tmp_cast, cast_u8x32_f32x8(b_permuted));
+
+		return cast_f32x8_u8x32(tmp_cast);
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 mul_all_u8x32(EmuSIMD::u8x32_arg lhs_, EmuSIMD::u8x32_arg rhs_)
 	{

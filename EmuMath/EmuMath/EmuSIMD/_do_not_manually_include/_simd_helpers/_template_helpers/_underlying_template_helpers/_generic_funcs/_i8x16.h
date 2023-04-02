@@ -543,8 +543,8 @@ namespace EmuSIMD::Funcs
 	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 shuffle_i8x16(EmuSIMD::i8x16_arg a_, EmuSIMD::i8x16_arg b_)
 	{
-		constexpr std::size_t a_permute_mask = duplicate_32bit_shuffle_mask_lane<ShuffleMask_, true>();
-		constexpr std::size_t b_permute_mask = duplicate_32bit_shuffle_mask_lane<ShuffleMask_, false>();
+		constexpr std::size_t a_permute_mask = duplicate_shuffle_mask_32bit_lane<ShuffleMask_, true>();
+		constexpr std::size_t b_permute_mask = duplicate_shuffle_mask_32bit_lane<ShuffleMask_, false>();
 
 		EmuSIMD::i8x16 a_permuted = permute_i8x16<a_permute_mask>(a_);
 		EmuSIMD::i8x16 b_permuted = permute_i8x16<b_permute_mask>(b_);
@@ -553,7 +553,7 @@ namespace EmuSIMD::Funcs
 		// where lo(result) = lo(a), hi(result) = lo(b)
 		// --- We take this approach as each permutation has been duplicated across 64-bit lanes within the respective permuted register
 		EmuSIMD::f32x4 tmp_cast = cast_i8x16_f32x4(a_permuted);
-		tmp_cast = _mm_movelh_ps(tmp_cast, cast_i8x16_f32x4(b_permuted));
+		tmp_cast = movelh_f32x4(tmp_cast, cast_i8x16_f32x4(b_permuted));
 
 		return cast_f32x4_i8x16(tmp_cast);
 	}

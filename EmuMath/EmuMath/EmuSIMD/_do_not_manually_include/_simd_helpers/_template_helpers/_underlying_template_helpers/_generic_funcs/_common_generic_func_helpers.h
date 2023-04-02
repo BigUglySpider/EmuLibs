@@ -53,7 +53,7 @@ namespace EmuSIMD::Funcs
 	/// </summary>
 	/// <returns>The passed ShuffleMask_ with the designated lane duplicated to replace the other lane.</returns>
 	template<shuffle_mask_type ShuffleMask_, bool HiLane_>
-	[[nodiscard]] constexpr inline shuffle_mask_type duplicate_32bit_shuffle_mask_lane()
+	[[nodiscard]] constexpr inline shuffle_mask_type duplicate_shuffle_mask_32bit_lane()
 	{
 		if constexpr (HiLane_)
 		{
