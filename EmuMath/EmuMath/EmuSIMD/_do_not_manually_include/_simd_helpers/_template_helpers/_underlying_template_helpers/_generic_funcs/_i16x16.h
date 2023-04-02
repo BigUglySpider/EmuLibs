@@ -521,6 +521,22 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region SHUFFLES
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 permute_i16x16(EmuSIMD::i16x16_arg a_)
+	{
+		static_assert(EmuCore::TMP::get_false<ShuffleMask_>(), "NO SUPPORT ERROR: EmuSIMD does not provide support for permuting i16x16 (256-bit registers containing 16 16-bit signed integer elements) [permute_i16x16].");
+		return {};
+	}
+
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 shuffle_i16x16(EmuSIMD::i16x16_arg a_, EmuSIMD::i16x16_arg b_)
+	{
+		static_assert(EmuCore::TMP::get_false<ShuffleMask_>(), "NO SUPPORT ERROR: EmuSIMD does not provide support for shuffling i16x16 (256-bit registers containing 16 16-bit signed integer elements) [shuffle_i16x16].");
+		return {};
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 mul_all_i16x16(EmuSIMD::i16x16_arg lhs_, EmuSIMD::i16x16_arg rhs_)
 	{

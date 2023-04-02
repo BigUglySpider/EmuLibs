@@ -437,6 +437,26 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region SHUFFLES
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 permute_u64x4(EmuSIMD::u64x4_arg a_)
+	{
+		return cast_f64x4_u64x4
+		(
+			permute_f64x4<ShuffleMask_>(cast_u64x4_f64x4(a_))
+		);
+	}
+
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 shuffle_u64x4(EmuSIMD::u64x4_arg a_, EmuSIMD::u64x4_arg b_)
+	{
+		return cast_f64x4_u64x4
+		(
+			shuffle_f64x4<ShuffleMask_>(cast_u64x4_f64x4(a_), cast_u64x4_f64x4(b_))
+		);
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 mul_all_u64x4(EmuSIMD::u64x4_arg lhs_, EmuSIMD::u64x4_arg rhs_)
 	{

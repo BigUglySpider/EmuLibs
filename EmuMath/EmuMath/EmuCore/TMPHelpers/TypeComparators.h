@@ -214,7 +214,7 @@ namespace EmuCore::TMP
 		static constexpr bool value = comparison_<ToCompareAgainst_, First_>::value;
 	};
 
-	/// <summary> Boolean indicating if any of the types passed types after ToFind_ are the same type as it. </summary>
+	/// <summary> Boolean indicating if any of the types passed after ToFind_ are the exact same type as ToFind_. </summary>
 	/// <typeparam name="ToFind_">Type to try to find.</typeparam>
 	/// <typeparam name="First_">First type to compare to ToFind_.</typeparam>
 	/// <typeparam name="Others">All types to compare after First_ until true or exhausted.</typeparam>
