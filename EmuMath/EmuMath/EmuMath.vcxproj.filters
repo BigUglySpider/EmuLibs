@@ -236,9 +236,6 @@
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_shuffle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_shuffle_masks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_basic_arithmetic.h">
       <Filter>Header Files</Filter>
     </ClInclude>

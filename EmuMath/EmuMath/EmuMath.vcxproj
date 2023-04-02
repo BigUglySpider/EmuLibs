@@ -467,7 +467,6 @@
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_index_masks.h" />
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_set.h" />
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_shuffle.h" />
-    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_shuffle_masks.h" />
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_stream.h" />
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_get.h" />
     <ClInclude Include="EmuCore\CommonTypes\DeferrableReferenceWrapper.h" />
