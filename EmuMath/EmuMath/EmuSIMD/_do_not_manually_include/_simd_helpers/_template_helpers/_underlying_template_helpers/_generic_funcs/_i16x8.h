@@ -476,14 +476,14 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 permute_i16x8(EmuSIMD::i16x8_arg a_)
 	{
 		static_assert(EmuCore::TMP::get_false<ShuffleMask_>(), "NO SUPPORT ERROR: EmuSIMD does not provide support for permuting i16x8 (128-bit registers containing 8 16-bit signed integer elements) [permute_i16x8].");
-		return {};
+		return EmuSIMD::i16x8{};
 	}
 
 	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 shuffle_i16x8(EmuSIMD::i16x8_arg a_, EmuSIMD::i16x8_arg b_)
 	{
 		static_assert(EmuCore::TMP::get_false<ShuffleMask_>(), "NO SUPPORT ERROR: EmuSIMD does not provide support for shuffling i16x8 (128-bit registers containing 8 16-bit signed integer elements) [shuffle_i16x8].");
-		return {};
+		return EmuSIMD::i16x8{};
 	}
 #pragma endregion
 

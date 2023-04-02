@@ -542,17 +542,17 @@ namespace EmuSIMD::Funcs
 
 #pragma region SHUFFLES
 	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x32 permute_i16x32(EmuSIMD::i16x8_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x32 permute_i16x32(EmuSIMD::i16x32_arg a_)
 	{
 		static_assert(EmuCore::TMP::get_false<ShuffleMask_>(), "NO SUPPORT ERROR: EmuSIMD does not provide support for permuting i16x32 (512-bit registers containing 32 16-bit signed integer elements) [permute_i16x32].");
-		return {};
+		return EmuSIMD::i16x32{};
 	}
 
 	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x32 shuffle_i16x32(EmuSIMD::i16x8_arg a_, EmuSIMD::i16x8_arg b_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x32 shuffle_i16x32(EmuSIMD::i16x32_arg a_, EmuSIMD::i16x32_arg b_)
 	{
 		static_assert(EmuCore::TMP::get_false<ShuffleMask_>(), "NO SUPPORT ERROR: EmuSIMD does not provide support for shuffling i16x32 (512-bit registers containing 32 16-bit signed integer elements) [shuffle_i16x32].");
-		return {};
+		return EmuSIMD::i16x32{};
 	}
 #pragma endregion
 
