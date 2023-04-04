@@ -32,21 +32,21 @@
 #else
 	// Warning macros
 
-	#define EMU_CORE_MSVC_DISABLE_WARNING_FOR_CODE_BLOCK(warning_code, code_block) ;
-	#define EMU_CORE_MSVC_PUSH_WARNING_STACK ;
-	#define EMU_CORE_MSVC_POP_WARNING_STACK ;
-	#define EMU_CORE_MSVC_DISABLE_WARNING(warning_code) ;
+	#define EMU_CORE_MSVC_DISABLE_WARNING_FOR_CODE_BLOCK(warning_code, code_block) 
+	#define EMU_CORE_MSVC_PUSH_WARNING_STACK 
+	#define EMU_CORE_MSVC_POP_WARNING_STACK 
+	#define EMU_CORE_MSVC_DISABLE_WARNING(warning_code) 
 
 	// Generic warning macros
 
-	#define EMU_CORE_PUSH_WARNING_STACK	;
-	#define EMU_CORE_POP_WARNING_STACK ;
-	#define EMU_CORE_DISABLE_WARNING(warning_code) ;
+	#define EMU_CORE_PUSH_WARNING_STACK	
+	#define EMU_CORE_POP_WARNING_STACK 
+	#define EMU_CORE_DISABLE_WARNING(warning_code) 
 
 	// Warnings
 
-	#define EMU_CORE_WARNING_TYPENAME_ONLY ;
-	#define EMU_CORE_WARNING_BAD_MOVE ;
+	#define EMU_CORE_WARNING_TYPENAME_ONLY 
+	#define EMU_CORE_WARNING_BAD_MOVE 
 #endif
 
 #endif
