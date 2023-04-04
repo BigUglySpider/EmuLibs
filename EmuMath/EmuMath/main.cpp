@@ -210,7 +210,7 @@ inline void WriteNoiseTableToPPM
 		}
 		else
 		{
-			EmuMath::Vector<2, std::size_t> resolution_(noise_table_vector_[0].size<0>(), noise_table_vector_.size());
+			EmuMath::Vector<2, std::size_t> resolution_(noise_table_vector_[0].template size<0>(), noise_table_vector_.size());
 			std::cout << "\nOutputting 1D noise image layer from full vector...\n";
 
 			std::ostringstream name_;
