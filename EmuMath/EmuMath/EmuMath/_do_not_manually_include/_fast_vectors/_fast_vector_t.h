@@ -410,6 +410,12 @@ namespace EmuMath
 				);
 			}
 		}
+
+		template<std::size_t Unused_>
+		[[nodiscard]] static constexpr inline bool has_multi_move_constructor()
+		{
+			return Unused_ >= 0 && contains_multiple_registers;
+		}
 #pragma endregion
 
 #pragma region CONSTRUCTORS
@@ -489,7 +495,7 @@ namespace EmuMath
 		/// <summary>
 		/// <para> Private constructor for creating a new instance of this FastVector type with a newly created data_type. Disabled if this Vector has 1 register. </para>
 		/// </summary>
-		template<typename = std::enable_if_t<contains_multiple_registers>>
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<has_multi_move_constructor<Unused_>()>>
 		explicit constexpr inline FastVector(data_type&& data_) noexcept : data(std::move(data_))
 		{
 		}
