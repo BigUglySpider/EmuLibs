@@ -8859,7 +8859,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 				}
 				else if constexpr (is_floating_point)
 				{
-					return this_type(_calculate_angle_cosine_2<OutRads_, fill_vector, AllowLossy_>(a_.data, b_.data)).Convert<OutFP_>();
+					return this_type(_calculate_angle_cosine_2<OutRads_, fill_vector, AllowLossy_>(a_.data, b_.data)).template Convert<OutFP_>();
 				}
 				else if constexpr (out_is_fp)
 				{
@@ -8867,8 +8867,8 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 					(
 						out_vector::template _calculate_angle_cosine_2<OutRads_, fill_vector, AllowLossy_>
 						(
-							a_.Convert<OutFP_>().data,
-							b_.Convert<OutFP_>().data
+							a_.template Convert<OutFP_>().data,
+							b_.template Convert<OutFP_>().data
 						)
 					);
 				}
@@ -8879,8 +8879,8 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 					(
 						fp_vector::template _calculate_angle_cosine_2<OutRads_, fill_vector, AllowLossy_>
 						(
-							a_.Convert<preferred_floating_point>().data,
-							b_.Convert<preferred_floating_point>().data
+							a_.template Convert<preferred_floating_point>().data,
+							b_.template Convert<preferred_floating_point>().data
 						)
 					).template Convert<OutFP_>();
 				}
