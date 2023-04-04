@@ -4231,11 +4231,11 @@ namespace EmuMath
 		{
 			if constexpr (per_element_byte_size <= 4)
 			{
-				return static_cast<Out_>(std::sqrtf(Dot2Scalar<float>(*this)));
+				return static_cast<Out_>(sqrtf(Dot2Scalar<float>(*this)));
 			}
 			else
 			{
-				return static_cast<Out_>(std::sqrt(Dot2Scalar<double>(*this)));
+				return static_cast<Out_>(sqrt(Dot2Scalar<double>(*this)));
 			}
 		}
 
@@ -4273,11 +4273,11 @@ namespace EmuMath
 		{
 			if constexpr (per_element_byte_size <= 4)
 			{
-				return static_cast<Out_>(std::sqrtf(Dot3Scalar<float>(*this)));
+				return static_cast<Out_>(sqrtf(Dot3Scalar<float>(*this)));
 			}
 			else
 			{
-				return static_cast<Out_>(std::sqrt(Dot3Scalar<double>(*this)));
+				return static_cast<Out_>(sqrt(Dot3Scalar<double>(*this)));
 			}
 		}
 
