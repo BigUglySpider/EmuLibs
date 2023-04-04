@@ -15,9 +15,6 @@ namespace EmuMath
 		using value_type = typename std::remove_cv<T_>::type;
 		using this_type = EmuMath::FastQuaternion<T_, RegisterWidth_>;
 
-		using register_type = typename EmuSIMD::TMP::register_type<value_type, register_width>::type;
-		using register_arg_type = typename EmuSIMD::TMP::register_arg_type<value_type, register_width>::type;
-		using shift_register_type = __m128i;
 		/// <summary> Alias to the type of SIMD register used for this Quaternion's data. </summary>
 		using register_type = typename EmuSIMD::TMP::register_type<value_type, register_width>::type;
 		/// <summary> Alias to the argument type used to pass an instance of this Quaternion's register_type. </summary>
