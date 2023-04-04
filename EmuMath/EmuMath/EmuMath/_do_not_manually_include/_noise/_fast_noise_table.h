@@ -193,7 +193,7 @@ namespace EmuMath
 		{
 			if constexpr (Index_ < num_dimensions)
 			{
-				return table_size.at<Index_>();
+				return table_size.template at<Index_>();
 			}
 			else
 			{
@@ -367,19 +367,19 @@ namespace EmuMath
 
 			if constexpr (num_dimensions == 3)
 			{
-				std::size_t end_x_ = table_size.at<0>();
-				std::size_t end_y_ = table_size.at<1>();
-				std::size_t end_z_ = table_size.at<2>();
-				std::size_t end_store_batch_ = table_size.at<major_dimension>();
+				std::size_t end_x_ = table_size.template at<0>();
+				std::size_t end_y_ = table_size.template at<1>();
+				std::size_t end_z_ = table_size.template at<2>();
+				std::size_t end_store_batch_ = table_size.template at<major_dimension>();
 				end_store_batch_ -= end_store_batch_ % num_elements_per_batch;
 
 
-				Register_ points_x_ = EmuSIMD::set1<Register_>(start_.at<0>());
-				Register_ points_y_ = EmuSIMD::set1<Register_>(start_.at<1>());
-				Register_ points_z_ = EmuSIMD::set1<Register_>(start_.at<2>());
-				Register_ step_x_ = EmuSIMD::set1<Register_>(step_.at<0>());
-				Register_ step_y_ = EmuSIMD::set1<Register_>(step_.at<1>());
-				Register_ step_z_ = EmuSIMD::set1<Register_>(step_.at<2>());
+				Register_ points_x_ = EmuSIMD::set1<Register_>(start_.template at<0>());
+				Register_ points_y_ = EmuSIMD::set1<Register_>(start_.template at<1>());
+				Register_ points_z_ = EmuSIMD::set1<Register_>(start_.template at<2>());
+				Register_ step_x_ = EmuSIMD::set1<Register_>(step_.template at<0>());
+				Register_ step_y_ = EmuSIMD::set1<Register_>(step_.template at<1>());
+				Register_ step_z_ = EmuSIMD::set1<Register_>(step_.template at<2>());
 
 				if constexpr (major_dimension == 0)
 				{
@@ -468,16 +468,16 @@ namespace EmuMath
 			}
 			else if constexpr (num_dimensions == 2)
 			{
-				std::size_t end_x_ = table_size.at<0>();
-				std::size_t end_y_ = table_size.at<1>();
-				std::size_t end_store_batch_ = table_size.at<major_dimension>();
+				std::size_t end_x_ = table_size.template at<0>();
+				std::size_t end_y_ = table_size.template at<1>();
+				std::size_t end_store_batch_ = table_size.template at<major_dimension>();
 				end_store_batch_ -= end_store_batch_ % num_elements_per_batch;
 
 
-				Register_ points_x_ = EmuSIMD::set1<Register_>(start_.at<0>());
-				Register_ points_y_ = EmuSIMD::set1<Register_>(start_.at<1>());
-				Register_ step_x_ = EmuSIMD::set1<Register_>(step_.at<0>());
-				Register_ step_y_ = EmuSIMD::set1<Register_>(step_.at<1>());
+				Register_ points_x_ = EmuSIMD::set1<Register_>(start_.template at<0>());
+				Register_ points_y_ = EmuSIMD::set1<Register_>(start_.template at<1>());
+				Register_ step_x_ = EmuSIMD::set1<Register_>(step_.template at<0>());
+				Register_ step_y_ = EmuSIMD::set1<Register_>(step_.template at<1>());
 
 				if constexpr (major_dimension == 0)
 				{
@@ -518,13 +518,13 @@ namespace EmuMath
 			}
 			else if constexpr (num_dimensions == 1)
 			{
-				std::size_t end_ = table_size.at<0>();
-				std::size_t end_store_batch_ = table_size.at<0>();
+				std::size_t end_ = table_size.template at<0>();
+				std::size_t end_store_batch_ = table_size.template at<0>();
 				end_store_batch_ -= end_store_batch_ % num_elements_per_batch;
 
 
-				Register_ points_simd_ = EmuSIMD::set1<Register_>(start_.at<0>());
-				Register_ step_simd_ = EmuSIMD::set1<Register_>(step_.at<0>());
+				Register_ points_simd_ = EmuSIMD::set1<Register_>(start_.template at<0>());
+				Register_ step_simd_ = EmuSIMD::set1<Register_>(step_.template at<0>());
 				points_simd_ = EmuSIMD::add(points_simd_, EmuSIMD::mul_all(step_simd_, EmuSIMD::setr_incrementing<Register_, 0>()));
 				step_simd_ = EmuSIMD::mul_all(step_simd_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
 
@@ -557,7 +557,7 @@ namespace EmuMath
 				if constexpr (num_dimensions == 1)
 				{
 					// simple resize for 1 dimension.
-					samples.resize(new_size_.at<0>());
+					samples.resize(new_size_.template at<0>());
 				}
 				else if constexpr (num_dimensions == 2)
 				{
@@ -567,11 +567,11 @@ namespace EmuMath
 					// Simple resize for 2-dimensions, since major_dimension differences are a simple swap
 					if constexpr (major_dimension == 0)
 					{
-						samples.resize(new_size_.at<1>(), layer_0_type(new_size_.at<0>()));
+						samples.resize(new_size_.template at<1>(), layer_0_type(new_size_.template at<0>()));
 					}
 					else
 					{
-						samples.resize(new_size_.at<0>(), layer_0_type(new_size_.at<1>()));
+						samples.resize(new_size_.template at<0>(), layer_0_type(new_size_.template at<1>()));
 					}
 				}
 				else if constexpr (num_dimensions == 3)
@@ -587,11 +587,11 @@ namespace EmuMath
 					{
 						samples.resize
 						(
-							new_size_.at<1>(),
+							new_size_.template at<1>(),
 							layer_0_type
 							(
-								new_size_.at<2>(),
-								layer_1_type(new_size_.at<0>())
+								new_size_.template at<2>(),
+								layer_1_type(new_size_.template at<0>())
 							)
 						);
 					}
@@ -599,11 +599,11 @@ namespace EmuMath
 					{
 						samples.resize
 						(
-							new_size_.at<0>(),
+							new_size_.template at<0>(),
 							layer_0_type
 							(
-								new_size_.at<2>(),
-								layer_1_type(new_size_.at<1>())
+								new_size_.template at<2>(),
+								layer_1_type(new_size_.template at<1>())
 							)
 						);
 					}
@@ -611,11 +611,11 @@ namespace EmuMath
 					{
 						samples.resize
 						(
-							new_size_.at<0>(),
+							new_size_.template at<0>(),
 							layer_0_type
 							(
-								new_size_.at<1>(),
-								layer_1_type(new_size_.at<2>())
+								new_size_.template at<1>(),
+								layer_1_type(new_size_.template at<2>())
 							)
 						);
 					}
@@ -633,19 +633,19 @@ namespace EmuMath
 			if constexpr (NumDimensions_ == 1)
 			{
 				// Only 1 dimension, so only 1 major.
-				return samples[coords_.at<0>()];
+				return samples[coords_.template at<0>()];
 			}
 			else if constexpr (NumDimensions_ == 2)
 			{
 				if constexpr (MajorDimensionIndex_ == 0)
 				{
 					// X coords stored contiguously per row
-					return samples[coords_.at<1>()][coords_.at<0>()];
+					return samples[coords_.template at<1>()][coords_.template at<0>()];
 				}
 				else
 				{
 					// Y coords stored contiguously per column
-					return samples[coords_.at<0>()][coords_.at<1>()];
+					return samples[coords_.template at<0>()][coords_.template at<1>()];
 				}
 			}
 			else if constexpr (NumDimensions_ == 3)
@@ -653,15 +653,15 @@ namespace EmuMath
 				// We store in alphabetical order before the major (i.e. X-major will be stored YZX, Y-major stored XZY, Z-major stored XYZ)
 				if constexpr (MajorDimensionIndex_ == 0)
 				{
-					return samples[coords_.at<1>()][coords_.at<2>()][coords_.at<0>()];
+					return samples[coords_.template at<1>()][coords_.template at<2>()][coords_.template at<0>()];
 				}
 				else if constexpr (MajorDimensionIndex_ == 1)
 				{
-					return samples[coords_.at<0>()][coords_.at<2>()][coords_.at<1>()];
+					return samples[coords_.template at<0>()][coords_.template at<2>()][coords_.template at<1>()];
 				}
 				else
 				{
-					return samples[coords_.at<0>()][coords_.at<1>()][coords_.at<2>()];
+					return samples[coords_.template at<0>()][coords_.template at<1>()][coords_.template at<2>()];
 				}
 			}
 			else

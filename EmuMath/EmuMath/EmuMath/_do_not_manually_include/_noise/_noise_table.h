@@ -132,15 +132,15 @@ namespace EmuMath
 		{
 			if constexpr (num_dimensions == 1)
 			{
-				return at(indices_.at<0>());
+				return at(indices_.template at<0>());
 			}
 			else if constexpr (num_dimensions == 2)
 			{
-				return at(indices_.at<0>(), EmuMath::Helpers::vector_get_theoretical<1>(indices_));
+				return at(indices_.template at<0>(), EmuMath::Helpers::vector_get_theoretical<1>(indices_));
 			}
 			else if constexpr (num_dimensions == 3)
 			{
-				return at(indices_.at<0>(), EmuMath::Helpers::vector_get_theoretical<1>(indices_), EmuMath::Helpers::vector_get_theoretical<2>(indices_));
+				return at(indices_.template at<0>(), EmuMath::Helpers::vector_get_theoretical<1>(indices_), EmuMath::Helpers::vector_get_theoretical<2>(indices_));
 			}
 			else
 			{
@@ -326,7 +326,7 @@ namespace EmuMath
 		{
 			if constexpr (num_dimensions == 1)
 			{
-				std::size_t size_x_ = table_size.at<0>();
+				std::size_t size_x_ = table_size.template at<0>();
 				if (size_x_ != 0)
 				{
 					_stream_append_open_brace_with_space<IsWide_>(str_);
@@ -345,8 +345,8 @@ namespace EmuMath
 			}
 			else if constexpr (num_dimensions == 2)
 			{
-				std::size_t size_x_ = table_size.at<0>();
-				std::size_t size_y_ = table_size.at<1>();
+				std::size_t size_x_ = table_size.template at<0>();
+				std::size_t size_y_ = table_size.template at<1>();
 				if (size_x_ != 0 && size_y_ != 0)
 				{
 					for (std::size_t y = 0; y < size_y_; ++y)
@@ -372,9 +372,9 @@ namespace EmuMath
 			}
 			else if constexpr (num_dimensions == 3)
 			{
-				std::size_t size_x_ = table_size.at<0>();
-				std::size_t size_y_ = table_size.at<1>();
-				std::size_t size_z_ = table_size.at<2>();
+				std::size_t size_x_ = table_size.template at<0>();
+				std::size_t size_y_ = table_size.template at<1>();
+				std::size_t size_z_ = table_size.template at<2>();
 				if (size_x_ != 0 && size_y_ != 0 && size_z_ != 0)
 				{
 					for (std::size_t z = 0; z < size_z_; ++z)
@@ -427,7 +427,7 @@ namespace EmuMath
 		{
 			if constexpr (Layer_ < num_dimensions)
 			{
-				return table_size.at<Layer_>();
+				return table_size.template at<Layer_>();
 			}
 			else
 			{
@@ -457,13 +457,13 @@ namespace EmuMath
 			table_data.shrink_to_fit();
 			if constexpr (num_dimensions >= 2)
 			{
-				for (std::size_t x = 0, end_x_ = table_size.at<0>(); x < end_x_; ++x)
+				for (std::size_t x = 0, end_x_ = table_size.template at<0>(); x < end_x_; ++x)
 				{
 					auto& layer_x_ = table_data[x];
 					layer_x_.shrink_to_fit();
 					if constexpr (num_dimensions >= 3)
 					{
-						for (std::size_t y = 0, end_y_ = table_data.at<1>(); y < end_y_; ++y)
+						for (std::size_t y = 0, end_y_ = table_size.template at<1>(); y < end_y_; ++y)
 						{
 							auto& layer_y_ = layer_x_[y];
 							layer_y_.shrink_to_fit();
@@ -608,25 +608,25 @@ namespace EmuMath
 			{
 				if constexpr (num_dimensions == 1)
 				{
-					table_data.resize(res_.at<0>(), value_type());
+					table_data.resize(res_.template at<0>(), value_type());
 				}
 				else if constexpr (num_dimensions == 2)
 				{
 					table_data.resize
 					(
-						res_.at<0>(),
-						EmuMath::TMP::noise_table_internal_layer<value_type>(res_.at<1>(), value_type())
+						res_.template at<0>(),
+						EmuMath::TMP::noise_table_internal_layer<value_type>(res_.template at<1>(), value_type())
 					);
 				}
 				else if constexpr (num_dimensions == 3)
 				{
 					table_data.resize
 					(
-						res_.at<0>(),
+						res_.template at<0>(),
 						EmuMath::TMP::noise_table_internal_layer<EmuMath::TMP::noise_table_internal_layer<value_type>>
 						(
-							res_.at<1>(),
-							EmuMath::TMP::noise_table_internal_layer<value_type>(res_.at<2>(), value_type())
+							res_.template at<1>(),
+							EmuMath::TMP::noise_table_internal_layer<value_type>(res_.template at<2>(), value_type())
 						)
 					);
 				}
@@ -649,7 +649,7 @@ namespace EmuMath
 				for (std::size_t x_ = 0, end_x_ = table_data.size(); x_ < end_x_; ++x_)
 				{
 					table_data[x_] = sample_processor_(generator_(point_));
-					point_.at<0>() += step_.at<0>();
+					point_.template at<0>() += step_.template at<0>();
 				}
 			}
 			else if constexpr (num_dimensions == 2)
@@ -657,33 +657,33 @@ namespace EmuMath
 				for (std::size_t x_ = 0, end_x_ = table_data.size(); x_ < end_x_; ++x_)
 				{
 					auto& layer_x_ = table_data[x_];
-					point_.at<1>() = start_.at<1>();
+					point_.template at<1>() = start_.template at<1>();
 					for (std::size_t y_ = 0, end_y_ = layer_x_.size(); y_ < end_y_; ++y_)
 					{
 						layer_x_[y_] = sample_processor_(generator_(point_));
-						point_.at<1>() += step_.at<1>();
+						point_.template at<1>() += step_.template at<1>();
 					}
-					point_.at<0>() += step_.at<0>();
+					point_.template at<0>() += step_.template at<0>();
 				}
 			}
 			else if constexpr (num_dimensions == 3)
 			{
-				for (std::size_t x_ = 0, end_x_ = table_size.at<0>(); x_ < end_x_; ++x_)
+				for (std::size_t x_ = 0, end_x_ = table_size.template at<0>(); x_ < end_x_; ++x_)
 				{
 					auto& layer_x_ = table_data[x_];
-					point_.at<1>() = start_.at<1>();
-					for (std::size_t y_ = 0, end_y_ = table_size.at<1>(); y_ < end_y_; ++y_)
+					point_.template at<1>() = start_.template at<1>();
+					for (std::size_t y_ = 0, end_y_ = table_size.template at<1>(); y_ < end_y_; ++y_)
 					{
 						auto& layer_y_ = layer_x_[y_];
-						point_.at<2>() = start_.at<2>();
-						for (std::size_t z_ = 0, end_z_ = table_size.at<2>(); z_ < end_z_; ++z_)
+						point_.template at<2>() = start_.template at<2>();
+						for (std::size_t z_ = 0, end_z_ = table_size.template at<2>(); z_ < end_z_; ++z_)
 						{
 							layer_y_[z_] = sample_processor_(generator_(point_));
-							point_.at<2>() += step_.at<2>();
+							point_.template at<2>() += step_.template at<2>();
 						}
-						point_.at<1>() += step_.at<1>();
+						point_.template at<1>() += step_.template at<1>();
 					}
-					point_.at<0>() += step_.at<0>();
+					point_.template at<0>() += step_.template at<0>();
 				}
 			}
 			else
