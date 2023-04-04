@@ -3306,7 +3306,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool operator>(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() > rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() > rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool operator>(value_type rhs_magnitude_) const
@@ -3321,7 +3321,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool operator<(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() < rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() < rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool operator<(value_type rhs_magnitude_) const
@@ -3336,7 +3336,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool operator>=(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() >= rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() >= rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool operator>=(value_type rhs_magnitude_) const
@@ -3351,7 +3351,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool operator<=(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() <= rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() <= rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool operator<=(value_type rhs_magnitude_) const
@@ -4432,7 +4432,7 @@ namespace EmuMath
 		template<typename Out_ = value_type>
 		[[nodiscard]] constexpr inline Out_ DistanceScalar(const this_type& target_) const
 		{
-			return target_.Subtract(*this).MagnitudeScalar<Out_>();
+			return target_.Subtract(*this).template MagnitudeScalar<Out_>();
 		}
 
 		/// <summary>
@@ -4476,7 +4476,7 @@ namespace EmuMath
 		template<typename Out_ = value_type>
 		[[nodiscard]] constexpr inline Out_ SquareDistanceScalar(const this_type& target_) const
 		{
-			return target_.Subtract(*this).SquareMagnitudeScalar<Out_>();
+			return target_.Subtract(*this).template SquareMagnitudeScalar<Out_>();
 		}
 
 		/// <summary>
@@ -5779,7 +5779,7 @@ namespace EmuMath
 				using calc_value_type = typename std::conditional<out_vector::is_floating_point, OutFP_, preferred_floating_point>::type;
 				using calc_vector_type = EmuMath::FastVector<Size_, calc_value_type, RegisterWidth_>;
 				calc_vector_type plane_normal = _calculate_normal_to_plane_3<calc_value_type>(plane_point_a_, plane_point_b_, plane_point_c_);
-				return calc_vector_type::_calculate_projection_to_plane<3, OutFP_>(this->Convert<calc_value_type>(), plane_normal);
+				return calc_vector_type::template _calculate_projection_to_plane<3, OutFP_>(this->Convert<calc_value_type>(), plane_normal);
 			}
 		}
 
@@ -6954,7 +6954,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool CmpGreater(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() > rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() > rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool CmpGreater(value_type rhs_magnitude_) const
@@ -6969,7 +6969,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool CmpLess(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() < rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() < rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool CmpLess(value_type rhs_magnitude_) const
@@ -6984,7 +6984,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool CmpGreaterEqual(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() >= rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() >= rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool CmpGreaterEqual(value_type rhs_magnitude_) const
@@ -6999,7 +6999,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool CmpLessEqual(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() <= rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() <= rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool CmpLessEqual(value_type rhs_magnitude_) const
