@@ -2,6 +2,7 @@
 #define EMU_MATH_FAST_MATRIX_UNDERLYING_BASIC_ARITHMETIC_H_INC_ 1
 
 #include "_fast_matrix_tmp.h"
+#include "_fast_matrix_underlying_get.h"
 
 namespace EmuMath::Helpers::_fast_matrix_underlying
 {
