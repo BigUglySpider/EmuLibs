@@ -442,7 +442,7 @@ namespace EmuSIMD::Funcs
 		return _mm_shuffle_epi8
 		(
 			mask_16bit_elements_,
-			_mm_setr_epi8(0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14)
+			_mm_set_epi8(14, 14, 12, 12, 10, 10, 8, 8, 6, 6, 4, 4, 2, 2, 0, 0)
 		);
 	}
 
@@ -451,7 +451,7 @@ namespace EmuSIMD::Funcs
 		return _mm256_shuffle_epi8
 		(
 			mask_16bit_elements_,
-			_mm256_setr_epi8(0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 22, 22, 24, 24, 26, 26, 28, 28, 30, 30)
+			_mm256_set_epi8(30, 30, 28, 28, 26, 26, 24, 24, 22, 22, 20, 20, 18, 18, 16, 16, 14, 14, 12, 12, 10, 10, 8, 8, 6, 6, 4, 4, 2, 2, 0, 0)
 		);
 	}
 
@@ -460,72 +460,10 @@ namespace EmuSIMD::Funcs
 		return _mm512_shuffle_epi8
 		(
 			mask_16bit_elements_,
-			_mm512_setr_epi8
+			_mm512_set_epi8
 			(
-				0,  0,  2,  2,  4,  4,  6,  6,  8,  8,  10, 10, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 22, 22, 24, 24, 26, 26, 28, 28, 30, 30,
-				32, 32, 34, 34, 36, 36, 38, 38, 40, 40, 42, 42, 44, 44, 46, 46, 48, 48, 50, 50, 52, 52, 54, 54, 56, 56, 58, 58, 60, 60, 62, 62
-			)
-		);
-	}
-
-	[[nodiscard]] inline EmuSIMD::i8x16 blend_mask_vector_32_to_8(EmuSIMD::i32x4_arg mask_16bit_elements_)
-	{
-		return _mm_shuffle_epi8
-		(
-			mask_16bit_elements_,
-			_mm_setr_epi8(0, 0, 0, 0, 4, 4, 4, 4, 8, 8, 8, 8, 12, 12, 12, 12)
-		);
-	}
-
-	[[nodiscard]] inline EmuSIMD::i8x32 blend_mask_vector_32_to_8(EmuSIMD::i32x8_arg mask_16bit_elements_)
-	{
-		return _mm256_shuffle_epi8
-		(
-			mask_16bit_elements_,
-			_mm256_setr_epi8(0, 0, 0, 0, 4, 4, 4, 4, 8, 8, 8, 8, 12, 12, 12, 12, 16, 16, 16, 16, 20, 20, 20, 20, 24, 24, 24, 24, 28, 28, 28, 28)
-		);
-	}
-
-	[[nodiscard]] inline EmuSIMD::i8x64 blend_mask_vector_32_to_8(EmuSIMD::i32x16_arg mask_16bit_elements_)
-	{
-		return _mm512_shuffle_epi8
-		(
-			mask_16bit_elements_,
-			_mm512_setr_epi8
-			(
-				0,  0,  0,  0,  4,  4,  4,  4,  8,  8,  8,  8,  12, 12, 12, 12, 16, 16, 16, 16, 20, 20, 20, 20, 24, 24, 24, 24, 28, 28, 28, 28,
-				32, 32, 32, 32, 36, 36, 36, 36, 40, 40, 40, 40, 44, 44, 44, 44, 48, 48, 48, 48, 52, 52, 52, 52, 56, 56, 56, 56, 60, 60, 60, 60
-			)
-		);
-	}
-
-	[[nodiscard]] inline EmuSIMD::i8x16 blend_mask_vector_64_to_8(EmuSIMD::i64x2_arg mask_16bit_elements_)
-	{
-		return _mm_shuffle_epi8
-		(
-			mask_16bit_elements_,
-			_mm_setr_epi8(0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8)
-		);
-	}
-
-	[[nodiscard]] inline EmuSIMD::i8x32 blend_mask_vector_64_to_8(EmuSIMD::i64x4_arg mask_16bit_elements_)
-	{
-		return _mm256_shuffle_epi8
-		(
-			mask_16bit_elements_,
-			_mm256_setr_epi8(0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 16, 16, 16, 16, 16, 16, 24, 24, 24, 24, 24, 24, 24, 24)
-		);
-	}
-
-	[[nodiscard]] inline EmuSIMD::i8x64 blend_mask_vector_64_to_8(EmuSIMD::i64x8_arg mask_16bit_elements_)
-	{
-		return _mm512_shuffle_epi8
-		(
-			mask_16bit_elements_,
-			_mm512_setr_epi8
-			(
-				0,  0,  0,  0,  0,  0,  0,  0,  8,  8,  8,  8,  8,  8,  8,  8,  16, 16, 16, 16, 16, 16, 16, 16, 24, 24, 24, 24, 24, 24, 24, 24,
-				32, 32, 32, 32, 32, 32, 32, 32, 40, 40, 40, 40, 40, 40, 40, 40, 48, 48, 48, 48, 48, 48, 48, 48, 56, 56, 56, 56, 56, 56, 56, 56
+				62, 62, 60, 60, 58, 58, 56, 56, 54, 54, 52, 52, 50, 50, 48, 48, 46, 46, 44, 44, 42, 42, 40, 40, 38, 38, 36, 36, 34, 34, 32, 32,
+				30, 30, 28, 28, 26, 26, 24, 24, 22, 22, 20, 20, 18, 18, 16, 16, 14, 14, 12, 12, 10, 10, 8,  8,  6,  6,  4,  4,  2,  2,  0,  0
 			)
 		);
 	}
