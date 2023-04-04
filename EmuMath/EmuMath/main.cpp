@@ -119,7 +119,7 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::str
 				for (std::size_t x = 0; x < resolution_.at<0>(); ++x)
 				{
 					// Clamp is merely to cancel out fp-rounding errors
-					EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.at(x, y, z)).Clamp(0.0f, 255.0f));
+					EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.template at(x, y, z)).Clamp(0.0f, 255.0f));
 					out_ppm_ << (char)colour_byte_.at<0>() << (char)colour_byte_.at<1>() << (char)colour_byte_.at<2>();
 				}
 			}
@@ -134,14 +134,14 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::str
 		std::ostringstream name_;
 		name_ << "./2d_test_noise_.ppm";
 		std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
-		out_ppm_ << "P6" << std::endl << noise_table_.size<0>() << ' ' << noise_table_.size<1>() << std::endl << "255" << std::endl;
+		out_ppm_ << "P6" << std::endl << noise_table_.template size<0>() << ' ' << noise_table_.template size<1>() << std::endl << "255" << std::endl;
 
-		for (std::size_t y = 0, end_y = noise_table_.size<1>(); y < end_y; ++y)
+		for (std::size_t y = 0, end_y = noise_table_.template size<1>(); y < end_y; ++y)
 		{
-			for (std::size_t x = 0, end_x = noise_table_.size<0>(); x < end_x; ++x)
+			for (std::size_t x = 0, end_x = noise_table_.template size<0>(); x < end_x; ++x)
 			{
 				// Clamp is merely to cancel out fp-rounding errors
-				EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.at(x, y)).Clamp(0.0f, 255.0f));
+				EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.template at(x, y)).Clamp(0.0f, 255.0f));
 				out_ppm_ << (char)colour_byte_.at<0>() << (char)colour_byte_.at<1>() << (char)colour_byte_.at<2>();
 			}
 		}
@@ -178,7 +178,7 @@ inline void WriteNoiseTableToPPM
 				{
 					for (std::size_t x = 0; x < resolution_.at<0>(); ++x)
 					{
-						EmuMath::ColourRGB<std::uint8_t> colour_byte_ = gradient_.GetColour<std::uint8_t>(noise_table_.at(x, y, z));
+						EmuMath::ColourRGB<std::uint8_t> colour_byte_ = gradient_.template GetColour<std::uint8_t>(noise_table_.template at(x, y, z));
 						out_ppm_ << (char)colour_byte_.R() << (char)colour_byte_.G() << (char)colour_byte_.B();
 					}
 				}
@@ -201,7 +201,7 @@ inline void WriteNoiseTableToPPM
 			{
 				for (std::size_t x = 0; x < resolution_.at<0>(); ++x)
 				{
-					EmuMath::ColourRGB<std::uint8_t> colour_byte_ = gradient_.GetColour<std::uint8_t>(noise_table_.at(x, y));
+					EmuMath::ColourRGB<std::uint8_t> colour_byte_ = gradient_.template GetColour<std::uint8_t>(noise_table_.template at(x, y));
 					out_ppm_ << (char)colour_byte_.R() << (char)colour_byte_.G() << (char)colour_byte_.B();
 				}
 			}
@@ -223,7 +223,7 @@ inline void WriteNoiseTableToPPM
 				auto& noise_table_ = noise_table_vector_[y];
 				for (std::size_t x = 0; x < resolution_.at<0>(); ++x)
 				{
-					EmuMath::ColourRGB<std::uint8_t> colour_byte_ = gradient_.GetColour<std::uint8_t>(noise_table_.at(x));
+					EmuMath::ColourRGB<std::uint8_t> colour_byte_ = gradient_.template GetColour<std::uint8_t>(noise_table_.template at(x));
 					out_ppm_ << (char)colour_byte_.R() << (char)colour_byte_.G() << (char)colour_byte_.B();
 				}
 			}
