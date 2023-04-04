@@ -871,14 +871,14 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline auto ImaginaryVector()
 			-> std::enable_if_t<valid_out_imaginary_vector_typearg<OutT_, false>(), EmuMath::Vector<3, OutT_>>
 		{
-			return EmuMath::Vector<3, OutT_>(data.at<0>(), data.at<1>(), data.at<2>());
+			return EmuMath::Vector<3, OutT_>(data.template at<0>(), data.template at<1>(), data.template at<2>());
 		}
 
 		template<typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline auto ImaginaryVector() const
 			-> std::enable_if_t<valid_out_imaginary_vector_typearg<OutT_, true>(), EmuMath::Vector<3, OutT_>>
 		{
-			return EmuMath::Vector<3, OutT_>(data.at<0>(), data.at<1>(), data.at<2>());
+			return EmuMath::Vector<3, OutT_>(data.template at<0>(), data.template at<1>(), data.template at<2>());
 		}
 
 		/// <summary>
@@ -887,12 +887,12 @@ namespace EmuMath
 		/// <returns> Reference to this Quaternion's X component. </returns>
 		[[nodiscard]] constexpr inline value_type& X()
 		{
-			return data.at<0>();
+			return data.template at<0>();
 		}
 
 		[[nodiscard]] constexpr inline const value_type& X() const
 		{
-			return data.at<0>();
+			return data.template at<0>();
 		}
 
 		/// <summary>
@@ -901,12 +901,12 @@ namespace EmuMath
 		/// <returns> Reference to this Quaternion's Y component. </returns>
 		[[nodiscard]] constexpr inline value_type& Y()
 		{
-			return data.at<1>();
+			return data.template at<1>();
 		}
 
 		[[nodiscard]] constexpr inline const value_type& Y() const
 		{
-			return data.at<1>();
+			return data.template at<1>();
 		}
 
 		/// <summary>
@@ -915,12 +915,12 @@ namespace EmuMath
 		/// <returns> Reference to this Quaternion's Z component. </returns>
 		[[nodiscard]] constexpr inline value_type& Z()
 		{
-			return data.at<2>();
+			return data.template at<2>();
 		}
 
 		[[nodiscard]] constexpr inline const value_type& Z() const
 		{
-			return data.at<2>();
+			return data.template at<2>();
 		}
 
 		/// <summary>
@@ -929,12 +929,12 @@ namespace EmuMath
 		/// <returns> Reference to this Quaternion's W component. </returns>
 		[[nodiscard]] constexpr inline value_type& W()
 		{
-			return data.at<3>();
+			return data.template at<3>();
 		}
 
 		[[nodiscard]] constexpr inline const value_type& W() const
 		{
-			return data.at<3>();
+			return data.template at<3>();
 		}
 
 		[[nodiscard]] constexpr inline stored_type* DataPointer() noexcept
