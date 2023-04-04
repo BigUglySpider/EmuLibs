@@ -8168,7 +8168,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 
 		template<bool NormaliseAll_, class Vector_>
-		[[nodiscard]] static constexpr inline typename Vector_ _calculate_norm_2(const Vector_& vec_)
+		[[nodiscard]] static constexpr inline Vector_ _calculate_norm_2(const Vector_& vec_)
 		{
 			using vec_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
 			using vec_register_type = typename vec_uq::register_type;
@@ -8187,7 +8187,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 
 		template<bool NormaliseAll_, class Vector_>
-		[[nodiscard]] static constexpr inline typename Vector_ _calculate_norm_3(const Vector_& vec_)
+		[[nodiscard]] static constexpr inline Vector_ _calculate_norm_3(const Vector_& vec_)
 		{
 			using vec_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
 			using vec_register_type = typename vec_uq::register_type;
