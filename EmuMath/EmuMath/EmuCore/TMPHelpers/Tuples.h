@@ -37,27 +37,30 @@ namespace EmuCore::TMP
 	struct tuple_n
 	{
 	private:
-		template<std::size_t N__>
-		struct create_tuple_n
+		[[nodiscard]] static constexpr inline auto _type_finder()
 		{
-			using left = typename create_tuple_n<N__ / 2>::type;
-			using right = typename create_tuple_n<N__ / 2 + N__ % 2>::type;
-			using type = typename join_tuples<left, right>::type;
-		};
-		template<>
-		struct create_tuple_n<0>
-		{
-			using type = std::tuple<>;
-		};
-		template<>
-		struct create_tuple_n<1>
-		{
-			using type = std::tuple<T_>;
-		};
+			if constexpr (N_ == 0)
+			{
+				return std::tuple<>();
+			}
+			else if constexpr (N_ == 1)
+			{
+				return std::tuple<T_>();
+			}
+			else
+			{
+				constexpr std::size_t half_n = N_ / 2;
+				using left = typename tuple_n<half_n, T_>::type;
+				using right = typename tuple_n<half_n + N_ % 2, T_>::type;
+				return typename join_tuples<left, right>::type();
+			}
+		}
 
 	public:
-		using type = typename create_tuple_n<N_>::type;
+		using type = decltype(_type_finder());
 	};
+	template<std::size_t N_, typename T_>
+	using tuple_n_t = typename tuple_n<N_, T_>::type;
 }
 
 #endif
