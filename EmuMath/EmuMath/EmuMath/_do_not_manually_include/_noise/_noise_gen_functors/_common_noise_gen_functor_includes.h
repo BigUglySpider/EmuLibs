@@ -151,7 +151,7 @@ namespace EmuMath::Functors::_underlying_noise_gen
 	template<typename T_>
 	constexpr inline T_ dot_with_scalar(const EmuMath::Vector<3, T_>& vector_, T_ x_, T_ y_, T_ z_)
 	{
-		return ((vector_.template at<0>()) * x_) + ((vector_.template at<1>()) * y_) + (vector_.at<2>() * z_);
+		return ((vector_.template at<0>()) * x_) + ((vector_.template at<1>()) * y_) + ((vector_.template at<2>()) * z_);
 	}
 }
 
