@@ -3642,7 +3642,7 @@ namespace EmuMath
 				constexpr std::size_t num_output_indices = OutSize_ - WriteOffset_;
 				constexpr std::size_t out_partial_length = num_output_indices % elements_per_register;
 				constexpr std::size_t required_register_count = (num_output_indices / elements_per_register) + (out_partial_length != 0);
-				_store_to_non_uniform<required_register_count, out_partial_length>(out_.data<WriteOffset_>());
+				_store_to_non_uniform<required_register_count, out_partial_length>(out_.template data<WriteOffset_>());
 			}
 		}
 
@@ -7477,7 +7477,7 @@ namespace EmuMath
 			if constexpr (all_indices_in_range && std::is_same_v<value_type, vector_stored_uq>)
 			{
 				constexpr std::size_t first_index = EmuCore::TMP::first_variadic_value_v<FullWidthIndices_...>;
-				return EmuSIMD::load<register_type>(vector_.data<first_index>());
+				return EmuSIMD::load<register_type>(vector_.template data<first_index>());
 			}
 			else
 			{
