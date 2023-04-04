@@ -433,7 +433,7 @@ namespace EmuMath
 		/// <para> Creates a copy of the passed Quaternion. </para>
 		/// </summary>
 		/// <param name="to_copy_">Quaternion of the same type to copy.</param>
-		template<std::size_t Unused_ = 0, typename = std::enable_if_t<is_copy_constructible<Unused_>()>>
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<is_non_const_copy_constructible<Unused_>()>>
 		constexpr inline Quaternion(Quaternion<T_>& to_copy_) : data(to_copy_.data)
 		{
 		}
