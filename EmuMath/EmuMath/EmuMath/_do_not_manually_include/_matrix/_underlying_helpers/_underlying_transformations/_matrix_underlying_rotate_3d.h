@@ -1068,14 +1068,14 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 			>::type;
 			if constexpr (Fused_)
 			{
-				EmuMath::Quaternion<calc_fp> combined_quaternion = first_quaternion_.FusedMultiply<calc_fp>(second_quaternion_);
+				EmuMath::Quaternion<calc_fp> combined_quaternion = first_quaternion_.template FusedMultiply<calc_fp>(second_quaternion_);
 				_complete_quaternion_sequence<Fused_>(combined_quaternion, remaining_quaternions_...);
 				return _matrix_rotate_3_from_quaternion<OutMatrix_>(combined_quaternion);
 
 			}
 			else
 			{
-				EmuMath::Quaternion<calc_fp> combined_quaternion = first_quaternion_.Multiply<calc_fp>(second_quaternion_);
+				EmuMath::Quaternion<calc_fp> combined_quaternion = first_quaternion_.template Multiply<calc_fp>(second_quaternion_);
 				_complete_quaternion_sequence<Fused_>(combined_quaternion, remaining_quaternions_...);
 				return _matrix_rotate_3_from_quaternion<OutMatrix_>(combined_quaternion);
 			}
@@ -1108,11 +1108,11 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 			>::type;
 			if constexpr (Fused_)
 			{
-				return _matrix_rotate_3_from_quaternion<OutMatrix_>(first_quaternion_.FusedMultiply<calc_fp>(second_quaternion_));
+				return _matrix_rotate_3_from_quaternion<OutMatrix_>(first_quaternion_.template FusedMultiply<calc_fp>(second_quaternion_));
 			}
 			else
 			{
-				return _matrix_rotate_3_from_quaternion<OutMatrix_>(first_quaternion_.Multiply<calc_fp>(second_quaternion_));
+				return _matrix_rotate_3_from_quaternion<OutMatrix_>(first_quaternion_.template Multiply<calc_fp>(second_quaternion_));
 			}
 		}
 		else
