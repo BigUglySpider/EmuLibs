@@ -9365,7 +9365,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 				return alt_vector.Subtract
 				(
 					calc_vector_type::template _calculate_projection_to_vector<CalcSize_, preferred_floating_point>(alt_vector, alt_plane_normal)
-				).Convert<Size_, OutFP_, RegisterWidth_>();
+				).template Convert<Size_, OutFP_, RegisterWidth_>();
 			}
 		}
 #pragma endregion
