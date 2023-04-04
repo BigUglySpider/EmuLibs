@@ -8605,8 +8605,8 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 			}
 		}
 
-		template<typename B_, typename T_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_lerp(const data_type& lhs_, B_&& b_, T_&& t_, std::index_sequence<RegisterIndices_...> indices_)
+		template<typename B_, typename Weighting_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_lerp(const data_type& lhs_, B_&& b_, Weighting_&& t_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			return data_type
 			({
@@ -8614,13 +8614,13 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 				(
 					lhs_[RegisterIndices_],
 					_retrieve_register_from_arg<RegisterIndices_>(std::forward<B_>(b_)),
-					_retrieve_register_from_arg<RegisterIndices_>(std::forward<T_>(t_))
+					_retrieve_register_from_arg<RegisterIndices_>(std::forward<Weighting_>(t_))
 				)...
 			});
 		}
 
-		template<typename B_, typename T_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_fused_lerp(const data_type& lhs_, B_&& b_, T_&& t_, std::index_sequence<RegisterIndices_...> indices_)
+		template<typename B_, typename Weighting_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_fused_lerp(const data_type& lhs_, B_&& b_, Weighting_&& t_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			return data_type
 			({
@@ -8628,7 +8628,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 				(
 					lhs_[RegisterIndices_],
 					_retrieve_register_from_arg<RegisterIndices_>(std::forward<B_>(b_)),
-					_retrieve_register_from_arg<RegisterIndices_>(std::forward<T_>(t_))
+					_retrieve_register_from_arg<RegisterIndices_>(std::forward<Weighting_>(t_))
 				)...
 			});
 		}
@@ -10393,8 +10393,8 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 
 #pragma region NON_CONST_VECTOR_ARITHMETIC_HELPERS
 	private:
-		template<typename B_, typename T_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_lerp_assign(const data_type& lhs_, B_&& b_, T_&& t_, std::index_sequence<RegisterIndices_...> indices_)
+		template<typename B_, typename Weighting_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_lerp_assign(const data_type& lhs_, B_&& b_, Weighting_&& t_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			(
 				(
@@ -10402,14 +10402,14 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 					(
 						lhs_[RegisterIndices_],
 						_retrieve_register_from_arg<RegisterIndices_>(std::forward<B_>(b_)),
-						_retrieve_register_from_arg<RegisterIndices_>(std::forward<T_>(t_))
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Weighting_>(t_))
 					)
 				), ...
 			);
 		}
 
-		template<typename B_, typename T_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_fused_lerp_assign(const data_type& lhs_, B_&& b_, T_&& t_, std::index_sequence<RegisterIndices_...> indices_)
+		template<typename B_, typename Weighting_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_fused_lerp_assign(const data_type& lhs_, B_&& b_, Weighting_&& t_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			(
 				(
@@ -10417,7 +10417,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 					(
 						lhs_[RegisterIndices_],
 						_retrieve_register_from_arg<RegisterIndices_>(std::forward<B_>(b_)),
-						_retrieve_register_from_arg<RegisterIndices_>(std::forward<T_>(t_))
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Weighting_>(t_))
 					)
 				), ...
 			);
