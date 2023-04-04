@@ -149,7 +149,7 @@ namespace EmuMath
 		struct _vector_get_index_for_load_result
 		{
 			using _vector_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
-			using _get_result = decltype(std::declval<_vector_uq>().AtTheoretical<FullWidthIndex_>());
+			using _get_result = decltype(std::declval<_vector_uq>().template AtTheoretical<FullWidthIndex_>());
 
 			using type = typename std::conditional
 			<
