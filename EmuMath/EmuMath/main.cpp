@@ -996,54 +996,6 @@ int main()
 	constexpr auto fast_mat_in_scalar_a = EmuMath::Helpers::matrix_ortho_vk<float, true>(0, 0, 1920, 1080, 0.001, 1000);
 	constexpr auto fast_mat_in_scalar_b = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 
-	constexpr std::array<std::array<int, 3>, 3> matrix({ {1, 2, 3}, {4, 5, 6}, {7, 8, 9} });
-
-	//constexpr auto fast8x8_in_a = EmuMath::Matrix<8, 7, float, false>
-	//(
-	//	1, 2, 3, 4, 5, 6, 7, 8,
-	//	9, 10, 11, 12, 13, 14, 15, 16,
-	//	17, 18, 19, 20, 21, 22, 23, 24,
-	//	25, 26, 27, 28, 29, 30, 31, 32,
-	//	33, 34, 35, 36, 37, 38, 39, 40,
-	//	41, 42, 43, 44, 45, 46, 47, 48,
-	//	49, 50, 51, 52, 53, 54, 55, 56
-	//);
-	//constexpr auto fast3x4_in_a = EmuMath::Matrix<3, 4, float, false>
-	//(
-	//	1, 2, 3,
-	//	9, 10, 11,
-	//	17, 18, 19,
-	//	25, 26, 27
-	//);
-	//constexpr auto fast4x3_in_b = fast3x4_in_a.Transpose();
-	//
-	//auto fast3x4_a = EmuMath::FastMatrix<3, 4, float, false>
-	//(
-	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, false>::register_type>(fast3x4_in_a.data<0, 0>()),
-	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, false>::register_type>(fast3x4_in_a.data<0, 1>()),
-	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, false>::register_type>(fast3x4_in_a.data<0, 2>()),
-	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, false>::register_type>(fast3x4_in_a.data<0, 3>())
-	//);
-	//auto fast4x3_b = EmuMath::FastMatrix<4, 3, float, false>
-	//(
-	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, false>::register_type>(fast4x3_in_b.data<0, 0>()),
-	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, false>::register_type>(fast4x3_in_b.data<0, 1>()),
-	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, false>::register_type>(fast4x3_in_b.data<0, 2>())
-	//);
-	//std::cout << fast3x4_a << "\nMUL\n" << fast4x3_b << "\n=\n" << fast3x4_a.Multiply(fast4x3_b) << "\n\n";
-	//std::cout << "Scalar result:\n" << (fast3x4_in_a * fast4x3_in_b) << "\n\n";
-	//std::cout << "REVERSED: " << fast3x4_a << "\nMUL\n" << fast4x3_b << "\n=\n" << fast4x3_b.Multiply(fast3x4_a) << "\n\n";
-	//std::cout << "REVERSED: " << "Scalar result:\n" << (fast4x3_in_b * fast3x4_in_a) << "\n\n";
-
-
-
-
-
-
-
-
-
-
 	constexpr bool tests_column_major = true;
 	constexpr auto fast5x4_in_a = EmuMath::Matrix<5, 4, float, tests_column_major>
 	(
