@@ -95,7 +95,7 @@ namespace EmuMath
 		}
 
 		template<std::size_t Unused_, EmuConcepts::KnownSIMD...MajorRegisters_>
-		[[nodiscard]] static constexpr inline bool _valid_major_fast_vector_construction()
+		[[nodiscard]] static constexpr inline bool _valid_major_register_construction()
 		{
 			return
 			(
@@ -508,7 +508,7 @@ namespace EmuMath
 		<
 			std::size_t Unused_ = 0,
 			EmuConcepts::KnownSIMD...MajorRegisters_,
-			typename = std::enable_if_t<_valid_major_fast_vector_construction<Unused_, MajorRegisters_...>()>
+			typename = std::enable_if_t<_valid_major_register_construction<Unused_, MajorRegisters_...>()>
 		>
 		explicit(num_major_elements == 1) constexpr inline FastMatrix(MajorRegisters_&&...major_order_registers_) noexcept
 			: major_chunks(_make_data_from_registers(major_index_sequence(), std::forward<MajorRegisters_>(major_order_registers_)...))
