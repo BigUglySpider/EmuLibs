@@ -41,11 +41,11 @@ namespace EmuCore::TestingHelpers
 	{
 		if constexpr (std::is_integral_v<T_>)
 		{
-			return rng_.NextInt<T_>();
+			return rng_.template NextInt<T_>();
 		}
 		else
 		{
-			return rng_.NextReal<T_>();
+			return rng_.template NextReal<T_>();
 		}
 	}
 
@@ -77,11 +77,11 @@ namespace EmuCore::TestingHelpers
 		{
 			if constexpr (std::is_floating_point_v<EmuCore::TMP::remove_ref_cv_t<T_>>)
 			{
-				out_[i] = rng_.NextReal<T_>();
+				out_[i] = rng_.template NextReal<T_>();
 			}
 			else
 			{
-				out_[i] = rng_.NextInt<T_>();
+				out_[i] = rng_.template NextInt<T_>();
 			}
 		}
 
