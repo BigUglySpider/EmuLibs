@@ -3712,8 +3712,8 @@ namespace EmuMath
 				using cast_type = typename std::conditional<is_integral, std::int32_t, float>::type;
 				using cast_vector_type = EmuMath::FastVector<cast_size, cast_type, cast_register_width>;
 				cast_vector_type cast_a = Convert<cast_size, cast_type, cast_register_width>();
-				cast_vector_type cast_b = b_.Convert<cast_size, cast_type, cast_register_width>();
-				return cast_a.Cross3(cast_b).Convert<Size_, T_, RegisterWidth_>();
+				cast_vector_type cast_b = b_.template Convert<cast_size, cast_type, cast_register_width>();
+				return cast_a.Cross3(cast_b).template Convert<Size_, T_, RegisterWidth_>();
 			}
 		}
 
