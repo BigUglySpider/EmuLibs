@@ -547,6 +547,32 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region BLENDS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 blendv_u8x32(EmuSIMD::u8x32_arg a_, EmuSIMD::u8x32_arg b_, EmuSIMD::u8x32_arg shuffle_mask_vec_)
+	{
+		return _mm256_blendv_epi8(a_, b_, shuffle_mask_vec_);
+	}
+
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 blend_u8x32(EmuSIMD::u8x32_arg a_, EmuSIMD::u8x32_arg b_)
+	{
+		constexpr bool is_reverse_set = false;
+		using target_element_type = std::uint8_t;
+		constexpr std::size_t num_elements = 32;
+
+		return _mm256_blendv_epi8
+		(
+			a_,
+			b_,
+			EmuSIMD::Funcs::blend_mask_to_vector<BlendMask, is_reverse_set, target_element_type>
+			(
+				std::make_index_sequence<num_elements>(),
+				[](auto&&...args_) { return set_u8x32(std::forward<decltype(args_)>(args_)...); }
+			)
+		);
+	}
+#pragma endregion
+
 #pragma region MOVES
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 movehl_u8x32(EmuSIMD::u8x32_arg lhs_, EmuSIMD::u8x32_arg rhs_)
 	{

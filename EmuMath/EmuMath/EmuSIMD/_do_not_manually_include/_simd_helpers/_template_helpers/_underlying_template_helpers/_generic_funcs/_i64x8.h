@@ -432,6 +432,34 @@ namespace EmuSIMD::Funcs
 		return cast_f64x8_i64x8(movelh_f64x8(cast_i64x8_f64x8(lhs_), cast_i64x8_f64x8(rhs_)));
 	}
 #pragma endregion
+	
+#pragma region BLENDS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 blendv_i64x8(EmuSIMD::i64x8_arg a_, EmuSIMD::i64x8_arg b_, EmuSIMD::i64x8_arg shuffle_mask_vec_)
+	{
+		return cast_f64x8_i64x8
+		(
+			blendv_f64x8
+			(
+				cast_i64x8_f64x8(a_),
+				cast_i64x8_f64x8(b_),
+				cast_i64x8_f64x8(shuffle_mask_vec_)
+			)
+		);
+	}
+
+	template<blend_mask_type BlendMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 blend_i64x8(EmuSIMD::i64x8_arg a_, EmuSIMD::i64x8_arg b_)
+	{
+		return cast_f64x8_i64x8
+		(
+			blend_f64x8<BlendMask_>
+			(
+				cast_i64x8_f64x8(a_),
+				cast_i64x8_f64x8(b_)
+			)
+		);
+	}
+#pragma endregion
 
 #pragma region MINMAX_FUNCS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 min_i64x8(EmuSIMD::i64x8_arg a_, EmuSIMD::i64x8_arg b_)

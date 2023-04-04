@@ -493,7 +493,8 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 blend_i8x16(EmuSIMD::i8x16_arg a_, EmuSIMD::i8x16_arg b_)
 	{
 		constexpr bool is_reverse_set = false;
-		using target_element_type = signed char;
+		using target_element_type = std::int8_t;
+		constexpr std::size_t num_elements = 16;
 
 		return _mm_blendv_epi8
 		(
@@ -501,7 +502,7 @@ namespace EmuSIMD::Funcs
 			b_,
 			EmuSIMD::Funcs::blend_mask_to_vector<BlendMask, is_reverse_set, target_element_type>
 			(
-				std::make_index_sequence<16>(),
+				std::make_index_sequence<num_elements>(),
 				[](auto&&...args_) { return set_i8x16(std::forward<decltype(args_)>(args_)...); }
 			)
 		);

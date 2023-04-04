@@ -442,6 +442,34 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region BLENDS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x16 blendv_i32x16(EmuSIMD::i32x16_arg a_, EmuSIMD::i32x16_arg b_, EmuSIMD::i32x16_arg shuffle_mask_vec_)
+	{
+		return cast_f32x16_i32x16
+		(
+			blendv_f32x16
+			(
+				cast_i32x16_f32x16(a_),
+				cast_i32x16_f32x16(b_),
+				cast_i32x16_f32x16(shuffle_mask_vec_)
+			)
+		);
+	}
+
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x16 blend_i32x16(EmuSIMD::i32x16_arg a_, EmuSIMD::i32x16_arg b_)
+	{
+		return cast_f32x16_i32x16
+		(
+			blend_f32x16<BlendMask_>
+			(
+				cast_i32x16_f32x16(a_),
+				cast_i32x16_f32x16(b_)
+			)
+		);
+	}
+#pragma endregion
+
 #pragma region MINMAX_FUNCS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x16 min_i32x16(EmuSIMD::i32x16_arg a_, EmuSIMD::i32x16_arg b_)
 	{

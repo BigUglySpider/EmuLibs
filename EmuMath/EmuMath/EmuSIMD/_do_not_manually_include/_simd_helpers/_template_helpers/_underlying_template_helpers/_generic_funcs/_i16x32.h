@@ -528,6 +528,42 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region BLENDS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x32 blendv_i16x32(EmuSIMD::i16x32_arg a_, EmuSIMD::i16x32_arg b_, EmuSIMD::i16x32_arg shuffle_mask_vec_)
+	{
+		auto blend_mask_for_8bit = blend_mask_vector_16_to_8(shuffle_mask_vec_);
+
+		EmuSIMD::i8x32 half_a = _mm512_castsi512_si256(a_);
+		EmuSIMD::i8x32 half_b = _mm512_castsi512_si256(b_);
+		EmuSIMD::i8x32 half_mask = _mm512_castsi512_si256(blend_mask_for_8bit);
+		EmuSIMD::i8x32 lo = _mm256_blendv_epi8(half_a, half_b, half_mask);
+
+		half_a = _mm512_extracti32x8_epi32(a_, 1);
+		half_b = _mm512_extracti32x8_epi32(b_, 1);
+		half_mask = _mm512_extracti32x8_epi32(blend_mask_for_8bit, 1);
+		half_b = _mm256_blendv_epi8(half_a, half_b, half_mask);
+
+		return _mm512_inserti32x8(cast_i8x32_i16x32(lo), half_b, 1);
+	}
+
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x32 blend_i16x32(EmuSIMD::i16x32_arg a_, EmuSIMD::i16x32_arg b_)
+	{
+		constexpr auto lo_blend_mask = BlendMask_;
+		constexpr auto hi_blend_mask = BlendMask_ >> 16;
+
+		EmuSIMD::i16x16 lo = _mm512_castsi512_si256(a_);
+		EmuSIMD::i16x16 half_b = _mm512_castsi512_si256(b_);
+		lo = _mm256_blend_epi16(lo, half_b, lo_blend_mask);
+
+		EmuSIMD::i16x16 hi = _mm512_extracti32x8_epi32(a_, 1);
+		half_b = _mm512_extracti32x8_epi32(b_, 1);
+		hi = _mm256_blend_epi16(hi, half_b, hi_blend_mask);
+
+		return _mm512_inserti32x8(_mm512_castsi256_si512(lo), hi, 1);
+	}
+#pragma endregion
+
 #pragma region MINMAX_FUNCS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x32 min_i16x32(EmuSIMD::i16x32_arg a_, EmuSIMD::i16x32_arg b_)
 	{

@@ -509,6 +509,24 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region BLENDS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 blendv_i16x16(EmuSIMD::i16x16_arg a_, EmuSIMD::i16x16_arg b_, EmuSIMD::i16x16_arg shuffle_mask_vec_)
+	{
+		return _mm256_blendv_epi8
+		(
+			a_,
+			b_,
+			blend_mask_vector_16_to_8(shuffle_mask_vec_)
+		);
+	}
+
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 blend_i16x16(EmuSIMD::i16x16_arg a_, EmuSIMD::i16x16_arg b_)
+	{
+		return _mm256_blend_epi16(a_, b_, BlendMask_);
+	}
+#pragma endregion
+
 #pragma region MINMAX_FUNCS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 min_i16x16(EmuSIMD::i16x16_arg a_, EmuSIMD::i16x16_arg b_)
 	{

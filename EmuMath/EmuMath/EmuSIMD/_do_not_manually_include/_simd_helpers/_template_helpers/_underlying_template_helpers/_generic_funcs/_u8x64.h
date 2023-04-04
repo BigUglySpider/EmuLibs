@@ -603,6 +603,42 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region BLENDS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 blendv_u8x64(EmuSIMD::u8x64_arg a_, EmuSIMD::u8x64_arg b_, EmuSIMD::u8x64_arg shuffle_mask_vec_)
+	{
+		EmuSIMD::i8x32 half_a = _mm512_castsi512_si256(a_);
+		EmuSIMD::i8x32 half_b = _mm512_castsi512_si256(b_);
+		EmuSIMD::i8x32 half_mask = _mm512_castsi512_si256(shuffle_mask_vec_);
+		EmuSIMD::i8x32 lo = _mm256_blendv_epi8(half_a, half_b, half_mask);
+
+		half_a = _mm512_extracti32x8_epi32(a_, 1);
+		half_b = _mm512_extracti32x8_epi32(b_, 1);
+		half_mask = _mm512_extracti32x8_epi32(shuffle_mask_vec_, 1);
+		half_b = _mm256_blendv_epi8(half_a, half_b, half_mask);
+
+		return _mm512_inserti32x8(cast_i8x32_u8x64(lo), half_b, 1);
+	}
+
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 blend_u8x64(EmuSIMD::u8x64_arg a_, EmuSIMD::u8x64_arg b_)
+	{
+		constexpr bool is_reverse_set = false;
+		using target_element_type = std::uint8_t;
+		constexpr std::size_t num_elements = 64;
+
+		return blendv_i8x64
+		(
+			a_,
+			b_,
+			EmuSIMD::Funcs::blend_mask_to_vector<BlendMask, is_reverse_set, target_element_type>
+			(
+				std::make_index_sequence<num_elements>(),
+				[](auto&&...args_) { return set_u8x64(std::forward<decltype(args_)>(args_)...); }
+			)
+		);
+	}
+#pragma endregion
+
 #pragma region MINMAX_FUNCS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 min_u8x64(EmuSIMD::u8x64_arg a_, EmuSIMD::u8x64_arg b_)
 	{
