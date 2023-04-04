@@ -212,7 +212,7 @@ namespace EmuMath::Helpers
 
 	template<EmuConcepts::EmuFastQuaternion FastQuaternion_, EmuConcepts::Arithmetic RhsScalar_>
 	requires (!std::is_const_v<FastQuaternion_>)
-	[[nodiscard]] constexpr inline void fast_quaternion_divide_assign(FastQuaternion_& lhs_and_out_, RhsScalar_&& rhs_scalar_)
+	constexpr inline void fast_quaternion_divide_assign(FastQuaternion_& lhs_and_out_, RhsScalar_&& rhs_scalar_)
 	{
 		constexpr std::size_t per_element_width = EmuCore::TMP::remove_ref_cv_t<FastQuaternion_>::per_element_width;
 		using _required_register_type = typename EmuCore::TMP::remove_ref_cv_t<FastQuaternion_>::register_type;
@@ -310,11 +310,11 @@ namespace EmuMath::Helpers
 	}
 
 	template<EmuConcepts::EmuFastQuaternion FastQuaternion_, EmuConcepts::Arithmetic RhsScalar_>
-	[[nodiscard]] constexpr inline void fast_quaternion_multiply_assign_scalar(FastQuaternion_& lhs_and_out_, RhsScalar_&& rhs_scalar_)
+	constexpr inline void fast_quaternion_multiply_assign_scalar(FastQuaternion_& lhs_and_out_, RhsScalar_&& rhs_scalar_)
 	{
 		constexpr std::size_t per_element_width = EmuCore::TMP::remove_ref_cv_t<FastQuaternion_>::per_element_width;
 		using _required_register_type = typename EmuCore::TMP::remove_ref_cv_t<FastQuaternion_>::register_type;
-		return EmuMath::Helpers::fast_quaternion_multiply_assign_scalar
+		EmuMath::Helpers::fast_quaternion_multiply_assign_scalar
 		(
 			lhs_and_out_,
 			EmuSIMD::set1<_required_register_type, per_element_width>(std::forward<RhsScalar_>(rhs_scalar_))
@@ -336,7 +336,7 @@ namespace EmuMath::Helpers
 
 	template<EmuConcepts::EmuFastQuaternion FastQuaternion_>
 	requires (!std::is_const_v<FastQuaternion_>)
-	[[nodiscard]] constexpr inline void fast_quaternion_multiply_assign_quaternion(FastQuaternion_& lhs_and_out_quat_, const FastQuaternion_& rhs_quat_)
+	constexpr inline void fast_quaternion_multiply_assign_quaternion(FastQuaternion_& lhs_and_out_quat_, const FastQuaternion_& rhs_quat_)
 	{
 		if constexpr (EmuCore::TMP::remove_ref_cv_t<FastQuaternion_>::num_registers > 1)
 		{

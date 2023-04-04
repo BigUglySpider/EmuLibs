@@ -52,7 +52,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 
 #pragma region CONVERSION_FUNCS
 	template<typename LhsT_, typename RhsT_>
-	[[nodiscard]] constexpr inline void _convert_assign(EmuMath::Quaternion<LhsT_>& lhs_, const EmuMath::Quaternion<RhsT_>& rhs_)
+	constexpr inline void _convert_assign(EmuMath::Quaternion<LhsT_>& lhs_, const EmuMath::Quaternion<RhsT_>& rhs_)
 	{
 		if constexpr (_can_const_convert_assign<LhsT_, RhsT_>())
 		{
@@ -69,7 +69,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 	}
 
 	template<typename LhsT_, typename RhsT_>
-	[[nodiscard]] constexpr inline void _convert_assign(EmuMath::Quaternion<LhsT_>& lhs_, EmuMath::Quaternion<RhsT_>& rhs_)
+	constexpr inline void _convert_assign(EmuMath::Quaternion<LhsT_>& lhs_, EmuMath::Quaternion<RhsT_>& rhs_)
 	{
 		if constexpr (_can_non_const_convert_assign<LhsT_, RhsT_>())
 		{
@@ -86,7 +86,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 	}
 
 	template<typename LhsT_, typename RhsT_>
-	[[nodiscard]] constexpr inline void _convert_assign(EmuMath::Quaternion<LhsT_>& lhs_, EmuMath::Quaternion<RhsT_>&& rhs_)
+	constexpr inline void _convert_assign(EmuMath::Quaternion<LhsT_>& lhs_, EmuMath::Quaternion<RhsT_>&& rhs_)
 	{
 		if constexpr (_can_move_convert_assign<LhsT_, RhsT_>())
 		{

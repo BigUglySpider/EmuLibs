@@ -142,7 +142,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<std::size_t OutSize_, typename OutT_, EmuConcepts::EmuMatrix Matrix_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline void matrix_multiply
+	constexpr inline void matrix_multiply
 	(
 		EmuMath::Vector<OutSize_, OutT_>& out_vector_,
 		const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_,

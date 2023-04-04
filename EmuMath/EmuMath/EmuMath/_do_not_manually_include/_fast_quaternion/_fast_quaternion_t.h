@@ -615,7 +615,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		/// <para> Adds this Quaternion and the passed `rhs_` Quaternion. </para>
 		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
 		/// </summary>
-		[[nodiscard]] constexpr inline void AddAssign(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_)
+		constexpr inline void AddAssign(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_)
 		{
 			EmuMath::Helpers::fast_quaternion_add_assign(*this, rhs_);
 		}
@@ -624,7 +624,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		/// <para> Subtracts the passed `rhs_` Quaternion from this Quaternion. </para>
 		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
 		/// </summary>
-		[[nodiscard]] constexpr inline void SubtractAssign(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_)
+		constexpr inline void SubtractAssign(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_)
 		{
 			EmuMath::Helpers::fast_quaternion_subtract_assign(*this, rhs_);
 		}
@@ -634,7 +634,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		/// <para> The passed register should contain the same value in all respective lanes for most cases of standard Quaternion division. </para>
 		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
 		/// </summary>
-		[[nodiscard]] constexpr inline void DivideAssign(register_arg_type rhs_scalar_register_)
+		constexpr inline void DivideAssign(register_arg_type rhs_scalar_register_)
 		{
 			EmuMath::Helpers::fast_quaternion_divide_assign(*this, rhs_scalar_register_);
 		}
@@ -645,7 +645,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
 		/// </summary>
 		template<EmuConcepts::Arithmetic RhsScalar_>
-		[[nodiscard]] constexpr inline void DivideAssign(RhsScalar_&& rhs_scalar_)
+		constexpr inline void DivideAssign(RhsScalar_&& rhs_scalar_)
 		{
 			EmuMath::Helpers::fast_quaternion_divide_assign(*this, std::forward<RhsScalar_>(rhs_scalar_));
 		}
@@ -654,7 +654,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		/// <para> Multiplies this Quaternion with the passed `rhs_` Quaternion. </para>
 		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
 		/// </summary>
-		[[nodiscard]] constexpr inline void MultiplyAssignQuaternion(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_)
+		constexpr inline void MultiplyAssignQuaternion(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_)
 		{
 			EmuMath::Helpers::fast_quaternion_multiply_assign_quaternion(*this, rhs_);
 		}
@@ -664,7 +664,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		/// <para> The passed register should contain the same value in all respective lanes for most cases of standard Quaternion x Scalar multiplication. </para>
 		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
 		/// </summary>
-		[[nodiscard]] constexpr inline void MultiplyAssignScalar(register_arg_type rhs_scalar_register_)
+		constexpr inline void MultiplyAssignScalar(register_arg_type rhs_scalar_register_)
 		{
 			EmuMath::Helpers::fast_quaternion_multiply_assign_scalar(*this, rhs_scalar_register_);
 		}
@@ -675,7 +675,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
 		/// </summary>
 		template<EmuConcepts::Arithmetic RhsScalar_>
-		[[nodiscard]] constexpr inline void MultiplyAssignScalar(RhsScalar_&& rhs_scalar_)
+		constexpr inline void MultiplyAssignScalar(RhsScalar_&& rhs_scalar_)
 		{
 			EmuMath::Helpers::fast_quaternion_multiply_assign_scalar(*this, std::forward<RhsScalar_>(rhs_scalar_));
 		}

@@ -88,7 +88,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 	/// <param name="out_rect_">EmuMath Rect to assign conversion results to.</param>
 	/// <param name="rect_">Rect to convert.</param>
 	template<typename OutT_, EmuConcepts::EmuRect Rect_>
-	[[nodiscard]] constexpr inline void rect_cast(EmuMath::Rect<OutT_>& out_rect_, Rect_&& rect_)
+	constexpr inline void rect_cast(EmuMath::Rect<OutT_>& out_rect_, Rect_&& rect_)
 	{
 		using out_value_uq = typename EmuMath::Rect<OutT_>::value_type_uq;
 		using get_left_result = decltype(rect_get_left(std::forward<Rect_>(rect_)));

@@ -432,7 +432,7 @@ namespace EmuMath::Helpers
 	/// <param name="lhs_vector_">EmuMath Vector to interpret as a Row Matrix on the left-hand side of multiplication.</param>
 	/// <param name="rhs_matrix_">EmuMath Matrix appearing on the right-hand side of multiplication.</param>
 	template<EmuConcepts::EmuMatrix Matrix_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline void matrix_multiply_assign
+	constexpr inline void matrix_multiply_assign
 	(
 		EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_,
 		Matrix_&& rhs_matrix_

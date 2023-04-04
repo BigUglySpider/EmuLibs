@@ -303,7 +303,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 	template<EmuConcepts::EmuFastMatrix FastMatrix_, std::size_t...MajorIndices_, std::size_t...RegisterIndices_>
-	[[nodiscard]] constexpr inline void _dump_data
+	constexpr inline void _dump_data
 	(
 		FastMatrix_&& fast_matrix_,
 		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::value_type* p_dump_,

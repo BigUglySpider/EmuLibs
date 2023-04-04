@@ -626,7 +626,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_,
 		bool IsRads_, std::size_t AxisIndex_, std::size_t ConstexprIterations_, bool ConstexprMod_, bool StaticAssert_, class Angle_
 	>
-	[[nodiscard]] constexpr inline void _matrix_assign_rotate_3_in_axis(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Angle_&& angle_)
+	constexpr inline void _matrix_assign_rotate_3_in_axis(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Angle_&& angle_)
 	{
 		using out_matrix = EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>&;
 		using out_matrix_uq = EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>;
