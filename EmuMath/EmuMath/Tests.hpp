@@ -651,7 +651,7 @@ namespace EmuCore::TestingHelpers
 			std::cout << "!!!Test " << TestIndex << " (" << Test::NAME << ") Results!!!\n";
 			if (test.DO_TEST)
 			{
-				std::cout << harness.ExecuteAndOutputAsString<Test::PASS_LOOP_NUM>(Test::NUM_LOOPS, test, test.WRITE_ALL_TIMES_TO_STREAM) << "\n\n";
+				std::cout << harness.template ExecuteAndOutputAsString<Test::PASS_LOOP_NUM>(Test::NUM_LOOPS, test, test.WRITE_ALL_TIMES_TO_STREAM) << "\n\n";
 			}
 			else
 			{
