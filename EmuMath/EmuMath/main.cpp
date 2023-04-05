@@ -1,3 +1,7 @@
+// GCC ONLY IGNORES - TEMPORARY
+#pragma GCC diagnostic ignored "-Wignored-attributes"
+#pragma GCC diagnostic ignored "-Wpsabi"
+
 // Helpful Functors
 #include "EmuCore/Functors/Analytics.h"
 
@@ -418,7 +422,7 @@ int main()
 		EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, res_new_ab) << "\n";
 		std::cout << "New aa: ";
 		EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, res_new_aa) << "\n";
-		universal_pause();
+		universal_pause("1\n");
 	}
 
 	{
@@ -485,7 +489,7 @@ int main()
 		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::movehl_f64x4(a64_256, b64_256)) << "\n";
 	}
 
-	universal_pause();
+	universal_pause("2\n");
 	srand(static_cast<unsigned int>(time(0)));
 	EmuCore::Timer<std::milli> timer_;
 
@@ -504,14 +508,17 @@ int main()
 			std::cout << "[" << i << "]: ";
 			EmuSIMD::append_simd_vector_to_stream<width, true>(std::cout, acos_res) << "\n";
 		}
-		universal_pause();
+		universal_pause("3\n");
 	}
 
 	//*
 #pragma region PRE_TEST_BODY
+	universal_pause("4\n");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	universal_pause("5\n");
 	constexpr auto mat_b_ = EmuMath::Matrix<4, 4, int, true>(1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
 	constexpr auto mat_c_ = EmuMath::Matrix<4, 4, float, true>(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25);
+	universal_pause("6\n");
 	constexpr auto mat_lerped_mmm_ = mat_a_.Lerp<float>(mat_b_, mat_c_);
 	constexpr auto mat_lerped_msm_ = mat_a_.Lerp<float>(100, mat_c_);
 	constexpr auto mat_lerped_mms_ = mat_a_.Lerp<float>(mat_b_, 0.5L);
@@ -531,6 +538,7 @@ int main()
 	std::cout << rt_ << "\n\n";
 	rt_.identity(rt_);
 	std::cout << rt_ << "\n\n";
+	universal_pause("4\n");
 
 	std::cout << "CLAMPS\n";
 	std::cout << mat_a_.Clamp(-4, 4) << "\n\n";
@@ -554,6 +562,7 @@ int main()
 	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(EmuMath::Matrix<2, 3, int, true>(7, 0, 2, 1, 4, 7), EmuMath::Matrix<4, 4, int, true>(12, 10, 6, 3, 15, 21, 13, -5, 19, 20, 21, -7, 1, 2, 3, 4)) << "\n\n";
 	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(EmuMath::Matrix<4, 4, int, false>(-3, 4, -4, 5, 3, 4, 5, 6, 10, 11, 12, 13, -255, -511, 31, 1337), EmuMath::Matrix<2, 3, int, false>(3, 12, 6, 8, 9, 10)) << "\n\n";
 
+	universal_pause("5\n");
 
 	constexpr auto scale = EmuMath::Helpers::matrix_make_scale<float>(2, 5, 10);
 	constexpr auto scale_from_tuple = EmuMath::Helpers::matrix_make_scale<double>(std::make_tuple(8, -2.0L, 0.5f));
@@ -581,6 +590,7 @@ int main()
 	std::cout << scale_assign_matrix << "\n\n";
 	scale_assign_matrix.AssignScale(EmuMath::Vector<4, unsigned long long int>(1, 2, 3, 4));
 	std::cout << scale_assign_matrix << "\n\n";
+	universal_pause("6\n");
 
 	std::cout << "MAKE_TRANSLATION TESTS\n";
 	constexpr auto translate = EmuMath::Helpers::matrix_make_translation<float>(2, 5, 10);
@@ -593,6 +603,7 @@ int main()
 	std::cout << translate_from_vector << "\n\n";
 	std::cout << translate_from_vector_no_t_arg << "\n\n";
 	std::cout << translate_auto_2d << "\n\n";
+	universal_pause("7\n");
 
 	constexpr auto another_translate_0 = EmuMath::Helpers::matrix_make_translation<4, 4, float>(EmuMath::Vector<12, float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12));
 	constexpr auto another_translate_1 = EmuMath::Helpers::matrix_make_translation<4, 4>(EmuMath::Vector<12, float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12));
@@ -601,6 +612,7 @@ int main()
 	std::cout << another_translate_0 << "\n\n";
 	std::cout << another_translate_1 << "\n\n";
 	std::cout << another_translate_2 << "\n\n";
+	universal_pause("8\n");
 
 	constexpr auto translate_ree = EmuMath::Matrix<4, 4, float, true>::valid_make_translation_args<int, int, int>();
 	constexpr auto translate_from_member = EmuMath::Matrix<4, 4, float, true>::make_translation(2, 1, 3);
@@ -611,6 +623,7 @@ int main()
 	std::cout << translate_from_member << "\n\n";
 	std::cout << translate_tuple_from_member << "\n\n";
 	std::cout << translate_vector_from_member << "\n\n";
+	universal_pause("9\n");
 
 
 	std::cout << "ASSIGN_TRANSLATION TESTS\n";
@@ -624,6 +637,7 @@ int main()
 	std::cout << translate_assign_matrix << "\n\n";
 	translate_assign_matrix.AssignTranslation(EmuMath::Vector<4, unsigned long long int>(1, 2, 3, 4));
 	std::cout << translate_assign_matrix << "\n\n";
+	universal_pause("10\n");
 
 	constexpr auto point_to_rotate = EmuMath::Vector<3, double>(1, 2, 3);
 	constexpr auto rot_0 = EmuMath::Helpers::matrix_make_rotation_3d_z_constexpr<12, true, false, 4, 4, double, true>(-33);
@@ -672,7 +686,7 @@ int main()
 	irregular_matrix.AssignRotation3DZConstexpr<12, true, false>(33);
 	std::cout << irregular_matrix << "\n\n";
 
-	universal_pause();;
+	universal_pause("4\n");;
 	std::cout << "\n\n\n\nQUATERNIONS\n";
 	constexpr auto rot_euler = EmuMath::Vector<3, float>
 	(
@@ -1377,7 +1391,7 @@ int main()
 	std::cout << (cmptestc != cmptestd) << "\n";
 	std::cout << cmptestc.CmpNear(cmptestd) << "\n";
 
-	universal_pause();
+	universal_pause("5\n");
 
 	/*
 	{

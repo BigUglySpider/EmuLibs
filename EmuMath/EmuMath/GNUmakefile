@@ -1,25 +1,26 @@
 .DEFAULT_GOAL := opt
 
-MAIN_ROOT = ./
-MAIN_SRCS = $(MAIN_ROOT)*.cpp
+MAIN_SRCS = **.cpp
 
 EMU_CORE_ROOT = EmuCore/
-EMU_CORE_SRCS = $(EMU_CORE)*.cpp
 
 COMPILER = g++
 WARNINGS =
 STD = -std=c++20
 EXTRA_LIBS = -lstdc++fs
-SIMD = -mavx2
+SIMD = -mavx2 -mfma
 INSTRUCTION_SETS = $(SIMD)
 COMMON_COMPILER_ARGS = $(WARNINGS) $(STD) $(INSTRUCTION_SETS) $(EXTRA_LIBS)
 SOURCES = $(MAIN_SRCS) $(EMU_CORE_SRCS)
 OUTPUT_BASE = ./build/emu_math_tests
 
+# Want to delete these flags at a later point, just to tidy up during changes-for-linux branch
+TMP_FLAGS = 
+
 OPT_OUT = $(OUTPUT_BASE)
 DBG_OUT = $(OUTPUT_BASE)_dbg
 
-COMMON_COMPILE = $(COMPILER) $(COMMON_COMPILER_ARGS)
+COMMON_COMPILE = $(COMPILER) $(COMMON_COMPILER_ARGS) ${TMP_FLAGS}
 DBG_COMPILE = $(COMMON_COMPILE) -o $(DBG_OUT)
 FULL_OPT_COMPILE = $(COMMON_COMPILE) -O3 -o $(OPT_OUT)
 
