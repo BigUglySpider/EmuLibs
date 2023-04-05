@@ -182,6 +182,8 @@ namespace EmuMath
 		{
 			return at(coords_);
 		}
+
+		[[nodiscard]] inline this_type& operator=(const this_type&) = default;
 #pragma endregion
 
 		[[nodiscard]] inline coordinate_type size() const
