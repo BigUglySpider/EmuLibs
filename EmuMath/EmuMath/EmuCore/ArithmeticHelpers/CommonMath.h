@@ -4,6 +4,7 @@
 #include "../TMPHelpers/OperatorChecks.h"
 #include "../TMPHelpers/TypeComparators.h"
 #include "../TMPHelpers/Values.h"
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
