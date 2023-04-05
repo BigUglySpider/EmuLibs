@@ -4,9 +4,7 @@
 #include "../../../../../EmuCore/CommonPreprocessor/Compiler.h"
 
 // GCC Diagnistics - Should be temporary, but no estimate on when
-#if EMU_CORE_IS_GCC
 #pragma GCC diagnostic ignored "-Wignored-attributes"
-#endif
 
 #include <immintrin.h>
 
