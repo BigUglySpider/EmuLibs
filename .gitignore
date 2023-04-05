@@ -338,3 +338,4 @@ ASALocalRun/
 
 # README Ignores
 **/README.md
+**/local/disassembly
