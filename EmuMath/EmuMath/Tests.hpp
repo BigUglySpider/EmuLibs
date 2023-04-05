@@ -30,6 +30,69 @@
 #include <DirectXMath.h>
 #endif
 
+inline bool get_yes_or_no(const std::string& message, std::istream& in_stream_, std::string&& overwriteable_buffer = std::string())
+{
+	std::cout << message << " (Y/N): ";
+	while(true)
+	{
+		std::getline(in_stream_, overwriteable_buffer);
+		std::transform
+		(
+			overwriteable_buffer.begin(),
+			overwriteable_buffer.end(),
+			overwriteable_buffer.begin(),
+			[](const auto& char_){ return std::tolower(char_); }
+		);
+		if(overwriteable_buffer.length() > 0) // Redo if no answer
+		{
+			switch(overwriteable_buffer[0])
+			{
+				case 'a':
+				{
+					if(overwriteable_buffer == "affirm" || overwriteable_buffer == "accept" || overwriteable_buffer == "affirmative")
+						return true;
+					break;
+				}
+				case 'c':
+				{
+					if(overwriteable_buffer == "c" || overwriteable_buffer == "confirm" || overwriteable_buffer == "consent")
+						return true;
+					break;
+				}
+				case 'd':
+				{
+					if(overwriteable_buffer == "d" || overwriteable_buffer == "deny" || overwriteable_buffer == "decline")
+						return false;
+					break;
+				}
+				case 'n':
+				{
+					if(overwriteable_buffer == "n" || overwriteable_buffer == "no" || overwriteable_buffer == "nope" || overwriteable_buffer == "negative" || overwriteable_buffer == "nah" || overwriteable_buffer == "nay")
+						return false;
+					break;
+				}
+				case 'r':
+				{
+					if(overwriteable_buffer == "reject" || overwriteable_buffer == "refuse")
+						return false;
+					break;
+				}
+				case 'y':
+				{
+					if(overwriteable_buffer == "y" || overwriteable_buffer == "yes" || overwriteable_buffer == "yep" || overwriteable_buffer == "yeah" || overwriteable_buffer == "yea")
+						return true;
+					break;
+				}
+			}
+		}
+	}
+}
+
+inline bool get_yes_or_no(const std::string& message, std::string&& overwriteable_buffer = std::string())
+{
+	return get_yes_or_no(message, std::cin, std::forward<decltype(overwriteable_buffer)>(overwriteable_buffer));
+}
+
 namespace EmuCore::TestingHelpers
 {
 	static constexpr std::size_t shared_num_loops = 5000000;
@@ -734,27 +797,13 @@ namespace EmuCore::TestingHelpers
 				auto duration = std::chrono::duration<double>(end - begin).count();
 				std::cout << "\n-----Finished execution and output of " << numTests << " test " << harnessCorrectPlural << " in " << duration << " seconds-----\n";
 
-				std::cout << "\n\nExecute additinal OnAllTestsOver branch? [Y - Yes]: ";
-				std::getline(std::cin, str);
-				if (str.size() != 0)
+				if(get_yes_or_no("\n\nExecute additinal OnAllTestsOver branch?"))
 				{
-					if (str[0] == 'y' || str[0] == 'Y')
-					{
-						OnAllTestsOver<0>(tests);
-					}
+					OnAllTestsOver<0>(tests);
 				}
 			}
 
-			std::cout << "\n\nRepeat all tests? [Y - Yes]: ";
-			std::getline(std::cin, str);
-			if (str.size() != 0)
-			{
-				shouldRepeat = str[0] == 'Y' || str[0] == 'y';
-			}
-			else
-			{
-				shouldRepeat = false;
-			}
+			shouldRepeat = get_yes_or_no("\n\nRepeat all tests?");
 		} while (shouldRepeat);
 	}
 #pragma endregion
