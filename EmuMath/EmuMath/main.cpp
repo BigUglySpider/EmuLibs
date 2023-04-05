@@ -1393,7 +1393,7 @@ int main()
 
 	universal_pause("5\n");
 
-	/*
+	//*
 	{
 		// ##### SCALAR vs SIMD NOISE #####
 		constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN; 
