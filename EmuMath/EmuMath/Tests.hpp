@@ -532,6 +532,55 @@ namespace EmuCore::TestingHelpers
 		std::vector<quaternion_type> res;
 	};
 
+	struct ScalarTan
+	{
+		static constexpr bool DO_TEST = true;
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr std::string_view NAME = "Scalar tan";
+
+		static constexpr std::size_t element_width = 64;
+		using scalar_type = double;
+
+		static constexpr std::size_t register_size = 128 / element_width;
+		static constexpr std::size_t BASE_NUM_LOOPS = (shared_num_loops * 10);
+		static constexpr std::size_t NUM_LOOPS = BASE_NUM_LOOPS * register_size;
+		static constexpr std::size_t NUM_SCALARS = NUM_LOOPS;
+
+		ScalarTan()
+		{
+		}
+		void Prepare()
+		{
+			// RESIZES
+			out.resize(NUM_SCALARS);
+
+			// RESERVES
+			in.reserve(NUM_SCALARS);
+
+			// EMPLACEMENTS
+			EmuMath::RngWrapper<true> rng(-90, 90, shared_fill_seed_);
+			for (std::size_t i = 0; i < NUM_SCALARS; ++i)
+			{
+				in.emplace_back(EmuCore::Pi::DegsToRads(rng.NextReal<scalar_type>()));
+			}
+		}
+		void operator()(std::size_t i_)
+		{
+			out[i_] = tan(in[i_]);
+		}
+		void OnTestsOver()
+		{
+			const std::size_t i = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, BASE_NUM_LOOPS - 1);
+			const std::size_t offset = i * register_size;
+			std::cout << "tan({" << in[offset] << ", " << in[offset + 1] /* << ", " << in[offset + 2] << ", " << in[offset + 3] */ << "}):\n\t";
+			std::cout << "{ " << out[offset] << ", " << out[offset + 1] /* << ", " << out[offset + 2] << ", " << out[offset + 3] */ << "}\n";
+		}
+
+		std::vector<scalar_type> in;
+		std::vector<scalar_type> out;
+	};
+
 	struct SIMDTan
 	{
 		static constexpr bool DO_TEST = true;
@@ -593,6 +642,7 @@ namespace EmuCore::TestingHelpers
 		//DirectXSimdTest
 		//ScalarQuaternionTest,
 		//FastQuaternionTest,
+		ScalarTan,
 		SIMDTan
 	>;
 
