@@ -203,8 +203,9 @@ namespace EmuSIMD
 						{
 							EmuSIMD::i128_generic out_ = _mm_add_epi8(register_, _underlying_simd_helpers::_execute_shuffle<2, 3, 0, 1>(register_));
 							out_ = add_i8x16(out_, _underlying_simd_helpers::_execute_shuffle<3, 2, 3, 2>(out_));
-							// out_ = _mm_add_epi8(out_, _mm_shufflelo_epi16(out_, _underlying_simd_helpers::_shuffle_mask<EmuSIMD::i128_generic, 1, 0, 3, 2>::get())); // REMOVED, COMMENTED FOR ARCHIVAL PURPOSES
-							out_ = add_i8x16(out_, _mm_shufflelo_epi16(out_, make_shuffle_mask_32<2, 3, 0, 1>()));
+
+							constexpr auto shuffle_mask = make_shuffle_mask_32<2, 3, 0, 1>();
+							out_ = add_i8x16(out_, _mm_shufflelo_epi16(out_, shuffle_mask));
 							return add_i8x16
 							(
 								out_,

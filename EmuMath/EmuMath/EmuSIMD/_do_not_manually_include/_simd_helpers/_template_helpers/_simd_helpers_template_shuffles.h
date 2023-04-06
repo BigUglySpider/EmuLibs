@@ -67,9 +67,10 @@ namespace EmuSIMD
 			// All hi indices, we can just shuffle hi lane
 			auto hi_a = EmuSIMD::extract_lane<1, _generic_lane_register>(a_);
 			auto hi_b = EmuSIMD::extract_lane<1, _generic_lane_register>(b_);
+			hi_b = EmuSIMD::shuffle<I2_ - 2, I3_ - 2>(hi_b);
 
 			out = EmuSIMD::cast<_generic_register_type>(EmuSIMD::shuffle<I0_ - 2, I1_ - 2>(hi_a));
-			out = _mm256_insertf128_pd(out, EmuSIMD::shuffle<I2_ - 2, I3_ - 2>(hi_b), 1);
+			out = _mm256_insertf128_pd(out, hi_b, 1);
 		}
 		else
 		{
@@ -115,7 +116,8 @@ namespace EmuSIMD
 					lane_1 = EmuSIMD::extract_lane<i3_lane, _generic_lane_register>(b_);
 				}
 
-				out = _mm256_insertf128_pd(out, EmuSIMD::cast<_generic_lane_register>(EmuSIMD::shuffle<I2_ % 2, I3_ % 2>(lane_0, lane_1)), 1);
+				auto tmp_shuffle = EmuSIMD::cast<_generic_lane_register>(EmuSIMD::shuffle<I2_ % 2, I3_ % 2>(lane_0, lane_1));
+				out = _mm256_insertf128_pd(out, tmp_shuffle, 1);
 			}
 		}
 
