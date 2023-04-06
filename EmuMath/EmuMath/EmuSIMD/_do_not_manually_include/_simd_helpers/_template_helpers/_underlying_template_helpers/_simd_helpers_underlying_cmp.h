@@ -375,7 +375,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	}
 
-	template<class Register_, std::size_t PerElementWidthIfIntegral_ = 32, std::int64_t Bits_ = 0xFFFFFFFFFFFFFFFF, EmuConcepts::Arithmetic Mask_>
+	template<class Register_, std::size_t PerElementWidthIfIntegral_ = 32, std::int64_t Bits_ = 0xFFFFFFFFFFFFFFFF, typename Mask_>
 	[[nodiscard]] inline Register_ _make_register_from_movemask(Mask_&& mask_)
 	{
 		using _mask_uq = typename std::remove_cvref<Mask_>::type;
