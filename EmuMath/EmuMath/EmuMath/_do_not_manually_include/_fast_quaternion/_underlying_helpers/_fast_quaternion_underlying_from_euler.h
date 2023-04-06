@@ -280,7 +280,8 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 			_register_type cos_xyz = EmuSIMD::cos<width, is_signed>(sin_xyz);
 			sin_xyz = EmuSIMD::sin<width, is_signed>(sin_xyz);
 
-			// NEEDS GENERALISING STILL: ONLY SUPPORTS 4-ELEMENT REGISTERS
+			// TODO: NEEDS GENERALISING STILL: ONLY SUPPORTS 4-ELEMENT REGISTERS
+			// --- Currently considered low priority due to the very low likelihood of choosing a Vector with > 4 elements
 			_register_type sin_and_cos_xy = EmuSIMD::shuffle_full_width<0, 1, 0, 1>(sin_xyz, cos_xyz);	// sin(x), sin(y), cos(x), cos(y)
 			_register_type sin_and_cos_z = EmuSIMD::shuffle_full_width<2, 2, 2, 2>(sin_xyz, cos_xyz);	// sin(z), sin(z), cos(z), cos(z)
 

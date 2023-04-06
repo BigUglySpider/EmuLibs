@@ -124,6 +124,50 @@ namespace EmuSIMD
 	{
 		return make_index_mask<Register_>(EmuCore::TMP::make_inverted_integer_sequence<EmuCore::TMP::bool_sequence<IndexActive_...>>());
 	}
+
+	/// <summary>
+	/// <para> Creates an register to act as an index mask for the first X_ elements, ignoring elements from index X_. </para>
+	/// <para> If X_ is greater than or equal to the number of elements in the output register type, this will output a mask for the full register width. </para>
+	/// </summary>
+	/// <returns>Register of the required type to mask the first X_ elements of the register's width.</returns>
+	template<EmuConcepts::KnownSIMD Register_, std::size_t X_, std::size_t PerElementWidthIfInt_ = 32>
+	[[nodiscard]] constexpr inline auto make_index_mask_for_first_x_elements() noexcept
+		-> typename EmuCore::TMP::remove_ref_cv<Register_>::type
+	{
+		constexpr std::size_t num_elements = EmuSIMD::TMP::determine_register_element_count<Register_, PerElementWidthIfInt_>();
+		if constexpr (X_ >= num_elements)
+		{
+			using full_true_seq = EmuCore::TMP::make_true_bool_sequence<num_elements>();
+			return make_index_mask<Register_>(full_true_seq());
+		}
+		else
+		{
+			using full_true_false_seq = EmuCore::TMP::make_chunked_true_false_bool_sequence<X_, num_elements - X_, true>;
+			return make_index_mask<Register_>(full_true_false_seq());
+		}
+	}
+
+	/// <summary>
+	/// <para> Creates an register to act as an index mask for the last X_ elements, ignoring elements from indices 0:(X_ - 1). </para>
+	/// <para> If X_ is greater than or equal to the number of elements in the output register type, this will output a mask for the full register width. </para>
+	/// </summary>
+	/// <returns>Register of the required type to mask the last X_ elements of the register's width.</returns>
+	template<EmuConcepts::KnownSIMD Register_, std::size_t X_, std::size_t PerElementWidthIfInt_ = 32>
+	[[nodiscard]] constexpr inline auto make_index_mask_for_last_x_elements() noexcept
+		-> typename EmuCore::TMP::remove_ref_cv<Register_>::type
+	{
+		constexpr std::size_t num_elements = EmuSIMD::TMP::determine_register_element_count<Register_, PerElementWidthIfInt_>();
+		if constexpr (X_ >= num_elements)
+		{
+			using full_true_seq = EmuCore::TMP::make_true_bool_sequence<num_elements>();
+			return make_index_mask<Register_>(full_true_seq());
+		}
+		else
+		{
+			using full_true_false_seq = EmuCore::TMP::make_chunked_true_false_bool_sequence<X_, num_elements - X_, false>;
+			return make_index_mask<Register_>(full_true_false_seq());
+		}
+	}
 	
 	// NOTE FOR FUNCS: Integral functions have their adaptive nature based on arguments as _per_index_mask does, but an extra subset of _width functions are provided
 	// --- These functions are used to enforce safety and sanity checks when working with known size integral registers, if desired

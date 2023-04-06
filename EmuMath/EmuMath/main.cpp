@@ -407,6 +407,26 @@ int main()
 	//universal_pause();
 
 	{
+		constexpr auto mult_constant = 5.281f;
+		std::cout << "Scalar: " << (EmuMath::Quaternion<float>::from_euler<false, false>(-25.73f, 45.95f, 72.34f) * mult_constant).Norm() << "\n";
+		std::cout << "f32x4: " << (EmuMath::FastQuaternion<float, 128>(EmuMath::Quaternion<float>::from_euler<false, false>(-25.73f, 45.95f, 72.34f)) * mult_constant).NormScalar() << "\n";
+		std::cout << "f32x4: "; EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, (EmuMath::FastQuaternion<float, 128>(EmuMath::Quaternion<float>::from_euler<false, false>(-25.73f, 45.95f, 72.34f)) * mult_constant).Norm()) << "\n";
+		std::cout << "f32x8: " << (EmuMath::FastQuaternion<float, 256>(EmuMath::Quaternion<float>::from_euler<false, false>(-25.73f, 45.95f, 72.34f)) * mult_constant).NormScalar() << "\n";
+		std::cout << "f32x8: "; EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, (EmuMath::FastQuaternion<float, 256>(EmuMath::Quaternion<float>::from_euler<false, false>(-25.73f, 45.95f, 72.34f)) * mult_constant).Norm()) << "\n";
+		std::cout << "f64x2: " << (EmuMath::FastQuaternion<double, 128>(EmuMath::Quaternion<double>::from_euler<false, false>(-25.73f, 45.95f, 72.34f)) * mult_constant).NormScalar() << "\n";
+		std::cout << "f64x2: "; EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, (EmuMath::FastQuaternion<double, 128>(EmuMath::Quaternion<double>::from_euler<false, false>(-25.73f, 45.95f, 72.34f)) * mult_constant).Norm()) << "\n";
+
+		std::cout << "Scalar: " << (EmuMath::Quaternion<float>::from_euler<false, false>(-25.73f, 45.95f, 72.34f) * mult_constant).SquareNorm() << "\n";
+		std::cout << "f32x4: " << (EmuMath::FastQuaternion<float, 128>(EmuMath::Quaternion<float>::from_euler<false, false>(-25.73f, 45.95f, 72.34f)) * mult_constant).SquareNormScalar() << "\n";
+		std::cout << "f32x4: "; EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, (EmuMath::FastQuaternion<float, 128>(EmuMath::Quaternion<float>::from_euler<false, false>(-25.73f, 45.95f, 72.34f)) * mult_constant).SquareNorm()) << "\n";
+		std::cout << "f32x8: " << (EmuMath::FastQuaternion<float, 256>(EmuMath::Quaternion<float>::from_euler<false, false>(-25.73f, 45.95f, 72.34f)) * mult_constant).SquareNormScalar() << "\n";
+		std::cout << "f32x8: "; EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, (EmuMath::FastQuaternion<float, 256>(EmuMath::Quaternion<float>::from_euler<false, false>(-25.73f, 45.95f, 72.34f)) * mult_constant).SquareNorm()) << "\n";
+		std::cout << "f64x2: " << (EmuMath::FastQuaternion<double, 128>(EmuMath::Quaternion<double>::from_euler<false, false>(-25.73f, 45.95f, 72.34f)) * mult_constant).SquareNormScalar() << "\n";
+		std::cout << "f64x2: "; EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, (EmuMath::FastQuaternion<double, 128>(EmuMath::Quaternion<double>::from_euler<false, false>(-25.73f, 45.95f, 72.34f)) * mult_constant).SquareNorm()) << "\n";
+		universal_pause();
+	}
+
+	{
 		__m128 a = EmuSIMD::setr<__m128, 32>(1, 2, 3, 4);
 		__m128 b = EmuSIMD::setr<__m128, 32>(5, 6, 7, 8);
 		__m128 res_old_ab = EmuSIMD::shuffle<0, 3, 2, 1>(a, b);

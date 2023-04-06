@@ -621,6 +621,54 @@ namespace EmuSIMD::TMP
 		template<typename T_>
 		concept KnownSIMD = EmuSIMD::TMP::is_simd_register_v<T_>;
 	}
+
+	template<Concepts::KnownSIMD Register_, std::size_t PerElementWidthIfGenericInt_ = 32>
+	[[nodiscard]] constexpr inline std::size_t determine_register_element_count()
+	{
+		using _register_uq = typename std::remove_cvref<Register_>::type;
+		if constexpr (EmuCore::TMP::is_any_same_v<_register_uq, EmuSIMD::i128_generic, EmuSIMD::i256_generic, EmuSIMD::i512_generic>)
+		{
+			if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfGenericInt_>())
+			{
+				return EmuSIMD::TMP::simd_register_width_v<_register_uq> / PerElementWidthIfGenericInt_;
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidthIfGenericInt_>(), "Invalid `PerElementWidthIfGenericInt_` passed when calling `EmuSIMD::TMP::determine_register_element_count` with a generic integral SIMD register.");
+			}
+		}
+		else
+		{
+			if constexpr (EmuCore::TMP::is_any_same_v<_register_uq, EmuSIMD::f64x2, EmuSIMD::i64x2, EmuSIMD::u64x2>)
+			{
+				return 2;
+			}
+			else if constexpr (EmuCore::TMP::is_any_same_v<_register_uq, EmuSIMD::f32x4, EmuSIMD::f64x4, EmuSIMD::i32x4, EmuSIMD::u32x4, EmuSIMD::i64x4, EmuSIMD::u64x4>)
+			{
+				return 4;
+			}
+			else if constexpr (EmuCore::TMP::is_any_same_v<_register_uq, EmuSIMD::f32x8, EmuSIMD::f64x8, EmuSIMD::i16x8, EmuSIMD::u16x8, EmuSIMD::i32x8, EmuSIMD::u32x8, EmuSIMD::i64x8, EmuSIMD::u64x8>)
+			{
+				return 8;
+			}
+			else if constexpr (EmuCore::TMP::is_any_same_v<_register_uq, EmuSIMD::f32x16, EmuSIMD::i8x16, EmuSIMD::u8x16, EmuSIMD::i16x16, EmuSIMD::u16x16, EmuSIMD::i32x16, EmuSIMD::u32x16>)
+			{
+				return 16;
+			}
+			else if constexpr (EmuCore::TMP::is_any_same_v<_register_uq, EmuSIMD::i8x32, EmuSIMD::u8x32, EmuSIMD::i16x32, EmuSIMD::u16x32>)
+			{
+				return 32;
+			}
+			else if constexpr (EmuCore::TMP::is_any_same_v<_register_uq, EmuSIMD::i8x64, EmuSIMD::u8x64>)
+			{
+				return 64;
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<_register_uq>(), "Invalid `Register_` type passed to `EmuSIMD::TMP::determine_register_element_count`: The register is not supported for this operation.");
+			}
+		}
+	}
 }
 
 namespace EmuConcepts

@@ -876,8 +876,98 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 
 #pragma region QUATERNION_OPERATIONS
 	public:
-		// TODO: See same region in `_quaternion_t.h`
+		/// <summary>
+		/// <para> Outputs the squared Norm (aka: Length) of this Quaternion as the specified scalar type (defaulting to this Quaternion's `preferred_floating_point`). </para>
+		/// </summary>
+		/// <returns>The squared Norm of this Quaternion, represented as a scalar value.</returns>
+		template<EmuConcepts::Arithmetic OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline auto SquareNormScalar() const
+			-> OutT_
+		{
+			return EmuMath::Helpers::fast_quaternion_square_norm_scalar<OutT_>(*this);
+		}
 
+		/// <summary>
+		/// <para> Outputs the squared Norm (aka: Length) of this Quaternion within all elements of a SIMD register. </para>
+		/// </summary>
+		/// <returns>The squared Norm of this Quaternion, represented as a SIMD register of this Quaternion's `register_type`.</returns>
+		[[nodiscard]] constexpr inline auto SquareNorm() const
+			-> register_type
+		{
+			return EmuMath::Helpers::fast_quaternion_square_norm(*this);
+		}
+
+		template<EmuConcepts::Arithmetic OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline auto NormScalar() const
+		{
+			return EmuMath::Helpers::fast_quaternion_norm_scalar<OutT_>(*this);
+		}
+
+		[[nodiscard]] constexpr inline auto Norm() const
+		{
+			return EmuMath::Helpers::fast_quaternion_norm(*this);
+		}
+
+		[[nodiscard]] constexpr inline auto Lerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, const EmuMath::FastQuaternion<T_, RegisterWidth_>& t_) const
+		{
+			// TODO
+		}
+
+		[[nodiscard]] constexpr inline auto FusedLerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, const EmuMath::FastQuaternion<T_, RegisterWidth_>& t_) const
+		{
+			// TODO
+		}
+
+		[[nodiscard]] constexpr inline auto Slerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, const EmuMath::FastQuaternion<T_, RegisterWidth_>& t_) const
+		{
+			// TODO
+		}
+
+		[[nodiscard]] constexpr inline auto FusedSlerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, const EmuMath::FastQuaternion<T_, RegisterWidth_>& t_) const
+		{
+			// TODO
+		}
+
+		[[nodiscard]] constexpr inline auto Conjugate() const
+		{
+			// TODO
+		}
+
+		template<bool PreferMultiplies_ = false>
+		[[nodiscard]] constexpr inline auto Inverse() const
+		{
+			// TODO
+		}
+
+		template<bool PreferMultiplies_ = false>
+		[[nodiscard]] constexpr inline auto FusedInverse() const
+		{
+			// TODO
+		}
+
+		template<bool PreferMultiplies_ = false>
+		[[nodiscard]] constexpr inline auto Unit() const
+		{
+			// TODO
+		}
+
+		template<bool PreferMultiplies_ = false>
+		[[nodiscard]] constexpr inline auto FusedUnit() const
+		{
+			// TODO
+		}
+
+		template<bool PreferMultiplies_ = false>
+		constexpr inline void AssignUnit()
+		{
+			// TODO
+		}
+
+		template<bool PreferMultiplies_ = false>
+		constexpr inline void AssignFusedUnit()
+		{
+			// TODO
+		}
 #pragma endregion
 
 #pragma region DATA
