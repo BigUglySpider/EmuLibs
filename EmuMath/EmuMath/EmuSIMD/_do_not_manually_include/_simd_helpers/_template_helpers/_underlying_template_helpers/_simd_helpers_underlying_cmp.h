@@ -740,7 +740,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _make_register_from_movemask<EmuSIMD::f32x16>(_mm512_cmp_ps_mask(lhs_, rhs_, CmpFlags_));
+				return _make_register_from_movemask<EmuSIMD::f32x16, 32, 0xFFFFFFFF>(_mm512_cmp_ps_mask(lhs_, rhs_, CmpFlags_));
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
@@ -752,7 +752,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _make_register_from_movemask<EmuSIMD::f64x8>(_mm512_cmp_pd_mask(lhs_, rhs_, CmpFlags_));
+				return _make_register_from_movemask<EmuSIMD::f64x8, 64, 0xFFFFFFFFFFFFFFFF>(_mm512_cmp_pd_mask(lhs_, rhs_, CmpFlags_));
 			}
 		}
 		else
