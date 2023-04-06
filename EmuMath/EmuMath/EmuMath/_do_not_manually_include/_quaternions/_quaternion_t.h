@@ -695,6 +695,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region ASSIGNMENT_OPERATORS
+	public:
 		template<std::size_t Unused_ = 0>
 		[[nodiscard]] static constexpr inline bool is_move_assignable()
 		{

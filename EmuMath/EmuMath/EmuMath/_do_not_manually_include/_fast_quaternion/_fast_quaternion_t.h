@@ -874,6 +874,12 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 #pragma endregion
 
+#pragma region QUATERNION_OPERATIONS
+	public:
+		// TODO: See same region in `_quaternion_t.h`
+
+#pragma endregion
+
 #pragma region DATA
 	public:
 		/// <summary>
