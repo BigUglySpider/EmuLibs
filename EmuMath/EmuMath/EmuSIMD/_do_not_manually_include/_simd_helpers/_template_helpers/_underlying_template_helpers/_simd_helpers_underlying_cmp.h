@@ -436,7 +436,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
 				int mask_ = _mm256_movemask_pd(_cast<EmuSIMD::f64x4>(register_)) << 4;
-				return mask_ | _mm256_movemask_ps(_mm512_extractf64x4_pd(register_, 1));
+				return mask_ | _mm256_movemask_pd(_mm512_extractf64x4_pd(register_, 1));
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 			{
