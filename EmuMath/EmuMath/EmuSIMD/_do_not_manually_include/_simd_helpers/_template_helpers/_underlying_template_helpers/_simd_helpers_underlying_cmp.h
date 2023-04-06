@@ -10,7 +10,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 {
 #pragma region MAKE_FROM_MOVEMASK_FUNCS
 	template<class Register_, std::size_t PerElementWidth_, std::uint64_t Bits_ = 0xFFFFFFFFFFFFFFFF>
-	[[nodiscard]] inline Register_ _make_register_from_movemask_int(const unsigned long long mask_)
+	[[nodiscard]] inline Register_ _make_register_from_movemask_int(const unsigned long long int mask_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
@@ -334,8 +334,8 @@ namespace EmuSIMD::_underlying_simd_helpers
 	}
 
 	
-	template<class Register_, std::int64_t Bits_ = 0xFFFFFFFFFFFFFFFF>
-	[[nodiscard]] inline Register_ _make_register_from_movemask_fp(const unsigned long long mask_)
+	template<class Register_, std::uint64_t Bits_ = 0xFFFFFFFFFFFFFFFF>
+	[[nodiscard]] inline Register_ _make_register_from_movemask_fp(const unsigned long long int mask_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
@@ -375,8 +375,8 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	}
 
-	template<class Register_, std::size_t PerElementWidthIfIntegral_ = 32, std::int64_t Bits_ = 0xFFFFFFFFFFFFFFFF>
-	[[nodiscard]] inline Register_ _make_register_from_movemask(const unsigned long long& mask_)
+	template<class Register_, std::size_t PerElementWidthIfIntegral_ = 32, std::uint64_t Bits_ = 0xFFFFFFFFFFFFFFFF>
+	[[nodiscard]] inline Register_ _make_register_from_movemask(const unsigned long long int& mask_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
@@ -400,10 +400,10 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	}
 
-	template<class Register_, std::size_t PerElementWidthIfIntegral_ = 32, std::int64_t Bits_ = 0xFFFFFFFFFFFFFFFF>
-	[[nodiscard]] inline Register_ _make_register_from_movemask(const signed long long& mask_)
+	template<class Register_, std::size_t PerElementWidthIfIntegral_ = 32, std::uint64_t Bits_ = 0xFFFFFFFFFFFFFFFF>
+	[[nodiscard]] inline Register_ _make_register_from_movemask(const signed long long int& mask_)
 	{
-		return _make_register_from_movemask<Register_, PerElementWidthIfIntegral_, Bits_>(static_cast<unsigned long long>(mask_));
+		return _make_register_from_movemask<Register_, PerElementWidthIfIntegral_, Bits_>(static_cast<unsigned long long int>(mask_));
 	}
 #pragma endregion
 
@@ -450,7 +450,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 			{
-				std::int64_t mask_ = _mm256_movemask_epi8(_cast<EmuSIMD::i256_generic>(register_));
+				std::uint64_t mask_ = _mm256_movemask_epi8(_cast<EmuSIMD::i256_generic>(register_));
 				mask_ <<= 32;
 				return mask_ | _mm256_movemask_epi8(_mm512_extracti32x8_epi32(register_, 1));
 			}
@@ -468,34 +468,34 @@ namespace EmuSIMD::_underlying_simd_helpers
 
 #pragma region GENERIC_CMP_FUNCS
 	template<int CmpFlags_, class Register_>
-	[[nodiscard]] inline unsigned long long _cmp_fp_mask(Register_ lhs_, Register_ rhs_)
+	[[nodiscard]] inline unsigned long long int _cmp_fp_mask(Register_ lhs_, Register_ rhs_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return static_cast<unsigned long long>(_mm_cmp_ps_mask(lhs_, rhs_, CmpFlags_));
+				return static_cast<unsigned long long int>(_mm_cmp_ps_mask(lhs_, rhs_, CmpFlags_));
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return static_cast<unsigned long long>(_mm256_cmp_ps_mask(lhs_, rhs_, CmpFlags_));
+				return static_cast<unsigned long long int>(_mm256_cmp_ps_mask(lhs_, rhs_, CmpFlags_));
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return static_cast<unsigned long long>(_mm512_cmp_ps_mask(lhs_, rhs_, CmpFlags_));
+				return static_cast<unsigned long long int>(_mm512_cmp_ps_mask(lhs_, rhs_, CmpFlags_));
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return static_cast<unsigned long long>(_mm_cmp_pd_mask(lhs_, rhs_, CmpFlags_));
+				return static_cast<unsigned long long int>(_mm_cmp_pd_mask(lhs_, rhs_, CmpFlags_));
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return static_cast<unsigned long long>(_mm256_cmp_pd_mask(lhs_, rhs_, CmpFlags_));
+				return static_cast<unsigned long long int>(_mm256_cmp_pd_mask(lhs_, rhs_, CmpFlags_));
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return static_cast<unsigned long long>(_mm512_cmp_pd_mask(lhs_, rhs_, CmpFlags_));
+				return static_cast<unsigned long long int>(_mm512_cmp_pd_mask(lhs_, rhs_, CmpFlags_));
 			}
 			else
 			{
@@ -508,7 +508,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	}
 	template<int CmpFlags_, std::size_t PerElementWidth_, bool Signed_, class Register_>
-	[[nodiscard]] inline unsigned long long _cmp_int_mask(Register_ lhs_, Register_ rhs_)
+	[[nodiscard]] inline unsigned long long int _cmp_int_mask(Register_ lhs_, Register_ rhs_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
@@ -672,7 +672,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	}
 	template<int CmpFlags_, std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
-	[[nodiscard]] inline unsigned long long _cmp_mask(Register_ lhs_, Register_ rhs_)
+	[[nodiscard]] inline unsigned long long int _cmp_mask(Register_ lhs_, Register_ rhs_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
@@ -742,7 +742,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				auto cmp_mask = static_cast<unsigned long long>(_mm512_cmp_ps_mask(lhs_, rhs_, CmpFlags_));
+				auto cmp_mask = static_cast<unsigned long long int>(_mm512_cmp_ps_mask(lhs_, rhs_, CmpFlags_));
 				return _make_register_from_movemask<EmuSIMD::f32x16, 32, 0xFFFFFFFF>(cmp_mask);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
@@ -755,7 +755,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				auto cmp_mask = static_cast<unsigned long long>(_mm512_cmp_pd_mask(lhs_, rhs_, CmpFlags_));
+				auto cmp_mask = static_cast<unsigned long long int>(_mm512_cmp_pd_mask(lhs_, rhs_, CmpFlags_));
 				return _make_register_from_movemask<EmuSIMD::f64x8, 64, 0xFFFFFFFFFFFFFFFF>(cmp_mask);
 			}
 		}

@@ -268,29 +268,31 @@ namespace EmuSIMD::_underlying_simd_helpers
 				else
 				{
 					// We have a non-register mask to use
+					using namespace EmuSIMD::Funcs;
+					constexpr auto blend_mask = mask_generator::get();
 					if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 					{
-						return _mm_blend_ps(a_, b_, mask_generator::get());
+						return blend_f32x4<blend_mask>(a_, b_);
 					}
 					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 					{
-						return _mm256_blend_ps(a_, b_, mask_generator::get());
+						return blend_f32x8<blend_mask>(a_, b_);
 					}
 					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 					{
-						return _mm512_mask_blend_ps(mask_generator::get(), a_, b_);
+						return blend_f32x16<blend_mask>(a_, b_);
 					}
 					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 					{
-						return _mm_blend_pd(a_, b_, mask_generator::get());
+						return blend_f64x2<blend_mask>(a_, b_);
 					}
 					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 					{
-						return _mm256_blend_pd(a_, b_, mask_generator::get());
+						return blend_f64x4<blend_mask>(a_, b_);
 					}
 					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 					{
-						return _mm512_mask_blend_pd(mask_generator::get(), a_, b_);
+						return blend_f64x8<blend_mask>(a_, b_);
 					}
 					else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::i128_generic, EmuSIMD::i256_generic, EmuSIMD::i512_generic>::value)
 					{
@@ -306,15 +308,15 @@ namespace EmuSIMD::_underlying_simd_helpers
 								// We know we have one of the 3 integral registers, so simple else...elif...else covers all scenarios
 								if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 								{
-									return _mm_blend_epi16(a_, b_, mask_generator::get());
+									return _mm_blend_epi16(a_, b_, blend_mask);
 								}
 								else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 								{
-									return _mm256_blend_epi16(a_, b_, mask_generator::get());
+									return _mm256_blend_epi16(a_, b_, blend_mask);
 								}
 								else
 								{
-									return _mm512_mask_blend_epi16(mask_generator::get(), a_, b_);
+									return _mm512_mask_blend_epi16(blend_mask, a_, b_);
 								}
 							}
 							else
@@ -323,15 +325,15 @@ namespace EmuSIMD::_underlying_simd_helpers
 								// --- e.g. 64-bit blend<false, true> translates to 32-bit blend<false, false, true, true>
 								if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 								{
-									return _mm_blend_epi32(a_, b_, mask_generator::get());
+									return _mm_blend_epi32(a_, b_, blend_mask);
 								}
 								else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 								{
-									return _mm256_blend_epi32(a_, b_, mask_generator::get());
+									return _mm256_blend_epi32(a_, b_, blend_mask);
 								}
 								else
 								{
-									return _mm512_mask_blend_epi32(mask_generator::get(), a_, b_);
+									return _mm512_mask_blend_epi32(blend_mask, a_, b_);
 								}
 							}
 						}

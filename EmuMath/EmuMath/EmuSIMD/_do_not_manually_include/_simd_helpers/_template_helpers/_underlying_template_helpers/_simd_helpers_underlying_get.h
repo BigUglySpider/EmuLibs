@@ -468,7 +468,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::Funcs::cast_f32x16_f64x8(_mm512_extractf32x8_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::cast_f32x8_f64x8(_mm512_extractf32x8_ps(std::forward<In_>(in_), LaneIndex_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
