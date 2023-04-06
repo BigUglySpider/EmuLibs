@@ -82,7 +82,8 @@ namespace EmuSIMD
 				auto lo_b = EmuSIMD::cast<_generic_lane_register>(b_);
 
 				out = EmuSIMD::cast<_generic_register_type>(EmuSIMD::shuffle<I0_, I1_>(lo_a));
-				out = _mm256_insertf128_pd(out, EmuSIMD::shuffle<I2_, I3_>(lo_b), 1);
+				lo_b = EmuSIMD::shuffle<I2_, I3_>(lo_b);
+				out = _mm256_insertf128_pd(out, lo_b, 1);
 			}
 			else // Mixed lanes, we need to actually try
 			{
