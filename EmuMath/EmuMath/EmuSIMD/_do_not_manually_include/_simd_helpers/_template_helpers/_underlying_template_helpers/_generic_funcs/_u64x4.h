@@ -2,6 +2,7 @@
 #define EMU_SIMD_GENERIC_FUNCS_U64X4_H_INC_ 1
 
 #include "_common_generic_func_helpers.h"
+#include "_f64x4.h"
 
 namespace EmuSIMD::Funcs
 {
@@ -370,9 +371,9 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC auto emulate_fp_u64x4(Func_ func_, EmuSIMD::u64x4_arg in_)
 		-> std::enable_if_t<std::is_invocable_r_v<EmuSIMD::f64x4, decltype(func_), EmuSIMD::f64x4>, EmuSIMD::u64x4>
 	{
-		return _mm256_cvtpd_epu64
+		return cvt_f64x4_u64x4
 		(
-			func_(_mm256_cvtepu64_pd(in_))
+			func_(cvt_u64x4_f64x4(in_))
 		);
 	}
 #pragma endregion
@@ -412,6 +413,78 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region MOVES
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 movehl_u64x4(EmuSIMD::u64x4_arg lhs_, EmuSIMD::u64x4_arg rhs_)
+	{
+		return cast_f64x4_u64x4(movehl_f64x4(cast_u64x4_f64x4(lhs_), cast_u64x4_f64x4(rhs_)));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 movelh_u64x4(EmuSIMD::u64x4_arg lhs_, EmuSIMD::u64x4_arg rhs_)
+	{
+		return cast_f64x4_u64x4(movelh_f64x4(cast_u64x4_f64x4(lhs_), cast_u64x4_f64x4(rhs_)));
+	}
+#pragma endregion
+	
+#pragma region BLENDS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 bleudv_i64x4(EmuSIMD::u64x4_arg a_, EmuSIMD::u64x4_arg b_, EmuSIMD::u64x4_arg shuffle_mask_vec_)
+	{
+		return cast_f64x4_u64x4
+		(
+			blendv_f64x4
+			(
+				cast_u64x4_f64x4(a_),
+				cast_u64x4_f64x4(b_),
+				cast_u64x4_f64x4(shuffle_mask_vec_)
+			)
+		);
+	}
+
+	template<blend_mask_type BlendMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 blend_u64x4(EmuSIMD::u64x4_arg a_, EmuSIMD::u64x4_arg b_)
+	{
+		return cast_f64x4_u64x4
+		(
+			blend_f64x4<BlendMask_>
+			(
+				cast_u64x4_f64x4(a_),
+				cast_u64x4_f64x4(b_)
+			)
+		);
+	}
+#pragma endregion
+
+#pragma region MINMAX_FUNCS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 min_u64x4(EmuSIMD::u64x4_arg a_, EmuSIMD::u64x4_arg b_)
+	{
+		return _mm256_min_epu64(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 max_u64x4(EmuSIMD::u64x4_arg a_, EmuSIMD::u64x4_arg b_)
+	{
+		return _mm256_max_epu64(a_, b_);
+	}
+#pragma endregion
+
+#pragma region SHUFFLES
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 permute_u64x4(EmuSIMD::u64x4_arg a_)
+	{
+		return cast_f64x4_u64x4
+		(
+			permute_f64x4<ShuffleMask_>(cast_u64x4_f64x4(a_))
+		);
+	}
+
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 shuffle_u64x4(EmuSIMD::u64x4_arg a_, EmuSIMD::u64x4_arg b_)
+	{
+		return cast_f64x4_u64x4
+		(
+			shuffle_f64x4<ShuffleMask_>(cast_u64x4_f64x4(a_), cast_u64x4_f64x4(b_))
+		);
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 mul_all_u64x4(EmuSIMD::u64x4_arg lhs_, EmuSIMD::u64x4_arg rhs_)
 	{
@@ -440,7 +513,13 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 div_u64x4(EmuSIMD::u64x4_arg lhs_, EmuSIMD::u64x4_arg rhs_)
 	{
-		return _mm256_div_epu64(lhs_, rhs_);
+#if EMU_CORE_X86_X64_SVML
+		return _mm256_div_epi64(lhs_, rhs_);
+#else
+		EmuSIMD::f64x4 result_f64 = cvt_u64x4_f64x4(lhs_);
+		result_f64 = div_f64x4(result_f64, cvt_u64x4_f64x4(rhs_));
+		return cvt_f64x4_u64x4(trunc_f64x4(result_f64));
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 addsub_u64x4(EmuSIMD::u64x4_arg lhs_, EmuSIMD::u64x4_arg rhs_)
@@ -512,7 +591,13 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 mod_u64x4(EmuSIMD::u64x4_arg lhs_, EmuSIMD::u64x4_arg rhs_)
 	{
+#if EMU_CORE_X86_X64_SVML
 		return _mm256_rem_epu64(lhs_, rhs_);
+#else
+		EmuSIMD::u64x4 to_subtract = div_u64x4(lhs_, rhs_);
+		to_subtract = mul_all_u64x4(to_subtract, rhs_);
+		return sub_u64x4(lhs_, to_subtract);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 abs_u64x4(EmuSIMD::u64x4_arg in_)
@@ -522,12 +607,12 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 sqrt_u64x4(EmuSIMD::u64x4_arg in_)
 	{
-		return emulate_fp_u64x4([](EmuSIMD::f64x4_arg in_fp_) { return _mm256_sqrt_pd(in_fp_); }, in_);
+		return emulate_fp_u64x4([](EmuSIMD::f64x4_arg in_fp_) { return sqrt_f64x4(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 rsqrt_u64x4(EmuSIMD::u64x4_arg in_)
 	{
-		return emulate_fp_u64x4([](EmuSIMD::f64x4_arg in_fp_) { return _mm256_div_pd(_mm256_set1_pd(1.0), _mm256_sqrt_pd(in_fp_)); }, in_);
+		return emulate_fp_u64x4([](EmuSIMD::f64x4_arg in_fp_) { return rsqrt_f64x4(in_fp_); }, in_);
 	}
 #pragma endregion
 
@@ -546,32 +631,32 @@ namespace EmuSIMD::Funcs
 #pragma region TRIG
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 cos_u64x4(EmuSIMD::u64x4_arg in_)
 	{
-		return emulate_fp_u64x4([](EmuSIMD::f64x4_arg in_fp_) { return _mm256_cos_pd(in_fp_); }, in_);
+		return emulate_fp_u64x4([](EmuSIMD::f64x4_arg in_fp_) { return cos_f64x4(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 sin_u64x4(EmuSIMD::u64x4_arg in_)
 	{
-		return emulate_fp_u64x4([](EmuSIMD::f64x4_arg in_fp_) { return _mm256_sin_pd(in_fp_); }, in_);
+		return emulate_fp_u64x4([](EmuSIMD::f64x4_arg in_fp_) { return sin_f64x4(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 tan_u64x4(EmuSIMD::u64x4_arg in_)
 	{
-		return emulate_fp_u64x4([](EmuSIMD::f64x4_arg in_fp_) { return _mm256_tan_pd(in_fp_); }, in_);
+		return emulate_fp_u64x4([](EmuSIMD::f64x4_arg in_fp_) { return tan_f64x4(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 acos_u64x4(EmuSIMD::u64x4_arg in_)
 	{
-		return emulate_fp_u64x4([](EmuSIMD::f64x4_arg in_fp_) { return _mm256_acos_pd(in_fp_); }, in_);
+		return emulate_fp_u64x4([](EmuSIMD::f64x4_arg in_fp_) { return acos_f64x4(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 asin_u64x4(EmuSIMD::u64x4_arg in_)
 	{
-		return emulate_fp_u64x4([](EmuSIMD::f64x4_arg in_fp_) { return _mm256_asin_pd(in_fp_); }, in_);
+		return emulate_fp_u64x4([](EmuSIMD::f64x4_arg in_fp_) { return asin_f64x4(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 atan_u64x4(EmuSIMD::u64x4_arg in_)
 	{
-		return emulate_fp_u64x4([](EmuSIMD::f64x4_arg in_fp_) { return _mm256_atan_pd(in_fp_); }, in_);
+		return emulate_fp_u64x4([](EmuSIMD::f64x4_arg in_fp_) { return atan_f64x4(in_fp_); }, in_);
 	}
 #pragma endregion
 }

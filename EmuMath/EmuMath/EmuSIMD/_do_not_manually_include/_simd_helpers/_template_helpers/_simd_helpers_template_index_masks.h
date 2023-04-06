@@ -154,7 +154,7 @@ namespace EmuSIMD
 	template<bool AllIndices_>
 	[[nodiscard]] inline EmuSIMD::i128_generic index_mask_m128i()
 	{
-		return index_mask<EmuSIMD::i128_generic, AllIndices_>;
+		return index_mask<EmuSIMD::i128_generic, AllIndices_>::get();
 	}
 	template
 	<
@@ -354,7 +354,7 @@ namespace EmuSIMD
 	template<bool AllIndices_>
 	[[nodiscard]] inline EmuSIMD::i256_generic index_mask_m256i()
 	{
-		return index_mask<EmuSIMD::i256_generic, AllIndices_>;
+		return index_mask<EmuSIMD::i256_generic, AllIndices_>::get();
 	}
 	template
 	<
@@ -580,7 +580,7 @@ namespace EmuSIMD
 	template<bool AllIndices_>
 	[[nodiscard]] inline EmuSIMD::i512_generic index_mask_m512i()
 	{
-		return index_mask<EmuSIMD::i512_generic, AllIndices_>;
+		return index_mask<EmuSIMD::i512_generic, AllIndices_>::get();
 	}
 	template
 	<

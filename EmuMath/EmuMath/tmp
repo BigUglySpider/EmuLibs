@@ -1,0 +1,1 @@
+g++  -std=c++20 -mavx2 -mfma -lstdc++fs  -O3 -o ./build/emu_math_tests **.cpp 

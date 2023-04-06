@@ -15,9 +15,6 @@ namespace EmuMath
 		using value_type = typename std::remove_cv<T_>::type;
 		using this_type = EmuMath::FastQuaternion<T_, RegisterWidth_>;
 
-		using register_type = typename EmuSIMD::TMP::register_type<value_type, register_width>::type;
-		using register_arg_type = typename EmuSIMD::TMP::register_arg_type<value_type, register_width>::type;
-		using shift_register_type = __m128i;
 		/// <summary> Alias to the type of SIMD register used for this Quaternion's data. </summary>
 		using register_type = typename EmuSIMD::TMP::register_type<value_type, register_width>::type;
 		/// <summary> Alias to the argument type used to pass an instance of this Quaternion's register_type. </summary>
@@ -388,8 +385,8 @@ namespace EmuMath
 			}
 			else
 			{
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 				if constexpr (elements_per_register == 4)
 				{
 					return EmuSIMD::set<register_type>
@@ -419,7 +416,7 @@ namespace EmuMath
 						);
 					}
 				}
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 			}
 		}
 #pragma endregion
@@ -615,7 +612,7 @@ namespace EmuMath
 		/// <para> Adds this Quaternion and the passed `rhs_` Quaternion. </para>
 		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
 		/// </summary>
-		[[nodiscard]] constexpr inline void AddAssign(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_)
+		constexpr inline void AddAssign(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_)
 		{
 			EmuMath::Helpers::fast_quaternion_add_assign(*this, rhs_);
 		}
@@ -624,7 +621,7 @@ namespace EmuMath
 		/// <para> Subtracts the passed `rhs_` Quaternion from this Quaternion. </para>
 		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
 		/// </summary>
-		[[nodiscard]] constexpr inline void SubtractAssign(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_)
+		constexpr inline void SubtractAssign(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_)
 		{
 			EmuMath::Helpers::fast_quaternion_subtract_assign(*this, rhs_);
 		}
@@ -634,7 +631,7 @@ namespace EmuMath
 		/// <para> The passed register should contain the same value in all respective lanes for most cases of standard Quaternion division. </para>
 		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
 		/// </summary>
-		[[nodiscard]] constexpr inline void DivideAssign(register_arg_type rhs_scalar_register_)
+		constexpr inline void DivideAssign(register_arg_type rhs_scalar_register_)
 		{
 			EmuMath::Helpers::fast_quaternion_divide_assign(*this, rhs_scalar_register_);
 		}
@@ -645,7 +642,7 @@ namespace EmuMath
 		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
 		/// </summary>
 		template<EmuConcepts::Arithmetic RhsScalar_>
-		[[nodiscard]] constexpr inline void DivideAssign(RhsScalar_&& rhs_scalar_)
+		constexpr inline void DivideAssign(RhsScalar_&& rhs_scalar_)
 		{
 			EmuMath::Helpers::fast_quaternion_divide_assign(*this, std::forward<RhsScalar_>(rhs_scalar_));
 		}
@@ -654,7 +651,7 @@ namespace EmuMath
 		/// <para> Multiplies this Quaternion with the passed `rhs_` Quaternion. </para>
 		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
 		/// </summary>
-		[[nodiscard]] constexpr inline void MultiplyAssignQuaternion(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_)
+		constexpr inline void MultiplyAssignQuaternion(const EmuMath::FastQuaternion<T_, RegisterWidth_>& rhs_)
 		{
 			EmuMath::Helpers::fast_quaternion_multiply_assign_quaternion(*this, rhs_);
 		}
@@ -664,7 +661,7 @@ namespace EmuMath
 		/// <para> The passed register should contain the same value in all respective lanes for most cases of standard Quaternion x Scalar multiplication. </para>
 		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
 		/// </summary>
-		[[nodiscard]] constexpr inline void MultiplyAssignScalar(register_arg_type rhs_scalar_register_)
+		constexpr inline void MultiplyAssignScalar(register_arg_type rhs_scalar_register_)
 		{
 			EmuMath::Helpers::fast_quaternion_multiply_assign_scalar(*this, rhs_scalar_register_);
 		}
@@ -675,7 +672,7 @@ namespace EmuMath
 		/// <para> Results of the operation are assigned to this FastQuaternion. </para>
 		/// </summary>
 		template<EmuConcepts::Arithmetic RhsScalar_>
-		[[nodiscard]] constexpr inline void MultiplyAssignScalar(RhsScalar_&& rhs_scalar_)
+		constexpr inline void MultiplyAssignScalar(RhsScalar_&& rhs_scalar_)
 		{
 			EmuMath::Helpers::fast_quaternion_multiply_assign_scalar(*this, std::forward<RhsScalar_>(rhs_scalar_));
 		}

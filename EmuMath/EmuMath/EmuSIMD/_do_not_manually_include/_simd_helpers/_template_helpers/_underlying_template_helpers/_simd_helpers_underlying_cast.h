@@ -26,7 +26,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (std::is_same_v<to_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_castpd_ps(from_);
+				return _mm_castps_pd(from_);
 			}
 			else if constexpr (std::is_same_v<to_uq, EmuSIMD::f64x4>)
 			{

@@ -2,6 +2,7 @@
 #define EMU_SIMD_HELPERS_UNDERLYING_INDEX_MASKS_H_INC_ 1
 
 #include "_common_underlying_simd_template_helper_includes.h"
+#include "../../../../../EmuCore/TMPHelpers/TypeComparators.h"
 #include "../../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD::_underlying_simd_helpers

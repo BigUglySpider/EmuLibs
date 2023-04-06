@@ -255,9 +255,10 @@ namespace EmuSIMD
 				{
 					constexpr std::size_t lane_index = Index_ >= 4 ? 1 : 0;
 					constexpr std::size_t mask = (lane_index << 4) | lane_index;
+					constexpr std::size_t index_in_lane = Index_ % 4;
 					register_uq matching_lanes = _mm256_permute2f128_ps(in_, in_, mask);
 					matching_lanes = _mm256_permute2f128_ps(matching_lanes, matching_lanes, mask);
-					return EmuSIMD::shuffle<Index_, Index_, Index_, Index_>(matching_lanes);
+					return EmuSIMD::shuffle<index_in_lane, index_in_lane, index_in_lane, index_in_lane>(matching_lanes);
 				}
 				else if constexpr (std::is_same_v<register_uq, EmuSIMD::f32x16>)
 				{
@@ -271,8 +272,9 @@ namespace EmuSIMD
 				{
 					constexpr std::size_t lane_index = Index_ >= 2 ? 1 : 0;
 					constexpr std::size_t mask = (lane_index << 4) | lane_index;
+					constexpr std::size_t index_in_lane = Index_ % 2;
 					register_uq matching_lanes = _mm256_permute2f128_pd(in_, in_, mask);
-					return EmuSIMD::shuffle<Index_, Index_>(matching_lanes);
+					return EmuSIMD::shuffle<index_in_lane, index_in_lane>(matching_lanes);
 				}
 				else if constexpr (std::is_same_v<register_uq, EmuSIMD::f64x8>)
 				{
@@ -310,26 +312,27 @@ namespace EmuSIMD
 					constexpr std::size_t half_elements = num_elements / 2;
 					constexpr std::size_t lane_index = Index_ >= half_elements ? 1 : 0;
 					constexpr std::size_t mask = (lane_index << 4) | lane_index;
+					constexpr std::size_t index_in_lane = Index_ % half_elements;
 					register_uq matching_lanes = _mm256_permute2f128_si256(in_, in_, mask);
 
 					if constexpr (PerElementWidthIfInt_ == 8)
 					{
-						return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>
+						return EmuSIMD::shuffle<index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane>
 						(
 							matching_lanes
 						);
 					}
 					else if constexpr (PerElementWidthIfInt_ == 16)
 					{
-						return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>(matching_lanes);
+						return EmuSIMD::shuffle<index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane>(matching_lanes);
 					}
 					else if constexpr (PerElementWidthIfInt_ == 32)
 					{
-						return EmuSIMD::shuffle<Index_, Index_, Index_, Index_>(matching_lanes);
+						return EmuSIMD::shuffle<index_in_lane, index_in_lane, index_in_lane, index_in_lane>(matching_lanes);
 					}
 					else if constexpr (PerElementWidthIfInt_ == 64)
 					{
-						return EmuSIMD::shuffle<Index_, Index_>(matching_lanes);
+						return EmuSIMD::shuffle<index_in_lane, index_in_lane>(matching_lanes);
 					}
 					else
 					{
@@ -377,11 +380,12 @@ namespace EmuSIMD
 					constexpr std::size_t half_elements = num_elements / 2;
 					constexpr std::size_t lane_index = Index_ >= half_elements ? 1 : 0;
 					constexpr std::size_t mask = (lane_index << 4) | lane_index;
+					constexpr std::size_t index_in_lane = num_elements % half_elements;
 					register_uq matching_lanes = _mm256_permute2f128_si256(in_, in_, mask);;
 
 					if constexpr (std::is_same_v<register_uq, EmuSIMD::i8x32> || std::is_same_v<register_uq, EmuSIMD::u8x32>)
 					{
-						return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>
+						return EmuSIMD::shuffle<index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane>
 						(
 							matching_lanes
 						);
@@ -389,15 +393,15 @@ namespace EmuSIMD
 					}
 					else if constexpr (std::is_same_v<register_uq, EmuSIMD::i16x16> || std::is_same_v<register_uq, EmuSIMD::u16x16>)
 					{
-						return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>(matching_lanes);
+						return EmuSIMD::shuffle<index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane, index_in_lane>(matching_lanes);
 					}
 					else if constexpr (std::is_same_v<register_uq, EmuSIMD::i32x8> || std::is_same_v<register_uq, EmuSIMD::u32x8>)
 					{
-						return EmuSIMD::shuffle<Index_, Index_, Index_, Index_>(matching_lanes);
+						return EmuSIMD::shuffle<index_in_lane, index_in_lane, index_in_lane, index_in_lane>(matching_lanes);
 					}
-					else if constexpr(std::is_same_v<register_uq, EmuSIMD::i64x4> || std::is_same_v<register_uq, EmuSIMD::u64x4>)
+					else if constexpr (std::is_same_v<register_uq, EmuSIMD::i64x4> || std::is_same_v<register_uq, EmuSIMD::u64x4>)
 					{
-						return EmuSIMD::shuffle<Index_, Index_>(matching_lanes);
+						return EmuSIMD::shuffle<index_in_lane, index_in_lane>(matching_lanes);
 					}
 					else
 					{

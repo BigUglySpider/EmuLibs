@@ -91,7 +91,7 @@ namespace EmuMath::Functors
 							result_ = EmuSIMD::add
 							(
 								result_,
-								EmuSIMD::mul(generator(points_x_, points_y_, points_z_, active_freq_, permutation_mask_simd, permutations), amplitude_)
+								EmuSIMD::mul_all(generator(points_x_, points_y_, points_z_, active_freq_, permutation_mask_simd, permutations), amplitude_)
 							);
 							++octave_;
 						} while (octave_ < end_);
@@ -137,7 +137,7 @@ namespace EmuMath::Functors
 							result_ = EmuSIMD::add
 							(
 								result_,
-								EmuSIMD::mul(generator(points_x_, points_y_, active_freq_, permutation_mask_simd, permutations), amplitude_)
+								EmuSIMD::mul_all(generator(points_x_, points_y_, active_freq_, permutation_mask_simd, permutations), amplitude_)
 							);
 							++octave_;
 						} while (octave_ < end_);
@@ -183,7 +183,7 @@ namespace EmuMath::Functors
 							result_ = EmuSIMD::add
 							(
 								result_,
-								EmuSIMD::mul(generator(points_x_, active_freq_, permutation_mask_simd, permutations), amplitude_)
+								EmuSIMD::mul_all(generator(points_x_, active_freq_, permutation_mask_simd, permutations), amplitude_)
 							);
 							++octave_;
 						} while (octave_ < end_);

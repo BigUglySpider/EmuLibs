@@ -1,8 +1,10 @@
 #ifndef EMU_CORE_BIT_HELPERS_H_INC_
 #define EMU_CORE_BIT_HELPERS_H_INC_ 1
 
+#include <bit>
 #include <cstddef>
 #include <cstdint>
+#include <utility>
 
 namespace EmuCore::ArithmeticHelpers
 {
@@ -55,6 +57,40 @@ namespace EmuCore::ArithmeticHelpers
 	{
 		UintT_ highest_bit_ = highest_set_uint_bit<UintT_>(val_);
 		return (highest_bit_ <= 1) ? UintT_(1) : (highest_bit_ >> 1);
+	}
+
+	namespace _underlying_funcs
+	{
+		template<typename UnqualifiedT_, std::size_t...ByteIndices_>
+		[[nodiscard]] constexpr inline decltype(auto) _set_generic_bits_to_max(std::index_sequence<ByteIndices_...> byte_indices_) noexcept
+		{
+			using byte_type = unsigned char;
+			constexpr byte_type all_one = std::numeric_limits<byte_type>::max();
+			constexpr byte_type bytes[sizeof...(ByteIndices_)] = { static_cast<byte_type>(all_one + (ByteIndices_ * 0))... };
+			return std::bit_cast<UnqualifiedT_>(bytes);
+		}
+	}
+
+	template<typename T_>
+	[[nodiscard]] constexpr inline decltype(auto) set_all_bits_one() noexcept
+	{
+		using _unqualified_type = typename std::remove_cvref<T_>::type;
+		if constexpr (std::is_integral_v<_unqualified_type>)
+		{
+			if constexpr (std::is_signed_v<_unqualified_type>)
+			{
+				return _unqualified_type(-1);
+			}
+			else
+			{
+				return std::numeric_limits<_unqualified_type>::max();
+			}
+		}
+		else
+		{
+			constexpr std::size_t num_bytes = sizeof(_unqualified_type);
+			return _underlying_funcs::_set_generic_bits_to_max<_unqualified_type>(std::make_index_sequence<num_bytes>());
+		}
 	}
 }
 

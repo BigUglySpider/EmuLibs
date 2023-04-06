@@ -67,8 +67,8 @@ namespace EmuMath::Helpers::_matrix_underlying
 		out_22 = EmuCore::do_divide<calc_fp, calc_fp>()(out_22, EmuCore::do_subtract<calc_fp, calc_fp>()(far, out_22));
 		calc_fp focal_length = static_cast<calc_fp>(std::forward<FocalLength_>(focal_length_));
 
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		return OutMatrix_
 		(
 			_make_perspective_arg_vk_reverse_depth<ColumnIndices_, RowIndices_, OutMatrix_, calc_fp>
@@ -79,7 +79,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 				focal_length 
 			)...
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 	template<class OutMatrix_, bool FovRads_, bool IsConstexpr_, typename FovY_, typename AspectRatio_, typename Near_, typename Far_>

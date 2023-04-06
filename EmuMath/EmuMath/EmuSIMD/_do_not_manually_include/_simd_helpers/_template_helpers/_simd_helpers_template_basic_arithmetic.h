@@ -71,42 +71,6 @@ namespace EmuSIMD
 	}
 
 	/// <summary>
-	/// <para> Performs the correct _mul_ operation for the provided SIMD Register_ type. </para>
-	/// <para> 
-	///		The provided SignedIfIntegral_ is used to determine if multiplied integers should be considered signed or unsigned, if integer registers are provided.
-	///		This is not used when a floating-point register is provided, and defaults to true.
-	/// </para>
-	/// <para> 
-	///		Note that integral _mul_ operations do not provide a full multiplication, and instead multiply the lo 32 bits of 64-bit lanes and provide 64-bit integer results. 
-	///		To instead multiply all elements and store results in the desired width, use mul_all instead.
-	/// </para>
-	/// </summary>
-	/// <typeparam name="Register_">Register type to perform a multiplication operation via.</typeparam>
-	/// <param name="lhs_">Register of values appearing on the left-hand side of multiplication.</param>
-	/// <param name="rhs_">Register of values appearing on the right-hand side of multiplication.</param>
-	/// <returns>Result of multiplying the two passed SIMD registers with their relevant _mul_ operation (e.g. _mm_mul_ps with EmuSIMD::f32x4 registers).</returns>
-	template<bool SignedIfIntegral_ = true, class Register_>
-	[[nodiscard]] inline Register_ mul(Register_ lhs_, Register_ rhs_)
-	{
-		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
-		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
-		{
-			if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
-			{
-				return _underlying_simd_helpers::_mul_fp(lhs_, rhs_);
-			}
-			else
-			{
-				return _underlying_simd_helpers::_mul_int<SignedIfIntegral_>(lhs_, rhs_);
-			}
-		}
-		else
-		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::mul with an unsupported type as the passed Register_.");
-		}
-	}
-
-	/// <summary>
 	/// <para> 
 	///		Performs the correct _mul_ operation for the provided SIMD Register_ type, 
 	///		where results will be that of multiplying each adjacent element. 
@@ -143,41 +107,6 @@ namespace EmuSIMD
 		else
 		{
 			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::mul_all with an unsupported type as the passed Register_.");
-		}
-	}
-
-	/// <summary>
-	/// <para> 
-	///		Multiplies PerElementWidth_-bit integers in the passed register to form (PerElementWidth_ * 2)-bit intermediate integers, 
-	///		and sets the values of the output register to the lo PerElementWidth_ bits of the resulting intermediates. 
-	///		This is performed using the correct _mullo_ operation for the provided register and specified element bit width.
-	/// </para>
-	/// <para> PerElementWidth_ is used to determine how many bits should be used to interpret each element within the passed registers. </para>
-	/// <para> Although there are no 8-bit functionalities built in, this will also emulate 8-bit width _mullo_ operations. </para>
-	/// <para> Only integral SIMD registers may be provided to form this function, as such operations do not exist for floating-point registers. </para>
-	/// </summary>
-	/// <typeparam name="IntegralRegister_">Integral register type to perform a multiplication operation via.</typeparam>
-	/// <param name="lhs_">Integral register of values appearing on the left-hand side of multiplication.</param>
-	/// <param name="rhs_">Integral register of values appearing on the right-hand side of multiplication.</param>
-	/// <returns>Result of multiplying respective elements in the passed two SIMD registers, read and written as their interpreted PerElementWidth_ bit size.</returns>
-	template<std::size_t PerElementWidth_ = 32, class IntegralRegister_>
-	[[nodiscard]] inline IntegralRegister_ mullo(IntegralRegister_ lhs_, IntegralRegister_ rhs_)
-	{
-		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<IntegralRegister_>::type;
-		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
-		{
-			if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<register_type_uq>)
-			{
-				return _underlying_simd_helpers::_mullo_int<PerElementWidth_>(lhs_, rhs_);
-			}
-			else
-			{
-				static_assert(EmuCore::TMP::get_false<IntegralRegister_>(), "Attempted to perform EmuSIMD::mullo with a non-integral SIMD register. Integral registers are required for this operation.");
-			}
-		}
-		else
-		{
-			static_assert(EmuCore::TMP::get_false<IntegralRegister_>(), "Attempted to perform EmuSIMD::mullo with an unsupported type as the passed IntegralRegister_.");
 		}
 	}
 
@@ -606,7 +535,7 @@ namespace EmuSIMD
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
-			return _underlying_simd_helpers::_clamp_min<PerElementWidthIfInt_, SignedIfInt_>(register_, min_);
+			return _underlying_simd_helpers::_max<PerElementWidthIfInt_, SignedIfInt_>(register_, min_);
 		}
 		else
 		{
@@ -620,7 +549,7 @@ namespace EmuSIMD
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
-			return _underlying_simd_helpers::_clamp_max<PerElementWidthIfInt_, SignedIfInt_>(register_, max_);
+			return _underlying_simd_helpers::_min<PerElementWidthIfInt_, SignedIfInt_>(register_, max_);
 		}
 		else
 		{

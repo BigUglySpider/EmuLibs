@@ -3,6 +3,7 @@
 
 #include "../../../EmuCore/CommonConcepts/Arithmetic.h"
 #include "../../../EmuCore/CommonConcepts/StdTypes.h"
+#include "../../../EmuCore/CommonPreprocessor/All.h"
 #include "../../../EmuCore/TMPHelpers/TypeConvertors.h"
 
 #pragma region CHECKS

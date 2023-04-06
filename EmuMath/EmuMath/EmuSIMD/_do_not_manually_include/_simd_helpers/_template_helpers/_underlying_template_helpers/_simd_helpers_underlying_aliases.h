@@ -1,6 +1,11 @@
 #ifndef EMU_SIMD_UNDERLYING_ALIASES_H_INC_
 #define EMU_SIMD_UNDERLYING_ALIASES_H_INC_ 1
 
+#include "../../../../../EmuCore/CommonPreprocessor/Compiler.h"
+
+// GCC Diagnistics - Should be temporary, but no estimate on when
+#pragma GCC diagnostic ignored "-Wignored-attributes"
+
 #include <immintrin.h>
 
 namespace EmuSIMD

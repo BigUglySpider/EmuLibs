@@ -106,33 +106,66 @@ namespace EmuMath
 		/// <summary>table_storage will be a Dimensions_-dimensional vector of value_types.</summary>
 		using table_storage = EmuMath::TMP::_full_noise_table_storage<num_dimensions, value_type>;
 
+		template<std::size_t Unused_>
+		[[nodiscard]] static constexpr inline bool _can_do_1d_only_funcs()
+		{
+			return Unused_ >= 0 && num_dimensions == 1;
+		}
+
+		template<std::size_t Unused_>
+		[[nodiscard]] static constexpr inline bool _can_do_2d_only_funcs()
+		{
+			return Unused_ >= 0 && num_dimensions == 2;
+		}
+
+		template<std::size_t Unused_>
+		[[nodiscard]] static constexpr inline bool _can_do_3d_only_funcs()
+		{
+			return Unused_ >= 0 && num_dimensions == 3;
+		}
+
 	public:
 #pragma region CONSTRUCTORS
 		FastNoiseTable() : samples(), table_size()
 		{
 		}
 
-		FastNoiseTable(const this_type& to_copy_) : samples(to_copy_.samples), table_size(to_copy_.table_size)
+		FastNoiseTable(const FastNoiseTable<NumDimensions_, MajorDimensionIndex_>& to_copy_) : samples(to_copy_.samples), table_size(to_copy_.table_size)
 		{
 		}
 
-		FastNoiseTable(this_type&& to_move_) noexcept : samples(std::move(to_move_.samples)), table_size(std::move(to_move_.table_size))
+		FastNoiseTable(FastNoiseTable<NumDimensions_, MajorDimensionIndex_>&& to_move_) noexcept : samples(std::move(to_move_.samples)), table_size(std::move(to_move_.table_size))
 		{
 		}
+
+		FastNoiseTable<NumDimensions_, MajorDimensionIndex_>& operator=(const FastNoiseTable<NumDimensions_, MajorDimensionIndex_>& rhs_)
+		{
+			this->samples = rhs_.samples;
+			this->table_size = rhs_.table_size;
+			return *this;
+		}
+
+		FastNoiseTable<NumDimensions_, MajorDimensionIndex_>& operator=(FastNoiseTable<NumDimensions_, MajorDimensionIndex_>&& rhs_) noexcept
+		{
+			this->samples = std::move(rhs_.samples);
+			this->table_size = std::move(rhs_.table_size);
+			return *this;
+		}
+
 #pragma endregion
 
 #pragma region RANDOM_ACCESS
-		template<typename OnlyAvailableFor1Dimensional_ = std::enable_if_t<num_dimensions == 1>>
+		template<std::size_t Unused_ = 0, typename OnlyAvailableFor1Dimensional_ = std::enable_if_t<_can_do_1d_only_funcs<Unused_>()>>
 		[[nodiscard]] inline value_type at(std::size_t x_) const
 		{
 			return _get_index(coordinate_type(x_));
 		}
-		template<typename OnlyAvailableFor2Dimensional_ = std::enable_if_t<num_dimensions == 2>>
+		template<std::size_t Unused_ = 0, typename OnlyAvailableFor2Dimensional_ = std::enable_if_t<_can_do_2d_only_funcs<Unused_>()>>
 		[[nodiscard]] inline value_type at(std::size_t x_, std::size_t y_) const
 		{
 			return _get_index(coordinate_type(x_, y_));
 		}
-		template<typename OnlyAvailableFor3Dimensional_ = std::enable_if_t<num_dimensions == 3>>
+		template<std::size_t Unused_ = 0, typename OnlyAvailableFor3Dimensional_ = std::enable_if_t<_can_do_3d_only_funcs<Unused_>()>>
 		[[nodiscard]] inline value_type at(std::size_t x_, std::size_t y_, std::size_t z_) const
 		{
 			return _get_index(coordinate_type(x_, y_, z_));
@@ -151,7 +184,7 @@ namespace EmuMath
 			}
 		}
 
-		template<typename OnlyAvailableFor1Dimensional_ = std::enable_if_t<num_dimensions == 1>>
+		template<std::size_t Unused_ = 0, typename OnlyAvailableFor1Dimensional_ = std::enable_if_t<_can_do_1d_only_funcs<Unused_>()>>
 		[[nodiscard]] inline value_type operator[](std::size_t x_) const
 		{
 			return at(x_);
@@ -162,17 +195,17 @@ namespace EmuMath
 			return at(coords_);
 		}
 
-		template<typename OnlyAvailableFor1Dimensional_ = std::enable_if_t<num_dimensions == 1>>
+		template<std::size_t Unused_ = 0, typename OnlyAvailableFor1Dimensional_ = std::enable_if_t<_can_do_1d_only_funcs<Unused_>()>>
 		[[nodiscard]] inline value_type operator()(std::size_t x_) const
 		{
 			return at(x_);
 		}
-		template<typename OnlyAvailableFor2Dimensional_ = std::enable_if_t<num_dimensions == 2>>
+		template<std::size_t Unused_ = 0, typename OnlyAvailableFor2Dimensional_ = std::enable_if_t<_can_do_2d_only_funcs<Unused_>()>>
 		[[nodiscard]] inline value_type operator()(std::size_t x_, std::size_t y_) const
 		{
 			return at(x_, y_);
 		}
-		template<typename OnlyAvailableFor3Dimensional_ = std::enable_if_t<num_dimensions == 3>>
+		template<std::size_t Unused_ = 0, typename OnlyAvailableFor3Dimensional_ = std::enable_if_t<_can_do_3d_only_funcs<Unused_>()>>
 		[[nodiscard]] inline value_type operator()(std::size_t x_, std::size_t y_, std::size_t z_) const
 		{
 			return at(x_, y_, z_);
@@ -193,7 +226,7 @@ namespace EmuMath
 		{
 			if constexpr (Index_ < num_dimensions)
 			{
-				return table_size.at<Index_>();
+				return table_size.template at<Index_>();
 			}
 			else
 			{
@@ -367,25 +400,25 @@ namespace EmuMath
 
 			if constexpr (num_dimensions == 3)
 			{
-				std::size_t end_x_ = table_size.at<0>();
-				std::size_t end_y_ = table_size.at<1>();
-				std::size_t end_z_ = table_size.at<2>();
-				std::size_t end_store_batch_ = table_size.at<major_dimension>();
+				std::size_t end_x_ = table_size.template at<0>();
+				std::size_t end_y_ = table_size.template at<1>();
+				std::size_t end_z_ = table_size.template at<2>();
+				std::size_t end_store_batch_ = table_size.template at<major_dimension>();
 				end_store_batch_ -= end_store_batch_ % num_elements_per_batch;
 
 
-				Register_ points_x_ = EmuSIMD::set1<Register_>(start_.at<0>());
-				Register_ points_y_ = EmuSIMD::set1<Register_>(start_.at<1>());
-				Register_ points_z_ = EmuSIMD::set1<Register_>(start_.at<2>());
-				Register_ step_x_ = EmuSIMD::set1<Register_>(step_.at<0>());
-				Register_ step_y_ = EmuSIMD::set1<Register_>(step_.at<1>());
-				Register_ step_z_ = EmuSIMD::set1<Register_>(step_.at<2>());
+				Register_ points_x_ = EmuSIMD::set1<Register_>(start_.template at<0>());
+				Register_ points_y_ = EmuSIMD::set1<Register_>(start_.template at<1>());
+				Register_ points_z_ = EmuSIMD::set1<Register_>(start_.template at<2>());
+				Register_ step_x_ = EmuSIMD::set1<Register_>(step_.template at<0>());
+				Register_ step_y_ = EmuSIMD::set1<Register_>(step_.template at<1>());
+				Register_ step_z_ = EmuSIMD::set1<Register_>(step_.template at<2>());
 
 				if constexpr (major_dimension == 0)
 				{
 					Register_ start_x_ = EmuSIMD::add(points_x_, EmuSIMD::mul_all(step_x_, EmuSIMD::setr_incrementing<Register_, 0>()));
 					Register_ start_z_ = points_z_;
-					step_x_ = EmuSIMD::mul(step_x_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
+					step_x_ = EmuSIMD::mul_all(step_x_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
 
 					for (std::size_t y = 0; y < end_y_; ++y)
 					{
@@ -413,7 +446,7 @@ namespace EmuMath
 				{
 					Register_ start_y_ = EmuSIMD::add(points_y_, EmuSIMD::mul_all(step_y_, EmuSIMD::setr_incrementing<Register_, 0>()));
 					Register_ start_z_ = points_z_;
-					step_y_ = EmuSIMD::mul(step_y_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
+					step_y_ = EmuSIMD::mul_all(step_y_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
 
 					for (std::size_t x = 0; x < end_x_; ++x)
 					{
@@ -440,8 +473,8 @@ namespace EmuMath
 				else
 				{
 					Register_ start_y_ = points_y_;
-					Register_ start_z_ = EmuSIMD::add(points_z_, EmuSIMD::mul(step_z_, EmuSIMD::setr_incrementing<Register_, 0>()));
-					step_z_ = EmuSIMD::mul(step_z_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
+					Register_ start_z_ = EmuSIMD::add(points_z_, EmuSIMD::mul_all(step_z_, EmuSIMD::setr_incrementing<Register_, 0>()));
+					step_z_ = EmuSIMD::mul_all(step_z_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
 
 					for (std::size_t x = 0; x < end_x_; ++x)
 					{
@@ -468,21 +501,21 @@ namespace EmuMath
 			}
 			else if constexpr (num_dimensions == 2)
 			{
-				std::size_t end_x_ = table_size.at<0>();
-				std::size_t end_y_ = table_size.at<1>();
-				std::size_t end_store_batch_ = table_size.at<major_dimension>();
+				std::size_t end_x_ = table_size.template at<0>();
+				std::size_t end_y_ = table_size.template at<1>();
+				std::size_t end_store_batch_ = table_size.template at<major_dimension>();
 				end_store_batch_ -= end_store_batch_ % num_elements_per_batch;
 
 
-				Register_ points_x_ = EmuSIMD::set1<Register_>(start_.at<0>());
-				Register_ points_y_ = EmuSIMD::set1<Register_>(start_.at<1>());
-				Register_ step_x_ = EmuSIMD::set1<Register_>(step_.at<0>());
-				Register_ step_y_ = EmuSIMD::set1<Register_>(step_.at<1>());
+				Register_ points_x_ = EmuSIMD::set1<Register_>(start_.template at<0>());
+				Register_ points_y_ = EmuSIMD::set1<Register_>(start_.template at<1>());
+				Register_ step_x_ = EmuSIMD::set1<Register_>(step_.template at<0>());
+				Register_ step_y_ = EmuSIMD::set1<Register_>(step_.template at<1>());
 
 				if constexpr (major_dimension == 0)
 				{
 					Register_ start_x_ = EmuSIMD::add(points_x_, EmuSIMD::mul_all(step_x_, EmuSIMD::setr_incrementing<Register_, 0>()));
-					step_x_ = EmuSIMD::mul(step_x_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
+					step_x_ = EmuSIMD::mul_all(step_x_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
 					for (std::size_t y = 0; y < end_y_; ++y)
 					{
 						auto& layer_ = samples[y];
@@ -500,7 +533,7 @@ namespace EmuMath
 				else
 				{
 					Register_ start_y_ = EmuSIMD::add(points_y_, EmuSIMD::mul_all(step_y_, EmuSIMD::setr_incrementing<Register_, 0>()));
-					step_y_ = EmuSIMD::mul(step_y_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
+					step_y_ = EmuSIMD::mul_all(step_y_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
 					for (std::size_t x = 0; x < end_x_; ++x)
 					{
 						auto& layer_ = samples[x];
@@ -518,15 +551,15 @@ namespace EmuMath
 			}
 			else if constexpr (num_dimensions == 1)
 			{
-				std::size_t end_ = table_size.at<0>();
-				std::size_t end_store_batch_ = table_size.at<0>();
+				std::size_t end_ = table_size.template at<0>();
+				std::size_t end_store_batch_ = table_size.template at<0>();
 				end_store_batch_ -= end_store_batch_ % num_elements_per_batch;
 
 
-				Register_ points_simd_ = EmuSIMD::set1<Register_>(start_.at<0>());
-				Register_ step_simd_ = EmuSIMD::set1<Register_>(step_.at<0>());
+				Register_ points_simd_ = EmuSIMD::set1<Register_>(start_.template at<0>());
+				Register_ step_simd_ = EmuSIMD::set1<Register_>(step_.template at<0>());
 				points_simd_ = EmuSIMD::add(points_simd_, EmuSIMD::mul_all(step_simd_, EmuSIMD::setr_incrementing<Register_, 0>()));
-				step_simd_ = EmuSIMD::mul(step_simd_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
+				step_simd_ = EmuSIMD::mul_all(step_simd_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
 
 				std::size_t i = 0;
 				for (; i < end_store_batch_; i += num_elements_per_batch)
@@ -557,7 +590,7 @@ namespace EmuMath
 				if constexpr (num_dimensions == 1)
 				{
 					// simple resize for 1 dimension.
-					samples.resize(new_size_.at<0>());
+					samples.resize(new_size_.template at<0>());
 				}
 				else if constexpr (num_dimensions == 2)
 				{
@@ -567,11 +600,11 @@ namespace EmuMath
 					// Simple resize for 2-dimensions, since major_dimension differences are a simple swap
 					if constexpr (major_dimension == 0)
 					{
-						samples.resize(new_size_.at<1>(), layer_0_type(new_size_.at<0>()));
+						samples.resize(new_size_.template at<1>(), layer_0_type(new_size_.template at<0>()));
 					}
 					else
 					{
-						samples.resize(new_size_.at<0>(), layer_0_type(new_size_.at<1>()));
+						samples.resize(new_size_.template at<0>(), layer_0_type(new_size_.template at<1>()));
 					}
 				}
 				else if constexpr (num_dimensions == 3)
@@ -587,11 +620,11 @@ namespace EmuMath
 					{
 						samples.resize
 						(
-							new_size_.at<1>(),
+							new_size_.template at<1>(),
 							layer_0_type
 							(
-								new_size_.at<2>(),
-								layer_1_type(new_size_.at<0>())
+								new_size_.template at<2>(),
+								layer_1_type(new_size_.template at<0>())
 							)
 						);
 					}
@@ -599,11 +632,11 @@ namespace EmuMath
 					{
 						samples.resize
 						(
-							new_size_.at<0>(),
+							new_size_.template at<0>(),
 							layer_0_type
 							(
-								new_size_.at<2>(),
-								layer_1_type(new_size_.at<1>())
+								new_size_.template at<2>(),
+								layer_1_type(new_size_.template at<1>())
 							)
 						);
 					}
@@ -611,11 +644,11 @@ namespace EmuMath
 					{
 						samples.resize
 						(
-							new_size_.at<0>(),
+							new_size_.template at<0>(),
 							layer_0_type
 							(
-								new_size_.at<1>(),
-								layer_1_type(new_size_.at<2>())
+								new_size_.template at<1>(),
+								layer_1_type(new_size_.template at<2>())
 							)
 						);
 					}
@@ -633,19 +666,19 @@ namespace EmuMath
 			if constexpr (NumDimensions_ == 1)
 			{
 				// Only 1 dimension, so only 1 major.
-				return samples[coords_.at<0>()];
+				return samples[coords_.template at<0>()];
 			}
 			else if constexpr (NumDimensions_ == 2)
 			{
 				if constexpr (MajorDimensionIndex_ == 0)
 				{
 					// X coords stored contiguously per row
-					return samples[coords_.at<1>()][coords_.at<0>()];
+					return samples[coords_.template at<1>()][coords_.template at<0>()];
 				}
 				else
 				{
 					// Y coords stored contiguously per column
-					return samples[coords_.at<0>()][coords_.at<1>()];
+					return samples[coords_.template at<0>()][coords_.template at<1>()];
 				}
 			}
 			else if constexpr (NumDimensions_ == 3)
@@ -653,15 +686,15 @@ namespace EmuMath
 				// We store in alphabetical order before the major (i.e. X-major will be stored YZX, Y-major stored XZY, Z-major stored XYZ)
 				if constexpr (MajorDimensionIndex_ == 0)
 				{
-					return samples[coords_.at<1>()][coords_.at<2>()][coords_.at<0>()];
+					return samples[coords_.template at<1>()][coords_.template at<2>()][coords_.template at<0>()];
 				}
 				else if constexpr (MajorDimensionIndex_ == 1)
 				{
-					return samples[coords_.at<0>()][coords_.at<2>()][coords_.at<1>()];
+					return samples[coords_.template at<0>()][coords_.template at<2>()][coords_.template at<1>()];
 				}
 				else
 				{
-					return samples[coords_.at<0>()][coords_.at<1>()][coords_.at<2>()];
+					return samples[coords_.template at<0>()][coords_.template at<1>()][coords_.template at<2>()];
 				}
 			}
 			else

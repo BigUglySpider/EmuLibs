@@ -30,6 +30,69 @@
 #include <DirectXMath.h>
 #endif
 
+inline bool get_yes_or_no(const std::string& message, std::istream& in_stream_, std::string&& overwriteable_buffer = std::string())
+{
+	std::cout << message << " (Y/N): ";
+	while(true)
+	{
+		std::getline(in_stream_, overwriteable_buffer);
+		std::transform
+		(
+			overwriteable_buffer.begin(),
+			overwriteable_buffer.end(),
+			overwriteable_buffer.begin(),
+			[](const auto& char_){ return std::tolower(char_); }
+		);
+		if(overwriteable_buffer.length() > 0) // Redo if no answer
+		{
+			switch(overwriteable_buffer[0])
+			{
+				case 'a':
+				{
+					if(overwriteable_buffer == "affirm" || overwriteable_buffer == "accept" || overwriteable_buffer == "affirmative")
+						return true;
+					break;
+				}
+				case 'c':
+				{
+					if(overwriteable_buffer == "c" || overwriteable_buffer == "confirm" || overwriteable_buffer == "consent")
+						return true;
+					break;
+				}
+				case 'd':
+				{
+					if(overwriteable_buffer == "d" || overwriteable_buffer == "deny" || overwriteable_buffer == "decline")
+						return false;
+					break;
+				}
+				case 'n':
+				{
+					if(overwriteable_buffer == "n" || overwriteable_buffer == "no" || overwriteable_buffer == "nope" || overwriteable_buffer == "negative" || overwriteable_buffer == "nah" || overwriteable_buffer == "nay")
+						return false;
+					break;
+				}
+				case 'r':
+				{
+					if(overwriteable_buffer == "reject" || overwriteable_buffer == "refuse")
+						return false;
+					break;
+				}
+				case 'y':
+				{
+					if(overwriteable_buffer == "y" || overwriteable_buffer == "yes" || overwriteable_buffer == "yep" || overwriteable_buffer == "yeah" || overwriteable_buffer == "yea")
+						return true;
+					break;
+				}
+			}
+		}
+	}
+}
+
+inline bool get_yes_or_no(const std::string& message, std::string&& overwriteable_buffer = std::string())
+{
+	return get_yes_or_no(message, std::cin, std::forward<decltype(overwriteable_buffer)>(overwriteable_buffer));
+}
+
 namespace EmuCore::TestingHelpers
 {
 	static constexpr std::size_t shared_num_loops = 5000000;
@@ -41,11 +104,11 @@ namespace EmuCore::TestingHelpers
 	{
 		if constexpr (std::is_integral_v<T_>)
 		{
-			return rng_.NextInt<T_>();
+			return rng_.template NextInt<T_>();
 		}
 		else
 		{
-			return rng_.NextReal<T_>();
+			return rng_.template NextReal<T_>();
 		}
 	}
 
@@ -77,11 +140,11 @@ namespace EmuCore::TestingHelpers
 		{
 			if constexpr (std::is_floating_point_v<EmuCore::TMP::remove_ref_cv_t<T_>>)
 			{
-				out_[i] = rng_.NextReal<T_>();
+				out_[i] = rng_.template NextReal<T_>();
 			}
 			else
 			{
-				out_[i] = rng_.NextInt<T_>();
+				out_[i] = rng_.template NextInt<T_>();
 			}
 		}
 
@@ -531,6 +594,107 @@ namespace EmuCore::TestingHelpers
 		std::vector<quaternion_type> rhs;
 		std::vector<quaternion_type> res;
 	};
+
+	struct ScalarTan
+	{
+		static constexpr bool DO_TEST = true;
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr std::string_view NAME = "Scalar tan";
+
+		static constexpr std::size_t element_width = 64;
+		using scalar_type = double;
+
+		static constexpr std::size_t register_size = 128 / element_width;
+		static constexpr std::size_t BASE_NUM_LOOPS = (shared_num_loops * 10);
+		static constexpr std::size_t NUM_LOOPS = BASE_NUM_LOOPS * register_size;
+		static constexpr std::size_t NUM_SCALARS = NUM_LOOPS;
+
+		ScalarTan()
+		{
+		}
+		void Prepare()
+		{
+			// RESIZES
+			out.resize(NUM_SCALARS);
+
+			// RESERVES
+			in.reserve(NUM_SCALARS);
+
+			// EMPLACEMENTS
+			EmuMath::RngWrapper<true> rng(-90, 90, shared_fill_seed_);
+			for (std::size_t i = 0; i < NUM_SCALARS; ++i)
+			{
+				in.emplace_back(EmuCore::Pi::DegsToRads(rng.NextReal<scalar_type>()));
+			}
+		}
+		void operator()(std::size_t i_)
+		{
+			out[i_] = tan(in[i_]);
+		}
+		void OnTestsOver()
+		{
+			const std::size_t i = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, BASE_NUM_LOOPS - 1);
+			const std::size_t offset = i * register_size;
+			std::cout << "tan({" << in[offset] << ", " << in[offset + 1] /* << ", " << in[offset + 2] << ", " << in[offset + 3] */ << "}):\n\t";
+			std::cout << "{ " << out[offset] << ", " << out[offset + 1] /* << ", " << out[offset + 2] << ", " << out[offset + 3] */ << "}\n";
+		}
+
+		std::vector<scalar_type> in;
+		std::vector<scalar_type> out;
+	};
+
+	struct SIMDTan
+	{
+		static constexpr bool DO_TEST = true;
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = shared_num_loops * 10;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr std::string_view NAME = "SIMD tan";
+
+		static constexpr std::size_t element_width = 64;
+		using scalar_type = double;
+		using register_type = EmuSIMD::f64x2;
+
+		static constexpr std::size_t register_size = EmuSIMD::TMP::register_element_count_v<register_type, element_width>;
+		static constexpr std::size_t NUM_SCALARS = NUM_LOOPS * register_size;
+
+		SIMDTan()
+		{
+		}
+		void Prepare()
+		{
+			// RESIZES
+			out.resize(NUM_SCALARS);
+
+			// RESERVES
+			in.reserve(NUM_SCALARS);
+
+			// EMPLACEMENTS
+			EmuMath::RngWrapper<true> rng(-90, 90, shared_fill_seed_);
+			for (std::size_t i = 0; i < NUM_SCALARS; ++i)
+			{
+				in.emplace_back(EmuCore::Pi::DegsToRads(rng.NextReal<scalar_type>()));
+			}
+		}
+		void operator()(std::size_t i_)
+		{
+			const std::size_t offset = i_ * register_size;
+			register_type data = EmuSIMD::load<register_type>(in.data() + offset);
+			data = EmuSIMD::Funcs::tan_f64x2(data);
+			EmuSIMD::store(data, out.data() + offset);
+		}
+		void OnTestsOver()
+		{
+			const std::size_t i = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
+			const std::size_t offset = i * register_size;
+			std::cout << "tan({" << in[offset] << ", " << in[offset + 1] /* << ", " << in[offset + 2] << ", " << in[offset + 3] */ << "}):\n\t";
+			std::cout << "{ " << out[offset] << ", " << out[offset + 1] /* << ", " << out[offset + 2] << ", " << out[offset + 3] */ << "}\n";
+		}
+
+		std::vector<scalar_type> in;
+		std::vector<scalar_type> out;
+	};
 #pragma endregion
 
 	// ----------- TESTS SELECTION -----------
@@ -539,8 +703,10 @@ namespace EmuCore::TestingHelpers
 		//EmuNormalMatrixTest,
 		//EmuFastMatrixTest,
 		//DirectXSimdTest
-		ScalarQuaternionTest,
-		FastQuaternionTest
+		//ScalarQuaternionTest,
+		//FastQuaternionTest,
+		ScalarTan,
+		SIMDTan
 	>;
 
 	// ----------- TESTS BEGIN -----------
@@ -598,7 +764,7 @@ namespace EmuCore::TestingHelpers
 			std::cout << "!!!Test " << TestIndex << " (" << Test::NAME << ") Results!!!\n";
 			if (test.DO_TEST)
 			{
-				std::cout << harness.ExecuteAndOutputAsString<Test::PASS_LOOP_NUM>(Test::NUM_LOOPS, test, test.WRITE_ALL_TIMES_TO_STREAM) << "\n\n";
+				std::cout << harness.template ExecuteAndOutputAsString<Test::PASS_LOOP_NUM>(Test::NUM_LOOPS, test, test.WRITE_ALL_TIMES_TO_STREAM) << "\n\n";
 			}
 			else
 			{
@@ -631,27 +797,13 @@ namespace EmuCore::TestingHelpers
 				auto duration = std::chrono::duration<double>(end - begin).count();
 				std::cout << "\n-----Finished execution and output of " << numTests << " test " << harnessCorrectPlural << " in " << duration << " seconds-----\n";
 
-				std::cout << "\n\nExecute additinal OnAllTestsOver branch? [Y - Yes]: ";
-				std::getline(std::cin, str);
-				if (str.size() != 0)
+				if(get_yes_or_no("\n\nExecute additinal OnAllTestsOver branch?"))
 				{
-					if (str[0] == 'y' || str[0] == 'Y')
-					{
-						OnAllTestsOver<0>(tests);
-					}
+					OnAllTestsOver<0>(tests);
 				}
 			}
 
-			std::cout << "\n\nRepeat all tests? [Y - Yes]: ";
-			std::getline(std::cin, str);
-			if (str.size() != 0)
-			{
-				shouldRepeat = str[0] == 'Y' || str[0] == 'y';
-			}
-			else
-			{
-				shouldRepeat = false;
-			}
+			shouldRepeat = get_yes_or_no("\n\nRepeat all tests?");
 		} while (shouldRepeat);
 	}
 #pragma endregion

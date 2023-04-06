@@ -44,8 +44,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		if constexpr (InColumnMajor_)
 		{
 			// Safe to ignore these warnings as we should never be accessing the same pointed-to item more than once
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 			(
 				EmuCore::TMP::assign_direct_or_cast<typename _out_mat_uq::value_type_uq>
 				(
@@ -53,12 +53,12 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 					std::move(*(p_data_ + NonMajorIndices_))
 				), ...
 			);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 		else
 		{
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 			(
 				EmuCore::TMP::assign_direct_or_cast<typename _out_mat_uq::value_type_uq>
 				(
@@ -66,7 +66,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 					std::move(*(p_data_ + NonMajorIndices_))
 				), ...
 			);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 	}
 
@@ -126,8 +126,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 			using _out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
 			if constexpr (column_index < _out_mat_uq::num_columns && row_index < _out_mat_uq::num_rows)
 			{
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 				if constexpr (_out_mat_uq::is_column_major == _fast_mat_uq::is_column_major)
 				{
 					constexpr std::size_t out_flattened_major_offset = _out_mat_uq::num_non_major_elements * MajorIndex_;
@@ -153,7 +153,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 					// Loads not possible as conflicting major orders
 					_move_register_to_scalar_matrix<MajorIndex_, RegisterIndex_>(out_matrix_, std::forward<FastMatrix_>(fast_matrix_));
 				}
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 			}
 		}
 		else
@@ -169,8 +169,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 	template<std::size_t MajorIndex_, EmuConcepts::EmuMatrix OutMatrix_, EmuConcepts::EmuFastMatrix FastMatrix_, std::size_t...RegisterIndices_>
 	constexpr inline void _store_major_to_scalar_matrix(OutMatrix_& out_matrix_, FastMatrix_&& fast_matrix_)
 	{
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		(
 			_store_register_to_scalar_matrix<MajorIndex_, RegisterIndices_>
 			(
@@ -178,7 +178,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 				std::forward<FastMatrix_>(fast_matrix_)
 			), ...
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 	template<EmuConcepts::EmuMatrix OutMatrix_, EmuConcepts::EmuFastMatrix FastMatrix_, std::size_t...MajorIndices_, std::size_t...RegisterIndices_>
@@ -190,8 +190,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		std::index_sequence<RegisterIndices_...> register_indices_
 	)
 	{
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		(
 			_store_major_to_scalar_matrix<MajorIndices_, OutMatrix_, FastMatrix_, RegisterIndices_...>
 			(
@@ -199,7 +199,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 				std::forward<FastMatrix_>(fast_matrix_)
 			), ...
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 #pragma endregion
 
@@ -269,8 +269,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		std::index_sequence<RegisterIndices_...> register_indices_
 	)
 	{
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		(
 			_store_major_to_data_pointer<FullWidth_, MajorIndices_, FastMatrix_, OutData_, RegisterIndices_...>
 			(
@@ -278,7 +278,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 				p_out_data_
 			), ...
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 #pragma endregion
 
@@ -290,8 +290,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		constexpr std::size_t per_major_offset = sizeof...(RegisterIndices_) * _fast_mat_uq::num_elements_per_register;
 		constexpr std::size_t major_offset = MajorIndex_ * per_major_offset;
 
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		(
 			EmuSIMD::store
 			(
@@ -299,11 +299,11 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 				p_dump_ + major_offset + (RegisterIndices_ * _fast_mat_uq::num_elements_per_register)
 			), ...
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 	template<EmuConcepts::EmuFastMatrix FastMatrix_, std::size_t...MajorIndices_, std::size_t...RegisterIndices_>
-	[[nodiscard]] constexpr inline void _dump_data
+	constexpr inline void _dump_data
 	(
 		FastMatrix_&& fast_matrix_,
 		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::value_type* p_dump_,
@@ -311,8 +311,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		std::index_sequence<RegisterIndices_...> register_indices_
 	)
 	{
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		(
 			_dump_major_data<FastMatrix_, MajorIndices_, RegisterIndices_...>
 			(
@@ -320,7 +320,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 				p_dump_
 			), ...
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 	template
@@ -343,10 +343,10 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 			{
 				constexpr std::size_t offset = major_flattened_offset + non_major_index;
 
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 				return std::move(*(p_data_ + offset));
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 			}
 			else
 			{
@@ -380,8 +380,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		typename _fast_mat_uq::value_type data_dump[stored_count];
 		_dump_data(std::forward<FastMatrix_>(fast_matrix_), data_dump, major_index_sequence(), register_index_sequence());
 
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		return typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type
 		(
 			_move_arg_from_index<OutColumnIndices_, OutRowIndices_, NumMajorsToStore_, NumRegistersToStorePerMajor_, OutMatrix_, FastMatrix_>
@@ -389,7 +389,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 				data_dump
 			)...
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 #pragma endregion
 }

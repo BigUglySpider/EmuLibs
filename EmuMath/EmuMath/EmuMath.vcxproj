@@ -157,6 +157,10 @@
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonValues.h" />
     <ClInclude Include="EmuCore\CommonConcepts\Arithmetic.h" />
     <ClInclude Include="EmuCore\CommonConcepts\StdTypes.h" />
+    <ClInclude Include="EmuCore\CommonPreprocessor\All.h" />
+    <ClInclude Include="EmuCore\CommonPreprocessor\Architecture.h" />
+    <ClInclude Include="EmuCore\CommonPreprocessor\Compiler.h" />
+    <ClInclude Include="EmuCore\CommonPreprocessor\Warning.h" />
     <ClInclude Include="EmuCore\CommonTypes\ComparisonEnum.h" />
     <ClInclude Include="EmuCore\CommonTypes\Stopwatch.h" />
     <ClInclude Include="EmuCore\CommonTypes\Timer.h" />
@@ -172,9 +176,11 @@
     <ClInclude Include="EmuCore\Functors\MiscMath.h" />
     <ClInclude Include="EmuCore\Functors\StdOps.h" />
     <ClInclude Include="EmuCore\TestingHelpers\LoopingTestHarness.h" />
+    <ClInclude Include="EmuCore\TMPHelpers\CommonTMPHelpers.h" />
     <ClInclude Include="EmuCore\TMPHelpers\DefaultItemBases.h" />
     <ClInclude Include="EmuCore\TMPHelpers\DescriptiveEnableIf.h" />
     <ClInclude Include="EmuCore\TMPHelpers\OperatorChecks.h" />
+    <ClInclude Include="EmuCore\TMPHelpers\RuntimeTupleTable.h" />
     <ClInclude Include="EmuCore\TMPHelpers\SafeEnumFuncs.h" />
     <ClInclude Include="EmuCore\TMPHelpers\StdAliases.h" />
     <ClInclude Include="EmuCore\TMPHelpers\StdFeatureChecks.h" />
@@ -461,7 +467,6 @@
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_index_masks.h" />
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_set.h" />
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_shuffle.h" />
-    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_shuffle_masks.h" />
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_stream.h" />
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_get.h" />
     <ClInclude Include="EmuCore\CommonTypes\DeferrableReferenceWrapper.h" />

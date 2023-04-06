@@ -60,13 +60,13 @@ namespace EmuMath::Helpers::_matrix_underlying
 		if constexpr (_matrix_transpose_is_valid<OutMatrix_, InMatrix_, true>(std::index_sequence<OutColumnIndices_...>(), std::index_sequence<OutRowIndices_...>()))
 		{
 			// Disable warning as intended use will never duplicate an index access, so we are never actually moving from the same object
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 			return OutMatrix_
 			(
 				_matrix_create_out_from_index<OutMatrix_, InMatrix_, OutRowIndices_, OutColumnIndices_>(std::forward<InMatrix_>(in_matrix_))...
 			);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 		else
 		{

@@ -114,6 +114,7 @@ namespace EmuSIMD
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
+			using namespace EmuSIMD::Funcs;
 			if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
 			{
 				if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
@@ -201,28 +202,31 @@ namespace EmuSIMD
 						if constexpr (PerElementWidthIfInt_ == 8)
 						{
 							EmuSIMD::i128_generic out_ = _mm_add_epi8(register_, _underlying_simd_helpers::_execute_shuffle<2, 3, 0, 1>(register_));
-							out_ = _mm_add_epi8(out_, _underlying_simd_helpers::_execute_shuffle<3, 2, 3, 2>(out_));
-							out_ = _mm_add_epi8(out_, _mm_shufflelo_epi16(out_, _underlying_simd_helpers::_shuffle_mask<EmuSIMD::i128_generic, 1, 0, 3, 2>::get()));
-							return _mm_add_epi8
+							out_ = add_i8x16(out_, _underlying_simd_helpers::_execute_shuffle<3, 2, 3, 2>(out_));
+							// out_ = _mm_add_epi8(out_, _mm_shufflelo_epi16(out_, _underlying_simd_helpers::_shuffle_mask<EmuSIMD::i128_generic, 1, 0, 3, 2>::get())); // REMOVED, COMMENTED FOR ARCHIVAL PURPOSES
+							out_ = add_i8x16(out_, _mm_shufflelo_epi16(out_, make_shuffle_mask_32<2, 3, 0, 1>()));
+							return add_i8x16
 							(
 								out_,
-								_mm_shuffle_epi8(out_, _underlying_simd_helpers::_shuffle_mask<EmuSIMD::i128_generic, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 14, 15>::get())
+								//_mm_shuffle_epi8(out_, _underlying_simd_helpers::_shuffle_mask<EmuSIMD::i128_generic, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 14, 15>::get()), // REMOVED, COMMENTED FOR ARCHIVAL PURPOSES
+								EmuSIMD::Funcs::permute_i8x16<make_shuffle_mask_8<15, 14, 12, 13, 10, 11, 8, 9, 6, 7, 4, 5, 2, 3, 0, 1>()>(out_)
 							);
 						}
 						else if constexpr (PerElementWidthIfInt_ == 16)
 						{
 							EmuSIMD::i128_generic out_ = _mm_add_epi16(register_, _underlying_simd_helpers::_execute_shuffle<2, 3, 0, 1>(register_));
 							out_ = _mm_add_epi16(out_, _underlying_simd_helpers::_execute_shuffle<3, 2, 3, 2>(out_));
-							return _mm_add_epi16(out_, _mm_shufflelo_epi16(out_, _underlying_simd_helpers::_shuffle_mask<EmuSIMD::i128_generic, 1, 0, 3, 2>::get()));
+							// return _mm_add_epi16(out_, _mm_shufflelo_epi16(out_, _underlying_simd_helpers::_shuffle_mask<EmuSIMD::i128_generic, 1, 0, 3, 2>::get())); // REMOVED, COMMENTED FOR ARCHIVAL PURPOSES
+							return add_i16x8(out_, _mm_shufflelo_epi16(out_, make_shuffle_mask_32<2, 3, 0, 1>()));
 						}
 						else if constexpr (PerElementWidthIfInt_ == 32)
 						{
-							EmuSIMD::i128_generic out_ = _mm_add_epi32(register_, _underlying_simd_helpers::_execute_shuffle<2, 3, 0, 1>(register_));
-							return _mm_add_epi32(out_, _underlying_simd_helpers::_execute_shuffle<3, 0, 3, 2>(out_));
+							EmuSIMD::i128_generic out_ = add_i32x4(register_, _underlying_simd_helpers::_execute_shuffle<2, 3, 0, 1>(register_));
+							return add_i32x4(out_, _underlying_simd_helpers::_execute_shuffle<3, 0, 3, 2>(out_));
 						}
 						else
 						{
-							return _mm_add_epi64(register_, _underlying_simd_helpers::_execute_shuffle<2, 3, 0, 1>(register_));
+							return add_i64x2(register_, _underlying_simd_helpers::_execute_shuffle<2, 3, 0, 1>(register_));
 						}
 					}
 					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)

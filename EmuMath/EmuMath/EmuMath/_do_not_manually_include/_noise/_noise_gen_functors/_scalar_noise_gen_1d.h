@@ -43,7 +43,7 @@ namespace EmuMath::Functors
 		template<std::size_t Size_, typename T_>
 		inline value_type operator()(const EmuMath::Vector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
-			return operator()(static_cast<value_type>(point_.at<0>()), freq_, permutations_);
+			return operator()(static_cast<value_type>(point_.template at<0>()), freq_, permutations_);
 		}
 	};
 
@@ -77,7 +77,7 @@ namespace EmuMath::Functors
 		template<std::size_t Size_, typename T_>
 		inline value_type operator()(const EmuMath::Vector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
-			return operator()(static_cast<value_type>(point_.at<0>()), freq_, permutations_);
+			return operator()(static_cast<value_type>(point_.template at<0>()), freq_, permutations_);
 		}
 	};
 
@@ -119,7 +119,7 @@ namespace EmuMath::Functors
 		template<std::size_t Size_, typename T_>
 		inline value_type operator()(const EmuMath::Vector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
-			return operator()(static_cast<value_type>(point_.at<0>()), freq_, permutations_);
+			return operator()(static_cast<value_type>(point_.template at<0>()), freq_, permutations_);
 		}
 	};
 }

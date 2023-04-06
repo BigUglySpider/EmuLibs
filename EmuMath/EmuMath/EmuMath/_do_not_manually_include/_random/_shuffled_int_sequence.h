@@ -356,18 +356,18 @@ namespace EmuMath
 		template<class Rng_, typename Seed_>
 		inline void _do_shuffle(Seed_ seed_)
 		{
-			std::size_t n_ = items.size();
-			if (n_ > 1)
+			std::size_t n = items.size();
+			if (n > 1)
 			{
-				Rng_ rng_(seed_);
+				Rng_ rng(seed_);
 				do
 				{
-					std::size_t k_ = rng_.NextInt<std::size_t>(0, --n_);
-					value_type temp_ = items[k_];
-					items[k_] = items[n_];
-					items[n_] = temp_;
+					std::size_t k = rng.template NextInt<std::size_t>(0, --n);
+					value_type temp_ = items[k];
+					items[k] = items[n];
+					items[n] = temp_;
 
-				} while (n_ > 1);
+				} while (n > 1);
 			}
 		}
 
