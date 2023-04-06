@@ -3,6 +3,7 @@
 
 #include "_common_underlying_simd_template_helper_includes.h"
 #include "_simd_helpers_underlying_cast.h"
+#include "../../../../../EmuCore/CommonConcepts/Arithmetic.h"
 #include "../../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD::_underlying_simd_helpers
@@ -374,34 +375,40 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	}
 
-	template<class Register_, std::size_t PerElementWidthIfIntegral_ = 32, std::int64_t Bits_ = 0xFFFFFFFFFFFFFFFF>
-	[[nodiscard]] inline Register_ _make_register_from_movemask(const unsigned long long mask_)
+	template<class Register_, std::size_t PerElementWidthIfIntegral_ = 32, std::int64_t Bits_ = 0xFFFFFFFFFFFFFFFF, EmuConcepts::Arithmetic Mask_>
+	[[nodiscard]] inline Register_ _make_register_from_movemask(Mask_&& mask_)
 	{
-		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
-		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		using _mask_uq = typename std::remove_cvref<Mask_>::type;
+		if constexpr (!std::is_same_v<_mask_uq, unsigned long long>)
 		{
-			if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
-			{
-				return _make_register_from_movemask_fp<register_type_uq, Bits_>(mask_);
-			}
-			else if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<register_type_uq>)
-			{
-				return _make_register_from_movemask_int<register_type_uq, PerElementWidthIfIntegral_, Bits_>(mask_);
-			}
-			else
-			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to make a SIMD register from a move mask using EmuSIMD helpers, but the requested output register is not a supported SIMD register.");
-			}
+			return _make_register_from_movemask<Register_, PerElementWidthIfIntegral_, Bits_>
+			(
+				static_cast<unsigned long long>(std::forward<Mask_>(mask_))
+			);
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to make a SIMD register from a move mask using EmuSIMD helpers, but the requested output register is not recognised as a SIMD register.");
+			using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+			if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+			{
+				if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
+				{
+					return _make_register_from_movemask_fp<register_type_uq, Bits_>(std::forward<Mask_>(mask_));
+				}
+				else if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<register_type_uq>)
+				{
+					return _make_register_from_movemask_int<register_type_uq, PerElementWidthIfIntegral_, Bits_>(std::forward<Mask_>(mask_));
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to make a SIMD register from a move mask using EmuSIMD helpers, but the requested output register is not a supported SIMD register.");
+				}
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to make a SIMD register from a move mask using EmuSIMD helpers, but the requested output register is not recognised as a SIMD register.");
+			}
 		}
-	}
-	template<class Register_, std::size_t PerElementWidthIfIntegral_ = 32, std::int64_t Bits_ = 0xFFFFFFFFFFFFFFFF>
-	[[nodiscard]] inline Register_ _make_register_from_movemask(const signed long long mask_)
-	{
-		return _make_register_from_movemask<Register_, PerElementWidthIfIntegral_, Bits_>(*reinterpret_cast<const unsigned long long*>(mask_));
 	}
 #pragma endregion
 
