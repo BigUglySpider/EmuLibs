@@ -375,40 +375,35 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	}
 
-	template<class Register_, std::size_t PerElementWidthIfIntegral_ = 32, std::int64_t Bits_ = 0xFFFFFFFFFFFFFFFF, typename Mask_>
-	[[nodiscard]] inline Register_ _make_register_from_movemask(Mask_&& mask_)
+	template<class Register_, std::size_t PerElementWidthIfIntegral_ = 32, std::int64_t Bits_ = 0xFFFFFFFFFFFFFFFF>
+	[[nodiscard]] inline Register_ _make_register_from_movemask(const unsigned long long mask_)
 	{
-		using _mask_uq = typename std::remove_cvref<Mask_>::type;
-		if constexpr (!std::is_same_v<_mask_uq, unsigned long long>)
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
-			return _make_register_from_movemask<Register_, PerElementWidthIfIntegral_, Bits_>
-			(
-				static_cast<unsigned long long>(std::forward<Mask_>(mask_))
-			);
-		}
-		else
-		{
-			using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
-			if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+			if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
 			{
-				if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
-				{
-					return _make_register_from_movemask_fp<register_type_uq, Bits_>(std::forward<Mask_>(mask_));
-				}
-				else if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<register_type_uq>)
-				{
-					return _make_register_from_movemask_int<register_type_uq, PerElementWidthIfIntegral_, Bits_>(std::forward<Mask_>(mask_));
-				}
-				else
-				{
-					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to make a SIMD register from a move mask using EmuSIMD helpers, but the requested output register is not a supported SIMD register.");
-				}
+				return _make_register_from_movemask_fp<register_type_uq, Bits_>(mask_);
+			}
+			else if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<register_type_uq>)
+			{
+				return _make_register_from_movemask_int<register_type_uq, PerElementWidthIfIntegral_, Bits_>(mask_);
 			}
 			else
 			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to make a SIMD register from a move mask using EmuSIMD helpers, but the requested output register is not recognised as a SIMD register.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to make a SIMD register from a move mask using EmuSIMD helpers, but the requested output register is not a supported SIMD register.");
 			}
 		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to make a SIMD register from a move mask using EmuSIMD helpers, but the requested output register is not recognised as a SIMD register.");
+		}
+	}
+
+	template<class Register_, std::size_t PerElementWidthIfIntegral_ = 32, std::int64_t Bits_ = 0xFFFFFFFFFFFFFFFF>
+	[[nodiscard]] inline Register_ _make_register_from_movemask(const signed long long mask_)
+	{
+		return _make_register_from_movemask<Register_, PerElementWidthIfIntegral_, Bits_>(static_cast<unsigned long long>(mask_));
 	}
 #pragma endregion
 
@@ -747,7 +742,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _make_register_from_movemask<EmuSIMD::f32x16, 32, 0xFFFFFFFF>(_mm512_cmp_ps_mask(lhs_, rhs_, CmpFlags_));
+				return _make_register_from_movemask<EmuSIMD::f32x16, 32, 0xFFFFFFFF>(static_cast<unsigned long long>(_mm512_cmp_ps_mask(lhs_, rhs_, CmpFlags_)));
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
@@ -759,7 +754,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _make_register_from_movemask<EmuSIMD::f64x8, 64, 0xFFFFFFFFFFFFFFFF>(_mm512_cmp_pd_mask(lhs_, rhs_, CmpFlags_));
+				return _make_register_from_movemask<EmuSIMD::f64x8, 64, 0xFFFFFFFFFFFFFFFF>(static_cast<unsigned long long>(_mm512_cmp_pd_mask(lhs_, rhs_, CmpFlags_)));
 			}
 		}
 		else
