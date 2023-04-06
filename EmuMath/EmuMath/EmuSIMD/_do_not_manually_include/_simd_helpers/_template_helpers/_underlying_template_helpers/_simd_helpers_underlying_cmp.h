@@ -376,7 +376,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	}
 
 	template<class Register_, std::size_t PerElementWidthIfIntegral_ = 32, std::int64_t Bits_ = 0xFFFFFFFFFFFFFFFF>
-	[[nodiscard]] inline Register_ _make_register_from_movemask(const unsigned long long mask_)
+	[[nodiscard]] inline Register_ _make_register_from_movemask(const unsigned long long& mask_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
@@ -401,7 +401,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	}
 
 	template<class Register_, std::size_t PerElementWidthIfIntegral_ = 32, std::int64_t Bits_ = 0xFFFFFFFFFFFFFFFF>
-	[[nodiscard]] inline Register_ _make_register_from_movemask(const signed long long mask_)
+	[[nodiscard]] inline Register_ _make_register_from_movemask(const signed long long& mask_)
 	{
 		return _make_register_from_movemask<Register_, PerElementWidthIfIntegral_, Bits_>(static_cast<unsigned long long>(mask_));
 	}
