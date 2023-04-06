@@ -245,7 +245,6 @@ namespace EmuMath
 			{
 				_do_resize(options_.table_resolution);
 
-				// TODO: OTHER RESOLUTIONS
 				if (options_.use_fractal_noise)
 				{
 					using fractal_generator = EmuMath::Functors::fractal_noise_wrapper<underlying_noise_gen_functor, register_type>;
