@@ -1,4 +1,5 @@
 // GCC ONLY IGNORES - TEMPORARY
+// GCC Diagnistics - Should be temporary, but no estimate on when
 #pragma GCC diagnostic ignored "-Wignored-attributes"
 #pragma GCC diagnostic ignored "-Wpsabi"
 

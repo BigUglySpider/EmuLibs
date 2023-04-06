@@ -3,9 +3,6 @@
 
 #include "../../../../../EmuCore/CommonPreprocessor/Compiler.h"
 
-// GCC Diagnistics - Should be temporary, but no estimate on when
-#pragma GCC diagnostic ignored "-Wignored-attributes"
-
 #include <immintrin.h>
 
 namespace EmuSIMD
