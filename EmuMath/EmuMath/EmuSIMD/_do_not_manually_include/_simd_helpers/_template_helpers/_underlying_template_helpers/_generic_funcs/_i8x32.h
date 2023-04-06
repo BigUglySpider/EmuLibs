@@ -307,7 +307,7 @@ namespace EmuSIMD::Funcs
 		//return _mm256_castsi128_si256(_mm256_cvtepi16_epi8(a_));
 
 		std::int16_t data_dump[16];
-		_mm256_store_si256(reinterpret_cast<__m256i*>(data_dump), a_);
+		_mm256_storeu_si256(reinterpret_cast<__m256i*>(data_dump), a_);
 		return setr_i8x32
 		(
 			static_cast<std::int8_t>(data_dump[0]),
