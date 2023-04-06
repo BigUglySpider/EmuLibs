@@ -913,7 +913,29 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 			// TODO
 		}
 
+		[[nodiscard]] constexpr inline auto Lerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, register_arg_type t_) const
+		{
+			// TODO
+		}
+
+		template<EmuConcepts::Arithmetic ScalarT_>
+		[[nodiscard]] constexpr inline auto Lerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, ScalarT_&& t_) const
+		{
+			// TODO
+		}
+
 		[[nodiscard]] constexpr inline auto FusedLerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, const EmuMath::FastQuaternion<T_, RegisterWidth_>& t_) const
+		{
+			// TODO
+		}
+
+		[[nodiscard]] constexpr inline auto FusedLerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, register_arg_type t_) const
+		{
+			// TODO
+		}
+
+		template<EmuConcepts::Arithmetic ScalarT_>
+		[[nodiscard]] constexpr inline auto FusedLerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, ScalarT_&& t_) const
 		{
 			// TODO
 		}
@@ -923,7 +945,29 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 			// TODO
 		}
 
+		[[nodiscard]] constexpr inline auto Slerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, register_arg_type t_) const
+		{
+			// TODO
+		}
+
+		template<EmuConcepts::Arithmetic ScalarT_>
+		[[nodiscard]] constexpr inline auto Slerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, ScalarT_&& t_) const
+		{
+			// TODO
+		}
+
 		[[nodiscard]] constexpr inline auto FusedSlerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, const EmuMath::FastQuaternion<T_, RegisterWidth_>& t_) const
+		{
+			// TODO
+		}
+
+		[[nodiscard]] constexpr inline auto FusedSlerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, register_arg_type t_) const
+		{
+			// TODO
+		}
+
+		template<EmuConcepts::Arithmetic ScalarT_>
+		[[nodiscard]] constexpr inline auto FusedSlerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, ScalarT_&& t_) const
 		{
 			// TODO
 		}
