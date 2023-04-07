@@ -897,6 +897,10 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 			return EmuMath::Helpers::fast_quaternion_square_norm(*this);
 		}
 
+		/// <summary>
+		/// <para> Outputs the Norm (aka: Length) of this Quaternion as the specified scalar type (defaulting to this Quaternion's `preferred_floating_point`). </para>
+		/// </summary>
+		/// <returns>The Norm of this Quaternion, represented as a scalar value.</returns>
 		template<EmuConcepts::Arithmetic OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline auto NormScalar() const
 			-> OutT_
@@ -904,12 +908,25 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 			return EmuMath::Helpers::fast_quaternion_norm_scalar<OutT_>(*this);
 		}
 
+
+		/// <summary>
+		/// <para> Outputs the Norm (aka: Length) of this Quaternion within all elements of a SIMD register. </para>
+		/// </summary>
+		/// <returns>The Norm of this Quaternion, represented as a SIMD register of this Quaternion's `register_type`.</returns>
 		[[nodiscard]] constexpr inline auto Norm() const
 			-> register_type
 		{
 			return EmuMath::Helpers::fast_quaternion_norm(*this);
 		}
 
+		/// <summary>
+		/// <para> Outputs a new FastQuaternion that is the result of linearly interpolating this Quaternion with Quaternion b_ and a weighting of t_. </para>
+		/// <para> Typically, Slerp (Spherical linear interpolation) is likely to be preferred for smoother interpolations. </para>
+		/// <para> The resulting Quaternion is not automatically normalised, so arguments that may result in a non-unit Quaternion should be considered. </para>
+		/// </summary>
+		/// <param name="b_">Target to linearly interpolate respective elements of this Quaternion to. May be a FastQuaternion of the same type, this FastQuaternion's `register_type`, or a scalar arithmetic type.</param>
+		/// <param name="t_">Weighting for interpolation of respective elements. May be a FastQuaternion of the same type, this FastQuaternion's `register_type`, or a scalar arithmetic type.</param>
+		/// <returns>Quaternion resulting from the linear interpolation.</returns>
 		template<EmuConcepts::EmuFastQuaternionLerpArg<this_type> B_, EmuConcepts::EmuFastQuaternionLerpArg<this_type> Weighting_>
 		[[nodiscard]] constexpr inline auto Lerp(B_&& b_, Weighting_&& t_) const
 			-> EmuMath::FastQuaternion<T_, RegisterWidth_>
@@ -917,6 +934,15 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 			return EmuMath::Helpers::fast_quaternion_lerp(*this, std::forward<B_>(b_), std::forward<Weighting_>(t_));
 		}
 
+		/// <summary>
+		/// <para> Outputs a new FastQuaternion that is the result of linearly interpolating this Quaternion with Quaternion b_ and a weighting of t_. </para>
+		/// <para> Typically, Slerp (Spherical linear interpolation) is likely to be preferred for smoother interpolations. </para>
+		/// <para> The resulting Quaternion is not automatically normalised, so arguments that may result in a non-unit Quaternion should be considered. </para>
+		/// <para> This function is allowed to use fused operations (such as `fmadd`) to potentially increase efficiency and/or accuracy. </para>
+		/// </summary>
+		/// <param name="b_">Target to linearly interpolate respective elements of this Quaternion to. May be a FastQuaternion of the same type, this FastQuaternion's `register_type`, or a scalar arithmetic type.</param>
+		/// <param name="t_">Weighting for interpolation of respective elements. May be a FastQuaternion of the same type, this FastQuaternion's `register_type`, or a scalar arithmetic type.</param>
+		/// <returns>Quaternion resulting from the linear interpolation.</returns>
 		template<EmuConcepts::EmuFastQuaternionLerpArg<this_type> B_, EmuConcepts::EmuFastQuaternionLerpArg<this_type> Weighting_>
 		[[nodiscard]] constexpr inline auto FusedLerp(B_&& b_, Weighting_&& t_) const
 			-> EmuMath::FastQuaternion<T_, RegisterWidth_>
@@ -924,12 +950,35 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 			return EmuMath::Helpers::fast_quaternion_fused_lerp(*this, std::forward<B_>(b_), std::forward<Weighting_>(t_));
 		}
 
+		/// <summary>
+		/// <para> Outputs a new FastQuaternion that is the result of a spherical linear interpolation of this Quaternion with Quaternion b_ and a weighting of t_. </para>
+		/// <para> Typically, this is likely to be preferred over a plain Lerp for smoother interpolations, however it will only work correctly with Unit Quaternions. </para>
+		/// <para> The resulting Quaternion is not automatically normalised, so arguments that may result in a non-unit Quaternion should be considered. </para>
+		/// </summary>
+		/// <param name="b_">FastQuaternion of the same type to spherically linearly interpolate this Quaternion with.</param>
+		/// <param name="t_">
+		///		Weighting for interpolation. May be a FastQuaternion of the same type, this FastQuaternion's `register_type`, or a scalar arithmetic type. 
+		///		If providing any argument other than a scalar arithmetic type, it is recommended that respective index values within this are identical.
+		/// </param>
+		/// <returns>Quaternion resulting from the spherical linear interpolation.</returns>
 		template<EmuConcepts::EmuFastQuaternionLerpArg<this_type> Weighting_>
 		[[nodiscard]] constexpr inline auto Slerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, Weighting_&& t_) const
 		{
 			return EmuMath::Helpers::fast_quaternion_slerp(*this, b_, std::forward<Weighting_>(t_));
 		}
 
+		/// <summary>
+		/// <para> Outputs a new FastQuaternion that is the result of a spherical linear interpolation of this Quaternion with Quaternion b_ and a weighting of t_. </para>
+		/// <para> Typically, this is likely to be preferred over a plain Lerp for smoother interpolations, however it will only work correctly with Unit Quaternions. </para>
+		/// <para> The resulting Quaternion is not automatically normalised, so arguments that may result in a non-unit Quaternion should be considered. </para>
+		/// <para> This function is allowed to use fused operations (such as `fmadd`) to potentially increase efficiency and/or accuracy. </para>
+		/// </summary>
+		/// <param name="b_">FastQuaternion of the same type to spherically linearly interpolate this Quaternion with.</param>
+		/// <param name="t_">
+		///		Weighting for interpolation. May be a FastQuaternion of the same type, this FastQuaternion's `register_type`, or a scalar arithmetic type. 
+		///		If providing any argument other than a scalar arithmetic type, it is recommended that respective index values within this are identical.
+		/// </param>
+		/// <returns>Quaternion resulting from the spherical linear interpolation.</returns>
 		template<EmuConcepts::EmuFastQuaternionLerpArg<this_type> Weighting_>
 		[[nodiscard]] constexpr inline auto FusedSlerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, Weighting_&& t_) const
 		{
