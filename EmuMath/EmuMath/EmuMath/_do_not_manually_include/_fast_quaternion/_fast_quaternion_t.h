@@ -899,45 +899,29 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 
 		template<EmuConcepts::Arithmetic OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline auto NormScalar() const
+			-> OutT_
 		{
 			return EmuMath::Helpers::fast_quaternion_norm_scalar<OutT_>(*this);
 		}
 
 		[[nodiscard]] constexpr inline auto Norm() const
+			-> register_type
 		{
 			return EmuMath::Helpers::fast_quaternion_norm(*this);
 		}
 
-		[[nodiscard]] constexpr inline auto Lerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, const EmuMath::FastQuaternion<T_, RegisterWidth_>& t_) const
+		template<EmuConcepts::EmuFastQuaternionLerpArg<this_type> B_, EmuConcepts::EmuFastQuaternionLerpArg<this_type> Weighting_>
+		[[nodiscard]] constexpr inline auto Lerp(B_&& b_, Weighting_&& t_) const
+			-> EmuMath::FastQuaternion<T_, RegisterWidth_>
 		{
-			// TODO
+			return EmuMath::Helpers::fast_quaternion_lerp(*this, std::forward<B_>(b_), std::forward<Weighting_>(t_));
 		}
 
-		[[nodiscard]] constexpr inline auto Lerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, register_arg_type t_) const
+		template<EmuConcepts::EmuFastQuaternionLerpArg<this_type> B_, EmuConcepts::EmuFastQuaternionLerpArg<this_type> Weighting_>
+		[[nodiscard]] constexpr inline auto FusedLerp(B_&& b_, Weighting_&& t_) const
+			-> EmuMath::FastQuaternion<T_, RegisterWidth_>
 		{
-			// TODO
-		}
-
-		template<EmuConcepts::Arithmetic ScalarT_>
-		[[nodiscard]] constexpr inline auto Lerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, ScalarT_&& t_) const
-		{
-			// TODO
-		}
-
-		[[nodiscard]] constexpr inline auto FusedLerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, const EmuMath::FastQuaternion<T_, RegisterWidth_>& t_) const
-		{
-			// TODO
-		}
-
-		[[nodiscard]] constexpr inline auto FusedLerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, register_arg_type t_) const
-		{
-			// TODO
-		}
-
-		template<EmuConcepts::Arithmetic ScalarT_>
-		[[nodiscard]] constexpr inline auto FusedLerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, ScalarT_&& t_) const
-		{
-			// TODO
+			return EmuMath::Helpers::fast_quaternion_fused_lerp(*this, std::forward<B_>(b_), std::forward<Weighting_>(t_));
 		}
 
 		[[nodiscard]] constexpr inline auto Slerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, const EmuMath::FastQuaternion<T_, RegisterWidth_>& t_) const
@@ -945,29 +929,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 			// TODO
 		}
 
-		[[nodiscard]] constexpr inline auto Slerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, register_arg_type t_) const
-		{
-			// TODO
-		}
-
-		template<EmuConcepts::Arithmetic ScalarT_>
-		[[nodiscard]] constexpr inline auto Slerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, ScalarT_&& t_) const
-		{
-			// TODO
-		}
-
 		[[nodiscard]] constexpr inline auto FusedSlerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, const EmuMath::FastQuaternion<T_, RegisterWidth_>& t_) const
-		{
-			// TODO
-		}
-
-		[[nodiscard]] constexpr inline auto FusedSlerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, register_arg_type t_) const
-		{
-			// TODO
-		}
-
-		template<EmuConcepts::Arithmetic ScalarT_>
-		[[nodiscard]] constexpr inline auto FusedSlerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, ScalarT_&& t_) const
 		{
 			// TODO
 		}

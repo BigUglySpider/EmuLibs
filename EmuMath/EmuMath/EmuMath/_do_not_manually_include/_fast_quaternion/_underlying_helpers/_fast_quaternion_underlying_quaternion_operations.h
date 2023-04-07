@@ -2,6 +2,7 @@
 #define EMU_MATH_FAST_QUATERNION_UNDERLYING_QUATERNION_OPERATIONS_H_INC_ 1
 
 #include "_fast_quaternion_tmp.h"
+#include "_fast_quaternion_underlying_get.h"
 
 namespace EmuMath::Helpers::_fast_quaternion_underlying
 {
@@ -69,6 +70,97 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 			else
 			{
 				return EmuSIMD::sqrt<per_element_width, is_signed>(norm);
+			}
+		}
+	}
+
+	template<bool Fused_, EmuConcepts::EmuFastQuaternion QuaternionA_, class B_, class T_>
+	[[nodiscard]] constexpr inline auto _fast_quaternion_lerp(QuaternionA_&& a_, B_&& b_, T_&& t_)
+	{
+		using _fast_quat_uq = typename std::remove_cvref<QuaternionA_>::type;
+		using _register_type = typename _fast_quat_uq::register_type;
+		constexpr std::size_t per_element_width = _fast_quat_uq::per_element_width;
+
+		// Recursive call to convert scalar arguments to registers if we have any scalars
+		if constexpr (EmuConcepts::Arithmetic<B_>)
+		{
+			if constexpr (EmuConcepts::Arithmetic<T_>)
+			{
+				return _fast_quaternion_lerp<Fused_>
+				(
+					std::forward<QuaternionA_>(a_),
+					EmuSIMD::set1<_register_type, per_element_width>(std::forward<B_>(b_)),
+					EmuSIMD::set1<_register_type, per_element_width>(std::forward<T_>(t_))
+				);
+			}
+			else
+			{
+				return _fast_quaternion_lerp<Fused_>
+				(
+					std::forward<QuaternionA_>(a_),
+					EmuSIMD::set1<_register_type, per_element_width>(std::forward<B_>(b_)),
+					std::forward<T_>(t_)
+				);
+			}
+		}
+		else if constexpr (EmuConcepts::Arithmetic<T_>)
+		{
+			return _fast_quaternion_lerp<Fused_>
+			(
+				std::forward<QuaternionA_>(a_),
+				std::forward<B_>(b_),
+				EmuSIMD::set1<_register_type, per_element_width>(std::forward<T_>(t_))
+			);
+		}
+		else
+		{
+			// Actual calculation, guaranteed registers or quaternions by this point if well-formed
+			using _b_uq = typename std::remove_cvref<B_>::type;
+			using _t_uq = typename std::remove_cvref<T_>::type;
+			using _value_type = typename _fast_quat_uq::value_type;
+			constexpr std::size_t elements_per_register = _fast_quat_uq::elements_per_register;
+			constexpr std::size_t num_registers = _fast_quat_uq::num_registers;
+
+			// All calculations are a + ((b - a) * t)
+			if constexpr (num_registers <= 1)
+			{
+				const _register_type& a_register = std::forward<QuaternionA_>(a_).template GetRegister<0>();
+				_register_type xyzw = EmuSIMD::sub<per_element_width>(_fast_quaternion_get_register_arg_for_index<0>(std::forward<B_>(b_)), a_register);
+				if constexpr (Fused_)
+				{
+					xyzw = EmuSIMD::fmadd<per_element_width>(xyzw, _fast_quaternion_get_register_arg_for_index<0>(std::forward<T_>(t_)), a_register);
+				}
+				else
+				{
+					xyzw = EmuSIMD::mul_all<per_element_width>(xyzw, _fast_quaternion_get_register_arg_for_index<0>(std::forward<T_>(t_)));
+					xyzw = EmuSIMD::add<per_element_width>(xyzw, a_register);
+				}
+				return _fast_quat_uq(std::move(xyzw));
+			}
+			else
+			{
+				const _fast_quat_uq & a_ref = std::forward<QuaternionA_>(a_);
+				const _b_uq& b_ref = std::forward<B_>(b_);
+				const _t_uq& t_ref = std::forward<T_>(t_);
+
+				const _register_type& a_register_0 = a_ref.template GetRegister<0>();
+				_register_type xy = EmuSIMD::sub<per_element_width>(_fast_quaternion_get_register_arg_for_index<0>(b_ref), a_register_0);
+				const _register_type& a_register_1 = a_ref.template GetRegister<1>();
+				_register_type zw = EmuSIMD::sub<per_element_width>(_fast_quaternion_get_register_arg_for_index<1>(b_ref), a_register_1);
+
+				if constexpr (Fused_)
+				{
+					xy = EmuSIMD::fmadd<per_element_width>(xy, _fast_quaternion_get_register_arg_for_index<0>(t_ref), a_register_0);
+					zw = EmuSIMD::fmadd<per_element_width>(zw, _fast_quaternion_get_register_arg_for_index<1>(t_ref), a_register_1);
+				}
+				else
+				{
+					xy = EmuSIMD::mul_all<per_element_width>(xy, _fast_quaternion_get_register_arg_for_index<0>(t_ref));
+					xy = EmuSIMD::add<per_element_width>(xy, a_register_0);
+					zw = EmuSIMD::mul_all<per_element_width>(zw, _fast_quaternion_get_register_arg_for_index<1>(t_ref));
+					zw = EmuSIMD::add<per_element_width>(zw, a_register_1);
+				}
+				return _fast_quat_uq(std::move(xy), std::move(zw));
 			}
 		}
 	}

@@ -172,6 +172,24 @@ namespace EmuMath::Concepts
 	/// </summary>
 	template<class T_>
 	concept EmuVector = EmuMath::TMP::is_emu_vector_v<T_>;
+
+	/// <summary>
+	/// <para> Concept that determines if the passed type Arg_ is suitable for a lerp argument (b or t) with a FastQuaternion of the specified FastQuaternion_ type. </para>
+	/// <para> True if FastQuaternion_ is an EmuFastQuaternion, and one of: </para>
+	/// <para> 1: Arg_ is the same FastQuaternion type; or </para>
+	/// <para> 2: Arg_ is the same type as the FastQuaternion's register_type; or </para>
+	/// <para> 3: Arg_ is a scalar arithmetic type recognised by EmuConcepts::Arithmetic. </para>
+	/// </summary>
+	template<class Arg_, class FastQuaternion_>
+	concept EmuFastQuaternionLerpArg =
+	(
+		(EmuFastQuaternion<FastQuaternion_>) &&
+		(
+			(std::is_same_v<typename std::remove_cvref<FastQuaternion_>::type, typename std::remove_cvref<Arg_>::type>) ||
+			(std::is_same_v<typename std::remove_cvref_t<FastQuaternion_>::register_type, typename std::remove_cvref<Arg_>::type>) ||
+			(EmuConcepts::Arithmetic<Arg_>)
+		)
+	);
 }
 
 namespace EmuConcepts

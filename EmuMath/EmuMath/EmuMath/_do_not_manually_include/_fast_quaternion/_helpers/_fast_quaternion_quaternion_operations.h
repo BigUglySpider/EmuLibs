@@ -70,6 +70,32 @@ namespace EmuMath::Helpers
 		);
 	}
 #pragma endregion
+
+#pragma region LERPS
+	template<EmuConcepts::EmuFastQuaternion FastQuaternionA_, EmuConcepts::EmuFastQuaternionLerpArg<FastQuaternionA_> B_, EmuConcepts::EmuFastQuaternionLerpArg<FastQuaternionA_> T_>
+	[[nodiscard]] constexpr inline auto fast_quaternion_lerp(FastQuaternionA_&& a_, B_&& b_, T_&& t_)
+		-> typename std::remove_cvref<FastQuaternionA_>::type
+	{
+		return _fast_quaternion_underlying::_fast_quaternion_lerp<false>
+		(
+			std::forward<FastQuaternionA_>(a_),
+			std::forward<B_>(b_),
+			std::forward<T_>(t_)
+		);
+	}
+	
+	template<EmuConcepts::EmuFastQuaternion FastQuaternionA_, EmuConcepts::EmuFastQuaternionLerpArg<FastQuaternionA_> B_, EmuConcepts::EmuFastQuaternionLerpArg<FastQuaternionA_> T_>
+	[[nodiscard]] constexpr inline auto fast_quaternion_fused_lerp(FastQuaternionA_&& a_, B_&& b_, T_&& t_)
+		-> typename std::remove_cvref<FastQuaternionA_>::type
+	{
+		return _fast_quaternion_underlying::_fast_quaternion_lerp<true>
+		(
+			std::forward<FastQuaternionA_>(a_),
+			std::forward<B_>(b_),
+			std::forward<T_>(t_)
+		);
+	}
+#pragma endregion
 }
 
 #endif
