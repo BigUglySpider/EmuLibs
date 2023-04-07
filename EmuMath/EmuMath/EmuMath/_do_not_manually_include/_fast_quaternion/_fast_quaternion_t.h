@@ -924,14 +924,16 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 			return EmuMath::Helpers::fast_quaternion_fused_lerp(*this, std::forward<B_>(b_), std::forward<Weighting_>(t_));
 		}
 
-		[[nodiscard]] constexpr inline auto Slerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, const EmuMath::FastQuaternion<T_, RegisterWidth_>& t_) const
+		template<EmuConcepts::EmuFastQuaternionLerpArg<this_type> Weighting_>
+		[[nodiscard]] constexpr inline auto Slerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, Weighting_&& t_) const
 		{
-			// TODO
+			return EmuMath::Helpers::fast_quaternion_slerp(*this, b_, std::forward<Weighting_>(t_));
 		}
 
-		[[nodiscard]] constexpr inline auto FusedSlerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, const EmuMath::FastQuaternion<T_, RegisterWidth_>& t_) const
+		template<EmuConcepts::EmuFastQuaternionLerpArg<this_type> Weighting_>
+		[[nodiscard]] constexpr inline auto FusedSlerp(const EmuMath::FastQuaternion<T_, RegisterWidth_>& b_, Weighting_&& t_) const
 		{
-			// TODO
+			return EmuMath::Helpers::fast_quaternion_fused_slerp(*this, b_, std::forward<Weighting_>(t_));
 		}
 
 		[[nodiscard]] constexpr inline auto Conjugate() const

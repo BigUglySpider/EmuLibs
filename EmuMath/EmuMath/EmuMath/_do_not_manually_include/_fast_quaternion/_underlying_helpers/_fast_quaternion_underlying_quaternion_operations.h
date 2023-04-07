@@ -75,7 +75,7 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 	}
 
 	template<bool Fused_, EmuConcepts::EmuFastQuaternion QuaternionA_, class B_, class T_>
-	[[nodiscard]] constexpr inline auto _fast_quaternion_lerp(QuaternionA_&& a_, B_&& b_, T_&& t_)
+	[[nodiscard]] constexpr inline decltype(auto) _fast_quaternion_lerp(QuaternionA_&& a_, B_&& b_, T_&& t_)
 	{
 		using _fast_quat_uq = typename std::remove_cvref<QuaternionA_>::type;
 		using _register_type = typename _fast_quat_uq::register_type;
@@ -159,6 +159,186 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 					xy = EmuSIMD::add<per_element_width>(xy, a_register_0);
 					zw = EmuSIMD::mul_all<per_element_width>(zw, _fast_quaternion_get_register_arg_for_index<1>(t_ref));
 					zw = EmuSIMD::add<per_element_width>(zw, a_register_1);
+				}
+				return _fast_quat_uq(std::move(xy), std::move(zw));
+			}
+		}
+	}
+
+	template<bool Fused_, EmuConcepts::EmuFastQuaternion QuaternionA_, class B_, class T_>
+	[[nodiscard]] constexpr inline decltype(auto) _fast_quaternion_slerp(QuaternionA_&& a_, B_&& b_, T_&& t_)
+	{
+		using _fast_quat_uq = typename std::remove_cvref<QuaternionA_>::type;
+		using _register_type = typename _fast_quat_uq::register_type;
+		constexpr std::size_t per_element_width = _fast_quat_uq::per_element_width;
+
+		// Recursive call to convert scalar arguments to registers if we have any scalars
+		if constexpr (EmuConcepts::Arithmetic<B_>)
+		{
+			if constexpr (EmuConcepts::Arithmetic<T_>)
+			{
+				return _fast_quaternion_slerp<Fused_>
+				(
+					std::forward<QuaternionA_>(a_),
+					EmuSIMD::set1<_register_type, per_element_width>(std::forward<B_>(b_)),
+					EmuSIMD::set1<_register_type, per_element_width>(std::forward<T_>(t_))
+				);
+			}
+			else
+			{
+				return _fast_quaternion_slerp<Fused_>
+				(
+					std::forward<QuaternionA_>(a_),
+					EmuSIMD::set1<_register_type, per_element_width>(std::forward<B_>(b_)),
+					std::forward<T_>(t_)
+				);
+			}
+		}
+		else if constexpr (EmuConcepts::Arithmetic<T_>)
+		{
+			return _fast_quaternion_slerp<Fused_>
+			(
+				std::forward<QuaternionA_>(a_),
+				std::forward<B_>(b_),
+				EmuSIMD::set1<_register_type, per_element_width>(std::forward<T_>(t_))
+			);
+		}
+		else
+		{
+			// Actual calculation, guaranteed registers or quaternions by this point if well-formed
+			using _b_uq = typename std::remove_cvref<B_>::type;
+			using _t_uq = typename std::remove_cvref<T_>::type;
+			using _value_type = typename _fast_quat_uq::value_type;
+			constexpr std::size_t elements_per_register = _fast_quat_uq::elements_per_register;
+			constexpr std::size_t num_registers = _fast_quat_uq::num_registers;
+			constexpr bool is_signed = _fast_quat_uq::is_signed;
+
+			// Common data
+			const _fast_quat_uq& a_ref = std::forward<QuaternionA_>(a_);
+			const _b_uq& b_ref = std::forward<B_>(b_);
+			const _t_uq& t_ref = std::forward<T_>(t_);
+			_register_type one = EmuSIMD::set1<_register_type, per_element_width>(1);
+
+			// Calculate dot(a, b) for omega
+			_register_type omega;
+			if constexpr (num_registers <= 1)
+			{
+				omega = a_ref.template GetRegister<0>();
+				if constexpr (elements_per_register > 4)
+				{
+					// Zero junk data to avoid including bits we don't want
+					_register_type xyzw_mask = EmuSIMD::make_index_mask_for_first_x_elements<_register_type, 4, per_element_width>();
+					omega = EmuSIMD::bitwise_and(omega, xyzw_mask);
+				}
+				omega = EmuSIMD::dot_fill<per_element_width>(omega, _fast_quaternion_get_register_arg_for_index<0>(b_ref));
+			}
+			else
+			{
+				const _register_type& a0 = a_ref.template GetRegister<0>();
+				const _register_type& a1 = a_ref.template GetRegister<1>();
+
+				// Perform a hand-written dot as an optimisation opportunity
+				// --- Can even take advantage of fused operations if allowed
+				if constexpr (Fused_)
+				{
+					omega = EmuSIMD::mul_all<per_element_width>(a0, _fast_quaternion_get_register_arg_for_index<0>(b_ref));
+					omega = EmuSIMD::fmadd<per_element_width>
+					(
+						a1,
+						_fast_quaternion_get_register_arg_for_index<1>(b_ref),
+						omega
+					);
+				}
+				else
+				{
+					omega = EmuSIMD::mul_all<per_element_width>(a0, _fast_quaternion_get_register_arg_for_index<0>(b_ref));
+					omega = EmuSIMD::add<per_element_width>
+					(
+						omega,
+						EmuSIMD::mul_all<per_element_width>(a1, _fast_quaternion_get_register_arg_for_index<1>(b_ref))
+					);
+				}
+				omega = EmuSIMD::horizontal_sum_fill<per_element_width>(omega);
+			}
+
+			// Saturate omega to range -1:+1, and then calculate acos
+			omega = EmuSIMD::clamp<per_element_width, is_signed>
+			(
+				omega,
+				EmuSIMD::set1<_register_type, per_element_width>(-1),
+				one
+			);
+			omega = EmuSIMD::acos<per_element_width, is_signed>(omega);
+
+			// Calculate weightings and output results
+			_register_type weighting_divisor = EmuSIMD::sin<per_element_width, is_signed>(omega);
+			if constexpr (num_registers <= 1)
+			{
+				// ta = sin((1 - t) * omega) / weighting_divisor
+				_register_type ta = EmuSIMD::sub<per_element_width>(one, _fast_quaternion_get_register_arg_for_index<0>(t_ref));
+				ta = EmuSIMD::mul_all<per_element_width>(ta, omega);
+				ta = EmuSIMD::sin<per_element_width, is_signed>(ta);
+				ta = EmuSIMD::div<per_element_width, is_signed>(ta, weighting_divisor);
+
+				// tb = sin(t * omega) / weighting_divisor
+				_register_type tb = EmuSIMD::mul_all<per_element_width>(_fast_quaternion_get_register_arg_for_index<0>(t_ref), omega);
+				tb = EmuSIMD::sin<per_element_width, is_signed>(tb);
+				tb = EmuSIMD::div<per_element_width, is_signed>(tb, weighting_divisor);
+
+				// Apply weighting to a and b values, and then add them
+				_register_type weighted_b = EmuSIMD::mul_all<per_element_width>(_fast_quaternion_get_register_arg_for_index<0>(b_ref), tb);
+				if constexpr (Fused_)
+				{
+					return _fast_quat_uq(EmuSIMD::fmadd<per_element_width>(a_ref.template GetRegister<0>(), ta, weighted_b));
+				}
+				else
+				{
+					_register_type weighted_a = EmuSIMD::mul_all<per_element_width>(a_ref.template GetRegister<0>(), ta);
+					return _fast_quat_uq(EmuSIMD::add<per_element_width>(weighted_a, weighted_b));
+				}
+			}
+			else
+			{
+				// Reuse t registers (while maintaining clean-ish) code to avoid potential inefficiencies when compiled
+				// t0={x, y}, t1={z, w} weightings
+				// tb = sin(t * omega) / weighting_divisor
+				_register_type t0 = EmuSIMD::mul_all<per_element_width>(_fast_quaternion_get_register_arg_for_index<0>(t_ref), omega);
+				t0 = EmuSIMD::sin<per_element_width, is_signed>(t0);
+				t0 = EmuSIMD::div<per_element_width, is_signed>(t0, weighting_divisor);
+
+				_register_type t1 = EmuSIMD::mul_all<per_element_width>(_fast_quaternion_get_register_arg_for_index<1>(t_ref), omega);
+				t1 = EmuSIMD::sin<per_element_width, is_signed>(t1);
+				t1 = EmuSIMD::div<per_element_width, is_signed>(t1, weighting_divisor);
+
+				// Apply weighting to b values
+				_register_type xy = EmuSIMD::mul_all<per_element_width>(_fast_quaternion_get_register_arg_for_index<0>(b_ref), t0);
+				_register_type zw = EmuSIMD::mul_all<per_element_width>(_fast_quaternion_get_register_arg_for_index<1>(b_ref), t1);
+
+				// Calculate a weightings
+				// ta = sin((1 - t) * omega) / weighting_divisor
+				t0 = EmuSIMD::sub<per_element_width>(one, _fast_quaternion_get_register_arg_for_index<0>(t_ref));
+				t0 = EmuSIMD::mul_all<per_element_width>(t0, omega);
+				t0 = EmuSIMD::sin<per_element_width, is_signed>(t0);
+				t0 = EmuSIMD::div<per_element_width, is_signed>(t0, weighting_divisor);
+
+				t1 = EmuSIMD::sub<per_element_width>(one, _fast_quaternion_get_register_arg_for_index<1>(t_ref));
+				t1 = EmuSIMD::mul_all<per_element_width>(t1, omega);
+				t1 = EmuSIMD::sin<per_element_width, is_signed>(t1);
+				t1 = EmuSIMD::div<per_element_width, is_signed>(t1, weighting_divisor);
+
+				// Apply weighting to a values and then add them with weighted b values
+				if constexpr (Fused_)
+				{
+					xy = EmuSIMD::fmadd<per_element_width>(a_ref.template GetRegister<0>(), t0, xy);
+					zw = EmuSIMD::fmadd<per_element_width>(a_ref.template GetRegister<1>(), t1, zw);
+				}
+				else
+				{
+					_register_type a_chunk = EmuSIMD::mul_all<per_element_width>(a_ref.template GetRegister<0>(), t0);
+					xy = EmuSIMD::add<per_element_width>(xy, a_chunk);
+
+					a_chunk = EmuSIMD::mul_all<per_element_width>(a_ref.template GetRegister<1>(), t1);
+					zw = EmuSIMD::add<per_element_width>(zw, a_chunk);
 				}
 				return _fast_quat_uq(std::move(xy), std::move(zw));
 			}

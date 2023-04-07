@@ -96,6 +96,34 @@ namespace EmuMath::Helpers
 		);
 	}
 #pragma endregion
+
+#pragma region SLERPS
+	template<EmuConcepts::EmuFastQuaternion FastQuaternionA_, EmuConcepts::EmuFastQuaternion FastQuaternionB_, EmuConcepts::EmuFastQuaternionLerpArg<FastQuaternionA_> T_>
+	requires(std::is_same_v<typename std::remove_cvref<FastQuaternionA_>::type, typename std::remove_cvref<FastQuaternionB_>::type>)
+	[[nodiscard]] constexpr inline auto fast_quaternion_slerp(FastQuaternionA_&& a_, FastQuaternionB_&& b_, T_&& t_)
+		-> typename std::remove_cvref<FastQuaternionA_>::type
+	{
+		return _fast_quaternion_underlying::_fast_quaternion_slerp<false>
+		(
+			std::forward<FastQuaternionA_>(a_),
+			std::forward<FastQuaternionB_>(b_),
+			std::forward<T_>(t_)
+		);
+	}
+	
+	template<EmuConcepts::EmuFastQuaternion FastQuaternionA_, EmuConcepts::EmuFastQuaternion FastQuaternionB_, EmuConcepts::EmuFastQuaternionLerpArg<FastQuaternionA_> T_>
+	requires(std::is_same_v<typename std::remove_cvref<FastQuaternionA_>::type, typename std::remove_cvref<FastQuaternionB_>::type>)
+	[[nodiscard]] constexpr inline auto fast_quaternion_fused_slerp(FastQuaternionA_&& a_, FastQuaternionB_&& b_, T_&& t_)
+		-> typename std::remove_cvref<FastQuaternionA_>::type
+	{
+		return _fast_quaternion_underlying::_fast_quaternion_slerp<true>
+		(
+			std::forward<FastQuaternionA_>(a_),
+			std::forward<FastQuaternionB_>(b_),
+			std::forward<T_>(t_)
+		);
+	}
+#pragma endregion
 }
 
 #endif

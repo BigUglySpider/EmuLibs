@@ -385,8 +385,26 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 			using sub_func = EmuCore::do_subtract<calc_fp, calc_fp>;
 			calc_fp weighting_divisor = sin_func()(omega);
 			calc_fp t = static_cast<calc_fp>(std::forward<ArgT_>(t_));
-			calc_fp ta = div_func()(sin_func()(mul_func()(sub_func()(calc_fp(1), t), omega)), weighting_divisor);
-			calc_fp tb = div_func()(sin_func()(mul_func()(t, omega)), weighting_divisor);
+			calc_fp ta = div_func() // sin((1 - t) * omega) / weighting_divisor
+			(
+				sin_func()
+				(
+					mul_func()
+					(
+						sub_func()(calc_fp(1), t),
+						omega
+					)
+				),
+				weighting_divisor
+			);
+			calc_fp tb = div_func() // sin(t * omega) / weighting_divisor
+			(
+				sin_func()
+				(
+					mul_func()(t, omega)
+				),
+				weighting_divisor
+			);
 
 			// Perform interpolation
 			using out_type = typename std::conditional<VectorOut_, typename out_quaternion::vector_type, out_quaternion>::type;
