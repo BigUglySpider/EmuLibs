@@ -407,34 +407,53 @@ int main()
 	//universal_pause();
 
 	{
-		constexpr auto mult_constant = 5.281f;
+		constexpr auto mult_constant = 1;
 		using fast_quat_f32x4 = EmuMath::FastQuaternion<float, 128>;
 		using fast_quat_f32x8 = EmuMath::FastQuaternion<float, 256>;
 		using fast_quat_f64x2 = EmuMath::FastQuaternion<double, 128>;
 		using quatf32 = EmuMath::Quaternion<float>;
 		using quatf64 = EmuMath::Quaternion<double>;
-		constexpr auto val_quatf32 = quatf32::from_euler_constexpr<false, true>(-25.73f, 45.95f, 72.34f);
-		constexpr auto val_quatf64 = quatf64::from_euler_constexpr<false, true>(-25.73, 45.95, 72.34);
-		constexpr auto b_quatf32 = quatf32::from_euler_constexpr<false, true>(1.0f, 0.0f, 2.0f);
-		constexpr auto b_quatf64 = quatf64(b_quatf32);
-		auto b_f32 = 1.0f;
-		auto b_f64 = static_cast<double>(b_f32);
-		auto t_quatf32 = quatf32(0.25f, 0.5f, 1.0f, 0.2f);
-		auto t_quatf64 = quatf64(t_quatf32);
-		auto t_f32 = 0.5f;
-		auto t_f64 = static_cast<double>(t_f32);
+		constexpr auto val_quatf32 = quatf32::from_euler_constexpr<false, false>(-25.73f, 45.95f, 72.34f) * mult_constant;
+		constexpr auto val_quatf64 = quatf64::from_euler_constexpr<false, false>(-25.73, 45.95, 72.34) * mult_constant;
 
-		std::cout << "Scalarf32 (quat, scalar): " << val_quatf32.Slerp(b_quatf32, t_f32) << "\n";
-		std::cout << "Scalarf32 (quat, scalar): " << val_quatf32.FusedSlerp(b_quatf32, t_f32) << "\n";
+		std::cout << "\n### Base ###\n";
+		std::cout << "Scalarf32: " << val_quatf32 << "\n";
+		std::cout << "Scalarf64: " << val_quatf64 << "\n";
 		std::cout << "---\n";
-		std::cout << "f32x4 (quat, scalar): " << fast_quat_f32x4(val_quatf32).Slerp(fast_quat_f32x4(b_quatf32), t_f32) << "\n";
-		std::cout << "f32x4 (quat, scalar): " << fast_quat_f32x4(val_quatf32).FusedSlerp(fast_quat_f32x4(b_quatf32), t_f32) << "\n";
+		std::cout << "f32x4: " << fast_quat_f32x4(val_quatf32) << "\n";
 		std::cout << "---\n";
-		std::cout << "f32x8 (quat, scalar): " << fast_quat_f32x8(val_quatf32).Slerp(fast_quat_f32x8(b_quatf32), t_f32) << "\n";
-		std::cout << "f32x8 (quat, scalar): " << fast_quat_f32x8(val_quatf32).FusedSlerp(fast_quat_f32x8(b_quatf32), t_f32) << "\n";
+		std::cout << "f32x8: " << fast_quat_f32x8(val_quatf32) << "\n";
 		std::cout << "---\n";
-		std::cout << "f64x2 (quat, scalar): " << fast_quat_f64x2(val_quatf64).Slerp(fast_quat_f64x2(b_quatf64), t_f64) << "\n";
-		std::cout << "f64x2 (quat, scalar): " << fast_quat_f64x2(val_quatf64).FusedSlerp(fast_quat_f64x2(b_quatf64), t_f64) << "\n";
+		std::cout << "f64x2: " << fast_quat_f64x2(val_quatf64) << "\n";
+
+		std::cout << "\n### Conjugate ###\n";
+		std::cout << "Scalarf32: " << val_quatf32.Conjugate() << "\n";
+		std::cout << "Scalarf64: " << val_quatf64.Conjugate() << "\n";
+		std::cout << "---\n";
+		std::cout << "f32x4: " << fast_quat_f32x4(val_quatf32).Conjugate() << "\n";
+		std::cout << "---\n";
+		std::cout << "f32x8: " << fast_quat_f32x8(val_quatf32).Conjugate() << "\n";
+		std::cout << "---\n";
+		std::cout << "f64x2: " << fast_quat_f64x2(val_quatf64).Conjugate() << "\n";
+
+		std::cout << "\n### Inverse ###\n";
+		std::cout << "Scalarf32: " << val_quatf32.Inverse() << "\n";
+		std::cout << "---\n";
+		std::cout << "f32x4: " << fast_quat_f32x4(val_quatf32).Inverse() << "\n";
+		std::cout << "---\n";
+		std::cout << "f32x8: " << fast_quat_f32x8(val_quatf32).Inverse() << "\n";
+		std::cout << "---\n";
+		std::cout << "f64x2: " << fast_quat_f64x2(val_quatf64).Inverse() << "\n";
+
+		std::cout << "\n### Unit ###\n";
+		std::cout << "Scalarf32: " << val_quatf32.Unit() << "\n";
+		std::cout << "Scalarf64: " << val_quatf64.Unit() << "\n";
+		std::cout << "---\n";
+		std::cout << "f32x4: " << fast_quat_f32x4(val_quatf32).Unit() << "\n";
+		std::cout << "---\n";
+		std::cout << "f32x8: " << fast_quat_f32x8(val_quatf32).Unit() << "\n";
+		std::cout << "---\n";
+		std::cout << "f64x2: " << fast_quat_f64x2(val_quatf64).Unit() << "\n";
 		universal_pause();
 	}
 

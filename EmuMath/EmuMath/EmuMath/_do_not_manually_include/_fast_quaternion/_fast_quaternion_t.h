@@ -985,45 +985,49 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 			return EmuMath::Helpers::fast_quaternion_fused_slerp(*this, b_, std::forward<Weighting_>(t_));
 		}
 
+		/// <summary>
+		/// <para> Returns the form of this Quaternion with its imaginary component (i.e. X, Y, Z) negated. </para>
+		/// </summary>
+		/// <returns>Quaternion representing this Quaternion's conjugate.</returns>
 		[[nodiscard]] constexpr inline auto Conjugate() const
 		{
-			// TODO
+			return EmuMath::Helpers::fast_quaternion_conjugate(*this);
 		}
 
+		/// <summary>
+		/// <para> Returns the inverse form of this Quaternion, which is equivalent to its Conjugate normalised. </para>
+		/// <para>
+		///		If this Quaternion is known to have a norm (or length) of 1, this is mathematically identical to `Conjugate`, 
+		///		although floating-point errors may produce different results.
+		/// </para>
+		/// <para> May optionally choose reciprocal multiplication instead of division for normalisation. If `PreferMultiplies_` is omitted, it will be considered `false`. </para>
+		/// </summary>
+		/// <returns>Quaternion representing the inverse of this Quaternion.</returns>
 		template<bool PreferMultiplies_ = false>
 		[[nodiscard]] constexpr inline auto Inverse() const
 		{
-			// TODO
+			return EmuMath::Helpers::fast_quaternion_inverse<PreferMultiplies_>(*this);
 		}
 
-		template<bool PreferMultiplies_ = false>
-		[[nodiscard]] constexpr inline auto FusedInverse() const
-		{
-			// TODO
-		}
-
+		/// <summary>
+		/// <para> Outputs the Unit form of this Quaternion (aka: its normalised form). </para>
+		/// <para> May optionally choose to prefer reciprocal multiplication over division. If `PreferMultiplies_` is omitted, it will be treated as `false`. </para>
+		/// </summary>
+		/// <returns>A normalised copy of this Quaternion.</returns>
 		template<bool PreferMultiplies_ = false>
 		[[nodiscard]] constexpr inline auto Unit() const
 		{
-			// TODO
+			return EmuMath::Helpers::fast_quaternion_unit<PreferMultiplies_>(*this);
 		}
 
-		template<bool PreferMultiplies_ = false>
-		[[nodiscard]] constexpr inline auto FusedUnit() const
-		{
-			// TODO
-		}
-
+		/// <summary>
+		/// <para> Sets this Quaternion to its unit (aka: normalised) form. </para>
+		/// <para> May optionally choose to prefer reciprocal multiplication over division. If `PreferMultiplies_` is omitted, it will be treated as `false`. </para>
+		/// </summary>
 		template<bool PreferMultiplies_ = false>
 		constexpr inline void AssignUnit()
 		{
-			// TODO
-		}
-
-		template<bool PreferMultiplies_ = false>
-		constexpr inline void AssignFusedUnit()
-		{
-			// TODO
+			EmuMath::Helpers::fast_quaternion_assign_unit<PreferMultiplies_>(*this);
 		}
 #pragma endregion
 

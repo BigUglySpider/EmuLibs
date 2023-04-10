@@ -10,7 +10,7 @@ namespace EmuMath::Helpers
 	[[nodiscard]] constexpr inline auto fast_quaternion_square_norm_scalar(FastQuaternion_&& fast_quaternion_)
 		-> OutT_
 	{
-		return _fast_quaternion_underlying::_fast_quaternion_calculate_norm<true, true, OutT_>
+		return _fast_quaternion_underlying::_fast_quaternion_calculate_norm<true, false, true, OutT_>
 		(
 			std::forward<FastQuaternion_>(fast_quaternion_)
 		);
@@ -21,7 +21,7 @@ namespace EmuMath::Helpers
 		-> typename std::remove_cvref_t<FastQuaternion_>::preferred_floating_point
 	{
 		using preferred_floating_point = typename std::remove_cvref_t<FastQuaternion_>::preferred_floating_point;
-		return _fast_quaternion_underlying::_fast_quaternion_calculate_norm<true, true, preferred_floating_point>
+		return _fast_quaternion_underlying::_fast_quaternion_calculate_norm<true, false, true, preferred_floating_point>
 		(
 			std::forward<FastQuaternion_>(fast_quaternion_)
 		);
@@ -31,7 +31,7 @@ namespace EmuMath::Helpers
 	[[nodiscard]] constexpr inline auto fast_quaternion_norm_scalar(FastQuaternion_&& fast_quaternion_)
 		-> OutT_
 	{
-		return _fast_quaternion_underlying::_fast_quaternion_calculate_norm<true, false, OutT_>
+		return _fast_quaternion_underlying::_fast_quaternion_calculate_norm<true, false, false, OutT_>
 		(
 			std::forward<FastQuaternion_>(fast_quaternion_)
 		);
@@ -42,7 +42,7 @@ namespace EmuMath::Helpers
 		-> typename std::remove_cvref_t<FastQuaternion_>::preferred_floating_point
 	{
 		using preferred_floating_point = typename std::remove_cvref_t<FastQuaternion_>::preferred_floating_point;
-		return _fast_quaternion_underlying::_fast_quaternion_calculate_norm<true, false, preferred_floating_point>
+		return _fast_quaternion_underlying::_fast_quaternion_calculate_norm<true, false, false, preferred_floating_point>
 		(
 			std::forward<FastQuaternion_>(fast_quaternion_)
 		);
@@ -122,6 +122,40 @@ namespace EmuMath::Helpers
 			std::forward<FastQuaternionB_>(b_),
 			std::forward<T_>(t_)
 		);
+	}
+#pragma endregion
+
+#pragma region CONJUGATES
+	template<EmuConcepts::EmuFastQuaternion FastQuaternion_>
+	[[nodiscard]] constexpr inline auto fast_quaternion_conjugate(FastQuaternion_&& fast_quaternion_)
+		-> typename std::remove_cvref<FastQuaternion_>::type
+	{
+		return _fast_quaternion_underlying::_fast_quaternion_conjugate(std::forward<FastQuaternion_>(fast_quaternion_));
+	}
+#pragma endregion
+
+#pragma region INVERSES
+	template<bool PreferMultiplies_ = false, EmuConcepts::EmuFastQuaternion FastQuaternion_>
+	[[nodiscard]] constexpr inline auto fast_quaternion_inverse(FastQuaternion_&& fast_quaternion_)
+		-> typename std::remove_cvref<FastQuaternion_>::type
+	{
+		return _fast_quaternion_underlying::_fast_quaternion_inverse<PreferMultiplies_>(std::forward<FastQuaternion_>(fast_quaternion_));
+	}
+#pragma endregion
+
+#pragma region UNITS
+	template<bool PreferMultiplies_ = false, EmuConcepts::EmuFastQuaternion FastQuaternion_>
+	[[nodiscard]] constexpr inline auto fast_quaternion_unit(FastQuaternion_&& fast_quaternion_)
+		-> typename std::remove_cvref<FastQuaternion_>::type
+	{
+		return _fast_quaternion_underlying::_fast_quaternion_unit<PreferMultiplies_>(std::forward<FastQuaternion_>(fast_quaternion_));
+	}
+
+	template<bool PreferMultiplies_ = false, typename T_, std::size_t RegisterWidth_>
+	[[nodiscard]] constexpr inline void fast_quaternion_assign_unit(EmuMath::FastQuaternion<T_, RegisterWidth_>& fast_quaternion_)
+	{
+		// NOTE: Could be optimised to prevent creating a new Quaternion, however it is likely optimised out anyway
+		fast_quaternion_ = _fast_quaternion_underlying::_fast_quaternion_unit<PreferMultiplies_>(fast_quaternion_);
 	}
 #pragma endregion
 }

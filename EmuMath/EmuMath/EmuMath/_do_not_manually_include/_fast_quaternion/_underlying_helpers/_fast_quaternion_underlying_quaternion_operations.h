@@ -6,9 +6,11 @@
 
 namespace EmuMath::Helpers::_fast_quaternion_underlying
 {
-	template<bool OutScalar_, bool Squared_, typename OutIfScalar_ = void, EmuConcepts::EmuFastQuaternion FastQuaternion_>
+	template<bool OutScalar_, bool OutRegister_, bool Squared_, typename OutIfScalar_ = void, EmuConcepts::EmuFastQuaternion FastQuaternion_>
 	[[nodiscard]] constexpr inline decltype(auto) _fast_quaternion_calculate_norm(FastQuaternion_&& fast_quaternion_)
 	{
+		static_assert(!(OutScalar_ && OutRegister_), "INTERNAL EMUMATH ERROR: Underlying `_fast_quaternion_calculate_norm` function told that output is both scalar and a (SIMD) register; these are mutually exclusive and should never both be true.");
+
 		using _fast_quat_uq = typename std::remove_cvref<FastQuaternion_>::type;
 		using _register_type = typename _fast_quat_uq::register_type;
 		using _value_type = typename _fast_quat_uq::value_type;
@@ -65,11 +67,25 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 			norm = EmuSIMD::horizontal_sum_fill<per_element_width>(norm);
 			if constexpr (Squared_)
 			{
-				return norm;
+				if constexpr (OutRegister_)
+				{
+					return norm;
+				}
+				else
+				{
+					return _fast_quat_uq(std::move(norm));
+				}
 			}
 			else
 			{
-				return EmuSIMD::sqrt<per_element_width, is_signed>(norm);
+				if constexpr (OutRegister_)
+				{
+					return EmuSIMD::sqrt<per_element_width, is_signed>(norm);
+				}
+				else
+				{
+					return _fast_quat_uq(EmuSIMD::sqrt<per_element_width, is_signed>(norm));
+				}
 			}
 		}
 	}
@@ -343,6 +359,112 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 				return _fast_quat_uq(std::move(xy), std::move(zw));
 			}
 		}
+	}
+
+	template<EmuConcepts::EmuFastQuaternion FastQuaternion_>
+	[[nodiscard]] constexpr inline auto _fast_quaternion_conjugate(FastQuaternion_&& in_)
+		-> typename std::remove_cvref<FastQuaternion_>::type
+	{
+		using _fast_quat_uq = typename std::remove_cvref<FastQuaternion_>::type;
+		using _register_type = typename _fast_quat_uq::register_type;
+		constexpr std::size_t per_element_width = _fast_quat_uq::per_element_width;
+
+		if constexpr (_fast_quat_uq::num_registers <= 1)
+		{
+			_register_type initial_chunk = std::forward<FastQuaternion_>(in_).template GetRegister<0>();
+			_register_type negated_chunk = EmuSIMD::negate<per_element_width>(initial_chunk);
+			_register_type xyz_mask = EmuSIMD::make_index_mask_for_first_x_elements<_register_type, 3, per_element_width>();
+			negated_chunk = EmuSIMD::bitwise_and(xyz_mask, negated_chunk);
+			initial_chunk = EmuSIMD::bitwise_andnot(xyz_mask, initial_chunk);
+			return _fast_quat_uq(EmuSIMD::bitwise_or(negated_chunk, initial_chunk));
+		}
+		else
+		{
+			_register_type xy = std::forward<FastQuaternion_>(in_).template GetRegister<0>();
+			_register_type initial_zw = std::forward<FastQuaternion_>(in_).template GetRegister<1>();
+			xy = EmuSIMD::negate<per_element_width>(xy);
+
+			// TODO: REPLACE WITH EMUSIMD EQUIVALENT OF E.G. _mm_sub_sd WHEN IMPLEMENTED
+			// --- Can be shortened to `return _fast_quat_uq(std::move(xy), EmuSIMD::negate_first<per_element_width>(initial_zw));` when implemented (example name in `negate_first`)
+			_register_type negated_zw = EmuSIMD::negate<per_element_width>(initial_zw);
+			_register_type mask_z = EmuSIMD::make_index_mask_for_first_x_elements<_register_type, 1, per_element_width>();
+			negated_zw = EmuSIMD::bitwise_and(mask_z, negated_zw);
+			initial_zw = EmuSIMD::bitwise_andnot(mask_z, initial_zw);
+			return _fast_quat_uq(std::move(xy), EmuSIMD::bitwise_or(negated_zw, initial_zw));
+		}
+	}
+
+	template<bool PreferMultiplies_, EmuConcepts::EmuFastQuaternion FastQuaternion_>
+	[[nodiscard]] constexpr inline auto _fast_quaternion_unit(FastQuaternion_&& in_conjugate_)
+		-> typename std::remove_cvref<FastQuaternion_>::type
+	{
+		using _fast_quat_uq = typename std::remove_cvref<FastQuaternion_>::type;
+		using _register_type = typename _fast_quat_uq::register_type;
+		constexpr std::size_t per_element_width = _fast_quat_uq::per_element_width;
+		constexpr bool is_signed = _fast_quat_uq::is_signed;
+		constexpr std::size_t num_registers = _fast_quat_uq::num_registers;
+
+		if constexpr (PreferMultiplies_ && _fast_quat_uq::is_floating_point)
+		{
+			_register_type length_reciprocal = _fast_quaternion_calculate_norm<false, true, true>(std::forward<FastQuaternion_>(in_conjugate_));
+			length_reciprocal = EmuSIMD::rsqrt<per_element_width, is_signed>(length_reciprocal);
+			_register_type normalised_0 = EmuSIMD::mul_all<per_element_width>
+			(
+				std::forward<FastQuaternion_>(in_conjugate_).template GetRegister<0>(),
+				length_reciprocal
+			);
+			if constexpr (num_registers <= 1)
+			{
+				return _fast_quat_uq(std::move(normalised_0));
+			}
+			else
+			{
+				return _fast_quat_uq
+				(
+					std::move(normalised_0),
+					EmuSIMD::mul_all<per_element_width>
+					(
+						std::forward<FastQuaternion_>(in_conjugate_).template GetRegister<1>(),
+						length_reciprocal
+					)
+				);
+			}
+		}
+		else
+		{
+			_register_type length = _fast_quaternion_calculate_norm<false, true, false>(std::forward<FastQuaternion_>(in_conjugate_));
+			_register_type normalised_0 = EmuSIMD::div<per_element_width, is_signed>
+			(
+				std::forward<FastQuaternion_>(in_conjugate_).template GetRegister<0>(),
+				length
+			);
+			if constexpr (num_registers <= 1)
+			{
+				return _fast_quat_uq(std::move(normalised_0));
+			}
+			else
+			{
+				return _fast_quat_uq
+				(
+					std::move(normalised_0),
+					EmuSIMD::div<per_element_width, is_signed>
+					(
+						std::forward<FastQuaternion_>(in_conjugate_).template GetRegister<1>(),
+						length
+					)
+				);
+			}
+		}
+	}
+	
+	template<bool PreferMultiplies_, EmuConcepts::EmuFastQuaternion FastQuaternion_>
+	[[nodiscard]] constexpr inline auto _fast_quaternion_inverse(FastQuaternion_&& in_)
+		-> typename std::remove_cvref<FastQuaternion_>::type
+	{
+		return _fast_quaternion_unit<PreferMultiplies_>
+		(
+			_fast_quaternion_conjugate(std::forward<FastQuaternion_>(in_))
+		);
 	}
 }
 
