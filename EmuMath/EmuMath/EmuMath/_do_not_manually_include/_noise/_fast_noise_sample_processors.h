@@ -30,12 +30,12 @@ namespace EmuMath::Functors
 		[[nodiscard]] inline __m128 operator()(__m128 samples_) const
 		{
 			samples_ = EmuSIMD::sub(samples_, _mm256_castps256_ps128(min_256));
-			return EmuSIMD::mul(samples_, _mm256_castps256_ps128(denominator_reciprocal_256));
+			return EmuSIMD::mul_all(samples_, _mm256_castps256_ps128(denominator_reciprocal_256));
 		}
 		[[nodiscard]] inline __m256 operator()(__m256 samples_) const
 		{
 			samples_ = EmuSIMD::sub(samples_, min_256);
-			return EmuSIMD::mul(samples_, denominator_reciprocal_256);
+			return EmuSIMD::mul_all(samples_, denominator_reciprocal_256);
 		}
 
 	private:

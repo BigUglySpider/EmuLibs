@@ -149,7 +149,7 @@ namespace EmuMath
 		struct _vector_get_index_for_load_result
 		{
 			using _vector_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
-			using _get_result = decltype(std::declval<_vector_uq>().AtTheoretical<FullWidthIndex_>());
+			using _get_result = decltype(std::declval<_vector_uq>().template AtTheoretical<FullWidthIndex_>());
 
 			using type = typename std::conditional
 			<
@@ -410,6 +410,12 @@ namespace EmuMath
 				);
 			}
 		}
+
+		template<std::size_t Unused_>
+		[[nodiscard]] static constexpr inline bool has_multi_move_constructor()
+		{
+			return Unused_ >= 0 && contains_multiple_registers;
+		}
 #pragma endregion
 
 #pragma region CONSTRUCTORS
@@ -489,7 +495,7 @@ namespace EmuMath
 		/// <summary>
 		/// <para> Private constructor for creating a new instance of this FastVector type with a newly created data_type. Disabled if this Vector has 1 register. </para>
 		/// </summary>
-		template<typename = std::enable_if_t<contains_multiple_registers>>
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<has_multi_move_constructor<Unused_>()>>
 		explicit constexpr inline FastVector(data_type&& data_) noexcept : data(std::move(data_))
 		{
 		}
@@ -3306,7 +3312,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool operator>(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() > rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() > rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool operator>(value_type rhs_magnitude_) const
@@ -3321,7 +3327,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool operator<(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() < rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() < rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool operator<(value_type rhs_magnitude_) const
@@ -3336,7 +3342,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool operator>=(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() >= rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() >= rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool operator>=(value_type rhs_magnitude_) const
@@ -3351,7 +3357,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool operator<=(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() <= rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() <= rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool operator<=(value_type rhs_magnitude_) const
@@ -3642,7 +3648,7 @@ namespace EmuMath
 				constexpr std::size_t num_output_indices = OutSize_ - WriteOffset_;
 				constexpr std::size_t out_partial_length = num_output_indices % elements_per_register;
 				constexpr std::size_t required_register_count = (num_output_indices / elements_per_register) + (out_partial_length != 0);
-				_store_to_non_uniform<required_register_count, out_partial_length>(out_.data<WriteOffset_>());
+				_store_to_non_uniform<required_register_count, out_partial_length>(out_.template data<WriteOffset_>());
 			}
 		}
 
@@ -3712,8 +3718,8 @@ namespace EmuMath
 				using cast_type = typename std::conditional<is_integral, std::int32_t, float>::type;
 				using cast_vector_type = EmuMath::FastVector<cast_size, cast_type, cast_register_width>;
 				cast_vector_type cast_a = Convert<cast_size, cast_type, cast_register_width>();
-				cast_vector_type cast_b = b_.Convert<cast_size, cast_type, cast_register_width>();
-				return cast_a.Cross3(cast_b).Convert<Size_, T_, RegisterWidth_>();
+				cast_vector_type cast_b = b_.template Convert<cast_size, cast_type, cast_register_width>();
+				return cast_a.Cross3(cast_b).template Convert<Size_, T_, RegisterWidth_>();
 			}
 		}
 
@@ -4231,11 +4237,11 @@ namespace EmuMath
 		{
 			if constexpr (per_element_byte_size <= 4)
 			{
-				return static_cast<Out_>(std::sqrtf(Dot2Scalar<float>(*this)));
+				return static_cast<Out_>(sqrtf(Dot2Scalar<float>(*this)));
 			}
 			else
 			{
-				return static_cast<Out_>(std::sqrt(Dot2Scalar<double>(*this)));
+				return static_cast<Out_>(sqrt(Dot2Scalar<double>(*this)));
 			}
 		}
 
@@ -4273,11 +4279,11 @@ namespace EmuMath
 		{
 			if constexpr (per_element_byte_size <= 4)
 			{
-				return static_cast<Out_>(std::sqrtf(Dot3Scalar<float>(*this)));
+				return static_cast<Out_>(sqrtf(Dot3Scalar<float>(*this)));
 			}
 			else
 			{
-				return static_cast<Out_>(std::sqrt(Dot3Scalar<double>(*this)));
+				return static_cast<Out_>(sqrt(Dot3Scalar<double>(*this)));
 			}
 		}
 
@@ -4432,7 +4438,7 @@ namespace EmuMath
 		template<typename Out_ = value_type>
 		[[nodiscard]] constexpr inline Out_ DistanceScalar(const this_type& target_) const
 		{
-			return target_.Subtract(*this).MagnitudeScalar<Out_>();
+			return target_.Subtract(*this).template MagnitudeScalar<Out_>();
 		}
 
 		/// <summary>
@@ -4476,7 +4482,7 @@ namespace EmuMath
 		template<typename Out_ = value_type>
 		[[nodiscard]] constexpr inline Out_ SquareDistanceScalar(const this_type& target_) const
 		{
-			return target_.Subtract(*this).SquareMagnitudeScalar<Out_>();
+			return target_.Subtract(*this).template SquareMagnitudeScalar<Out_>();
 		}
 
 		/// <summary>
@@ -5779,7 +5785,7 @@ namespace EmuMath
 				using calc_value_type = typename std::conditional<out_vector::is_floating_point, OutFP_, preferred_floating_point>::type;
 				using calc_vector_type = EmuMath::FastVector<Size_, calc_value_type, RegisterWidth_>;
 				calc_vector_type plane_normal = _calculate_normal_to_plane_3<calc_value_type>(plane_point_a_, plane_point_b_, plane_point_c_);
-				return calc_vector_type::_calculate_projection_to_plane<3, OutFP_>(this->Convert<calc_value_type>(), plane_normal);
+				return calc_vector_type::template _calculate_projection_to_plane<3, OutFP_>(this->Convert<calc_value_type>(), plane_normal);
 			}
 		}
 
@@ -6954,7 +6960,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool CmpGreater(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() > rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() > rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool CmpGreater(value_type rhs_magnitude_) const
@@ -6969,7 +6975,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool CmpLess(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() < rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() < rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool CmpLess(value_type rhs_magnitude_) const
@@ -6984,7 +6990,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool CmpGreaterEqual(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() >= rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() >= rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool CmpGreaterEqual(value_type rhs_magnitude_) const
@@ -6999,7 +7005,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool CmpLessEqual(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() <= rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() <= rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool CmpLessEqual(value_type rhs_magnitude_) const
@@ -7145,16 +7151,16 @@ namespace EmuMath
 #pragma region GENERAL_HELPERS
 	private:
 		template<std::size_t FullWidthIndex_, typename Vector_>
-		[[nodiscard]] static constexpr inline typename _vector_get_index_for_load_result<FullWidthIndex_, Vector_>::type _get_index_from_normal_vector(Vector_&& arg_)
+		[[nodiscard]] static constexpr inline decltype(auto) _get_index_from_normal_vector(Vector_&& arg_)
 		{
 			using vector_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
-			if constexpr (FullWidthIndex_ > vector_uq::size || std::is_lvalue_reference_v<Vector_>)
+			if constexpr (FullWidthIndex_ >= vector_uq::size || std::is_lvalue_reference_v<Vector_>)
 			{
-				return arg_.AtTheoretical<FullWidthIndex_>();
+				return std::forward<Vector_>(arg_).template AtTheoretical<FullWidthIndex_>();
 			}
 			else
 			{
-				return std::move(arg_.AtTheoretical<FullWidthIndex_>());
+				return std::move(std::forward<Vector_>(arg_).template at<FullWidthIndex_>());
 			}
 		}
 
@@ -7477,17 +7483,22 @@ namespace EmuMath
 			if constexpr (all_indices_in_range && std::is_same_v<value_type, vector_stored_uq>)
 			{
 				constexpr std::size_t first_index = EmuCore::TMP::first_variadic_value_v<FullWidthIndices_...>;
-				return EmuSIMD::load<register_type>(vector_.data<first_index>());
+				return EmuSIMD::load<register_type>(vector_.template data<first_index>());
 			}
 			else
 			{
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 				return EmuSIMD::setr<register_type, per_element_byte_size>(_get_index_from_normal_vector<FullWidthIndices_>(std::forward<Vector_>(vector_))...);
+EMU_CORE_MSVC_POP_WARNING_STACK
 			}
 		}
 
 		template<class Vector_, std::size_t...RegisterIndices_>
 		static constexpr inline data_type _make_array_as_normal_vector_conversion(Vector_&& vector_, std::index_sequence<RegisterIndices_...> register_indices_)
 		{
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 			return data_type
 			({ 
 				_make_register_from_normal_vector
@@ -7496,6 +7507,7 @@ namespace EmuMath
 					EmuCore::TMP::make_offset_index_sequence<RegisterIndices_ * elements_per_register, elements_per_register>()
 				)...
 			});
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 
 		template<class Vector_>
@@ -8162,7 +8174,7 @@ namespace EmuMath
 		}
 
 		template<bool NormaliseAll_, class Vector_>
-		[[nodiscard]] static constexpr inline typename Vector_ _calculate_norm_2(const Vector_& vec_)
+		[[nodiscard]] static constexpr inline Vector_ _calculate_norm_2(const Vector_& vec_)
 		{
 			using vec_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
 			using vec_register_type = typename vec_uq::register_type;
@@ -8181,7 +8193,7 @@ namespace EmuMath
 		}
 
 		template<bool NormaliseAll_, class Vector_>
-		[[nodiscard]] static constexpr inline typename Vector_ _calculate_norm_3(const Vector_& vec_)
+		[[nodiscard]] static constexpr inline Vector_ _calculate_norm_3(const Vector_& vec_)
 		{
 			using vec_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
 			using vec_register_type = typename vec_uq::register_type;
@@ -8599,8 +8611,8 @@ namespace EmuMath
 			}
 		}
 
-		template<typename B_, typename T_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_lerp(const data_type& lhs_, B_&& b_, T_&& t_, std::index_sequence<RegisterIndices_...> indices_)
+		template<typename B_, typename Weighting_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_lerp(const data_type& lhs_, B_&& b_, Weighting_&& t_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			return data_type
 			({
@@ -8608,13 +8620,13 @@ namespace EmuMath
 				(
 					lhs_[RegisterIndices_],
 					_retrieve_register_from_arg<RegisterIndices_>(std::forward<B_>(b_)),
-					_retrieve_register_from_arg<RegisterIndices_>(std::forward<T_>(t_))
+					_retrieve_register_from_arg<RegisterIndices_>(std::forward<Weighting_>(t_))
 				)...
 			});
 		}
 
-		template<typename B_, typename T_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_fused_lerp(const data_type& lhs_, B_&& b_, T_&& t_, std::index_sequence<RegisterIndices_...> indices_)
+		template<typename B_, typename Weighting_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_fused_lerp(const data_type& lhs_, B_&& b_, Weighting_&& t_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			return data_type
 			({
@@ -8622,7 +8634,7 @@ namespace EmuMath
 				(
 					lhs_[RegisterIndices_],
 					_retrieve_register_from_arg<RegisterIndices_>(std::forward<B_>(b_)),
-					_retrieve_register_from_arg<RegisterIndices_>(std::forward<T_>(t_))
+					_retrieve_register_from_arg<RegisterIndices_>(std::forward<Weighting_>(t_))
 				)...
 			});
 		}
@@ -8853,7 +8865,7 @@ namespace EmuMath
 				}
 				else if constexpr (is_floating_point)
 				{
-					return this_type(_calculate_angle_cosine_2<OutRads_, fill_vector, AllowLossy_>(a_.data, b_.data)).Convert<OutFP_>();
+					return this_type(_calculate_angle_cosine_2<OutRads_, fill_vector, AllowLossy_>(a_.data, b_.data)).template Convert<OutFP_>();
 				}
 				else if constexpr (out_is_fp)
 				{
@@ -8861,8 +8873,8 @@ namespace EmuMath
 					(
 						out_vector::template _calculate_angle_cosine_2<OutRads_, fill_vector, AllowLossy_>
 						(
-							a_.Convert<OutFP_>().data,
-							b_.Convert<OutFP_>().data
+							a_.template Convert<OutFP_>().data,
+							b_.template Convert<OutFP_>().data
 						)
 					);
 				}
@@ -8873,8 +8885,8 @@ namespace EmuMath
 					(
 						fp_vector::template _calculate_angle_cosine_2<OutRads_, fill_vector, AllowLossy_>
 						(
-							a_.Convert<preferred_floating_point>().data,
-							b_.Convert<preferred_floating_point>().data
+							a_.template Convert<preferred_floating_point>().data,
+							b_.template Convert<preferred_floating_point>().data
 						)
 					).template Convert<OutFP_>();
 				}
@@ -8896,8 +8908,8 @@ namespace EmuMath
 					(
 						fp_vector::template _calculate_angle_cosine_2<OutRads_, fill_vector, AllowLossy_>
 						(
-							a_.Convert<calc_fp>().data,
-							b_.Convert<calc_fp>().data
+							a_.template Convert<calc_fp>().data,
+							b_.template Convert<calc_fp>().data
 						)
 					);
 				}
@@ -9359,7 +9371,7 @@ namespace EmuMath
 				return alt_vector.Subtract
 				(
 					calc_vector_type::template _calculate_projection_to_vector<CalcSize_, preferred_floating_point>(alt_vector, alt_plane_normal)
-				).Convert<Size_, OutFP_, RegisterWidth_>();
+				).template Convert<Size_, OutFP_, RegisterWidth_>();
 			}
 		}
 #pragma endregion
@@ -10387,8 +10399,8 @@ namespace EmuMath
 
 #pragma region NON_CONST_VECTOR_ARITHMETIC_HELPERS
 	private:
-		template<typename B_, typename T_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_lerp_assign(const data_type& lhs_, B_&& b_, T_&& t_, std::index_sequence<RegisterIndices_...> indices_)
+		template<typename B_, typename Weighting_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_lerp_assign(const data_type& lhs_, B_&& b_, Weighting_&& t_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			(
 				(
@@ -10396,14 +10408,14 @@ namespace EmuMath
 					(
 						lhs_[RegisterIndices_],
 						_retrieve_register_from_arg<RegisterIndices_>(std::forward<B_>(b_)),
-						_retrieve_register_from_arg<RegisterIndices_>(std::forward<T_>(t_))
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Weighting_>(t_))
 					)
 				), ...
 			);
 		}
 
-		template<typename B_, typename T_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_fused_lerp_assign(const data_type& lhs_, B_&& b_, T_&& t_, std::index_sequence<RegisterIndices_...> indices_)
+		template<typename B_, typename Weighting_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_fused_lerp_assign(const data_type& lhs_, B_&& b_, Weighting_&& t_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			(
 				(
@@ -10411,7 +10423,7 @@ namespace EmuMath
 					(
 						lhs_[RegisterIndices_],
 						_retrieve_register_from_arg<RegisterIndices_>(std::forward<B_>(b_)),
-						_retrieve_register_from_arg<RegisterIndices_>(std::forward<T_>(t_))
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Weighting_>(t_))
 					)
 				), ...
 			);

@@ -1,6 +1,8 @@
 #ifndef EMU_SIMD_UNDERLYING_ALIASES_H_INC_
 #define EMU_SIMD_UNDERLYING_ALIASES_H_INC_ 1
 
+#include "../../../../../EmuCore/CommonPreprocessor/Compiler.h"
+
 #include <immintrin.h>
 
 namespace EmuSIMD

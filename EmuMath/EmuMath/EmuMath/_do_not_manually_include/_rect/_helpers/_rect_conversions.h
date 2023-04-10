@@ -70,8 +70,8 @@ namespace EmuMath::Helpers
 		using get_right_result = decltype(rect_get_right(std::forward<Rect_>(rect_)));
 		using get_bottom_result = decltype(rect_get_bottom(std::forward<Rect_>(rect_)));
 
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		return EmuMath::Rect<OutT_>
 		(
 			static_cast<out_value_uq>(std::forward<get_left_result>(rect_get_left(std::forward<Rect_>(rect_)))),
@@ -79,7 +79,7 @@ namespace EmuMath::Helpers
 			static_cast<out_value_uq>(std::forward<get_right_result>(rect_get_right(std::forward<Rect_>(rect_)))),
 			static_cast<out_value_uq>(std::forward<get_bottom_result>(rect_get_bottom(std::forward<Rect_>(rect_))))
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 	/// <summary>
@@ -88,7 +88,7 @@ namespace EmuMath::Helpers
 	/// <param name="out_rect_">EmuMath Rect to assign conversion results to.</param>
 	/// <param name="rect_">Rect to convert.</param>
 	template<typename OutT_, EmuConcepts::EmuRect Rect_>
-	[[nodiscard]] constexpr inline void rect_cast(EmuMath::Rect<OutT_>& out_rect_, Rect_&& rect_)
+	constexpr inline void rect_cast(EmuMath::Rect<OutT_>& out_rect_, Rect_&& rect_)
 	{
 		using out_value_uq = typename EmuMath::Rect<OutT_>::value_type_uq;
 		using get_left_result = decltype(rect_get_left(std::forward<Rect_>(rect_)));
@@ -96,13 +96,13 @@ namespace EmuMath::Helpers
 		using get_right_result = decltype(rect_get_right(std::forward<Rect_>(rect_)));
 		using get_bottom_result = decltype(rect_get_bottom(std::forward<Rect_>(rect_)));
 
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		EmuCore::TMP::assign_direct_or_cast<out_value_uq>(rect_get_left(out_rect_), std::forward<get_left_result>(rect_get_left(std::forward<Rect_>(rect_))));
 		EmuCore::TMP::assign_direct_or_cast<out_value_uq>(rect_get_top(out_rect_), std::forward<get_left_result>(rect_get_top(std::forward<Rect_>(rect_))));
 		EmuCore::TMP::assign_direct_or_cast<out_value_uq>(rect_get_right(out_rect_), std::forward<get_left_result>(rect_get_right(std::forward<Rect_>(rect_))));
 		EmuCore::TMP::assign_direct_or_cast<out_value_uq>(rect_get_bottom(out_rect_), std::forward<get_left_result>(rect_get_bottom(std::forward<Rect_>(rect_))));
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 	/// <summary>
@@ -116,8 +116,8 @@ namespace EmuMath::Helpers
 	[[nodiscard]] constexpr inline auto rect_as_vector(Rect_&& rect_)
 		-> std::enable_if_t<rect_valid_index_args_for_vector_conversion<LeftIndex_, TopIndex_, RightIndex_, BottomIndex_>(), EmuMath::Vector<4, OutT_>>
 	{
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		return EmuMath::Vector<4, OutT_>
 		(
 			_rect_underlying::_get_for_vector_index<0, LeftIndex_, TopIndex_, RightIndex_, BottomIndex_>(std::forward<Rect_>(rect_)),
@@ -125,7 +125,7 @@ namespace EmuMath::Helpers
 			_rect_underlying::_get_for_vector_index<2, LeftIndex_, TopIndex_, RightIndex_, BottomIndex_>(std::forward<Rect_>(rect_)),
 			_rect_underlying::_get_for_vector_index<3, LeftIndex_, TopIndex_, RightIndex_, BottomIndex_>(std::forward<Rect_>(rect_))
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 	template<typename OutT_, EmuConcepts::EmuRect Rect_>

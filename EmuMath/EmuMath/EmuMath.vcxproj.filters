@@ -236,9 +236,6 @@
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_shuffle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_shuffle_masks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_basic_arithmetic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -957,6 +954,78 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_helpers\_fast_matrix_rotation_3d.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_fast_quaternion_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\FastQuaternion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_underlying_helpers\_fast_quaternion_tmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_helpers\_fast_quaternion_store.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_helpers\_common_fast_quaternion_includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_helpers\_all_fast_quaternion_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_underlying_helpers\_fast_quaternion_underlying_store.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_helpers\_fast_quaternion_from_euler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_underlying_helpers\_fast_quaternion_underlying_from_euler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_helpers\_fast_quaternion_to_euler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_underlying_helpers\_fast_quaternion_underlying_to_euler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_helpers\_fast_quaternion_arithmetic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_underlying_helpers\_fast_quaternion_underlying_arithmetic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_fast_quaternion_operators.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_helpers\_fast_quaternion_cmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuCore\CommonPreprocessor\Architecture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuCore\CommonPreprocessor\Compiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuCore\CommonPreprocessor\All.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuCore\CommonPreprocessor\Warning.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuCore\TMPHelpers\RuntimeTupleTable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuCore\TMPHelpers\CommonTMPHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_underlying_helpers\_fast_quaternion_underlying_quaternion_operations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_helpers\_fast_quaternion_quaternion_operations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_underlying_helpers\_fast_quaternion_underlying_get.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -215,39 +215,39 @@ namespace EmuSIMD::_underlying_simd_helpers
 			using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				_mm_store_ps(reinterpret_cast<float*>(p_out_), register_);
+				_mm_storeu_ps(reinterpret_cast<float*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				_mm_store_pd(reinterpret_cast<double*>(p_out_), register_);
+				_mm_storeu_pd(reinterpret_cast<double*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				_mm256_store_ps(reinterpret_cast<float*>(p_out_), register_);
+				_mm256_storeu_ps(reinterpret_cast<float*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				_mm256_store_pd(reinterpret_cast<double*>(p_out_), register_);
+				_mm256_storeu_pd(reinterpret_cast<double*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				_mm512_store_ps(reinterpret_cast<void*>(p_out_), register_);
+				_mm512_storeu_ps(reinterpret_cast<void*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				_mm512_store_pd(reinterpret_cast<void*>(p_out_), register_);
+				_mm512_storeu_pd(reinterpret_cast<void*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 			{
-				_mm_store_si128(reinterpret_cast<EmuSIMD::i128_generic*>(p_out_), register_);
+				_mm_storeu_si128(reinterpret_cast<EmuSIMD::i128_generic*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 			{
-				_mm256_store_si256(reinterpret_cast<EmuSIMD::i256_generic*>(p_out_), register_);
+				_mm256_storeu_si256(reinterpret_cast<EmuSIMD::i256_generic*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
 			{
-				_mm512_store_si512(reinterpret_cast<void*>(p_out_), register_);
+				_mm512_storeu_si512(reinterpret_cast<void*>(p_out_), register_);
 			}
 			else
 			{
@@ -468,7 +468,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::Funcs::cast_f32x16_f64x8(_mm512_extractf32x8_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::cast_f32x8_f64x8(_mm512_extractf32x8_ps(std::forward<In_>(in_), LaneIndex_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{

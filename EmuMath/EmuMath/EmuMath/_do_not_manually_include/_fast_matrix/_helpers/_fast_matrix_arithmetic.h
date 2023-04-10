@@ -53,7 +53,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic addition.</param>
 	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
 	requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) && !std::is_const_v<LhsFastMatrix_>)
-	[[nodiscard]] constexpr inline void fast_matrix_add_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
+	constexpr inline void fast_matrix_add_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
 		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
@@ -118,7 +118,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic subtraction.</param>
 	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
 	requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) && !std::is_const_v<LhsFastMatrix_>)
-	[[nodiscard]] constexpr inline void fast_matrix_subtract_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
+	constexpr inline void fast_matrix_subtract_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
 		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
@@ -183,7 +183,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic multiplication.</param>
 	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
 	requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) && !std::is_const_v<LhsFastMatrix_>)
-	[[nodiscard]] constexpr inline void fast_matrix_basic_multiply_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
+	constexpr inline void fast_matrix_basic_multiply_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
 		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
@@ -248,7 +248,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic division.</param>
 	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
 	requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) && !std::is_const_v<LhsFastMatrix_>)
-	[[nodiscard]] constexpr inline void fast_matrix_basic_divide_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
+	constexpr inline void fast_matrix_basic_divide_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
 		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
@@ -313,7 +313,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">One of the several described argument types, appearing on the right-hand side of basic modulodivision.</param>
 	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_>
 	requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_>) && !std::is_const_v<LhsFastMatrix_>)
-	[[nodiscard]] constexpr inline void fast_matrix_basic_mod_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
+	constexpr inline void fast_matrix_basic_mod_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_)
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
 		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
@@ -387,7 +387,7 @@ namespace EmuMath::Helpers
 	/// <param name="to_add_">One of the several described argument types, which will be added to intermediate multiplication results.</param>
 	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_, class ToAdd_>
 	requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_, ToAdd_>) && !std::is_const_v<LhsFastMatrix_>)
-	[[nodiscard]] constexpr inline void fast_matrix_basic_fmadd_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_, ToAdd_&& to_add_)
+	constexpr inline void fast_matrix_basic_fmadd_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_, ToAdd_&& to_add_)
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
 		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;
@@ -462,7 +462,7 @@ namespace EmuMath::Helpers
 	/// <param name="to_subtract_">One of the several described argument types, which will be subtracted from intermediate multiplication results.</param>
 	template<EmuConcepts::EmuFastMatrix LhsFastMatrix_, class Rhs_, class ToAdd_>
 	requires ((EmuConcepts::EmuFastMatrixBasicOpCompatible<LhsFastMatrix_, Rhs_, ToAdd_>) && !std::is_const_v<LhsFastMatrix_>)
-	[[nodiscard]] constexpr inline void fast_matrix_basic_fmsub_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_, ToAdd_&& to_subtract_)
+	constexpr inline void fast_matrix_basic_fmsub_assign(LhsFastMatrix_& lhs_, Rhs_&& rhs_, ToAdd_&& to_subtract_)
 	{
 		using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<LhsFastMatrix_>::type;
 		using _major_indices = std::make_index_sequence<_lhs_fast_mat_uq::num_major_elements>;

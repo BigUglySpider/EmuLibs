@@ -3,6 +3,8 @@
 
 #include <type_traits>
 
+#include "CommonTMPHelpers.h"
+
 namespace EmuCore::TMP
 {
 	template<typename T_>
@@ -148,7 +150,7 @@ namespace EmuCore::TMP
 				<
 					NumBytes_ == sizeof(std::uint64_t),
 					std::uint64_t,
-					std::false_type
+					EmuCore::TMP::emu_tmp_err
 				>
 			>
 		>
@@ -171,7 +173,7 @@ namespace EmuCore::TMP
 				<
 					NumBytes_ == sizeof(std::int64_t),
 					std::int64_t,
-					std::false_type
+					EmuCore::TMP::emu_tmp_err
 				>
 			>
 		>

@@ -547,13 +547,13 @@ namespace EmuMath
 				// We'll never access the same index twice, so silence false-positives
 				// --- This is a slight disadvantage since there are scenarios where different references to the same object may be moved,
 				// --- but silencing this has been chosen since VS is not showing any compromise
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 				return matrix_vector_type
 				(
 					_get_conversion_construct_index_arg<ColumnIndices_, RowIndices_>(std::forward<ToConvert_>(to_convert_))...
 				);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 			}
 			else
 			{

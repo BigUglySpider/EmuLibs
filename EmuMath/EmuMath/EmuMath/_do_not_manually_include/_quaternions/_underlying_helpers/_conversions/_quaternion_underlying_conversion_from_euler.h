@@ -489,15 +489,15 @@ namespace EmuMath::Helpers::_quaternion_underlying
 		using in_vector = EmuMath::Vector<VecSize_, VecT_>;
 
 		// Warning disabled as we are only ever moving separate indices
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		return _make_from_euler<VectorOut_, IsRads_, PreferMultiplies_, Normalise_, Fused_, IsConstexpr_, OutT_>
 		(
 			_conditional_quaternion_vector_move_get<ReadOffset_>(std::forward<in_vector>(euler_vector_)),
 			_conditional_quaternion_vector_move_get<ReadOffset_ + 1>(std::forward<in_vector>(euler_vector_)),
 			_conditional_quaternion_vector_move_get<ReadOffset_ + 2>(std::forward<in_vector>(euler_vector_))
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 #pragma endregion
 }

@@ -2,6 +2,7 @@
 #define EMU_SIMD_GENERIC_FUNCS_I64X2_H_INC_ 1
 
 #include "_common_generic_func_helpers.h"
+#include "_f64x2.h"
 
 namespace EmuSIMD::Funcs
 {
@@ -368,9 +369,9 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC auto emulate_fp_i64x2(Func_ func_, EmuSIMD::i64x2_arg in_)
 		-> std::enable_if_t<std::is_invocable_r_v<EmuSIMD::f64x2, decltype(func_), EmuSIMD::f64x2>, EmuSIMD::i64x2>
 	{
-		return _mm_cvtpd_epi64
+		return cvt_f64x2_i64x2
 		(
-			func_(_mm_cvtepi64_pd(in_))
+			func_(cvt_i64x2_f64x2(in_))
 		);
 	}
 #pragma endregion
@@ -408,6 +409,78 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region MOVES
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 movehl_i64x2(EmuSIMD::i64x2_arg lhs_, EmuSIMD::i64x2_arg rhs_)
+	{
+		return cast_f64x2_i64x2(movehl_f64x2(cast_i64x2_f64x2(lhs_), cast_i64x2_f64x2(rhs_)));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 movelh_i64x2(EmuSIMD::i64x2_arg lhs_, EmuSIMD::i64x2_arg rhs_)
+	{
+		return cast_f64x2_i64x2(movelh_f64x2(cast_i64x2_f64x2(lhs_), cast_i64x2_f64x2(rhs_)));
+	}
+#pragma endregion
+
+#pragma region BLENDS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 blendv_i64x2(EmuSIMD::i64x2_arg a_, EmuSIMD::i64x2_arg b_, EmuSIMD::i64x2_arg shuffle_mask_vec_)
+	{
+		return cast_f64x2_i64x2
+		(
+			blendv_f64x2
+			(
+				cast_i64x2_f64x2(a_),
+				cast_i64x2_f64x2(b_),
+				cast_i64x2_f64x2(shuffle_mask_vec_)
+			)
+		);
+	}
+
+	template<blend_mask_type BlendMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 blend_i64x2(EmuSIMD::i64x2_arg a_, EmuSIMD::i64x2_arg b_)
+	{
+		return cast_f64x2_i64x2
+		(
+			blend_f64x2<BlendMask_>
+			(
+				cast_i64x2_f64x2(a_),
+				cast_i64x2_f64x2(b_)
+			)
+		);
+	}
+#pragma endregion
+
+#pragma region MINMAX_FUNCS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 min_i64x2(EmuSIMD::i64x2_arg a_, EmuSIMD::i64x2_arg b_)
+	{
+		return _mm_min_epi64(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 max_i64x2(EmuSIMD::i64x2_arg a_, EmuSIMD::i64x2_arg b_)
+	{
+		return _mm_max_epi64(a_, b_);
+	}
+#pragma endregion
+
+#pragma region SHUFFLES
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 permute_i64x2(EmuSIMD::i64x2_arg a_)
+	{
+		return cast_f64x2_i64x2
+		(
+			permute_f64x2<ShuffleMask_>(cast_i64x2_f64x2(a_))
+		);
+	}
+
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 shuffle_i64x2(EmuSIMD::i64x2_arg a_, EmuSIMD::i64x2_arg b_)
+	{
+		return cast_f64x2_i64x2
+		(
+			shuffle_f64x2<ShuffleMask_>(cast_i64x2_f64x2(a_), cast_i64x2_f64x2(b_))
+		);
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 mul_all_i64x2(EmuSIMD::i64x2_arg lhs_, EmuSIMD::i64x2_arg rhs_)
 	{
@@ -436,7 +509,13 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 div_i64x2(EmuSIMD::i64x2_arg lhs_, EmuSIMD::i64x2_arg rhs_)
 	{
+#if EMU_CORE_X86_X64_SVML
 		return _mm_div_epi64(lhs_, rhs_);
+#else
+		EmuSIMD::f64x2 result_f64 = cvt_i64x2_f64x2(lhs_);
+		result_f64 = div_f64x2(result_f64, cvt_i64x2_f64x2(rhs_));
+		return cvt_f64x2_i64x2(trunc_f64x2(result_f64));
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 addsub_i64x2(EmuSIMD::i64x2_arg lhs_, EmuSIMD::i64x2_arg rhs_)
@@ -508,7 +587,13 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 mod_i64x2(EmuSIMD::i64x2_arg lhs_, EmuSIMD::i64x2_arg rhs_)
 	{
+#if EMU_CORE_X86_X64_SVML
 		return _mm_rem_epi64(lhs_, rhs_);
+#else
+		EmuSIMD::i64x2 to_subtract = div_i64x2(lhs_, rhs_);
+		to_subtract = mul_all_i64x2(to_subtract, rhs_);
+		return sub_i64x2(lhs_, to_subtract);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 abs_i64x2(EmuSIMD::i64x2_arg in_)
@@ -518,12 +603,12 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 sqrt_i64x2(EmuSIMD::i64x2_arg in_)
 	{
-		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return _mm_sqrt_pd(in_fp_); }, in_);
+		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return sqrt_f64x2(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 rsqrt_i64x2(EmuSIMD::i64x2_arg in_)
 	{
-		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return _mm_div_pd(_mm_set1_pd(1.0), _mm_sqrt_pd(in_fp_)); }, in_);
+		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return rsqrt_f64x2(in_fp_); }, in_);
 	}
 #pragma endregion
 
@@ -542,32 +627,32 @@ namespace EmuSIMD::Funcs
 #pragma region TRIG
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 cos_i64x2(EmuSIMD::i64x2_arg in_)
 	{
-		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return _mm_cos_pd(in_fp_); }, in_);
+		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return cos_f64x2(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 sin_i64x2(EmuSIMD::i64x2_arg in_)
 	{
-		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return _mm_sin_pd(in_fp_); }, in_);
+		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return sin_f64x2(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 tan_i64x2(EmuSIMD::i64x2_arg in_)
 	{
-		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return _mm_tan_pd(in_fp_); }, in_);
+		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return tan_f64x2(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 acos_i64x2(EmuSIMD::i64x2_arg in_)
 	{
-		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return _mm_acos_pd(in_fp_); }, in_);
+		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return acos_f64x2(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 asin_i64x2(EmuSIMD::i64x2_arg in_)
 	{
-		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return _mm_asin_pd(in_fp_); }, in_);
+		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return asin_f64x2(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 atan_i64x2(EmuSIMD::i64x2_arg in_)
 	{
-		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return _mm_atan_pd(in_fp_); }, in_);
+		return emulate_fp_i64x2([](EmuSIMD::f64x2_arg in_fp_) { return atan_f64x2(in_fp_); }, in_);
 	}
 #pragma endregion
 }

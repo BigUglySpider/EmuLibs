@@ -79,8 +79,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		}
 		else
 		{
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 			return OutFastMatrix_
 			(
 				_basic_func_for_major_chunk<UseRegisterOutOfRangeSpecialisations_, Func_, typename _out_fast_mat_uq::major_chunk_type, MajorIndices_, RegisterIndices_...>
@@ -88,7 +88,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 					std::forward<Args_>(args_)...
 				)...
 			);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 	}
 #pragma endregion
@@ -168,8 +168,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		}
 		else
 		{
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 			(
 				_basic_func_assign_for_major_chunk<UseRegisterOutOfRangeSpecialisations_, Func_, MajorIndices_, RegisterIndices_...>
 				(
@@ -177,7 +177,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 					std::forward<Args_>(args_)...
 				), ...
 			);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 	}
 #pragma endregion

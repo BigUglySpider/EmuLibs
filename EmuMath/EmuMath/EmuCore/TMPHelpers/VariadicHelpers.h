@@ -57,6 +57,43 @@ namespace EmuCore::TMP
 	using make_false_bool_sequence = typename false_bool_sequence_maker<Count_>::type;
 
 	/// <summary>
+	/// <para> Creates a bool integer sequence with a chunk of contiguous `true` bools and a chunk of contiguous `false` bools. </para>
+	/// <para> By default, `true` bools come first and `false` bools come last; to invert this order, set `FalseFirst_` to true. </para>
+	/// </summary>
+	template<std::size_t TrueCount_, std::size_t FalseCount_, bool FalseFirst_ = false>
+	struct chunked_true_false_bool_sequence_maker
+	{
+	private:
+		template<bool TrueFirst_, typename TrueSeq_, typename FalseSeq_>
+		struct _instantiator
+		{
+			using type = std::integer_sequence<bool>;
+		};
+
+		template<bool...Trues_, bool...Falses_>
+		struct _instantiator<true, std::integer_sequence<bool, Trues_...>, std::integer_sequence<bool, Falses_...>>
+		{
+			using type = std::integer_sequence<bool, Trues_..., Falses_...>;
+		};
+
+		template<bool...Trues_, bool...Falses_>
+		struct _instantiator<false, std::integer_sequence<bool, Trues_...>, std::integer_sequence<bool, Falses_...>>
+		{
+			using type = std::integer_sequence<bool, Falses_..., Trues_...>;
+		};
+
+	public:
+		using type = typename _instantiator<!FalseFirst_, make_true_bool_sequence<TrueCount_>, make_false_bool_sequence<FalseCount_>>::type;
+	};
+
+	/// <summary>
+	/// <para> Creates a bool integer sequence with a chunk of contiguous `true` bools and a chunk of contiguous `false` bools. </para>
+	/// <para> By default, `true` bools come first and `false` bools come last; to invert this order, set `FalseFirst_` to true. </para>
+	/// </summary>
+	template<std::size_t TrueCount_, std::size_t FalseCount_, bool FalseFirst_ = false>
+	using make_chunked_true_false_bool_sequence = typename chunked_true_false_bool_sequence_maker<TrueCount_, FalseCount_, FalseFirst_>::type;
+
+	/// <summary>
 	/// <para> Helper to safely instantiate a Template_ from variadic Args_, cancelling instantiation if it is a failure. </para>
 	/// <para> If instantiation fails, type will be void. Otherwise, it will be an instance of Template_ instantiated with the provided Args_. </para>
 	/// <para> Static member value may also be used to determine success (true if successful, otherwise false). </para>
@@ -698,6 +735,43 @@ namespace EmuCore::TMP
 	public:
 		static constexpr inline bool value = _get();
 	};
+
+	template<class OriginalSequence_>
+	struct inverted_integer_sequence_maker
+	{
+		using type = std::integer_sequence<int>;
+	};
+
+	template<typename T_, T_...Vals_>
+	struct inverted_integer_sequence_maker<std::integer_sequence<T_, Vals_...>>
+	{
+	private:
+		template<class ReverseIndexSequence_>
+		struct _instantiator
+		{
+			using type = std::integer_sequence<T_>;
+		};
+
+		template<std::size_t...ReverseIndices_>
+		struct _instantiator<std::index_sequence<ReverseIndices_...>>
+		{
+		private:
+			static constexpr auto _make_sequence()
+			{
+				constexpr std::array<T_, sizeof...(ReverseIndices_)> vals({ Vals_... });
+				return std::integer_sequence<T_, vals[ReverseIndices_]...>();
+			}
+
+		public:
+			using type = decltype(_make_sequence());
+		};
+
+	public:
+		using type = typename _instantiator<EmuCore::TMP::make_reverse_index_sequence<sizeof...(Vals_)>>::type;
+	};
+
+	template<class IntegerSequence_>
+	using make_inverted_integer_sequence = typename inverted_integer_sequence_maker<IntegerSequence_>::type;
 }
 
 #endif

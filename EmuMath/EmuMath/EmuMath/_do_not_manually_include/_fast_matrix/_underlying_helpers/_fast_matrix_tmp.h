@@ -135,32 +135,25 @@ namespace EmuMath::TMP
 	struct fast_matrix_multiply_result
 	{
 	private:
-		template<bool Valid_>
-		struct _type_finder
+		static constexpr inline auto _type_finder()
 		{
-			using type = void;
-		};
-
-		template<>
-		struct _type_finder<true>
-		{
-		private:
-			using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<Lhs_>::type;
-			using _rhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
-
-		public:
-			using type = EmuMath::FastMatrix
-			<
-				_rhs_fast_mat_uq::num_columns,
-				_lhs_fast_mat_uq::num_rows,
-				typename _lhs_fast_mat_uq::value_type,
-				_lhs_fast_mat_uq::is_column_major,
-				_lhs_fast_mat_uq::register_width
-			>;
-		};
+			if constexpr (EmuConcepts::EmuFastMatrixMultPair<Lhs_, Rhs_>)
+			{
+				using _lhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<Lhs_>::type;
+				using _rhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+				return EmuMath::FastMatrix
+				<
+					_rhs_fast_mat_uq::num_columns,
+					_lhs_fast_mat_uq::num_rows,
+					typename _lhs_fast_mat_uq::value_type,
+					_lhs_fast_mat_uq::is_column_major,
+					_lhs_fast_mat_uq::register_width
+				>();
+			}
+		}
 
 	public:
-		using type = typename _type_finder<EmuConcepts::EmuFastMatrixMultPair<Lhs_, Rhs_>>::type;
+		using type = decltype(_type_finder());
 	};
 	template<EmuConcepts::EmuFastMatrix Lhs_, EmuConcepts::EmuFastMatrix Rhs_>
 	using fast_matrix_multiply_result_t = typename fast_matrix_multiply_result<Lhs_, Rhs_>::type;

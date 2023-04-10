@@ -3,6 +3,7 @@
 
 #include "_underlying_template_helpers/_all_underlying_templates.h"
 #include "../../../../EmuCore/TMPHelpers/Values.h"
+#include "../../../../EmuCore/TMPHelpers/VariadicHelpers.h"
 
 namespace EmuSIMD
 {
@@ -95,6 +96,78 @@ namespace EmuSIMD
 			}
 		}
 	};
+
+	template<class Register_, bool...IndexActive_>
+	[[nodiscard]] constexpr inline auto make_index_mask(EmuCore::TMP::bool_sequence<IndexActive_...> indices_active_) noexcept
+		-> typename EmuCore::TMP::remove_ref_cv<Register_>::type
+	{
+		return index_mask<Register_, IndexActive_...>::get();
+	}
+
+	template<class Register_, bool...IndexActive_>
+	[[nodiscard]] constexpr inline auto make_index_mask() noexcept
+		-> typename EmuCore::TMP::remove_ref_cv<Register_>::type
+	{
+		return index_mask<Register_, IndexActive_...>::get();
+	}
+
+	template<class Register_, bool...IndexActive_>
+	[[nodiscard]] constexpr inline auto make_index_mask_reverse(EmuCore::TMP::bool_sequence<IndexActive_...> indices_active_) noexcept
+		-> typename EmuCore::TMP::remove_ref_cv<Register_>::type
+	{
+		return make_index_mask<Register_>(EmuCore::TMP::make_inverted_integer_sequence<EmuCore::TMP::bool_sequence<IndexActive_...>>());
+	}
+
+	template<class Register_, bool...IndexActive_>
+	[[nodiscard]] constexpr inline auto make_index_mask_reverse() noexcept
+		-> typename EmuCore::TMP::remove_ref_cv<Register_>::type
+	{
+		return make_index_mask<Register_>(EmuCore::TMP::make_inverted_integer_sequence<EmuCore::TMP::bool_sequence<IndexActive_...>>());
+	}
+
+	/// <summary>
+	/// <para> Creates an register to act as an index mask for the first X_ elements, ignoring elements from index X_. </para>
+	/// <para> If X_ is greater than or equal to the number of elements in the output register type, this will output a mask for the full register width. </para>
+	/// </summary>
+	/// <returns>Register of the required type to mask the first X_ elements of the register's width.</returns>
+	template<EmuConcepts::KnownSIMD Register_, std::size_t X_, std::size_t PerElementWidthIfInt_ = 32>
+	[[nodiscard]] constexpr inline auto make_index_mask_for_first_x_elements() noexcept
+		-> typename EmuCore::TMP::remove_ref_cv<Register_>::type
+	{
+		constexpr std::size_t num_elements = EmuSIMD::TMP::determine_register_element_count<Register_, PerElementWidthIfInt_>();
+		if constexpr (X_ >= num_elements)
+		{
+			using full_true_seq = EmuCore::TMP::make_true_bool_sequence<num_elements>();
+			return make_index_mask<Register_>(full_true_seq());
+		}
+		else
+		{
+			using full_true_false_seq = EmuCore::TMP::make_chunked_true_false_bool_sequence<X_, num_elements - X_, true>;
+			return make_index_mask<Register_>(full_true_false_seq());
+		}
+	}
+
+	/// <summary>
+	/// <para> Creates an register to act as an index mask for the last X_ elements, ignoring elements from indices 0:(X_ - 1). </para>
+	/// <para> If X_ is greater than or equal to the number of elements in the output register type, this will output a mask for the full register width. </para>
+	/// </summary>
+	/// <returns>Register of the required type to mask the last X_ elements of the register's width.</returns>
+	template<EmuConcepts::KnownSIMD Register_, std::size_t X_, std::size_t PerElementWidthIfInt_ = 32>
+	[[nodiscard]] constexpr inline auto make_index_mask_for_last_x_elements() noexcept
+		-> typename EmuCore::TMP::remove_ref_cv<Register_>::type
+	{
+		constexpr std::size_t num_elements = EmuSIMD::TMP::determine_register_element_count<Register_, PerElementWidthIfInt_>();
+		if constexpr (X_ >= num_elements)
+		{
+			using full_true_seq = EmuCore::TMP::make_true_bool_sequence<num_elements>();
+			return make_index_mask<Register_>(full_true_seq());
+		}
+		else
+		{
+			using full_true_false_seq = EmuCore::TMP::make_chunked_true_false_bool_sequence<X_, num_elements - X_, false>;
+			return make_index_mask<Register_>(full_true_false_seq());
+		}
+	}
 	
 	// NOTE FOR FUNCS: Integral functions have their adaptive nature based on arguments as _per_index_mask does, but an extra subset of _width functions are provided
 	// --- These functions are used to enforce safety and sanity checks when working with known size integral registers, if desired
@@ -125,7 +198,7 @@ namespace EmuSIMD
 	template<bool AllIndices_>
 	[[nodiscard]] inline EmuSIMD::i128_generic index_mask_m128i()
 	{
-		return index_mask<EmuSIMD::i128_generic, AllIndices_>;
+		return index_mask<EmuSIMD::i128_generic, AllIndices_>::get();
 	}
 	template
 	<
@@ -325,7 +398,7 @@ namespace EmuSIMD
 	template<bool AllIndices_>
 	[[nodiscard]] inline EmuSIMD::i256_generic index_mask_m256i()
 	{
-		return index_mask<EmuSIMD::i256_generic, AllIndices_>;
+		return index_mask<EmuSIMD::i256_generic, AllIndices_>::get();
 	}
 	template
 	<
@@ -551,7 +624,7 @@ namespace EmuSIMD
 	template<bool AllIndices_>
 	[[nodiscard]] inline EmuSIMD::i512_generic index_mask_m512i()
 	{
-		return index_mask<EmuSIMD::i512_generic, AllIndices_>;
+		return index_mask<EmuSIMD::i512_generic, AllIndices_>::get();
 	}
 	template
 	<

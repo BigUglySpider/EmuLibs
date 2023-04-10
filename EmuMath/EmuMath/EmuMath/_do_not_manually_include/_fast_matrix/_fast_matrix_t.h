@@ -31,10 +31,6 @@ namespace EmuMath
 		using register_type = typename EmuSIMD::TMP::register_type<value_type, register_width>::type;
 		/// <summary> Alias to the argument type used to pass an instance of this Matrix's register_type. </summary>
 		using register_arg_type = typename EmuSIMD::TMP::register_arg_type<value_type, register_width>::type;
-		/// <summary> Alias to the register type used as an argument for the number of shifts performed when a register argument is used instead of a constant. </summary>
-		using shift_register_type = __m128i;
-		/// <summary>The number of bits each element is interpreted to consume within this Matrix's shift_register_type, with 8-bit bytes regardless of CHAR_BIT. </summary>
-		static constexpr std::size_t shift_register_per_element_width = 64;
 		/// <summary> The preferred floating-point type for this Matrix, used for floating-point-based calculations using this Matrix. </summary>
 		using preferred_floating_point = typename std::conditional<(sizeof(value_type) >= 64), double, float>::type;
 
@@ -99,7 +95,7 @@ namespace EmuMath
 		}
 
 		template<std::size_t Unused_, EmuConcepts::KnownSIMD...MajorRegisters_>
-		[[nodiscard]] static constexpr inline bool _valid_major_fast_vector_construction()
+		[[nodiscard]] static constexpr inline bool _valid_major_register_construction()
 		{
 			return
 			(
@@ -512,7 +508,7 @@ namespace EmuMath
 		<
 			std::size_t Unused_ = 0,
 			EmuConcepts::KnownSIMD...MajorRegisters_,
-			typename = std::enable_if_t<_valid_major_fast_vector_construction<Unused_, MajorRegisters_...>()>
+			typename = std::enable_if_t<_valid_major_register_construction<Unused_, MajorRegisters_...>()>
 		>
 		explicit(num_major_elements == 1) constexpr inline FastMatrix(MajorRegisters_&&...major_order_registers_) noexcept
 			: major_chunks(_make_data_from_registers(major_index_sequence(), std::forward<MajorRegisters_>(major_order_registers_)...))

@@ -15,7 +15,6 @@
 #include "_simd_helpers_underlying_movemasks.h"
 #include "_simd_helpers_underlying_set.h"
 #include "_simd_helpers_underlying_shuffle.h"
-#include "_simd_helpers_underlying_shuffle_masks.h"
 #include "_simd_helpers_underlying_stream.h"
 #include "_simd_helpers_underlying_tmp.h"
 

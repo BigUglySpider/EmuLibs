@@ -2,6 +2,8 @@
 #define EMU_SIMD_GENERIC_FUNCS_U16X32_H_INC_ 1
 
 #include "_common_generic_func_helpers.h"
+#include "_f32x16.h"
+#include "_u32x16.h"
 
 namespace EmuSIMD::Funcs
 {
@@ -25,7 +27,8 @@ namespace EmuSIMD::Funcs
 		std::uint16_t e24, std::uint16_t e25, std::uint16_t e26, std::uint16_t e27, std::uint16_t e28, std::uint16_t e29, std::uint16_t e30, std::uint16_t e31
 	)
 	{
-		return _mm512_setr_epi16(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31);
+		//return _mm512_setr_epi16(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31);
+		return _mm512_set_epi16(e31, e30, e29, e28, e27, e26, e25, e24, e23, e22, e21, e20, e19, e18, e17, e16, e15, e14, e13, e12, e11, e10, e9, e8, e7, e6, e5, e4, e3, e2, e1, e0);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 set1_u16x32(std::uint16_t all_)
@@ -427,15 +430,17 @@ namespace EmuSIMD::Funcs
 		store_u16x32(data, in_);
 		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
 		{
-			_mm512_store_ps
+			store_f32x16
 			(
 				results + i,
 				func_
 				(
-					_mm512_set_ps
+					set_f32x16
 					(
-						data[i + 15], data[i + 14], data[i + 13], data[i + 12], data[i + 11], data[i + 10], data[i + 9], data[i + 8],
-						data[i + 7], data[i + 6], data[i + 5], data[i + 4], data[i + 3], data[i + 2], data[i + 1], data[i]
+						static_cast<float>(data[i + 15]), static_cast<float>(data[i + 14]), static_cast<float>(data[i + 13]), static_cast<float>(data[i + 12]),
+						static_cast<float>(data[i + 11]), static_cast<float>(data[i + 10]), static_cast<float>(data[i + 9]),  static_cast<float>(data[i + 8]),
+						static_cast<float>(data[i + 7]),  static_cast<float>(data[i + 6]),  static_cast<float>(data[i + 5]),  static_cast<float>(data[i + 4]),
+						static_cast<float>(data[i + 3]),  static_cast<float>(data[i + 2]),  static_cast<float>(data[i + 1]),  static_cast<float>(data[i])
 					)
 				)
 			);
@@ -511,6 +516,82 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region MOVES
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 movehl_u16x32(EmuSIMD::u16x32_arg lhs_, EmuSIMD::u16x32_arg rhs_)
+	{
+		return cast_f32x16_u16x32(movehl_f32x16(cast_u16x32_f32x16(lhs_), cast_u16x32_f32x16(rhs_)));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 movelh_u16x32(EmuSIMD::u16x32_arg lhs_, EmuSIMD::u16x32_arg rhs_)
+	{
+		return cast_f32x16_u16x32(movelh_f32x16(cast_u16x32_f32x16(lhs_), cast_u16x32_f32x16(rhs_)));
+	}
+#pragma endregion
+
+#pragma region BLENDS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 blendv_u16x32(EmuSIMD::u16x32_arg a_, EmuSIMD::u16x32_arg b_, EmuSIMD::u16x32_arg shuffle_mask_vec_)
+	{
+		auto blend_mask_for_8bit = blend_mask_vector_16_to_8(shuffle_mask_vec_);
+
+		EmuSIMD::u8x32 half_a = _mm512_castsi512_si256(a_);
+		EmuSIMD::u8x32 half_b = _mm512_castsi512_si256(b_);
+		EmuSIMD::u8x32 half_mask = _mm512_castsi512_si256(blend_mask_for_8bit);
+		EmuSIMD::u8x32 lo = _mm256_blendv_epi8(half_a, half_b, half_mask);
+
+		half_a = _mm512_extracti32x8_epi32(a_, 1);
+		half_b = _mm512_extracti32x8_epi32(b_, 1);
+		half_mask = _mm512_extracti32x8_epi32(blend_mask_for_8bit, 1);
+		half_b = _mm256_blendv_epi8(half_a, half_b, half_mask);
+
+		return _mm512_inserti32x8(cast_u8x32_u16x32(lo), half_b, 1);
+	}
+
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 blend_u16x32(EmuSIMD::u16x32_arg a_, EmuSIMD::u16x32_arg b_)
+	{
+		constexpr auto lo_blend_mask = BlendMask_;
+		constexpr auto hi_blend_mask = BlendMask_ >> 16;
+
+		EmuSIMD::u16x16 lo = _mm512_castsi512_si256(a_);
+		EmuSIMD::u16x16 half_b = _mm512_castsi512_si256(b_);
+		lo = _mm256_blend_epi16(lo, half_b, lo_blend_mask);
+
+		EmuSIMD::u16x16 hi = _mm512_extracti32x8_epi32(a_, 1);
+		half_b = _mm512_extracti32x8_epi32(b_, 1);
+		hi = _mm256_blend_epi16(hi, half_b, hi_blend_mask);
+
+		return _mm512_inserti32x8(cast_u8x32_u16x32(lo), hi, 1);
+	}
+#pragma endregion
+
+#pragma region MINMAX_FUNCS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 min_u16x32(EmuSIMD::u16x32_arg a_, EmuSIMD::u16x32_arg b_)
+	{
+		return _mm512_min_epu16(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 max_u16x32(EmuSIMD::u16x32_arg a_, EmuSIMD::u16x32_arg b_)
+	{
+		return _mm512_max_epu16(a_, b_);
+	}
+#pragma endregion
+
+#pragma region SHUFFLES
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 permute_u16x32(EmuSIMD::u16x32_arg a_)
+	{
+		static_assert(EmuCore::TMP::get_false<ShuffleMask_>(), "NO SUPPORT ERROR: EmuSIMD does not provide support for permuting u16x32 (512-bit registers containing 32 16-bit unsigned integer elements) [permute_u16x32].");
+		return EmuSIMD::u16x32{};
+	}
+
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 shuffle_u16x32(EmuSIMD::u16x32_arg a_, EmuSIMD::u16x32_arg b_)
+	{
+		static_assert(EmuCore::TMP::get_false<ShuffleMask_>(), "NO SUPPORT ERROR: EmuSIMD does not provide support for shuffling u16x32 (512-bit registers containing 32 16-bit unsigned integer elements) [shuffle_u16x32].");
+		return EmuSIMD::u16x32{};
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 mul_all_u16x32(EmuSIMD::u16x32_arg lhs_, EmuSIMD::u16x32_arg rhs_)
 	{
@@ -539,7 +620,25 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 div_u16x32(EmuSIMD::u16x32_arg lhs_, EmuSIMD::u16x32_arg rhs_)
 	{
+#if EMU_CORE_X86_X64_SVML
 		return _mm512_div_epu16(lhs_, rhs_);
+#else
+		// lo
+		EmuSIMD::i32x16 lane64_a = cvt_u16x32_u32x16(lhs_);
+		EmuSIMD::i32x16 lane64_b = cvt_u16x32_u32x16(rhs_);
+		EmuSIMD::i16x32 lo = cvt_u32x16_u16x32(div_u32x16(lane64_a, lane64_b));
+
+		// hi - move hi bits to lo
+		EmuSIMD::i16x32 tmp_lane = movehl_u16x32(lhs_, lhs_);
+		lane64_a = cvt_u16x32_u32x16(tmp_lane);
+
+		tmp_lane = movehl_u16x32(rhs_, rhs_);
+		lane64_b = cvt_u16x32_u32x16(tmp_lane);
+
+		// Move hi and lo into the same register, in their respective 64-bit lanes
+		EmuSIMD::i16x32 hi = cvt_u32x16_u16x32(div_u32x16(lane64_a, lane64_b));
+		return movelh_u16x32(lo, hi);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 addsub_u16x32(EmuSIMD::u16x32_arg lhs_, EmuSIMD::u16x32_arg rhs_)
@@ -619,7 +718,13 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 mod_u16x32(EmuSIMD::u16x32_arg lhs_, EmuSIMD::u16x32_arg rhs_)
 	{
+#if EMU_CORE_X86_X64_SVML
 		return _mm512_rem_epu16(lhs_, rhs_);
+#else
+		EmuSIMD::u16x32 to_subtract = div_u16x32(lhs_, rhs_);
+		to_subtract = mul_all_u16x32(to_subtract, rhs_);
+		return sub_u16x32(lhs_, to_subtract);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 abs_u16x32(EmuSIMD::u16x32_arg in_)
@@ -629,12 +734,12 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 sqrt_u16x32(EmuSIMD::u16x32_arg in_)
 	{
-		return emulate_fp_u16x32([](EmuSIMD::f32x16_arg in_fp_) { return _mm512_sqrt_ps(in_fp_); }, in_);
+		return emulate_fp_u16x32([](EmuSIMD::f32x16_arg in_fp_) { return sqrt_f32x16(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 rsqrt_u16x32(EmuSIMD::u16x32_arg in_)
 	{
-		return emulate_fp_u16x32([](EmuSIMD::f32x16_arg in_fp_) { return _mm512_rsqrt28_ps(in_fp_); }, in_);
+		return emulate_fp_u16x32([](EmuSIMD::f32x16_arg in_fp_) { return rsqrt_f32x16(in_fp_); }, in_);
 	}
 #pragma endregion
 
@@ -653,32 +758,32 @@ namespace EmuSIMD::Funcs
 #pragma region TRIG
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 cos_u16x32(EmuSIMD::u16x32_arg in_)
 	{
-		return emulate_fp_u16x32([](EmuSIMD::f32x16_arg in_fp_) { return _mm512_cos_ps(in_fp_); }, in_);
+		return emulate_fp_u16x32([](EmuSIMD::f32x16_arg in_fp_) { return cos_f32x16(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 sin_u16x32(EmuSIMD::u16x32_arg in_)
 	{
-		return emulate_fp_u16x32([](EmuSIMD::f32x16_arg in_fp_) { return _mm512_sin_ps(in_fp_); }, in_);
+		return emulate_fp_u16x32([](EmuSIMD::f32x16_arg in_fp_) { return sin_f32x16(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 tan_u16x32(EmuSIMD::u16x32_arg in_)
 	{
-		return emulate_fp_u16x32([](EmuSIMD::f32x16_arg in_fp_) { return _mm512_tan_ps(in_fp_); }, in_);
+		return emulate_fp_u16x32([](EmuSIMD::f32x16_arg in_fp_) { return tan_f32x16(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 acos_u16x32(EmuSIMD::u16x32_arg in_)
 	{
-		return emulate_fp_u16x32([](EmuSIMD::f32x16_arg in_fp_) { return _mm512_acos_ps(in_fp_); }, in_);
+		return emulate_fp_u16x32([](EmuSIMD::f32x16_arg in_fp_) { return acos_f32x16(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 asin_u16x32(EmuSIMD::u16x32_arg in_)
 	{
-		return emulate_fp_u16x32([](EmuSIMD::f32x16_arg in_fp_) { return _mm512_asin_ps(in_fp_); }, in_);
+		return emulate_fp_u16x32([](EmuSIMD::f32x16_arg in_fp_) { return asin_f32x16(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 atan_u16x32(EmuSIMD::u16x32_arg in_)
 	{
-		return emulate_fp_u16x32([](EmuSIMD::f32x16_arg in_fp_) { return _mm512_atan_ps(in_fp_); }, in_);
+		return emulate_fp_u16x32([](EmuSIMD::f32x16_arg in_fp_) { return atan_f32x16(in_fp_); }, in_);
 	}
 #pragma endregion
 }
