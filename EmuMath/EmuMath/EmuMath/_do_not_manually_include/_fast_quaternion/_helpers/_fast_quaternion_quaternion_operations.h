@@ -152,7 +152,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<bool PreferMultiplies_ = false, typename T_, std::size_t RegisterWidth_>
-	[[nodiscard]] constexpr inline void fast_quaternion_assign_unit(EmuMath::FastQuaternion<T_, RegisterWidth_>& fast_quaternion_)
+	constexpr inline void fast_quaternion_assign_unit(EmuMath::FastQuaternion<T_, RegisterWidth_>& fast_quaternion_)
 	{
 		// NOTE: Could be optimised to prevent creating a new Quaternion, however it is likely optimised out anyway
 		fast_quaternion_ = _fast_quaternion_underlying::_fast_quaternion_unit<PreferMultiplies_>(fast_quaternion_);
