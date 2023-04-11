@@ -125,6 +125,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		typename EmuCore::TMP::remove_ref_cv_t<OutFastMatrix_>::value_type* p_loading_data_
 	)
 	{
+#pragma region REEEEE
 		// Quaternion Info
 		using _fast_quat_uq = typename std::remove_cvref<FastQuaternion_>::type;
 		using _register_type = typename _fast_quat_uq::register_type;
@@ -172,7 +173,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		_value_type xyzw_MUL_2_MUL_w[data_dump_size]; // [3] never used
 
 		// Calculate common constants via SIMD
-		_register_type two = EmuSIMD::set1<_register_type, per_element_width>(_value_type(1));
+		_register_type two = EmuSIMD::set1<_register_type, per_element_width>(_value_type(2));
 		if constexpr (num_registers <= 1)
 		{
 			_register_type xyzw = std::forward<FastQuaternion_>(quaternion_).template GetRegister<0>();
@@ -227,6 +228,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 				one_SUB_x_MUL_2_MUL_x = _value_type(1) - one_SUB_x_MUL_2_MUL_x;
 			}
 		}
+#pragma endregion
 
 		// Calculate Matrix points as scalar for 2 reasons
 		// --- 1: Calculations don't contiguously use what we have from above calculations, so would use a lot of shuffles that may ultimately harm performance
