@@ -28,6 +28,30 @@ namespace EmuMath::Helpers
 			rotation_
 		);
 	}
+
+	template
+	<
+		std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_,
+		bool OutColumnMajor_ = true, std::size_t OutRegisterWidth_ = 128, EmuConcepts::EmuFastQuaternion FastQuaternion_
+	>
+	[[nodiscard]] constexpr inline auto fast_matrix_make_rotation_3d(FastQuaternion_&& rotation_)
+		-> EmuMath::FastMatrix<4, 4, OutT_, OutColumnMajor_, OutRegisterWidth_>
+	{
+		return _fast_matrix_underlying::_make_matrix_rotate_3d_quat<EmuMath::FastMatrix<4, 4, OutT_, OutColumnMajor_, OutRegisterWidth_>>
+		(
+			std::forward<FastQuaternion_>(rotation_)
+		);
+	}
+
+	template<typename OutT_, bool OutColumnMajor_ = true, std::size_t OutRegisterWidth_ = 128, EmuConcepts::EmuFastQuaternion FastQuaternion_>
+	[[nodiscard]] constexpr inline auto fast_matrix_make_rotation_3d(FastQuaternion_&& rotation_)
+		-> EmuMath::FastMatrix<4, 4, OutT_, OutColumnMajor_, OutRegisterWidth_>
+	{
+		return _fast_matrix_underlying::_make_matrix_rotate_3d_fast_quat<EmuMath::FastMatrix<4, 4, OutT_, OutColumnMajor_, OutRegisterWidth_>>
+		(
+			std::forward<FastQuaternion_>(rotation_)
+		);
+	}
 }
 
 #endif

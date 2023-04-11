@@ -190,6 +190,14 @@ namespace EmuMath::Concepts
 			(EmuConcepts::Arithmetic<Arg_>)
 		)
 	);
+
+	template<class FastQuaternion_, class FastMatrix_>
+	concept EmuFastMatrixCompatibleQuaternion =
+	(
+		(EmuFastMatrix<FastMatrix_>) &&
+		(EmuFastQuaternion<FastQuaternion_>) &&
+		(std::is_same_v<typename std::remove_cvref_t<FastMatrix_>::register_type, typename std::remove_cvref_t<FastQuaternion_>::register_type>)
+	);
 }
 
 namespace EmuConcepts

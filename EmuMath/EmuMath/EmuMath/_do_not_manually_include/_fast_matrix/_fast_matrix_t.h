@@ -1248,6 +1248,24 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region ROTATION
+	public:
+		template<EmuConcepts::Arithmetic QuaternionT_>
+		[[nodiscard]] static constexpr inline auto make_rotation_3d(const EmuMath::Quaternion<QuaternionT_>& rotation_)
+		{
+			return EmuMath::Helpers::fast_matrix_make_rotation_3d<value_type, is_column_major, register_width>(rotation_);
+		}
+
+		template<EmuConcepts::EmuFastQuaternion FastQuaternion_>
+		[[nodiscard]] static constexpr inline auto make_rotation_3d(FastQuaternion_&& rotation_)
+		{
+			return EmuMath::Helpers::fast_matrix_make_rotation_3d<value_type, is_column_major, register_width>
+			(
+				std::forward<FastQuaternion_>(rotation_)
+			);
+		}
+#pragma endregion
+
 #pragma region DATA
 	public:
 		/// <summary>

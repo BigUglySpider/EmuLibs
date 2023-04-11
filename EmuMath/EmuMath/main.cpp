@@ -407,53 +407,16 @@ int main()
 	//universal_pause();
 
 	{
-		constexpr auto mult_constant = 1;
-		using fast_quat_f32x4 = EmuMath::FastQuaternion<float, 128>;
-		using fast_quat_f32x8 = EmuMath::FastQuaternion<float, 256>;
-		using fast_quat_f64x2 = EmuMath::FastQuaternion<double, 128>;
-		using quatf32 = EmuMath::Quaternion<float>;
-		using quatf64 = EmuMath::Quaternion<double>;
-		constexpr auto val_quatf32 = quatf32::from_euler_constexpr<false, false>(-25.73f, 45.95f, 72.34f) * mult_constant;
-		constexpr auto val_quatf64 = quatf64::from_euler_constexpr<false, false>(-25.73, 45.95, 72.34) * mult_constant;
+		constexpr auto rot_quat = EmuMath::Quaternion<float>::from_euler_constexpr<false>(45.0f, -33.3333f, 0.0f);
+		constexpr auto rot_quat_64 = EmuMath::Quaternion<double>::from_euler_constexpr<false>(45.0, -33.3333, 0.0);
+		auto fast_rot_quat = EmuMath::FastQuaternion<float, 128>(rot_quat);
+		std::cout << "Scalar Matrix (f32):\n" << EmuMath::Matrix<4, 4, float, true>::make_rotation_3d(rot_quat) << "\n";
+		std::cout << "Scalar Matrix (f64):\n" << EmuMath::Matrix<4, 4, float, true>::make_rotation_3d(rot_quat_64) << "\n";
+		std::cout << "Fast Matrix (f32x4):\n" << EmuMath::FastMatrix<4, 4, float, true, 128>::make_rotation_3d(rot_quat) << "\n";
+		std::cout << "Fast Matrix (f32x8):\n" << EmuMath::FastMatrix<4, 4, float, true, 256>::make_rotation_3d(rot_quat) << "\n";
+		std::cout << "Fast Matrix (f64x2):\n" << EmuMath::FastMatrix<4, 4, double, true, 128>::make_rotation_3d(rot_quat_64) << "\n";
+		std::cout << "Fast Matrix (f64x4):\n" << EmuMath::FastMatrix<4, 4, double, true, 256>::make_rotation_3d(rot_quat_64) << "\n";
 
-		std::cout << "\n### Base ###\n";
-		std::cout << "Scalarf32: " << val_quatf32 << "\n";
-		std::cout << "Scalarf64: " << val_quatf64 << "\n";
-		std::cout << "---\n";
-		std::cout << "f32x4: " << fast_quat_f32x4(val_quatf32) << "\n";
-		std::cout << "---\n";
-		std::cout << "f32x8: " << fast_quat_f32x8(val_quatf32) << "\n";
-		std::cout << "---\n";
-		std::cout << "f64x2: " << fast_quat_f64x2(val_quatf64) << "\n";
-
-		std::cout << "\n### Conjugate ###\n";
-		std::cout << "Scalarf32: " << val_quatf32.Conjugate() << "\n";
-		std::cout << "Scalarf64: " << val_quatf64.Conjugate() << "\n";
-		std::cout << "---\n";
-		std::cout << "f32x4: " << fast_quat_f32x4(val_quatf32).Conjugate() << "\n";
-		std::cout << "---\n";
-		std::cout << "f32x8: " << fast_quat_f32x8(val_quatf32).Conjugate() << "\n";
-		std::cout << "---\n";
-		std::cout << "f64x2: " << fast_quat_f64x2(val_quatf64).Conjugate() << "\n";
-
-		std::cout << "\n### Inverse ###\n";
-		std::cout << "Scalarf32: " << val_quatf32.Inverse() << "\n";
-		std::cout << "---\n";
-		std::cout << "f32x4: " << fast_quat_f32x4(val_quatf32).Inverse() << "\n";
-		std::cout << "---\n";
-		std::cout << "f32x8: " << fast_quat_f32x8(val_quatf32).Inverse() << "\n";
-		std::cout << "---\n";
-		std::cout << "f64x2: " << fast_quat_f64x2(val_quatf64).Inverse() << "\n";
-
-		std::cout << "\n### Unit ###\n";
-		std::cout << "Scalarf32: " << val_quatf32.Unit() << "\n";
-		std::cout << "Scalarf64: " << val_quatf64.Unit() << "\n";
-		std::cout << "---\n";
-		std::cout << "f32x4: " << fast_quat_f32x4(val_quatf32).Unit() << "\n";
-		std::cout << "---\n";
-		std::cout << "f32x8: " << fast_quat_f32x8(val_quatf32).Unit() << "\n";
-		std::cout << "---\n";
-		std::cout << "f64x2: " << fast_quat_f64x2(val_quatf64).Unit() << "\n";
 		universal_pause();
 	}
 
