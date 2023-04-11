@@ -11,12 +11,12 @@
 
 // ADDITIONAL INCLUDES
 #include "EmuMath/FastMatrix.h"
+#include "EmuMath/FastQuaternion.h"
 #include "EmuMath/FastVector.h"
 #include "EmuMath/Matrix.h"
 #include "EmuMath/Vector.h"
 #include "EmuMath/Random.h"
 #include "EmuMath/Quaternion.h"
-#include "EmuMath/FastQuaternion.h"
 #include <bitset>
 #include <string_view>
 
@@ -695,6 +695,109 @@ namespace EmuCore::TestingHelpers
 		std::vector<scalar_type> in;
 		std::vector<scalar_type> out;
 	};
+
+	struct FastMatFromScalarQuaternionTest
+	{
+		static constexpr bool DO_TEST = true;
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = shared_num_loops;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr std::string_view NAME = "Rotation FastMatrix from Quaternion (scalar)";
+
+		using value_type = float;
+		static constexpr std::size_t matrix_columns = 4;
+		static constexpr std::size_t matrix_rows = 4;
+		static constexpr bool matrix_column_major = true;
+		static constexpr std::size_t register_width = 128;
+
+		using euler_type = EmuMath::Vector<3, value_type>;
+		using quaternion_type = EmuMath::Quaternion<value_type>;
+		using matrix_type = EmuMath::FastMatrix<matrix_columns, matrix_rows, value_type, matrix_column_major, register_width>;
+		static constexpr bool in_rads = false;
+		static constexpr bool norm_out = false;
+
+		FastMatFromScalarQuaternionTest()
+		{
+		}
+		void Prepare()
+		{
+			// FILLS
+			rot_matrices.resize(NUM_LOOPS);
+
+			// RESERVES
+			rot_quaternions.reserve(NUM_LOOPS);
+			EmuMath::RngWrapper<true> rng(-90, 90, shared_fill_seed_);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				auto euler = make_random_vec<euler_type, value_type, 3>(rng);
+				rot_quaternions.emplace_back(quaternion_type::from_euler(std::move(euler)));
+			}
+		}
+		void operator()(std::size_t i_)
+		{
+			rot_matrices[i_] = matrix_type::make_rotation_3d(rot_quaternions[i_]);
+		}
+		void OnTestsOver()
+		{
+			const std::size_t i = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
+			std::cout << rot_quaternions[i] << ":\n" << rot_matrices[i] << "\n\n";
+		}
+
+		std::vector<quaternion_type> rot_quaternions;
+		std::vector<matrix_type> rot_matrices;
+	};
+
+	struct FastMatFromFastQuaternionTest
+	{
+		static constexpr bool DO_TEST = true;
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = shared_num_loops;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr std::string_view NAME = "Rotation FastMatrix from Quaternion (SIMD)";
+
+		using value_type = float;
+		static constexpr std::size_t matrix_columns = 4;
+		static constexpr std::size_t matrix_rows = 4;
+		static constexpr bool matrix_column_major = true;
+		static constexpr std::size_t matrix_register_width = 128;
+		static constexpr std::size_t quaternion_register_width = matrix_register_width;
+
+		using euler_type = EmuMath::Vector<3, value_type>;
+		using quaternion_type = EmuMath::FastQuaternion<value_type, quaternion_register_width>;
+		using matrix_type = EmuMath::FastMatrix<matrix_columns, matrix_rows, value_type, matrix_column_major, matrix_register_width>;
+		static constexpr bool in_rads = false;
+		static constexpr bool norm_out = false;
+
+		FastMatFromFastQuaternionTest()
+		{
+		}
+		void Prepare()
+		{
+			// FILLS
+			rot_matrices.resize(NUM_LOOPS);
+
+			// RESERVES
+			rot_quaternions.reserve(NUM_LOOPS);
+			EmuMath::RngWrapper<true> rng(-90, 90, shared_fill_seed_);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				auto euler = make_random_vec<euler_type, value_type, 3>(rng);
+				rot_quaternions.emplace_back(quaternion_type::from_euler(std::move(euler)));
+			}
+		}
+		void operator()(std::size_t i_)
+		{
+			rot_matrices[i_] = matrix_type::make_rotation_3d(rot_quaternions[i_]);
+		}
+		void OnTestsOver()
+		{
+			const std::size_t i = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
+			std::cout << rot_quaternions[i] << ":\n" << rot_matrices[i] << "\n\n";
+		}
+
+		std::vector<quaternion_type> rot_quaternions;
+		std::vector<matrix_type> rot_matrices;
+	};
 #pragma endregion
 
 	// ----------- TESTS SELECTION -----------
@@ -705,8 +808,10 @@ namespace EmuCore::TestingHelpers
 		//DirectXSimdTest
 		//ScalarQuaternionTest,
 		//FastQuaternionTest,
-		ScalarTan,
-		SIMDTan
+		//ScalarTan,
+		//SIMDTan,
+		FastMatFromScalarQuaternionTest,
+		FastMatFromFastQuaternionTest
 	>;
 
 	// ----------- TESTS BEGIN -----------

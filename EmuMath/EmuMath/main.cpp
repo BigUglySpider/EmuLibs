@@ -1390,7 +1390,7 @@ int main()
 	std::cout << (cmptestc != cmptestd) << "\n";
 	std::cout << cmptestc.CmpNear(cmptestd) << "\n";
 
-	//*
+	/*
 	{
 		// ##### SCALAR vs SIMD NOISE #####
 		constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN; 

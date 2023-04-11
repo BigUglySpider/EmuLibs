@@ -132,7 +132,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		constexpr std::size_t per_element_width = _fast_quat_uq::per_element_width;
 		constexpr bool is_signed = _fast_quat_uq::is_signed;
 		constexpr std::size_t num_registers = (_fast_quat_uq::num_registers < 1) ? 1 : _fast_quat_uq::num_registers;
-		constexpr std::size_t num_elements_per_register = _fast_quat_uq::num_elements_per_register;
+		constexpr std::size_t num_elements_per_register = _fast_quat_uq::elements_per_register;
 		constexpr std::size_t data_dump_size = num_registers * num_elements_per_register;
 
 		// Fast Matrix info
@@ -172,7 +172,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		_value_type xyzw_MUL_2_MUL_w[data_dump_size]; // [3] never used
 
 		// Calculate common constants via SIMD
-		_register_type two = EmuSIMD::set1<per_element_width>(_value_type(1));
+		_register_type two = EmuSIMD::set1<_register_type, per_element_width>(_value_type(1));
 		if constexpr (num_registers <= 1)
 		{
 			_register_type xyzw = std::forward<FastQuaternion_>(quaternion_).template GetRegister<0>();
@@ -196,7 +196,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 
 			if constexpr (requires_one_SUB_x_MUL_2_MUL_x)
 			{
-				one_SUB_x_MUL_2_MUL_x = EmuSIMD::get_index<0>(xyzw);
+				one_SUB_x_MUL_2_MUL_x = EmuSIMD::get_index<0, _value_type, per_element_width>(xyzw);
 				one_SUB_x_MUL_2_MUL_x *= (2 * one_SUB_x_MUL_2_MUL_x);
 				one_SUB_x_MUL_2_MUL_x = _value_type(1) - one_SUB_x_MUL_2_MUL_x;
 			}
@@ -222,7 +222,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 
 			if constexpr (requires_one_SUB_x_MUL_2_MUL_x)
 			{
-				one_SUB_x_MUL_2_MUL_x = EmuSIMD::get_index<0>(xy);
+				one_SUB_x_MUL_2_MUL_x = EmuSIMD::get_index<0, _value_type, per_element_width>(xy);
 				one_SUB_x_MUL_2_MUL_x *= (2 * one_SUB_x_MUL_2_MUL_x);
 				one_SUB_x_MUL_2_MUL_x = _value_type(1) - one_SUB_x_MUL_2_MUL_x;
 			}
