@@ -1266,6 +1266,22 @@ namespace EmuMath
 		}
 #pragma endregion
 
+		/*
+		* TODO:
+		*	- Floor()
+		*	- Ceil()
+		*	- Trunc()
+		*	- Abs()
+		*	- Min()
+		*	- Min(b)
+		*	- Max()
+		*	- Max(b)
+		*	- Lerp(b, t)
+		*	- ClampMin(min)
+		*	- ClampMax(max)
+		*	- Clamp(min, max)
+		*/
+
 #pragma region DATA
 	public:
 		/// <summary>
