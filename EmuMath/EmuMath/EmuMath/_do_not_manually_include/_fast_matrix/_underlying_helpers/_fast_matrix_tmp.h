@@ -5,6 +5,7 @@
 #include "../../../FastVector.h"
 #include "../../../Matrix.h"
 #include "../../../../EmuCore/TMPHelpers/TypeConvertors.h"
+#include "../../../../EmuCore/TMPHelpers/VariadicHelpers.h"
 #include <functional>
 #include <type_traits>
 
@@ -33,6 +34,48 @@ namespace EmuMath::TMP
 
 	public:
 		using type = typename _in_fast_mat_uq::register_type;
+	};
+
+	/// <summary>
+	/// <para> Helper type to retrieve the index sequences to contiguously iterate over an EmuMath FastMatrix via compile-time iteration. </para>
+	/// </summary>
+	template<EmuConcepts::EmuFastMatrix FastMatrix_>
+	struct fast_matrix_full_register_sequences
+	{
+	private:
+		using _fast_mat_uq = typename std::remove_cvref<FastMatrix_>::type;
+		template<std::size_t...MajorIndices_, std::size_t...NonMajorIndices_>
+		static constexpr inline auto _determine_types_pair(std::index_sequence<MajorIndices_...> major_indices_, std::index_sequence<NonMajorIndices_...> non_major_indices_)
+		{
+			constexpr std::size_t num_major_elements = _fast_mat_uq::num_major_elements;
+			constexpr std::size_t num_registers_per_major = _fast_mat_uq::num_registers_per_major;
+
+			using major_index_sequence = typename EmuCore::TMP::variadic_splice_integer_sequences
+			<
+				EmuCore::TMP::make_duplicated_index_sequence<MajorIndices_, num_registers_per_major>...
+			>::type;
+
+			using register_index_sequence = typename EmuCore::TMP::looped_integer_sequence
+			<
+				std::index_sequence<NonMajorIndices_...>,
+				num_major_elements - 1
+			>::type;
+
+			return std::pair<major_index_sequence, register_index_sequence>();
+		}
+
+		using _major_and_register_sequences_pair = decltype
+		(
+			_determine_types_pair
+			(
+				std::make_index_sequence<_fast_mat_uq::num_major_elements>(),
+				std::make_index_sequence<_fast_mat_uq::num_registers_per_major>()
+			)
+		);
+
+	public:
+		using major_index_sequence = typename _major_and_register_sequences_pair::first_type;
+		using register_index_sequence = typename _major_and_register_sequences_pair::second_type;
 	};
 }
 

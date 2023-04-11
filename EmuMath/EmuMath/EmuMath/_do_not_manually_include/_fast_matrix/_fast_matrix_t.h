@@ -1266,6 +1266,42 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region ROUNDS
+	public:
+		[[nodiscard]] constexpr inline auto Floor() const
+			-> EmuMath::FastMatrix<num_columns, num_rows, value_type, is_column_major, register_width>
+		{
+			return EmuMath::Helpers::fast_matrix_floor(*this);
+		}
+
+		[[nodiscard]] constexpr inline auto Ceil() const
+			-> EmuMath::FastMatrix<num_columns, num_rows, value_type, is_column_major, register_width>
+		{
+			return EmuMath::Helpers::fast_matrix_ceil(*this);
+		}
+
+		[[nodiscard]] constexpr inline auto Trunc() const
+			-> EmuMath::FastMatrix<num_columns, num_rows, value_type, is_column_major, register_width>
+		{
+			return EmuMath::Helpers::fast_matrix_trunc(*this);
+		}
+		
+		constexpr inline void FloorAssign() &
+		{
+			return EmuMath::Helpers::fast_matrix_floor_assign(*this);
+		}
+
+		constexpr inline void CeilAssign() &
+		{
+			return EmuMath::Helpers::fast_matrix_ceil_assign(*this);
+		}
+
+		constexpr inline void TruncAssign() &
+		{
+			return EmuMath::Helpers::fast_matrix_trunc_assign(*this);
+		}
+#pragma endregion
+
 		/*
 		* TODO:
 		*	- Floor()

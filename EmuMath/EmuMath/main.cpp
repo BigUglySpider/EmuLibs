@@ -355,68 +355,22 @@ constexpr inline decltype(auto) setr_test_helper(Func_&& func_, std::index_seque
 
 int main()
 {
-	//try
-	//{
-	//	using tuple_test_type = std::tuple<int, char, float, bool, double, std::string>;
-	//	EmuCore::TMP::RuntimeTupleTable<const tuple_test_type, test_func<void>> table;
-	//	tuple_test_type in_tuple(42, 'L', 2.1f, false, -42.09, "It worked!");
-	//	auto j = test_func<void>();
-	//	for (std::size_t i = 0; i < std::tuple_size_v<tuple_test_type> + 1; ++i)
-	//	{
-	//		table.Execute(i, in_tuple);
-	//	}
-	//}
-	//catch (std::exception& except)
-	//{
-	//	std::cout << except.what() << "\n";
-	//}
-	//
-	//{
-	//	using tuple_test_type = std::tuple<int, char, float, bool, double, std::string, bool>;
-	//	EmuCore::TMP::RuntimeTupleTable<tuple_test_type, boolifier> table;
-	//	tuple_test_type in_tuple(42, 'L', 2.1f, false, -42.09, "It worked!", true);
-	//	for (std::size_t i = 0; i < std::tuple_size_v<tuple_test_type>; ++i)
-	//	{
-	//		std::cout << table(i, in_tuple, boolifier()) << " | ";
-	//		std::cout << table[i](in_tuple, boolifier()) << "\n";
-	//	}
-	//
-	//	std::cout << "\n---\n";
-	//	for (auto& func : table)
-	//	{
-	//		std::cout << func(in_tuple, boolifier()) << "\n";
-	//	}
-	//	std::cout << "\n---\n";
-	//	for (auto it = table.rbegin(), end = table.rend(); it != end; ++it)
-	//	{
-	//		std::cout <<  (*it)(in_tuple, boolifier()) << "\n";
-	//	}
-	//}
-	//std::cout << "\n---###---\n";
-	//{
-	//	using tuple_test_type = std::tuple<tester_of_array<float>, tester_of_array<int>, tester_of_array<char>, tester_of_array<long double>, tester_of_array<EmuMath::Vector<20, float>>>;
-	//	tuple_test_type in_tuple = tuple_test_type();
-	//	EmuCore::TMP::RuntimeTupleTable<tuple_test_type, get_string_array> table;
-	//	for (auto& func : table)
-	//	{
-	//		PrintIndexable<10>(func(in_tuple, get_string_array()));
-	//		std::cout << "\n";
-	//	}
-	//}
-	// 
-	//universal_pause();
-
 	{
-		constexpr auto rot_quat = EmuMath::Quaternion<float>::from_euler_constexpr<false>(45.0f, -33.3333f, 0.0f);
-		constexpr auto rot_quat_64 = EmuMath::Quaternion<double>::from_euler_constexpr<false>(45.0, -33.3333, 0.0);
-		auto fast_rot_quat = EmuMath::FastQuaternion<float, 128>(rot_quat);
-		std::cout << "Scalar Matrix (f32):\n" << EmuMath::Matrix<4, 4, float, true>::make_rotation_3d(rot_quat) << "\n";
-		std::cout << "Scalar Matrix (f64):\n" << EmuMath::Matrix<4, 4, float, true>::make_rotation_3d(rot_quat_64) << "\n";
-		std::cout << "Fast Matrix (f32x4):\n" << EmuMath::FastMatrix<4, 4, float, true, 128>::make_rotation_3d(rot_quat) << "\n";
-		std::cout << "Fast Matrix (f32x8):\n" << EmuMath::FastMatrix<4, 4, float, true, 256>::make_rotation_3d(rot_quat) << "\n";
-		std::cout << "Fast Matrix (f64x2):\n" << EmuMath::FastMatrix<4, 4, double, true, 128>::make_rotation_3d(rot_quat_64) << "\n";
-		std::cout << "Fast Matrix (f64x4):\n" << EmuMath::FastMatrix<4, 4, double, true, 256>::make_rotation_3d(rot_quat_64) << "\n";
+		auto fast_mat_to_round = EmuMath::FastMatrix<4, 4, float, true, 128>(1.2, -2.2, 3.5, 4.0, 5.1, 6.7, 7.0, 8.0, 9, 10, 11.123456789f, 12, 13, 14, 15, 16.2f);
+		auto fast_mat_to_round_64 = EmuMath::FastMatrix<4, 4, double, true, 128>(1.2, -2.2, 3.5, 4.0, 5.1, 6.7, 7.0, 8.0, 9, 10, 11.123456789f, 12, 13, 14, 15, 16.2f);
 
+
+		std::cout << "Initial (f32x4):\n" << fast_mat_to_round << "\n";
+		std::cout << "Initial (f64x2):\n" << fast_mat_to_round_64 << "\n";
+
+		std::cout << "Floored (f32x4):\n" << fast_mat_to_round.Floor() << "\n";
+		std::cout << "Floored (f64x2):\n" << fast_mat_to_round_64.Floor() << "\n";
+
+		std::cout << "Ceiled (f32x4):\n" << fast_mat_to_round.Ceil() << "\n";
+		std::cout << "Ceiled (f64x2):\n" << fast_mat_to_round_64.Ceil() << "\n";
+
+		std::cout << "Trunced (f32x4):\n" << fast_mat_to_round.Trunc() << "\n";
+		std::cout << "Trunced (f64x2):\n" << fast_mat_to_round_64.Trunc() << "\n";
 		universal_pause();
 	}
 
