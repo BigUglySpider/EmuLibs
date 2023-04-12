@@ -322,22 +322,23 @@ namespace EmuSIMD::Funcs
 		return a_;
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 cvt_u16x8_u8x16(u16x8_arg a_)
+		EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 cvt_u16x8_u8x16(u16x8_arg a_)
 	{
-		//return _mm_cvtepi16_epi8(a_);
-
-		std::uint16_t data_dump[8];
-		_mm_store_si128(reinterpret_cast<__m128i*>(data_dump), a_);
-		return setr_u8x16
+#if 0 // Need a test for if this is legal
+		return _mm_cvtepi16_epi8(a_);
+#else
+		std::uint16_t dump[8];
+		store_u16x8(dump, a_);
+		return setr_i8x16
 		(
-			static_cast<std::uint8_t>(data_dump[0]),
-			static_cast<std::uint8_t>(data_dump[1]),
-			static_cast<std::uint8_t>(data_dump[2]),
-			static_cast<std::uint8_t>(data_dump[3]),
-			static_cast<std::uint8_t>(data_dump[4]),
-			static_cast<std::uint8_t>(data_dump[5]),
-			static_cast<std::uint8_t>(data_dump[6]),
-			static_cast<std::uint8_t>(data_dump[7]),
+			static_cast<std::uint8_t>(dump[0]),
+			static_cast<std::uint8_t>(dump[1]),
+			static_cast<std::uint8_t>(dump[2]),
+			static_cast<std::uint8_t>(dump[3]),
+			static_cast<std::uint8_t>(dump[4]),
+			static_cast<std::uint8_t>(dump[5]),
+			static_cast<std::uint8_t>(dump[6]),
+			static_cast<std::uint8_t>(dump[7]),
 			0,
 			0,
 			0,
@@ -347,16 +348,65 @@ namespace EmuSIMD::Funcs
 			0,
 			0
 		);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 cvt_u32x4_u8x16(u32x4_arg a_)
 	{
+#if 0 // Need a test for if this is legal
 		return _mm_cvtepi32_epi8(a_);
+#else
+		std::uint32_t dump[4];
+		store_u32x4(dump, a_);
+		return setr_i8x16
+		(
+			static_cast<std::int8_t>(dump[0]),
+			static_cast<std::int8_t>(dump[1]),
+			static_cast<std::int8_t>(dump[2]),
+			static_cast<std::int8_t>(dump[3]),
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0
+		);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 cvt_u64x2_u8x16(u64x2_arg a_)
 	{
+#if 0 // Need a test for if this is legal
 		return _mm_cvtepi64_epi8(a_);
+#else
+		std::uint64_t dump[2];
+		store_u64x2(dump, a_);
+		return setr_i8x16
+		(
+			static_cast<std::int8_t>(dump[0]),
+			static_cast<std::int8_t>(dump[1]),
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0
+		);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 cvt_u8x32_u8x16(u8x32_arg a_)
@@ -364,19 +414,91 @@ namespace EmuSIMD::Funcs
 		return _mm256_castsi256_si128(a_);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 cvt_u16x16_u8x16(u16x16_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 cvt_u16x16_u8x16(u16x16_arg a_)
 	{
+#if 0 // Need a test for if this is legal
 		return _mm256_cvtepi16_epi8(a_);
+#else
+		std::uint16_t dump[16];
+		store_u16x16(dump, a_);
+		return setr_u8x16
+		(
+			static_cast<std::uint8_t>(dump[0]),
+			static_cast<std::uint8_t>(dump[1]),
+			static_cast<std::uint8_t>(dump[2]),
+			static_cast<std::uint8_t>(dump[3]),
+			static_cast<std::uint8_t>(dump[4]),
+			static_cast<std::uint8_t>(dump[5]),
+			static_cast<std::uint8_t>(dump[6]),
+			static_cast<std::uint8_t>(dump[7]),
+			static_cast<std::uint8_t>(dump[8]),
+			static_cast<std::uint8_t>(dump[9]),
+			static_cast<std::uint8_t>(dump[10]),
+			static_cast<std::uint8_t>(dump[11]),
+			static_cast<std::uint8_t>(dump[12]),
+			static_cast<std::uint8_t>(dump[13]),
+			static_cast<std::uint8_t>(dump[14]),
+			static_cast<std::uint8_t>(dump[15])
+		);
+#endif
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 cvt_u32x8_u8x16(u32x8_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 cvt_u32x8_u8x16(u32x8_arg a_)
 	{
+#if 0 // Need a test for if this is legal
 		return _mm256_cvtepi32_epi8(a_);
+#else
+		std::uint32_t dump[8];
+		store_u32x8(dump, a_);
+		return setr_u8x16
+		(
+			static_cast<std::uint8_t>(dump[0]),
+			static_cast<std::uint8_t>(dump[1]),
+			static_cast<std::uint8_t>(dump[2]),
+			static_cast<std::uint8_t>(dump[3]),
+			static_cast<std::uint8_t>(dump[4]),
+			static_cast<std::uint8_t>(dump[5]),
+			static_cast<std::uint8_t>(dump[6]),
+			static_cast<std::uint8_t>(dump[7]),
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0
+		);
+#endif
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 cvt_u64x4_u8x16(u64x4_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 cvt_u64x4_u8x16(u64x4_arg a_)
 	{
+#if 0 // Need a test for if this is legal
 		return _mm256_cvtepi64_epi8(a_);
+#else
+		std::uint64_t dump[4];
+		store_u64x4(dump, a_);
+		return setr_u8x16
+		(
+			static_cast<std::uint8_t>(dump[0]),
+			static_cast<std::uint8_t>(dump[1]),
+			static_cast<std::uint8_t>(dump[2]),
+			static_cast<std::uint8_t>(dump[3]),
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0
+		);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 cvt_u8x64_u8x16(u8x64_arg a_)

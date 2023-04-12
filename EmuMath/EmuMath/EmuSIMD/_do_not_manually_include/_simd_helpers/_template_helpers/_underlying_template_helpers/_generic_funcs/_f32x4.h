@@ -8,32 +8,54 @@ namespace EmuSIMD::Funcs
 #pragma region SETTERS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 set_f32x4(float e0, float e1, float e2, float e3)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_set_ps(e0, e1, e2, e3);
+#else
+		// Emulated, we use reverse-ordering in this case
+		return _underlying_impl::set_single_lane_simd_emulator<4, float>(e3, e2, e1, e0);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 setr_f32x4(float e0, float e1, float e2, float e3)
 	{
-		//return _mm_setr_ps(e0, e1, e2, e3);
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_set_ps(e3, e2, e1, e0);
+#else
+		// Emulated, we use reverse-ordering in this case
+		return _underlying_impl::set_single_lane_simd_emulator<4, float>(e0, e1, e2, e3);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 set1_f32x4(float all_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_set1_ps(all_);
+#else
+		return _underlying_impl::set1_single_lane_simd_emulator<4, float>(all_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 load_f32x4(const float* p_to_load_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_load_ps(p_to_load_);
+#else
+		return _underlying_impl::load_single_lane_simd_emulator<4, float>(p_to_load_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 setzero_f32x4()
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_setzero_ps();
+#else
+		return _underlying_impl::set_single_lane_simd_emulator<4, float>();
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 setmasked_f32x4(std::uint8_t bit_mask_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		constexpr std::int32_t element_mask = static_cast<std::int32_t>(0xFFFFFFFF);
 		return _mm_castsi128_ps
 		(
@@ -45,13 +67,20 @@ namespace EmuSIMD::Funcs
 				((bit_mask_ & 0x08) >> 3) * element_mask
 			)
 		);
+#else
+		// TODO
+#endif
 	}
 #pragma endregion
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_f32x4(float* p_out_, f32x4_arg a_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		_mm_store_ps(p_out_, a_);
+#else
+		_underlying_impl::emulate_simd_store(a_, p_out_);
+#endif
 	}
 #pragma endregion
 
@@ -63,17 +92,29 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cast_f32x8_f32x4(f32x8_arg a_)
 	{
+#if EMU_SIMD_USE_256_REGISTERS
 		return _mm256_castps256_ps128(a_);
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<f32x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cast_f32x16_f32x4(f32x16_arg a_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm512_castps512_ps128(a_);
+#else
+		// TODO
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cast_f64x2_f32x4(f64x2_arg a_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_castpd_ps(a_);
+#else
+		return _underlying_impl::emulate_simd_cast_same_width<2, double>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cast_f64x4_f32x4(f64x4_arg a_)
@@ -458,9 +499,33 @@ namespace EmuSIMD::Funcs
 		return _mm_min_ps(a_, b_);
 	}
 
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 horizontal_min_f32x4(EmuSIMD::f32x4_arg a_)
+	{
+		EmuSIMD::f32x4 min = movehl_f32x4(a_, a_);
+		min = min_f32x4(min, a_);
+		min = min_f32x4
+		(
+			permute_f32x4<make_shuffle_mask_32<0, 1, 0, 1>()>(min),
+			min
+		);
+		return permute_f32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(min);
+	}
+
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 max_f32x4(EmuSIMD::f32x4_arg a_, EmuSIMD::f32x4_arg b_)
 	{
 		return _mm_max_ps(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 horizontal_max_f32x4(EmuSIMD::f32x4_arg a_)
+	{
+		EmuSIMD::f32x4 max = movehl_f32x4(a_, a_);
+		max = max_f32x4(max, a_);
+		max = max_f32x4
+		(
+			permute_f32x4<make_shuffle_mask_32<0, 1, 0, 1>()>(max),
+			max
+		);
+		return permute_f32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(max);
 	}
 #pragma endregion
 

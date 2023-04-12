@@ -446,6 +446,27 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region SHUFFLES
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 permute_i32x4(EmuSIMD::i32x4_arg a_)
+	{
+		return _mm_shuffle_epi32(a_, ShuffleMask_);
+	}
+
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 shuffle_i32x4(EmuSIMD::i32x4_arg a_, EmuSIMD::i32x4_arg b_)
+	{
+		return cast_f32x4_i32x4
+		(
+			shuffle_f32x4<ShuffleMask_>
+			(
+				cast_i32x4_f32x4(a_),
+				cast_i32x4_f32x4(b_)
+			)
+		);
+	}
+#pragma endregion
+
 #pragma region BLENDS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 blendv_i32x4(EmuSIMD::i32x4_arg a_, EmuSIMD::i32x4_arg b_, EmuSIMD::i32x4_arg shuffle_mask_vec_)
 	{
@@ -473,30 +494,33 @@ namespace EmuSIMD::Funcs
 		return _mm_min_epi32(a_, b_);
 	}
 
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 horizontal_min_i32x4(EmuSIMD::i32x4_arg a_)
+	{
+		EmuSIMD::i32x4 min = movehl_i32x4(a_, a_);
+		min = min_i32x4(min, a_);
+		min = min_i32x4
+		(
+			permute_i32x4<make_shuffle_mask_32<0, 1, 0, 1>()>(min),
+			min
+		);
+		return permute_i32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(min);
+	}
+
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 max_i32x4(EmuSIMD::i32x4_arg a_, EmuSIMD::i32x4_arg b_)
 	{
 		return _mm_max_epi32(a_, b_);
 	}
-#pragma endregion
 
-#pragma region SHUFFLES
-	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 permute_i32x4(EmuSIMD::i32x4_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 horizontal_max_i32x4(EmuSIMD::i32x4_arg a_)
 	{
-		return _mm_shuffle_epi32(a_, ShuffleMask_);
-	}
-
-	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 shuffle_i32x4(EmuSIMD::i32x4_arg a_, EmuSIMD::i32x4_arg b_)
-	{
-		return cast_f32x4_i32x4
+		EmuSIMD::i32x4 max = movehl_i32x4(a_, a_);
+		max = max_i32x4(max, a_);
+		max = max_i32x4
 		(
-			shuffle_f32x4<ShuffleMask_>
-			(
-				cast_i32x4_f32x4(a_),
-				cast_i32x4_f32x4(b_)
-			)
+			permute_i32x4<make_shuffle_mask_32<0, 1, 0, 1>()>(max),
+			max
 		);
+		return permute_i32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(max);
 	}
 #pragma endregion
 

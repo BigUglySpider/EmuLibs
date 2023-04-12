@@ -9,7 +9,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 	template<bool Assigning_, EmuConcepts::EmuFastMatrix FastMatrix_>
 	[[nodiscard]] constexpr inline decltype(auto) _fast_matrix_floor(FastMatrix_&& matrix_)
 	{
-		return _fast_matrix_mutate<Assigning_>
+		return _fast_matrix_mutate<Assigning_, false>
 		(
 			std::forward<FastMatrix_>(matrix_),
 			[](auto&& register_) { return EmuSIMD::floor(register_); }
@@ -19,7 +19,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 	template<bool Assigning_, EmuConcepts::EmuFastMatrix FastMatrix_>
 	[[nodiscard]] constexpr inline decltype(auto) _fast_matrix_ceil(FastMatrix_&& matrix_)
 	{
-		return _fast_matrix_mutate<Assigning_>
+		return _fast_matrix_mutate<Assigning_, false>
 		(
 			std::forward<FastMatrix_>(matrix_),
 			[](auto&& register_) { return EmuSIMD::ceil(register_); }
@@ -29,7 +29,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 	template<bool Assigning_, EmuConcepts::EmuFastMatrix FastMatrix_>
 	[[nodiscard]] constexpr inline decltype(auto) _fast_matrix_trunc(FastMatrix_&& matrix_)
 	{
-		return _fast_matrix_mutate<Assigning_>
+		return _fast_matrix_mutate<Assigning_, false>
 		(
 			std::forward<FastMatrix_>(matrix_),
 			[](auto&& register_) { return EmuSIMD::trunc(register_); }
@@ -39,7 +39,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 	template<int RoundingFlag_, bool Assigning_, EmuConcepts::EmuFastMatrix FastMatrix_>
 	[[nodiscard]] constexpr inline decltype(auto) _fast_matrix_round(FastMatrix_&& matrix_)
 	{
-		return _fast_matrix_mutate<Assigning_>
+		return _fast_matrix_mutate<Assigning_, false>
 		(
 			std::forward<FastMatrix_>(matrix_),
 			[](auto&& register_) { return EmuSIMD::round<RoundingFlag_>(register_); }

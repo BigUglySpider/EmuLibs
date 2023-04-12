@@ -465,9 +465,25 @@ namespace EmuSIMD::Funcs
 		return _mm256_min_ps(a_, b_);
 	}
 
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 horizontal_min_f32x8(EmuSIMD::f32x8_arg a_)
+	{
+		EmuSIMD::f32x4 min128 = cast_f32x8_f32x4(a_);
+		min128 = min_f32x4(min128, _mm256_extractf128_ps(a_, 1));
+		min128 = horizontal_min_f32x4(min128);
+		return _mm256_insertf128_ps(cast_f32x4_f32x8(min128), min128, 1);
+	}
+
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 max_f32x8(EmuSIMD::f32x8_arg a_, EmuSIMD::f32x8_arg b_)
 	{
 		return _mm256_max_ps(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 horizontal_max_f32x8(EmuSIMD::f32x8_arg a_)
+	{
+		EmuSIMD::f32x4 max128 = cast_f32x8_f32x4(a_);
+		max128 = max_f32x4(max128, _mm256_extractf128_ps(a_, 1));
+		max128 = horizontal_max_f32x4(max128);
+		return _mm256_insertf128_ps(cast_f32x4_f32x8(max128), max128, 1);
 	}
 #pragma endregion
 

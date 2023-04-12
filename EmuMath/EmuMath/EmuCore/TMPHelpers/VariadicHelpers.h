@@ -332,8 +332,8 @@ namespace EmuCore::TMP
 
 	/// <summary>
 	///	<para> Type used to splice two integer sequences into a single one. Indices in the left-hand sequence will all appear first, then those in the right-hand sequence. </para>
-	/// <para> If an argument is not a std::intger_sequence, it will be interpreted as an empty std::integer_sequence of the correct type. </para>
-	/// <para> If both arguments are not a std::intger_sequence, type will be an empty std::integer_sequence of chars. </para>
+	/// <para> If an argument is not a std::integer_sequence, it will be interpreted as an empty std::integer_sequence of the correct type. </para>
+	/// <para> If both arguments are not a std::integer_sequence, type will be an empty std::integer_sequence of chars. </para>
 	/// <para> If both arguments are std::integer_sequences (as they should be), the value_type of the left-hand integer sequence will be used. </para>
 	/// </summary>
 	template<class LhsIntegerSequence_, class RhsIntegerSequence_>
@@ -368,6 +368,106 @@ namespace EmuCore::TMP
 	};
 	template<class Lhs_, class Rhs_>
 	using splice_index_sequences_t = typename splice_integer_sequences<Lhs_, Rhs_>::type;
+
+	/// <summary>
+	/// <para> Type used to slice one integer sequence into two. The first `LeftLength_` indices will be used to make the sequence `left`, and the remainder indices to make the sequence `right`. </para>
+	/// <para> If the argument is not a std::integer_sequence, both left and right will be interpreted as an empty std::integer_sequence of chars. </para>
+	/// </summary>
+	template<std::size_t LeftLength_, class IntegerSequence_>
+	struct slice_integer_sequence
+	{
+	private:
+		[[nodiscard]] static constexpr inline bool _is_int_sequence()
+		{
+			using _sequence_uq = typename std::remove_cvref<IntegerSequence_>::type;
+			return EmuCore::TMP::is_integer_sequence_v<_sequence_uq>;
+		}
+
+		[[nodiscard]] static constexpr inline std::size_t _num_ints()
+		{
+			if constexpr (_is_int_sequence())
+			{
+				using _sequence_uq = typename std::remove_cvref<IntegerSequence_>::type;
+				return _sequence_uq::size();
+			}
+			else
+			{
+				return 0;
+			}
+		}
+
+		static constexpr inline auto _determine_sequence_value_type()
+		{
+			if constexpr (_is_int_sequence())
+			{
+				using _sequence_uq = typename std::remove_cvref<IntegerSequence_>::type;
+				return typename _sequence_uq::value_type();
+			}
+			else
+			{
+				return char();
+			}
+		}
+
+		using _sequence_value_type = decltype(_determine_sequence_value_type());
+		template<_sequence_value_type...InInts_, _sequence_value_type...OutIndices_>
+		static constexpr inline auto _build
+		(
+			std::integer_sequence<_sequence_value_type, InInts_...> in_ints_,
+			std::index_sequence<OutIndices_...> out_index_sequence_
+		)
+		{
+			if constexpr (_is_int_sequence())
+			{
+				constexpr auto index_array = std::array<_sequence_value_type, sizeof...(InInts_)>{ InInts_... };
+				return std::integer_sequence<_sequence_value_type, index_array[OutIndices_]...>();
+			}
+		}
+
+		static constexpr inline auto _make_left()
+		{
+			if constexpr (_is_int_sequence())
+			{
+				if constexpr (LeftLength_ > 0)
+				{
+					constexpr std::size_t num_left = LeftLength_ <= _num_ints() ? LeftLength_ : _num_ints();
+					return _build(IntegerSequence_(), std::make_index_sequence<num_left>());
+				}
+				else
+				{
+					return std::integer_sequence<_sequence_value_type>();
+				}
+			}
+			else
+			{
+				return std::integer_sequence<_sequence_value_type>();
+			}
+		}
+
+		static constexpr inline auto _make_right()
+		{
+			if constexpr (_is_int_sequence())
+			{
+				if constexpr (LeftLength_ < _num_ints())
+				{
+					constexpr std::size_t num_right = _num_ints() - LeftLength_;
+					return _build(IntegerSequence_(), EmuCore::TMP::make_offset_index_sequence<LeftLength_, num_right>());
+				}
+				else
+				{
+					return std::integer_sequence<_sequence_value_type>();
+				}
+			}
+			else
+			{
+				return std::integer_sequence<_sequence_value_type>();
+			}
+		}
+
+	public:
+		using left = decltype(_make_left());
+		using right = decltype(_make_right());
+	};
 
 	/// <summary>
 	/// <para> Type extension of splice_index_sequences which may be used to splice a variadic number of integer sequences. </para>

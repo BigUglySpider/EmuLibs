@@ -1304,7 +1304,11 @@ namespace EmuMath
 
 #pragma region MISC_ARITHMETIC
 	public:
-
+		[[nodiscard]] constexpr inline auto Abs() const
+			->EmuMath::FastMatrix<num_columns, num_rows, value_type, is_column_major, register_width>
+		{
+			return EmuMath::Helpers::fast_matrix_abs(*this);
+		}
 #pragma endregion
 
 		/*

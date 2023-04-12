@@ -356,21 +356,83 @@ constexpr inline decltype(auto) setr_test_helper(Func_&& func_, std::index_seque
 int main()
 {
 	{
+		constexpr std::size_t num_elements = 4;
+		using scalar_type = float;
+		using emulated_f32x4 = EmuSIMD::_underlying_impl::single_lane_simd_emulator<num_elements, scalar_type>;
+		using store_index_sequence = std::make_index_sequence<num_elements>;
+		scalar_type data_dump[num_elements];
+
+		emulated_f32x4 ef32x4_a = EmuSIMD::_underlying_impl::set1_single_lane_simd_emulator<4, float>(25.0f);
+		emulated_f32x4 ef32x4_b = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, float>(1.0f, 2.0f, 3.0f, 4.0f);
+		emulated_f32x4 ef32x4_c = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, float>(1.0f, 0.25f, 0.5f, 0.75f);
+
+		EmuSIMD::_underlying_impl::emulate_simd_store(ef32x4_a, data_dump);
+		PrintIndexable<num_elements>(data_dump);
+		std::cout << '\n';
+
+		EmuSIMD::_underlying_impl::emulate_simd_store(ef32x4_b, data_dump);
+		PrintIndexable<num_elements>(data_dump);
+		std::cout << '\n';
+
+		EmuSIMD::_underlying_impl::emulate_simd_store(ef32x4_c, data_dump);
+		PrintIndexable<num_elements>(data_dump);
+		std::cout << '\n';
+
+		ef32x4_a = EmuSIMD::_underlying_impl::emulate_simd_basic<true>(EmuCore::do_lerp<float>(), ef32x4_a, ef32x4_b, ef32x4_c, store_index_sequence());
+		EmuSIMD::_underlying_impl::emulate_simd_store(ef32x4_a, data_dump);
+		PrintIndexable<num_elements>(data_dump);
+		std::cout << '\n';
+
+		constexpr std::size_t num_16bit_elements = 8;
+		using store16_index_sequence = std::make_index_sequence<16>;
+		std::int16_t int16_dump[num_16bit_elements];
+		auto cast_to_same_width = EmuSIMD::_underlying_impl::emulate_simd_cast_same_width<8, std::int16_t>(ef32x4_a);
+		EmuSIMD::_underlying_impl::emulate_simd_store(cast_to_same_width, int16_dump);
+		PrintIndexable<num_16bit_elements>(int16_dump);
+		std::cout << '\n';
+
+		__m128 float_test = _mm_load_ps(data_dump);
+		__m128i i16_test = EmuSIMD::Funcs::cast_f32x4_i16x8(float_test);
+		EmuSIMD::append_simd_vector_to_stream<16, true>(std::cout, i16_test) << '\n';
+
+		auto cast_to_greater_width = EmuSIMD::_underlying_impl::emulate_simd_cast_greater_width
+		<
+			EmuSIMD::_underlying_impl::dual_lane_simd_emulator<256, emulated_f32x4>
+		>(ef32x4_a);
+		constexpr std::size_t greater_size = 8;
+		scalar_type greater_dump[greater_size];
+		EmuSIMD::_underlying_impl::emulate_simd_store(cast_to_greater_width, greater_dump);
+		PrintIndexable<greater_size>(greater_dump);
+		std::cout << '\n';
+
+		auto cast_to_lesser_width_register = EmuSIMD::_underlying_impl::emulate_simd_cast_lesser_width<__m128>(cast_to_greater_width);
+		EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, cast_to_lesser_width_register) << '\n';
+
+		universal_pause();
+	}
+
+	// TODO: Continue with horizontal min/max (This is part of FastMatrix::Max()'s underlying implementation)
+	// --- Also need to sort out downgrading int conversions (e.g. 32- -> 16-bit)
+	{
+		using simd_type = EmuSIMD::i8x16;
+		constexpr std::size_t width = 8;
+		constexpr bool is_signed = true;
+		simd_type yo = EmuSIMD::setr<simd_type, width>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+		EmuSIMD::append_simd_vector_to_stream<width, is_signed>(std::cout, yo) << "\nMin: ";
+		EmuSIMD::append_simd_vector_to_stream<width, is_signed>(std::cout, EmuSIMD::Funcs::horizontal_min_i8x16(yo)) << "\nMax: ";
+		EmuSIMD::append_simd_vector_to_stream<width, is_signed>(std::cout, EmuSIMD::Funcs::horizontal_max_i8x16(yo)) << "\n";
+		universal_pause();
+	}
+
+	{
 		auto fast_mat_to_round = EmuMath::FastMatrix<4, 4, float, true, 128>(1.2, -2.2, 3.5, 4.0, 5.1, 6.7, 7.0, 8.0, 9, 10, 11.123456789f, 12, 13, 14, 15, 16.2f);
 		auto fast_mat_to_round_64 = EmuMath::FastMatrix<4, 4, double, true, 128>(1.2, -2.2, 3.5, 4.0, 5.1, 6.7, 7.0, 8.0, 9, 10, 11.123456789f, 12, 13, 14, 15, 16.2f);
 
-
 		std::cout << "Initial (f32x4):\n" << fast_mat_to_round << "\n";
-		std::cout << "Initial (f64x2):\n" << fast_mat_to_round_64 << "\n";
-
 		std::cout << "Floored (f32x4):\n" << fast_mat_to_round.Floor() << "\n";
-		std::cout << "Floored (f64x2):\n" << fast_mat_to_round_64.Floor() << "\n";
-
 		std::cout << "Ceiled (f32x4):\n" << fast_mat_to_round.Ceil() << "\n";
-		std::cout << "Ceiled (f64x2):\n" << fast_mat_to_round_64.Ceil() << "\n";
-
 		std::cout << "Trunced (f32x4):\n" << fast_mat_to_round.Trunc() << "\n";
-		std::cout << "Trunced (f64x2):\n" << fast_mat_to_round_64.Trunc() << "\n";
+		std::cout << "Abs (f32x4):\n" << fast_mat_to_round.Abs() << "\n";
 		universal_pause();
 	}
 

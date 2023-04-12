@@ -6,6 +6,7 @@
 #include "_fast_matrix_identity.h"
 #include "_fast_matrix_inverse_and_related.h"
 #include "_fast_matrix_load.h"
+#include "_fast_matrix_misc_arithmetic.h"
 #include "_fast_matrix_rotation_3d.h"
 #include "_fast_matrix_rounds.h"
 #include "_fast_matrix_scale.h"

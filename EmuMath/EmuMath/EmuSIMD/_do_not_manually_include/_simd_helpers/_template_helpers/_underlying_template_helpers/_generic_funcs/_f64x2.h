@@ -457,9 +457,19 @@ namespace EmuSIMD::Funcs
 		return _mm_min_pd(a_, b_);
 	}
 
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 horizontal_min_f64x2(EmuSIMD::f64x2_arg a_)
+	{
+		return min_f64x2(a_, permute_f64x2<make_shuffle_mask_64x2<0, 1>()>(a_));
+	}
+
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 max_f64x2(EmuSIMD::f64x2_arg a_, EmuSIMD::f64x2_arg b_)
 	{
 		return _mm_max_pd(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 horizontal_max_f64x2(EmuSIMD::f64x2_arg a_)
+	{
+		return max_f64x2(a_, permute_f64x2<make_shuffle_mask_64x2<0, 1>()>(a_));
 	}
 #pragma endregion
 
