@@ -1302,11 +1302,13 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region MISC_ARITHMETIC
+	public:
+
+#pragma endregion
+
 		/*
 		* TODO:
-		*	- Floor()
-		*	- Ceil()
-		*	- Trunc()
 		*	- Abs()
 		*	- Min()
 		*	- Min(b)

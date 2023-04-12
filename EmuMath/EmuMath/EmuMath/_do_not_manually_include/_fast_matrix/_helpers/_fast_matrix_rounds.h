@@ -10,39 +10,28 @@ namespace EmuMath::Helpers
 	[[nodiscard]] constexpr inline auto fast_matrix_floor(FastMatrix_&& fast_matrix_)
 		-> typename std::remove_cvref<FastMatrix_>::type
 	{
-		using index_sequences = EmuMath::TMP::fast_matrix_full_register_sequences<FastMatrix_>;
-		return _fast_matrix_underlying::_fast_matrix_floor<false>
-		(
-			std::forward<FastMatrix_>(fast_matrix_),
-			typename index_sequences::major_index_sequence(),
-			typename index_sequences::register_index_sequence()
-		);
+		return _fast_matrix_underlying::_fast_matrix_floor<false>(std::forward<FastMatrix_>(fast_matrix_));
 	}
 	
 	template<EmuConcepts::EmuFastMatrix FastMatrix_>
 	[[nodiscard]] constexpr inline auto fast_matrix_ceil(FastMatrix_&& fast_matrix_)
 		-> typename std::remove_cvref<FastMatrix_>::type
 	{
-		using index_sequences = EmuMath::TMP::fast_matrix_full_register_sequences<FastMatrix_>;
-		return _fast_matrix_underlying::_fast_matrix_ceil<false>
-		(
-			std::forward<FastMatrix_>(fast_matrix_),
-			typename index_sequences::major_index_sequence(),
-			typename index_sequences::register_index_sequence()
-		);
+		return _fast_matrix_underlying::_fast_matrix_ceil<false>(std::forward<FastMatrix_>(fast_matrix_));
 	}
 	
 	template<EmuConcepts::EmuFastMatrix FastMatrix_>
 	[[nodiscard]] constexpr inline auto fast_matrix_trunc(FastMatrix_&& fast_matrix_)
 		-> typename std::remove_cvref<FastMatrix_>::type
 	{
-		using index_sequences = EmuMath::TMP::fast_matrix_full_register_sequences<FastMatrix_>;
-		return _fast_matrix_underlying::_fast_matrix_trunc<false>
-		(
-			std::forward<FastMatrix_>(fast_matrix_),
-			typename index_sequences::major_index_sequence(),
-			typename index_sequences::register_index_sequence()
-		);
+		return _fast_matrix_underlying::_fast_matrix_trunc<false>(std::forward<FastMatrix_>(fast_matrix_));
+	}
+	
+	template<int RoundingFlag_, EmuConcepts::EmuFastMatrix FastMatrix_>
+	[[nodiscard]] constexpr inline auto fast_matrix_round(FastMatrix_&& fast_matrix_)
+		-> typename std::remove_cvref<FastMatrix_>::type
+	{
+		return _fast_matrix_underlying::_fast_matrix_round<RoundingFlag_, false>(std::forward<FastMatrix_>(fast_matrix_));
 	}
 #pragma endregion
 
@@ -50,37 +39,25 @@ namespace EmuMath::Helpers
 	template<EmuConcepts::EmuFastMatrix FastMatrix_>
 	[[nodiscard]] constexpr inline void fast_matrix_floor_assign(FastMatrix_&& fast_matrix_)
 	{
-		using index_sequences = EmuMath::TMP::fast_matrix_full_register_sequences<FastMatrix_>;
-		_fast_matrix_underlying::_fast_matrix_floor<true>
-		(
-			std::forward<FastMatrix_>(fast_matrix_),
-			typename index_sequences::major_index_sequence(),
-			typename index_sequences::register_index_sequence()
-		);
+		_fast_matrix_underlying::_fast_matrix_floor<true>(std::forward<FastMatrix_>(fast_matrix_));
 	}
-	
+
 	template<EmuConcepts::EmuFastMatrix FastMatrix_>
 	[[nodiscard]] constexpr inline void fast_matrix_ceil_assign(FastMatrix_&& fast_matrix_)
 	{
-		using index_sequences = EmuMath::TMP::fast_matrix_full_register_sequences<FastMatrix_>;
-		_fast_matrix_underlying::_fast_matrix_ceil<true>
-		(
-			std::forward<FastMatrix_>(fast_matrix_),
-			typename index_sequences::major_index_sequence(),
-			typename index_sequences::register_index_sequence()
-		);
+		_fast_matrix_underlying::_fast_matrix_ceil<true>(std::forward<FastMatrix_>(fast_matrix_));
 	}
-	
+
 	template<EmuConcepts::EmuFastMatrix FastMatrix_>
 	[[nodiscard]] constexpr inline void fast_matrix_trunc_assign(FastMatrix_&& fast_matrix_)
 	{
-		using index_sequences = EmuMath::TMP::fast_matrix_full_register_sequences<FastMatrix_>;
-		_fast_matrix_underlying::_fast_matrix_trunc<true>
-		(
-			std::forward<FastMatrix_>(fast_matrix_),
-			typename index_sequences::major_index_sequence(),
-			typename index_sequences::register_index_sequence()
-		);
+		_fast_matrix_underlying::_fast_matrix_trunc<true>(std::forward<FastMatrix_>(fast_matrix_));
+	}
+
+	template<int RoundingFlag_, EmuConcepts::EmuFastMatrix FastMatrix_>
+	[[nodiscard]] constexpr inline void fast_matrix_round_assign(FastMatrix_&& fast_matrix_)
+	{
+		_fast_matrix_underlying::_fast_matrix_round<RoundingFlag_, true>(std::forward<FastMatrix_>(fast_matrix_));
 	}
 #pragma endregion
 }
