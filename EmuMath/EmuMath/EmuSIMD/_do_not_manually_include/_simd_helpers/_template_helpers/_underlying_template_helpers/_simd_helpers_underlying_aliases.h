@@ -10,30 +10,62 @@
 
 // Should make these defines actually determined based on architecture/compiler rather than hard-coded
 
+/// <summary>
+/// <para> Preprocessor flag indicating if EmuSIMD uses 128-bit SIMD registers. If this is false, 128-bit registers are emulated. </para>
+/// <para> When emulating, 128-bit registers will be emulated as a collection of scalars of the matching type. </para>
+/// </summary>
 #define EMU_SIMD_USE_128_REGISTERS true
+/// <summary>
+/// <para> Preprocessor flag indicating if EmuSIMD uses 256-bit SIMD registers. If this is false, 256-bit registers are emulated. </para>
+/// <para> If this is true, `EMU_SIMD_USE_128_REGISTERS` will also be true. </para>
+/// <para> When emulating, 256-bit registers will be emulated as two 128-bit registers (this will also work when 128-bit registers are emulated). </para>
+/// </summary>
 #define EMU_SIMD_USE_256_REGISTERS true
-#define EMU_SIMD_USE_512_REGISTERS false
+/// <summary>
+/// <para> Preprocessor flag indicating if EmuSIMD uses 512-bit SIMD registers. If this is false, 512-bit registers are emulated. </para>
+/// <para> If this is true, `EMU_SIMD_USE_256_REGISTERS` and `EMU_SIMD_USE_128_REGISTERS` will also be true. </para>
+/// <para> When emulating, 512-bit registers will be emulated as two 256-bit registers (this will also work when 256-bit registers are emulated). </para>
+/// </summary>
+#define EMU_SIMD_USE_512_REGISTERS true
 #define EMU_SIMD_USES_ANY_SIMD_REGISTERS EMU_SIMD_USE_128_REGISTERS || EMU_SIMD_USE_256_REGISTERS || EMU_SIMD_USE_512_REGISTERS
 
+/// <summary>
+/// <para> Boolean preprocessor flag indicating if 128-bit registers use reference arguments. </para>
+/// <para> This affects the`_arg` variants of all 128-bit register aliases. </para>
+/// </summary>
 #define EMU_SIMD_128_ARG_REFS !EMU_SIMD_USE_128_REGISTERS
+/// <summary>
+/// <para> Boolean preprocessor flag indicating if 256-bit registers use reference arguments. </para>
+/// <para> This affects the`_arg` variants of all 256-bit register aliases. </para>
+/// </summary>
 #define EMU_SIMD_256_ARG_REFS !EMU_SIMD_USE_256_REGISTERS
-#define EMU_SIMD_512_ARG_REFS !EMU_SIMD_USE_512_REGISTERS
+/// <summary>
+/// <para> Boolean preprocessor flag indicating if 512-bit registers use reference arguments. </para>
+/// <para> This affects the`_arg` variants of all 512-bit register aliases. </para>
+/// </summary>
+#define EMU_SIMD_512_ARG_REFS EMU_SIMD_USE_512_REGISTERS
 
 #if EMU_SIMD_128_ARG_REFS
+/// <summary> Helper macro for creating the 128-bit register arg types. `basic_type` is the base register alias (e.g. for `f32x4_arg`, `basic_type` is `f32x4`). </summary>
 #define EMU_SIMD_128_MAKE_ARG_TYPE(basic_type) const basic_type&
 #else
+/// <summary> Helper macro for creating the 128-bit register arg types. `basic_type` is the base register alias (e.g. for `f32x4_arg`, `basic_type` is `f32x4`). </summary>
 #define EMU_SIMD_128_MAKE_ARG_TYPE(basic_type) basic_type
 #endif
 
 #if EMU_SIMD_256_ARG_REFS
+/// <summary> Helper macro for creating the 256-bit register arg types. `basic_type` is the base register alias (e.g. for `f32x8_arg`, `basic_type` is `f32x8`). </summary>
 #define EMU_SIMD_256_MAKE_ARG_TYPE(basic_type) const basic_type&
 #else
+/// <summary> Helper macro for creating the 256-bit register arg types. `basic_type` is the base register alias (e.g. for `f32x8_arg`, `basic_type` is `f32x8`). </summary>
 #define EMU_SIMD_256_MAKE_ARG_TYPE(basic_type) basic_type
 #endif
 
 #if EMU_SIMD_512_ARG_REFS
+/// <summary> Helper macro for creating the 512-bit register arg types. `basic_type` is the base register alias (e.g. for `f32x16_arg`, `basic_type` is `f32x16`). </summary>
 #define EMU_SIMD_512_MAKE_ARG_TYPE(basic_type) const basic_type&
 #else
+/// <summary> Helper macro for creating the 512-bit register arg types. `basic_type` is the base register alias (e.g. for `f32x16_arg`, `basic_type` is `f32x16`). </summary>
 #define EMU_SIMD_512_MAKE_ARG_TYPE(basic_type) basic_type
 #endif
 
@@ -387,18 +419,21 @@ namespace EmuSIMD
 		template<class Out_, std::size_t InElements_, EmuConcepts::Arithmetic InT_>
 		[[nodiscard]] constexpr inline Out_ emulate_simd_cast_greater_width(const single_lane_simd_emulator<InElements_, InT_>& in_)
 		{
+			constexpr std::size_t copy_bytes = 128 / 8;
 			if constexpr (is_simd_emulator<Out_>::value)
 			{
-				constexpr std::size_t copy_bytes = sizeof(single_lane_simd_emulator<InElements_, InT_>);
+				// 128-bit emulator -> 256-bit or 512-bit emulator
+				// Guaranteed to be emulators all the way up as the lowest-width register is being emulated (due to single_lane_simd_emulator being in use)
+				// --- As such, we know we can safely use `_lane_X` and `_data` syntax
 				Out_ out_emulator = Out_();
 				if constexpr (Out_::emulated_width == 256)
 				{
-					memcpy(&out_emulator._lane_0, &in_, copy_bytes);
+					memcpy(out_emulator._lane_0._data.data(), in_._data.data(), copy_bytes);
 					return out_emulator;
 				}
 				else if constexpr(Out_::emulated_width == 512)
 				{
-					memcpy(&out_emulator._lane_0._lane_0, &in_, copy_bytes);
+					memcpy(out_emulator._lane_0._lane_0._data.data(), in_._data.data(), copy_bytes);
 					return out_emulator;
 				}
 				else
@@ -408,76 +443,194 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(EmuCore::TMP::get_false<Out_>(), "EMUSIMD NOT IMPLEMENTED ERROR: Cannot perform a cast from an emulated SIMD register to a non-emulated SIMD register of a greater width.");
+				// 128-bit emulator -> 256-bit or 512-bit register
+				// --- Just copy the emulated register's 128-bits to the lo end of the output register and return that
+				Out_ out_register = Out_();
+				memcpy(&out_register, in_._data.data(), copy_bytes);
+				return out_register;
+			}
+		}
+
+		template<class Out_, std::size_t EmulatedWidth_, typename LaneT_>
+		[[nodiscard]] constexpr inline Out_ emulate_simd_cast_greater_width(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& in_)
+		{
+			// Guaranteed 256-bit -> 512-bit as possible values are 128, 256, 512, and 128-bit is guaranteed to never be `dual_lane_simd_emulator`
+			constexpr std::size_t bytes_per_128_chunk = 128 / 8;
+			using _lane_type = typename std::remove_cvref<decltype(in_._lane_0)>::type;
+
+			if constexpr (is_simd_emulator<Out_>::value)
+			{
+				// 256-bit emulator -> 512-bit emulator
+				Out_ out_emulator = Out_();
+				if constexpr (is_simd_emulator<_lane_type>::value)
+				{
+					// Emulators all the way down, so copy to-and-from the data chunks specifically
+					memcpy(out_emulator._lane_0._lane_0._data.data(), in_._lane_0._data.data(), bytes_per_128_chunk);
+					memcpy(out_emulator._lane_0._lane_1._data.data(), in_._lane_1._data.data(), bytes_per_128_chunk);
+				}
+				else
+				{
+					// 128-bit chunks are actual registers
+					memcpy(&(out_emulator._lane_0._lane_0), &(in_._lane_0), bytes_per_128_chunk);
+					memcpy(&(out_emulator._lane_0._lane_1), &(in_._lane_1), bytes_per_128_chunk);
+				}
+				return out_emulator;
+			}
+			else
+			{
+				// 256-bit emulator -> 512-bit register
+				// --- Just copy the emulated register's 256-bits to the lo end of the output register and return that
+				Out_ out_register = Out_();
+				if constexpr (is_simd_emulator<_lane_type>::value)
+				{
+					// 128-bit lanes are emulated, so copy the data chunks of the emulator to the register
+					memcpy(&out_register, in_._lane_0._data.data(), bytes_per_128_chunk);
+					memcpy(reinterpret_cast<std::byte*>(&out_register) + bytes_per_128_chunk, in_._lane_1._data.data(), bytes_per_128_chunk);
+				}
+				else
+				{
+					// 128-bit lanes are actual registers, so copy 128 bits them directly
+					memcpy(&out_register, &(in_._lane_0), bytes_per_128_chunk);
+					memcpy(reinterpret_cast<std::byte*>(&out_register) + bytes_per_128_chunk, &(in_._lane_1), bytes_per_128_chunk);
+				}
+				return out_register;
 			}
 		}
 
 		template<class Out_, std::size_t EmulatedWidth_, class LaneT_>
 		[[nodiscard]] constexpr inline Out_ emulate_simd_cast_lesser_width(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& in_)
 		{
-			if constexpr (is_simd_emulator<Out_>::value)
+			// We will always need lane_0 and will analyse its type on every path, so may as well prepare it here
+			auto& lane_0 = in_._lane_0;
+			using _lane_type = typename std::remove_cvref<decltype(lane_0)>::type;
+
+			if constexpr (EmulatedWidth_ == 256)
 			{
-				Out_ out_emulator = Out_();
-				if constexpr (EmulatedWidth_ == 256)
+				// Guaranteed casting 256-bit -> 128-bit
+				if constexpr (std::is_same_v<Out_, _lane_type>)
 				{
-					// Guaranteed casting down to single_lane_simd_emulator
-					constexpr std::size_t bytes_to_copy = 128 / 8;
-					memcpy(out_emulator._data.data(), in_._lane_0._data.data(), bytes_to_copy);
+					// Output is the same as a lane within the emulator, so just return a copy of the lo lane
+					return Out_(lane_0);
 				}
 				else
 				{
-					if constexpr (is_single_lane_simd_emulator<Out_>)
+					// Need to copy the bytes to the new type to safely "reinterpret" (due to type aliasing rules)
+					constexpr std::size_t bytes_to_copy = 128 / 8;
+					Out_ cast_result = Out_();
+					if constexpr (is_simd_emulator<Out_>::value)
 					{
-						// 512-bit -> 128-bit
-						constexpr std::size_t bytes_to_copy = 128 / 8;
-						memcpy(out_emulator._data.data(), in_._lane_0._lane_0._data.data(), bytes_to_copy);
+						// Casting to 128-bit emulator
+						memcpy(&cast_result._data.data(), lane_0._data.data(), bytes_to_copy);
 					}
 					else
 					{
-						// 512-bit -> 256-bit
-						constexpr std::size_t bytes_to_copy = 256 / 8;
-						memcpy(&out_emulator._lane_0, &in_._lane_0, bytes_to_copy);
+						// Casting to 128-bit register
+						memcpy(&cast_result, lane_0._data.data(), bytes_to_copy);
 					}
+					return cast_result;
 				}
-				return out_emulator;
 			}
 			else
 			{
-				// Casting down to supported SIMD register
-				// --- Ultimately this is slower than just a basic cast which would be possible, but it cannot be written generically as things stand
-				Out_ out_register = Out_();
-				if constexpr (EmulatedWidth_ == 256)
+				// 512-bit -> either 256-bit or 128-bit, need to test more
+				if constexpr (std::is_same_v<Out_, _lane_type>)
 				{
-					// Guaranteed casting down to 128-bit register
-					constexpr std::size_t bytes_to_copy = 128 / 8;
-					memcpy(&out_register, in_._lane_0._data.data(), bytes_to_copy);
+					// Output is the same as a lane within the emulator, so just return a copy of the lo lane
+					return Out_(lane_0);
 				}
 				else
 				{
-					if constexpr (sizeof(Out_) >= 32)
+					if constexpr (is_simd_emulator<Out_>::value)
 					{
-						// 512-bit emulator -> 256-bit output register
-						constexpr std::size_t bytes_to_copy = 256 / 8;
-						memcpy(&out_register, &in_._lane_0, bytes_to_copy);
-					}
-					else
-					{
-						// 512-bit emulator -> 128-bit output register
-						constexpr std::size_t bytes_to_copy = 128 / 8;
-						const auto& lane_0_256 = in_._lane_0;
-						if constexpr (is_simd_emulator<decltype(lane_0_256)>::value)
+						// 512-bit -> 256-bit or 128-bit emulator
+						if constexpr (is_single_lane_simd_emulator<Out_>::value)
 						{
-							// 256-bit emulator -> 128 bit output register
-							memcpy(&out_register, &lane_0_256._lane_0);
+							// 512-bit -> 128-bit emulator
+							// --- As output is an emulator, guaranteed we only have emulators until the end due to the guarnateed hierarchy
+							auto& lane_0_lo = lane_0._lane_0;
+							using _lane_lo_type = typename std::remove_cvref<decltype(lane_0_lo)>::type;
+							if constexpr (std::is_same_v<Out_, _lane_lo_type>)
+							{
+								// Result is same type as the lo 128-bit lane of the lo 256-bit lane, so just return a direct copy
+								return Out_(lane_0_lo);
+							}
+							else
+							{
+								// Need to copy the bytes to the new type to safely "reinterpret" (due to type aliasing rules)
+								constexpr std::size_t bytes_to_copy = 128 / 8;
+								Out_ cast_result = Out_();
+								memcpy(cast_result._data.data(), lane_0_lo._data.data(), bytes_to_copy);
+								return cast_result;
+							}
 						}
 						else
 						{
-							// 256-bit register -> 128-bit output register
-							memcpy(&out_register, &lane_0_256, bytes_to_copy);
+							// 512-bit -> 256-bit emulator, copying individual 128-bit lanes
+							// --- Need to determine if a 128-bit lane is emulated in the output
+							constexpr std::size_t bytes_to_copy_per_lane = 128 / 8;
+							using _out_lo_lane_type = typename std::remove_cvref<decltype(std::declval<Out_>()._lane_0)>::type;
+							Out_ cast_result = Out_();
+							if constexpr (is_simd_emulator<_out_lo_lane_type>::value)
+							{
+								// Outputting a 256-bit lane as two 128-bit emulated lanes
+								memcpy(cast_result._lane_0._data.data(), lane_0._lane_0._data.data(), bytes_to_copy_per_lane);
+								memcpy(cast_result._lane_1._data.data(), lane_0._lane_1._data.data(), bytes_to_copy_per_lane);
+							}
+							else
+							{
+								// Outputting a 256-bit lane as two 128-bit register lanes
+								memcpy(&(cast_result._lane_0), &(lane_0._lane_0), bytes_to_copy_per_lane);
+								memcpy(&(cast_result._lane_1), &(lane_0._lane_1), bytes_to_copy_per_lane);
+							}
+							return cast_result;
+						}
+					}
+					else
+					{
+						// 512-bit -> 256-bit or 128-bit register
+						constexpr std::size_t min_bytes_for_256bit = 256 / 8;
+						if constexpr (sizeof(Out_) < min_bytes_for_256bit)
+						{
+							// 512-bit -> 128-bit register
+							if constexpr (is_simd_emulator<_lane_type>::value)
+							{
+								// lane_0 is an emulated 256-bit register, so we're outputting its lo lane
+								auto& lane_0_lo = lane_0._lane_0;
+								using _lane_lo_type = typename std::remove_cvref<decltype(lane_0_lo)>::type;
+								if constexpr (std::is_same_v<_lane_lo_type, Out_>)
+								{
+									// lane_0's lo lane is the same as the output register, so just output a copy of that
+									return Out_(lane_0_lo);
+								}
+								else
+								{
+									// lane_0's lo lane is a different type to the output
+									constexpr std::size_t bytes_to_copy = 128 / 8;
+									Out_ cast_result = Out_();
+									memcpy(&cast_result, &lane_0_lo, bytes_to_copy);
+									return cast_result;
+								}
+							}
+							else
+							{
+								// lane_0 is a 256-bit register so we can't work with emulated lanes
+								// --- This can be optimised but not presently due to EmuSIMD structure, unless we want to make this function a *lot* larger
+								constexpr std::size_t bytes_to_copy = 128 / 8;
+								Out_ cast_result = Out_();
+								memcpy(&cast_result, lane_0, bytes_to_copy);
+								return cast_result;
+							}
+						}
+						else
+						{
+							// 512-bit -> 256-bit register
+							constexpr std::size_t bytes_to_copy = 256 / 8;
+							Out_ cast_result = Out_();
+							memcpy(&cast_result, &lane_0, bytes_to_copy);
+							return cast_result;
 						}
 					}
 				}
-				return out_register;
 			}
 		}
 #pragma endregion
@@ -500,7 +653,7 @@ namespace EmuSIMD
 	using f32x8 = _underlying_impl::dual_lane_simd_emulator<256, f32x4>;
 #endif
 
-#if !EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
 	/// <summary> Alias to a 512-bit register of 16 32-bit floating-point values. </summary>
 	using f32x16 = __m512;
 #else
@@ -524,7 +677,7 @@ namespace EmuSIMD
 	using f64x4 = _underlying_impl::dual_lane_simd_emulator<256, f64x2>;
 #endif
 
-#if !EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
 	/// <summary> Alias to a 512-bit register of 8 64-bit floating-point values. </summary>
 	using f64x8 = __m512d;
 #else
@@ -548,7 +701,7 @@ namespace EmuSIMD
 	using i8x32 = _underlying_impl::dual_lane_simd_emulator<256, i8x16>;
 #endif
 
-#if !EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
 	/// <summary> Alias to a 512-bit register of 64 8-bit signed integer values. This may be a generic 512-bit integral register, such as if using x86 intrinsics. </summary>
 	using i8x64 = __m512i;
 #else
@@ -572,7 +725,7 @@ namespace EmuSIMD
 	using i16x16 = _underlying_impl::dual_lane_simd_emulator<256, i16x8>;
 #endif
 
-#if !EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
 	/// <summary> Alias to a 512-bit register of 32 16-bit signed integer values. This may be a generic 512-bit integral register, such as if using x86 intrinsics. </summary>
 	using i16x32 = __m512i;
 #else
@@ -596,7 +749,7 @@ namespace EmuSIMD
 	using i32x8 = _underlying_impl::dual_lane_simd_emulator<256, i32x4>;
 #endif
 
-#if !EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
 	/// <summary> Alias to a 512-bit register of 16 32-bit signed integer values. This may be a generic 512-bit integral register, such as if using x86 intrinsics. </summary>
 	using i32x16 = __m512i;
 #else
@@ -620,7 +773,7 @@ namespace EmuSIMD
 	using i64x4 = _underlying_impl::dual_lane_simd_emulator<256, i64x2>;
 #endif
 
-#if !EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
 	/// <summary> Alias to a 512-bit register of 8 64-bit signed integer values. This may be a generic 512-bit integral register, such as if using x86 intrinsics. </summary>
 	using i64x8 = __m512i;
 #else
@@ -644,7 +797,7 @@ namespace EmuSIMD
 	using u8x32 = _underlying_impl::dual_lane_simd_emulator<256, u8x16>;
 #endif
 
-#if !EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
 	/// <summary> Alias to a 512-bit register of 64 8-bit unsigned integer values. This may be a generic 512-bit integral register, such as if using x86 intrinsics. </summary>
 	using u8x64 = __m512i;
 #else
@@ -668,7 +821,7 @@ namespace EmuSIMD
 	using u16x16 = _underlying_impl::dual_lane_simd_emulator<256, u16x8>;
 #endif
 
-#if !EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
 	/// <summary> Alias to a 512-bit register of 32 16-bit unsigned integer values. This may be a generic 512-bit integral register, such as if using x86 intrinsics. </summary>
 	using u16x32 = __m512i;
 #else
@@ -692,7 +845,7 @@ namespace EmuSIMD
 	using u32x8 = _underlying_impl::dual_lane_simd_emulator<256, u32x4>;
 #endif
 
-#if !EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
 	/// <summary> Alias to a 512-bit register of 16 32-bit unsigned integer values. This may be a generic 512-bit integral register, such as if using x86 intrinsics. </summary>
 	using u32x16 = __m512i;
 #else
@@ -716,7 +869,7 @@ namespace EmuSIMD
 	using u64x4 = _underlying_impl::dual_lane_simd_emulator<256, u64x2>;
 #endif
 
-#if !EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
 	/// <summary> Alias to a 512-bit register of 8 64-bit unsigned integer values. This may be a generic 512-bit integral register, such as if using x86 intrinsics. </summary>
 	using u64x8 = __m512i;
 #else
@@ -741,7 +894,7 @@ namespace EmuSIMD
 #endif
 
 	/// <summary> Alias to a generic 512-bit integral register, which is per-element-width-and-signedness-agnostic. If there is no generic register, this will be `void`. </summary>
-#if !EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE
+#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE
 	using i512_generic = __m512i;
 #else
 	/// <summary> Alias to a generic 512-bit integral register, which is per-element-width-and-signedness-agnostic. If there is no generic register, this will be `void`. </summary>
