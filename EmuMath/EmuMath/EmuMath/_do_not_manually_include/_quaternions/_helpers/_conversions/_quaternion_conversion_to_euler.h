@@ -110,28 +110,28 @@ namespace EmuMath::Helpers
 	/// <returns>3D EmuMath Vector of Euler angles X, Y, Z represented by the passed Quaternion.</returns>
 	template<bool OutRads_, typename OutT_, typename Epsilon_, typename T_>
 	[[nodiscard]] constexpr inline auto quaternion_to_euler(const EmuMath::Quaternion<T_>& quaternion_, Epsilon_&& epsilon_)
-		-> std::enable_if_t<quaternion_can_convert_to_euler<OutRads_, OutT_, T_, Epsilon_, false>(), EmuMath::Vector<3, OutT_>>
+		-> std::enable_if_t<EmuMath::Helpers::quaternion_can_convert_to_euler<OutRads_, OutT_, T_, Epsilon_, false>(), EmuMath::Vector<3, OutT_>>
 	{
 		return _quaternion_underlying::_convert_to_euler_vector<false, OutT_, false, OutRads_>(quaternion_, std::forward<Epsilon_>(epsilon_));
 	}
 
 	template<bool OutRads_, typename OutT_, typename T_>
 	[[nodiscard]] constexpr inline auto quaternion_to_euler(const EmuMath::Quaternion<T_>& quaternion_)
-		-> std::enable_if_t<quaternion_can_convert_to_euler<OutRads_, OutT_, T_, false>(), EmuMath::Vector<3, OutT_>>
+		-> std::enable_if_t<EmuMath::Helpers::quaternion_can_convert_to_euler<OutRads_, OutT_, T_, false>(), EmuMath::Vector<3, OutT_>>
 	{
 		return _quaternion_underlying::_convert_to_euler_vector<false, OutT_, false, OutRads_>(quaternion_);
 	}
 
 	template<typename OutT_, typename Epsilon_, typename T_>
 	[[nodiscard]] constexpr inline auto quaternion_to_euler(const EmuMath::Quaternion<T_>& quaternion_, Epsilon_&& epsilon_)
-		-> std::enable_if_t<quaternion_can_convert_to_euler<true, OutT_, T_, Epsilon_, false>(), EmuMath::Vector<3, OutT_>>
+		-> std::enable_if_t<EmuMath::Helpers::quaternion_can_convert_to_euler<true, OutT_, T_, Epsilon_, false>(), EmuMath::Vector<3, OutT_>>
 	{
 		return _quaternion_underlying::_convert_to_euler_vector<false, OutT_, false, true>(quaternion_, std::forward<Epsilon_>(epsilon_));
 	}
 
 	template<typename OutT_, typename T_>
 	[[nodiscard]] constexpr inline auto quaternion_to_euler(const EmuMath::Quaternion<T_>& quaternion_)
-		-> std::enable_if_t<quaternion_can_convert_to_euler<true, OutT_, T_, false>(), EmuMath::Vector<3, OutT_>>
+		-> std::enable_if_t<EmuMath::Helpers::quaternion_can_convert_to_euler<true, OutT_, T_, false>(), EmuMath::Vector<3, OutT_>>
 	{
 		return _quaternion_underlying::_convert_to_euler_vector<false, OutT_, false, true>(quaternion_);
 	}

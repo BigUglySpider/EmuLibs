@@ -408,6 +408,17 @@ int main()
 		auto cast_to_lesser_width_register = EmuSIMD::_underlying_impl::emulate_simd_cast_lesser_width<__m128>(cast_to_greater_width);
 		EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, cast_to_lesser_width_register) << '\n';
 
+		constexpr std::int8_t setmask = 0b1010;
+		float setmask_dump[4];
+		__m128 setmask_test_reg = EmuSIMD::Funcs::setmasked_f32x4(setmask);
+		auto setmask_test_emu = EmuSIMD::_underlying_impl::setmasked_single_lane_simd_emulator<4, float>(setmask);
+		EmuSIMD::store(setmask_test_reg, setmask_dump);
+		PrintIndexable<4>(setmask_dump);
+		std::cout << '\n';
+		EmuSIMD::_underlying_impl::emulate_simd_store(setmask_test_emu, setmask_dump);
+		PrintIndexable<4>(setmask_dump);
+		std::cout << '\n';
+
 		universal_pause();
 	}
 

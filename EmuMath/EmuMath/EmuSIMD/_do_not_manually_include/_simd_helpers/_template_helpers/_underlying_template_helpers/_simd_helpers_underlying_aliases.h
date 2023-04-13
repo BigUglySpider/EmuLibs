@@ -3,6 +3,7 @@
 
 #include "../../../../../EmuCore/CommonConcepts/Arithmetic.h"
 #include "../../../../../EmuCore/CommonPreprocessor/Compiler.h"
+#include "../../../../../EmuCore/TMPHelpers/Tuples.h"
 #include "../../../../../EmuCore/TMPHelpers/TypeComparators.h"
 
 #include <array>
@@ -132,6 +133,10 @@ namespace EmuSIMD
 		template<std::size_t NumElements_, EmuConcepts::Arithmetic T_>
 		struct single_lane_simd_emulator
 		{
+		public:
+			static constexpr std::size_t _num_elements = NumElements_;
+			using _value_type = T_;
+
 		private:
 			template<std::size_t Index_>
 			[[nodiscard]] static constexpr inline const T_& _get_set1_arg(const T_& arg_) noexcept
@@ -281,16 +286,155 @@ namespace EmuSIMD
 			return single_lane_simd_emulator<NumElements_, T_>();
 		}
 
+		template<std::size_t EmulatedWidth_, class LaneT_>
+		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> set_dual_lane_simd_emulator() noexcept
+		{
+			return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>();
+		}
+
 		template<std::size_t NumElements_, EmuConcepts::Arithmetic T_, EmuConcepts::Arithmetic...Args_>
 		constexpr inline single_lane_simd_emulator<NumElements_, T_> set_single_lane_simd_emulator(Args_&&...args_) noexcept
 		{
 			return single_lane_simd_emulator<NumElements_, T_>(std::forward<Args_>(args_)...);
 		}
 
+		template<class OutSingleLaneEmulator_, std::size_t Offset_, EmuConcepts::Arithmetic...Args_, std::size_t...ElementIndices_>
+		constexpr inline OutSingleLaneEmulator_ set_single_lane_simd_emulator_with_offset_tuple(std::tuple<Args_...> args_tuple_, std::index_sequence<ElementIndices_...> element_indices_)
+		{
+			using _out_t = typename OutSingleLaneEmulator_::_value_type;
+			return OutSingleLaneEmulator_
+			(
+				static_cast<_out_t>
+				(
+					EmuCore::TMP::forward_tuple_index<Offset_ + ElementIndices_>(args_tuple_)
+				)...
+			);
+		}
+
+		template<std::size_t EmulatedWidth_, class LaneT_, std::size_t Offset_, std::size_t Layer_, EmuConcepts::Arithmetic...Args_, std::size_t...LaneIndices_>
+		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> set_dual_lane_simd_emulator_with_offset_tuple(std::tuple<Args_...>& args_tuple_, std::index_sequence<LaneIndices_...> lane_indices_)
+		{
+			constexpr std::size_t num_args = sizeof...(Args_);
+			if constexpr (is_dual_lane_simd_emulator<LaneT_>::value)
+			{
+				constexpr std::size_t args_per_lane = num_args / (2 << Layer_);
+				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+				(
+					set_dual_lane_simd_emulator_with_offset_tuple<EmulatedWidth_ / 2, LaneT_, Offset_ + (LaneIndices_ * args_per_lane), Layer_ + 1>
+					(
+						args_tuple_,
+						std::make_index_sequence<2>()
+					)
+				);
+			}
+			else if constexpr (is_single_lane_simd_emulator<LaneT_>::value)
+			{
+				constexpr std::size_t args_per_lane = num_args / (2 << Layer_);
+				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+				(
+					set_single_lane_simd_emulator_with_offset_tuple<LaneT_, Offset_ + (LaneIndices_ * args_per_lane)>
+					(
+						args_tuple_,
+						std::make_index_sequence<args_per_lane>()
+					)
+				);
+			}
+			else
+			{
+				// TODO: Find a way to set actual registers
+				// --- May want some forward declarations for the template `set` and `setr` variants
+
+			}
+		}
+
+		template<std::size_t EmulatedWidth_, class LaneT_, EmuConcepts::Arithmetic...Args_, std::size_t...LaneIndices_>
+		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> set_dual_lane_simd_emulator(std::tuple<Args_...>& args_tuple_, std::index_sequence<LaneIndices_...> lane_indices_)
+		{
+			constexpr std::size_t num_args = sizeof...(Args_);
+			if constexpr (is_dual_lane_simd_emulator<LaneT_>::value)
+			{
+				// 2 dual-lane emulators (most probably constructing a 512-bit in this case)
+				constexpr std::size_t args_per_lane = num_args / 2;
+				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+				(
+					set_dual_lane_simd_emulator_with_offset_tuple<EmulatedWidth_ / 2, LaneT_, LaneIndices_ * args_per_lane, 1>
+					(
+						args_tuple_,
+						std::make_index_sequence<2>()
+					)...
+				);
+			}
+			else if constexpr (is_single_lane_simd_emulator<LaneT_>::value)
+			{
+				// 2 single-lane emulators (most probably constructing a 256-bit in this case)
+				constexpr std::size_t args_per_lane = num_args / 2;
+				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+				(
+					set_single_lane_simd_emulator_with_offset_tuple<LaneT_, LaneIndices_ * args_per_lane>
+					(
+						args_tuple_,
+						std::make_index_sequence<2>()
+					)...
+				);
+			}
+			else
+			{
+				// 2 actual SIMD registers
+				// TODO: Find a way to set actual registers
+				// --- May want some forward declarations for the template `set` and `setr` variants
+				constexpr std::size_t per_element_width = EmulatedWidth_ / num_args;
+				// ...
+			}
+		}
+
+		template<std::size_t EmulatedWidth_, class LaneT_, EmuConcepts::Arithmetic...Args_, std::size_t...LaneIndices_>
+		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> set_dual_lane_simd_emulator(Args_&&...args_, std::index_sequence<LaneIndices_...> lane_indices_) noexcept
+		{
+			return set_dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+			(
+				std::forward_as_tuple(std::forward<Args_>(args_)...),
+				std::index_sequence<LaneIndices_...>()
+			);
+		}
+
 		template<std::size_t NumElements_, EmuConcepts::Arithmetic T_>
 		constexpr inline single_lane_simd_emulator<NumElements_, T_> set1_single_lane_simd_emulator(const T_& set1_val_) noexcept
 		{
 			return single_lane_simd_emulator<NumElements_, T_>(set1_val_, std::make_index_sequence<NumElements_>());
+		}
+
+		template<std::size_t NumElements_, EmuConcepts::Arithmetic T_, EmuConcepts::Arithmetic BitMaskT_, EmuConcepts::Arithmetic WidthInt_, std::size_t...ReverseIndices_>
+		constexpr inline single_lane_simd_emulator<NumElements_, T_> setmasked_single_lane_simd_emulator(const BitMaskT_& bit_mask_, const WidthInt_& all_bits_, std::index_sequence<ReverseIndices_...> reverse_indices_) noexcept
+		{
+			return single_lane_simd_emulator<NumElements_, T_>
+			(
+				std::bit_cast<T_>(((bit_mask_ & (1 << ReverseIndices_)) >> ReverseIndices_) * all_bits_)...
+			);
+		}
+
+		template<std::size_t NumElements_, EmuConcepts::Arithmetic T_, EmuConcepts::Arithmetic BitMaskT_>
+		constexpr inline single_lane_simd_emulator<NumElements_, T_> setmasked_single_lane_simd_emulator(const BitMaskT_& bit_mask_)
+		{
+			constexpr std::size_t element_byte_width = sizeof(T_);
+			using _width_uint = EmuCore::TMP::uint_of_size_t<element_byte_width>;
+			if constexpr (!EmuCore::TMP::is_emu_tmp_err<_width_uint>::value)
+			{
+				constexpr _width_uint all_bits = std::numeric_limits<_width_uint>::max();
+				return setmasked_single_lane_simd_emulator<NumElements_, T_>
+				(
+					bit_mask_,
+					all_bits,
+					EmuCore::TMP::make_reverse_index_sequence<NumElements_>()
+				);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<T_, _width_uint>(),
+					"INTERNAL EMUSIMD ERROR: A `setmasked` call cannot be implemented by the emulator as it cannot determine an unsigned integer representing all 1s for the correct width in the output register."
+				);
+			}
 		}
 
 		template<std::size_t NumElements_, EmuConcepts::Arithmetic T_>
