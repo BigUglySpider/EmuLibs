@@ -1,0 +1,6 @@
+#ifndef EMU_SIMD_UNDERLYING_FORWARD_TEMPLATE_SETS_H_INC_
+#define EMU_SIMD_UNDERLYING_FORWARD_TEMPLATE_SETS_H_INC_ 1
+
+#include "_forward_tmp.h"
+
+#endif
