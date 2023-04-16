@@ -155,6 +155,69 @@ namespace EmuSIMD::TMP
 	{
 		static constexpr bool value = true;
 	};
+
+	template<>
+	struct is_simd_register<EmuSIMD::u8x16>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_simd_register<EmuSIMD::u16x8>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_simd_register<EmuSIMD::u32x4>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_simd_register<EmuSIMD::u64x2>
+	{
+		static constexpr bool value = true;
+	};
+
+	template<>
+	struct is_simd_register<EmuSIMD::u8x32>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_simd_register<EmuSIMD::u16x16>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_simd_register<EmuSIMD::u32x8>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_simd_register<EmuSIMD::u64x4>
+	{
+		static constexpr bool value = true;
+	};
+
+	template<>
+	struct is_simd_register<EmuSIMD::u8x64>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_simd_register<EmuSIMD::u16x32>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_simd_register<EmuSIMD::u32x16>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_simd_register<EmuSIMD::u64x8>
+	{
+		static constexpr bool value = true;
+	};
 #endif
 #pragma endregion
 
@@ -267,6 +330,69 @@ namespace EmuSIMD::TMP
 	};
 	template<>
 	struct simd_register_width<EmuSIMD::i64x8>
+	{
+		static constexpr std::size_t value = 512;
+	};
+
+	template<>
+	struct simd_register_width<EmuSIMD::u8x16>
+	{
+		static constexpr std::size_t value = 128;
+	};
+	template<>
+	struct simd_register_width<EmuSIMD::u16x8>
+	{
+		static constexpr std::size_t value = 128;
+	};
+	template<>
+	struct simd_register_width<EmuSIMD::u32x4>
+	{
+		static constexpr std::size_t value = 128;
+	};
+	template<>
+	struct simd_register_width<EmuSIMD::u64x2>
+	{
+		static constexpr std::size_t value = 128;
+	};
+
+	template<>
+	struct simd_register_width<EmuSIMD::u8x32>
+	{
+		static constexpr std::size_t value = 256;
+	};
+	template<>
+	struct simd_register_width<EmuSIMD::u16x16>
+	{
+		static constexpr std::size_t value = 256;
+	};
+	template<>
+	struct simd_register_width<EmuSIMD::u32x8>
+	{
+		static constexpr std::size_t value = 256;
+	};
+	template<>
+	struct simd_register_width<EmuSIMD::u64x4>
+	{
+		static constexpr std::size_t value = 256;
+	};
+
+	template<>
+	struct simd_register_width<EmuSIMD::u8x64>
+	{
+		static constexpr std::size_t value = 512;
+	};
+	template<>
+	struct simd_register_width<EmuSIMD::u16x32>
+	{
+		static constexpr std::size_t value = 512;
+	};
+	template<>
+	struct simd_register_width<EmuSIMD::u32x16>
+	{
+		static constexpr std::size_t value = 512;
+	};
+	template<>
+	struct simd_register_width<EmuSIMD::u64x8>
 	{
 		static constexpr std::size_t value = 512;
 	};
@@ -383,6 +509,69 @@ namespace EmuSIMD::TMP
 	};
 	template<>
 	struct is_integral_simd_register<EmuSIMD::i64x8>
+	{
+		static constexpr bool value = true;
+	};
+
+	template<>
+	struct is_integral_simd_register<EmuSIMD::u8x16>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_integral_simd_register<EmuSIMD::u16x8>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_integral_simd_register<EmuSIMD::u32x4>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_integral_simd_register<EmuSIMD::u64x2>
+	{
+		static constexpr bool value = true;
+	};
+
+	template<>
+	struct is_integral_simd_register<EmuSIMD::u8x32>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_integral_simd_register<EmuSIMD::u16x16>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_integral_simd_register<EmuSIMD::u32x8>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_integral_simd_register<EmuSIMD::u64x4>
+	{
+		static constexpr bool value = true;
+	};
+
+	template<>
+	struct is_integral_simd_register<EmuSIMD::u8x64>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_integral_simd_register<EmuSIMD::u16x32>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_integral_simd_register<EmuSIMD::u32x16>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_integral_simd_register<EmuSIMD::u64x8>
 	{
 		static constexpr bool value = true;
 	};
@@ -517,6 +706,69 @@ namespace EmuSIMD::TMP
 	};
 	template<>
 	struct is_floating_point_simd_register<EmuSIMD::i64x8>
+	{
+		static constexpr bool value = false;
+	};
+
+	template<>
+	struct is_floating_point_simd_register<EmuSIMD::u8x16>
+	{
+		static constexpr bool value = false;
+	};
+	template<>
+	struct is_floating_point_simd_register<EmuSIMD::u16x8>
+	{
+		static constexpr bool value = false;
+	};
+	template<>
+	struct is_floating_point_simd_register<EmuSIMD::u32x4>
+	{
+		static constexpr bool value = false;
+	};
+	template<>
+	struct is_floating_point_simd_register<EmuSIMD::u64x2>
+	{
+		static constexpr bool value = false;
+	};
+
+	template<>
+	struct is_floating_point_simd_register<EmuSIMD::u8x32>
+	{
+		static constexpr bool value = false;
+	};
+	template<>
+	struct is_floating_point_simd_register<EmuSIMD::u16x16>
+	{
+		static constexpr bool value = false;
+	};
+	template<>
+	struct is_floating_point_simd_register<EmuSIMD::u32x8>
+	{
+		static constexpr bool value = false;
+	};
+	template<>
+	struct is_floating_point_simd_register<EmuSIMD::u64x4>
+	{
+		static constexpr bool value = false;
+	};
+
+	template<>
+	struct is_floating_point_simd_register<EmuSIMD::u8x64>
+	{
+		static constexpr bool value = false;
+	};
+	template<>
+	struct is_floating_point_simd_register<EmuSIMD::u16x32>
+	{
+		static constexpr bool value = false;
+	};
+	template<>
+	struct is_floating_point_simd_register<EmuSIMD::u32x16>
+	{
+		static constexpr bool value = false;
+	};
+	template<>
+	struct is_floating_point_simd_register<EmuSIMD::u64x8>
 	{
 		static constexpr bool value = false;
 	};
@@ -749,6 +1001,69 @@ namespace EmuSIMD::TMP
 	{
 		static constexpr std::size_t value = 8;
 	};
+
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_element_count<EmuSIMD::u8x16, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t value = 16;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_element_count<EmuSIMD::u16x8, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t value = 8;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_element_count<EmuSIMD::u32x4, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t value = 4;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_element_count<EmuSIMD::u64x2, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t value = 2;
+	};
+
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_element_count<EmuSIMD::u8x32, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t value = 32;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_element_count<EmuSIMD::u16x16, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t value = 16;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_element_count<EmuSIMD::u32x8, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t value = 8;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_element_count<EmuSIMD::u64x4, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t value = 4;
+	};
+
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_element_count<EmuSIMD::u8x64, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t value = 64;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_element_count<EmuSIMD::u16x32, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t value = 32;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_element_count<EmuSIMD::u32x16, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t value = 16;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_element_count<EmuSIMD::u64x8, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t value = 8;
+	};
 #endif
 #pragma endregion
 
@@ -959,6 +1274,90 @@ namespace EmuSIMD::TMP
 		static constexpr std::size_t max_index = 7;
 		static constexpr bool value = Index_ <= max_index;
 	};
+
+	template<std::size_t Index_, std::size_t PerElementWidthIfGenericInt_>
+	struct valid_register_index<EmuSIMD::u8x16, Index_, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t max_index = 15;
+		static constexpr bool value = Index_ <= max_index;
+	};
+
+	template<std::size_t Index_, std::size_t PerElementWidthIfGenericInt_>
+	struct valid_register_index<EmuSIMD::u16x8, Index_, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t max_index = 7;
+		static constexpr bool value = Index_ <= max_index;
+	};
+
+	template<std::size_t Index_, std::size_t PerElementWidthIfGenericInt_>
+	struct valid_register_index<EmuSIMD::u32x4, Index_, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t max_index = 3;
+		static constexpr bool value = Index_ <= max_index;
+	};
+
+	template<std::size_t Index_, std::size_t PerElementWidthIfGenericInt_>
+	struct valid_register_index<EmuSIMD::u64x2, Index_, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t max_index = 1;
+		static constexpr bool value = Index_ <= max_index;
+	};
+
+	template<std::size_t Index_, std::size_t PerElementWidthIfGenericInt_>
+	struct valid_register_index<EmuSIMD::u8x32, Index_, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t max_index = 31;
+		static constexpr bool value = Index_ <= max_index;
+	};
+
+	template<std::size_t Index_, std::size_t PerElementWidthIfGenericInt_>
+	struct valid_register_index<EmuSIMD::u16x16, Index_, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t max_index = 15;
+		static constexpr bool value = Index_ <= max_index;
+	};
+
+	template<std::size_t Index_, std::size_t PerElementWidthIfGenericInt_>
+	struct valid_register_index<EmuSIMD::u32x8, Index_, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t max_index = 7;
+		static constexpr bool value = Index_ <= max_index;
+	};
+
+	template<std::size_t Index_, std::size_t PerElementWidthIfGenericInt_>
+	struct valid_register_index<EmuSIMD::u64x4, Index_, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t max_index = 3;
+		static constexpr bool value = Index_ <= max_index;
+	};
+
+	template<std::size_t Index_, std::size_t PerElementWidthIfGenericInt_>
+	struct valid_register_index<EmuSIMD::u8x64, Index_, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t max_index = 63;
+		static constexpr bool value = Index_ <= max_index;
+	};
+
+	template<std::size_t Index_, std::size_t PerElementWidthIfGenericInt_>
+	struct valid_register_index<EmuSIMD::u16x32, Index_, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t max_index = 31;
+		static constexpr bool value = Index_ <= max_index;
+	};
+
+	template<std::size_t Index_, std::size_t PerElementWidthIfGenericInt_>
+	struct valid_register_index<EmuSIMD::u32x16, Index_, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t max_index = 15;
+		static constexpr bool value = Index_ <= max_index;
+	};
+
+	template<std::size_t Index_, std::size_t PerElementWidthIfGenericInt_>
+	struct valid_register_index<EmuSIMD::u64x8, Index_, PerElementWidthIfGenericInt_>
+	{
+		static constexpr std::size_t max_index = 7;
+		static constexpr bool value = Index_ <= max_index;
+	};
 #endif
 #pragma endregion
 
@@ -1074,6 +1473,248 @@ namespace EmuSIMD::TMP
 	struct half_width<EmuSIMD::i64x8>
 	{
 		using type = EmuSIMD::i64x4;
+	};
+
+	template<>
+	struct half_width<EmuSIMD::u8x16>
+	{
+		using type = void;
+	};
+	template<>
+	struct half_width<EmuSIMD::u8x32>
+	{
+		using type = EmuSIMD::u8x16;
+	};
+	template<>
+	struct half_width<EmuSIMD::u8x64>
+	{
+		using type = EmuSIMD::u8x32;
+	};
+
+	template<>
+	struct half_width<EmuSIMD::u16x8>
+	{
+		using type = void;
+	};
+	template<>
+	struct half_width<EmuSIMD::u16x16>
+	{
+		using type = EmuSIMD::u16x8;
+	};
+	template<>
+	struct half_width<EmuSIMD::u16x32>
+	{
+		using type = EmuSIMD::u16x16;
+	};
+
+	template<>
+	struct half_width<EmuSIMD::u32x4>
+	{
+		using type = void;
+	};
+	template<>
+	struct half_width<EmuSIMD::u32x8>
+	{
+		using type = EmuSIMD::u32x4;
+	};
+	template<>
+	struct half_width<EmuSIMD::u32x16>
+	{
+		using type = EmuSIMD::u32x8;
+	};
+
+	template<>
+	struct half_width<EmuSIMD::u64x2>
+	{
+		using type = void;
+	};
+	template<>
+	struct half_width<EmuSIMD::u64x4>
+	{
+		using type = EmuSIMD::u64x2;
+	};
+	template<>
+	struct half_width<EmuSIMD::u64x8>
+	{
+		using type = EmuSIMD::u64x4;
+	};
+#endif
+#pragma endregion
+
+#pragma region REGISTER_TO_ARG_TYPE
+	template<>
+	struct register_to_arg_type<EmuSIMD::f32x4>
+	{
+		using type = EmuSIMD::f32x4_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::f32x8>
+	{
+		using type = EmuSIMD::f32x8_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::f32x16>
+	{
+		using type = EmuSIMD::f32x16_arg;
+	};
+
+	template<>
+	struct register_to_arg_type<EmuSIMD::f64x2>
+	{
+		using type = EmuSIMD::f64x2_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::f64x4>
+	{
+		using type = EmuSIMD::f64x4_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::f64x8>
+	{
+		using type = EmuSIMD::f64x8_arg;
+	};
+
+#if EMU_SIMD_USE_GENERIC_INT_REGISTERS
+	template<>
+	struct register_to_arg_type<EmuSIMD::i128_generic>
+	{
+		using type = EmuSIMD::i128_generic_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::i256_generic>
+	{
+		using type = EmuSIMD::i256_generic_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::i512_generic>
+	{
+		using type = EmuSIMD::i512_generic_arg;
+	};
+#else
+	template<>
+	struct register_to_arg_type<EmuSIMD::i8x16>
+	{
+		using type = EmuSIMD::i8x16_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::i16x8>
+	{
+		using type = EmuSIMD::i16x8_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::i32x4>
+	{
+		using type = EmuSIMD::i32x4_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::i64x2>
+	{
+		using type = EmuSIMD::i64x2_arg;
+	};
+
+	template<>
+	struct register_to_arg_type<EmuSIMD::i8x32>
+	{
+		using type = EmuSIMD::i8x32_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::i16x16>
+	{
+		using type = EmuSIMD::i16x16_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::i32x8>
+	{
+		using type = EmuSIMD::i32x8_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::i64x4>
+	{
+		using type = EmuSIMD::i64x4_arg;
+	};
+
+	template<>
+	struct register_to_arg_type<EmuSIMD::i8x64>
+	{
+		using type = EmuSIMD::i8x64_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::i16x32>
+	{
+		using type = EmuSIMD::i16x32_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::i32x16>
+	{
+		using type = EmuSIMD::i32x16_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::i64x8>
+	{
+		using type = EmuSIMD::i64x8_arg;
+	};
+
+	template<>
+	struct register_to_arg_type<EmuSIMD::u8x16>
+	{
+		using type = EmuSIMD::u8x16_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::u16x8>
+	{
+		using type = EmuSIMD::u16x8_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::u32x4>
+	{
+		using type = EmuSIMD::u32x4_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::u64x2>
+	{
+		using type = EmuSIMD::u64x2_arg;
+	};
+
+	template<>
+	struct register_to_arg_type<EmuSIMD::u8x32>
+	{
+		using type = EmuSIMD::u8x32_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::u16x16>
+	{
+		using type = EmuSIMD::u16x16_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::u32x8>
+	{
+		using type = EmuSIMD::u32x8_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::u64x4>
+	{
+		using type = EmuSIMD::u64x4_arg;
+	};
+
+	template<>
+	struct register_to_arg_type<EmuSIMD::u8x64>
+	{
+		using type = EmuSIMD::u8x64_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::u16x32>
+	{
+		using type = EmuSIMD::u16x32_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::u32x16>
+	{
+		using type = EmuSIMD::u32x16_arg;
+	};
+	template<>
+	struct register_to_arg_type<EmuSIMD::u64x8>
+	{
+		using type = EmuSIMD::u64x8_arg;
 	};
 #endif
 #pragma endregion

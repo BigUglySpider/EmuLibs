@@ -155,6 +155,21 @@ namespace EmuSIMD::TMP
 		>::type;
 	};
 
+	template<class SIMDRegister_>
+	struct register_to_arg_type
+	{
+	private:
+		using _register_uq = typename std::remove_cvref<SIMDRegister_>::type;
+
+	public:
+		using type = typename std::conditional_t
+		<
+			std::is_same_v<SIMDRegister_, _register_uq>,
+			EmuCore::TMP::dummy_type_wrapper<EmuCore::TMP::emu_tmp_err>,
+			register_to_arg_type<_register_uq>
+		>::type;
+	};
+
 	namespace Concepts
 	{
 		template<typename T_>
