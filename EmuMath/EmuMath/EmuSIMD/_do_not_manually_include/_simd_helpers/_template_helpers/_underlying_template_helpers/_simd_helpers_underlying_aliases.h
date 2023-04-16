@@ -7,6 +7,7 @@
 #include "../../../../../EmuCore/TMPHelpers/TypeComparators.h"
 
 #include <array>
+#include <bit>
 #include <immintrin.h>
 
 // Should make these defines actually determined based on architecture/compiler rather than hard-coded
