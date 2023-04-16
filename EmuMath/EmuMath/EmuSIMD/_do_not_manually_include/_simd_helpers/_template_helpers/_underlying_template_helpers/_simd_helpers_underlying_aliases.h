@@ -331,7 +331,7 @@ namespace EmuSIMD
 					(
 						args_tuple_,
 						std::make_index_sequence<2>()
-					)
+					)...
 				);
 			}
 			else if constexpr (is_single_lane_simd_emulator<LaneT_>::value)
@@ -343,7 +343,7 @@ namespace EmuSIMD
 					(
 						args_tuple_,
 						std::make_index_sequence<args_per_lane>()
-					)
+					)...
 				);
 			}
 			else
