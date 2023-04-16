@@ -1,6 +1,7 @@
 #ifndef EMU_SIMD_UNDERLYING_ALIASES_H_INC_
 #define EMU_SIMD_UNDERLYING_ALIASES_H_INC_ 1
 
+#include "_generic_funcs/_forward_declarations/_all_forward_declarations.h"
 #include "../../../../../EmuCore/CommonConcepts/Arithmetic.h"
 #include "../../../../../EmuCore/CommonPreprocessor/Compiler.h"
 #include "../../../../../EmuCore/TMPHelpers/Tuples.h"
@@ -231,16 +232,92 @@ namespace EmuSIMD
 		struct dual_lane_simd_emulator
 		{
 		public:
+			using lane_type = LaneT_;
 			static constexpr std::size_t emulated_width = EmulatedWidth_;
 
+			/// <summary> Default constructor for an emulated SIMD register. This is safe to use. </summary>
 			inline dual_lane_simd_emulator() noexcept = default;
+			/// <summary> Copy constructor for an emulated SIMD register. This is safe to use. </summary>
 			inline dual_lane_simd_emulator(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>&) noexcept = default;
+			/// <summary> Move constructor for an emulated SIMD register. This is safe to use. </summary>
 			inline dual_lane_simd_emulator(dual_lane_simd_emulator<EmulatedWidth_, LaneT_>&&) noexcept = default;
 
-			inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& operator=(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>&) = default;
-			inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& operator=(dual_lane_simd_emulator<EmulatedWidth_, LaneT_>&&) = default;
+			/// <summary>
+			/// <para> Constructor to create an emulated dual-lane SIMD register by copying two separate lanes. </para>
+			/// <para> This is non-standard and not safe to use. </para>
+			/// </summary>
+			inline dual_lane_simd_emulator(const LaneT_& _lane_0_, const LaneT_& _lane_1_) noexcept :
+				_lane_0(_lane_0_),
+				_lane_1(_lane_1_)
+			{
+			}
+			/// <summary>
+			/// <para> Constructor to create an emulated dual-lane SIMD register by moving in _lane_0 and copying _lane_1. </para>
+			/// <para> This is non-standard and not safe to use. </para>
+			/// </summary>
+			inline dual_lane_simd_emulator(LaneT_&& _lane_0_, const LaneT_& _lane_1_) noexcept :
+				_lane_0(std::move(_lane_0_)),
+				_lane_1(_lane_1_)
+			{
+			}
+			/// <summary>
+			/// <para> Constructor to create an emulated dual-lane SIMD register by copying _lane_0 and moving in _lane_1. </para>
+			/// <para> This is non-standard and not safe to use. </para>
+			/// </summary>
+			inline dual_lane_simd_emulator(const LaneT_& _lane_0_, LaneT_&& _lane_1_) noexcept :
+				_lane_0(_lane_0_),
+				_lane_1(std::move(_lane_1_))
+			{
+			}
+			/// <summary>
+			/// <para> Constructor to create an emulated dual-lane SIMD register by moving two separate lanes. </para>
+			/// <para> This is non-standard and not safe to use. </para>
+			/// </summary>
+			inline dual_lane_simd_emulator(LaneT_&& _lane_0_, LaneT_&& _lane_1_) noexcept :
+				_lane_0(std::move(_lane_0_)),
+				_lane_1(std::move(_lane_1_))
+			{
+			}
 
+			/// <summary>
+			/// <para> Constructor to create an emulated dual-lane SIMD register by copying its lo lane and zeroing its hi lane. </para>
+			/// <para> This is non-standard and not safe to use. </para>
+			/// </summary>
+			inline dual_lane_simd_emulator(const LaneT_& _lane_0_) noexcept :
+				_lane_0(_lane_0_),
+				_lane_1()
+			{
+			}
+			/// <summary>
+			/// <para> Constructor to create an emulated dual-lane SIMD register by moving in its lo lane and zeroing its hi lane. </para>
+			/// <para> This is non-standard and not safe to use. </para>
+			/// </summary>
+			inline dual_lane_simd_emulator(LaneT_&& _lane_0_) noexcept :
+				_lane_0(std::move(_lane_0_)),
+				_lane_1()
+			{
+			}
+
+			/// <summary> 
+			/// <para> Copy assignment operator for an emulated SIMD register. </para>
+			/// <para> This should only be used through the syntax `x = y`; the syntax `x.operator=(y)` is non-standard and not safe to use. </para>
+			/// </summary>
+			inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& operator=(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>&) noexcept = default;
+			/// <summary> 
+			/// <para> Move assignment operator for an emulated SIMD register. </para>
+			/// <para> This should only be used through the syntax `x = y`; the syntax `x.operator=(y)` is non-standard and not safe to use. </para>
+			/// </summary>
+			inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& operator=(dual_lane_simd_emulator<EmulatedWidth_, LaneT_>&&) noexcept = default;
+
+			/// <summary>
+			/// <para> The lo half of this emulator. </para>
+			/// <para> This is non-standard and not safe to use; you should use the emulated-register's suitable `store` or `storea` function from the `EmuSIMD` namespace to look at its data as scalar. </para>
+			/// </summary>
 			LaneT_ _lane_0;
+			/// <summary>
+			/// <para> The hi half of this emulator. </para>
+			/// <para> This is non-standard and not safe to use; you should use the emulated-register's suitable `store` or `storea` function from the `EmuSIMD` namespace to look at its data as scalar. </para>
+			/// </summary>
 			LaneT_ _lane_1;
 		};
 #pragma endregion
@@ -306,8 +383,17 @@ namespace EmuSIMD
 			return single_lane_simd_emulator<NumElements_, T_>(std::forward<Args_>(args_)...);
 		}
 
+		template<class OutSIMDRegister_, std::size_t PerElementWidthIfGenericInt_, std::size_t Offset_, EmuConcepts::Arithmetic...Args_, std::size_t...ElementIndices_>
+		constexpr inline OutSIMDRegister_ set_simd_register_with_offset_tuple(std::tuple<Args_...>& args_tuple_, std::index_sequence<ElementIndices_...> element_indices_)
+		{
+			return EmuSIMD::setr<OutSIMDRegister_, PerElementWidthIfGenericInt_>
+			(
+				EmuCore::TMP::forward_tuple_index<Offset_ + ElementIndices_>(args_tuple_)...
+			);
+		}
+
 		template<class OutSingleLaneEmulator_, std::size_t Offset_, EmuConcepts::Arithmetic...Args_, std::size_t...ElementIndices_>
-		constexpr inline OutSingleLaneEmulator_ set_single_lane_simd_emulator_with_offset_tuple(std::tuple<Args_...> args_tuple_, std::index_sequence<ElementIndices_...> element_indices_)
+		constexpr inline OutSingleLaneEmulator_ set_single_lane_simd_emulator_with_offset_tuple(std::tuple<Args_...>& args_tuple_, std::index_sequence<ElementIndices_...> element_indices_)
 		{
 			using _out_t = typename OutSingleLaneEmulator_::_value_type;
 			return OutSingleLaneEmulator_
@@ -323,9 +409,10 @@ namespace EmuSIMD
 		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> set_dual_lane_simd_emulator_with_offset_tuple(std::tuple<Args_...>& args_tuple_, std::index_sequence<LaneIndices_...> lane_indices_)
 		{
 			constexpr std::size_t num_args = sizeof...(Args_);
+			constexpr std::size_t args_per_lane = num_args / (2 << Layer_);
 			if constexpr (is_dual_lane_simd_emulator<LaneT_>::value)
 			{
-				constexpr std::size_t args_per_lane = num_args / (2 << Layer_);
+				// Contains two dual-lane emulators
 				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
 				(
 					set_dual_lane_simd_emulator_with_offset_tuple<EmulatedWidth_ / 2, LaneT_, Offset_ + (LaneIndices_ * args_per_lane), Layer_ + 1>
@@ -337,7 +424,7 @@ namespace EmuSIMD
 			}
 			else if constexpr (is_single_lane_simd_emulator<LaneT_>::value)
 			{
-				constexpr std::size_t args_per_lane = num_args / (2 << Layer_);
+				// Contains two single-lane emulators
 				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
 				(
 					set_single_lane_simd_emulator_with_offset_tuple<LaneT_, Offset_ + (LaneIndices_ * args_per_lane)>
@@ -349,9 +436,28 @@ namespace EmuSIMD
 			}
 			else
 			{
-				// TODO: Find a way to set actual registers
-				// --- May want some forward declarations for the template `set` and `setr` variants
-
+				// Contains two SIMD registers
+				constexpr std::size_t total_width_including_parent = (EmulatedWidth_ << Layer_);
+				constexpr std::size_t per_element_width = total_width_including_parent / num_args;
+				if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<per_element_width>())
+				{
+					return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+					(
+						set_simd_register_with_offset_tuple<LaneT_, per_element_width, Offset_ + (LaneIndices_ * args_per_lane)>
+						(
+							args_tuple_,
+							std::make_index_sequence<args_per_lane>()
+						)...
+					);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<std::size_t, per_element_width>(),
+						"INTERNAL EMUSIMD ERROR: Invalid per_element_width calculated from arguments whilst trying to execute set_dual_lane_simd_emulator_with_offset_tuple."
+					);
+				}
 			}
 		}
 
@@ -359,10 +465,10 @@ namespace EmuSIMD
 		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> set_dual_lane_simd_emulator(std::tuple<Args_...>& args_tuple_, std::index_sequence<LaneIndices_...> lane_indices_)
 		{
 			constexpr std::size_t num_args = sizeof...(Args_);
+			constexpr std::size_t args_per_lane = num_args / 2;
 			if constexpr (is_dual_lane_simd_emulator<LaneT_>::value)
 			{
 				// 2 dual-lane emulators (most probably constructing a 512-bit in this case)
-				constexpr std::size_t args_per_lane = num_args / 2;
 				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
 				(
 					set_dual_lane_simd_emulator_with_offset_tuple<EmulatedWidth_ / 2, LaneT_, LaneIndices_ * args_per_lane, 1>
@@ -375,32 +481,48 @@ namespace EmuSIMD
 			else if constexpr (is_single_lane_simd_emulator<LaneT_>::value)
 			{
 				// 2 single-lane emulators (most probably constructing a 256-bit in this case)
-				constexpr std::size_t args_per_lane = num_args / 2;
 				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
 				(
 					set_single_lane_simd_emulator_with_offset_tuple<LaneT_, LaneIndices_ * args_per_lane>
 					(
 						args_tuple_,
-						std::make_index_sequence<2>()
+						std::make_index_sequence<args_per_lane>()
 					)...
 				);
 			}
 			else
 			{
 				// 2 actual SIMD registers
-				// TODO: Find a way to set actual registers
-				// --- May want some forward declarations for the template `set` and `setr` variants
 				constexpr std::size_t per_element_width = EmulatedWidth_ / num_args;
-				// ...
+				if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<per_element_width>())
+				{
+					return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+					(
+						set_simd_register_with_offset_tuple<LaneT_, per_element_width, (LaneIndices_ * args_per_lane)>
+						(
+							args_tuple_,
+							std::make_index_sequence<args_per_lane>()
+						)...
+					);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<std::size_t, per_element_width>(),
+						"INTERNAL EMUSIMD ERROR: Invalid per_element_width calculated from arguments whilst trying to execute set_dual_lane_simd_emulator_with_offset_tuple."
+					);
+				}
 			}
 		}
 
 		template<std::size_t EmulatedWidth_, class LaneT_, EmuConcepts::Arithmetic...Args_, std::size_t...LaneIndices_>
-		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> set_dual_lane_simd_emulator(Args_&&...args_, std::index_sequence<LaneIndices_...> lane_indices_) noexcept
+		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> set_dual_lane_simd_emulator(std::index_sequence<LaneIndices_...> lane_indices_, Args_&&...args_) noexcept
 		{
+			auto args_tuple = std::forward_as_tuple(std::forward<Args_>(args_)...);
 			return set_dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
 			(
-				std::forward_as_tuple(std::forward<Args_>(args_)...),
+				args_tuple,
 				std::index_sequence<LaneIndices_...>()
 			);
 		}
@@ -475,8 +597,11 @@ namespace EmuSIMD
 				else
 				{
 					// Storing two 128-bit registers
-					memcpy(p_out_bytes, simd_emulator_._lane_0, lane_bytes);
-					memcpy(p_out_bytes + lane_bytes, simd_emulator_._lane_1, lane_bytes);
+					memcpy(p_out_bytes, &(simd_emulator_._lane_0), lane_bytes);
+					memcpy(p_out_bytes + lane_bytes, &(simd_emulator_._lane_1), lane_bytes);
+					// TODO: CHANGE TO THIS WHEN FORWARDED
+					//EmuSIMD::store(simd_emulator_._lane_0, p_out_bytes);
+					//EmuSIMD::store(simd_emulator_._lane_1, p_out_bytes + lane_bytes);
 				}
 			}
 			else
@@ -498,8 +623,11 @@ namespace EmuSIMD
 				{
 					// Storing two 256-bit registers
 					constexpr std::size_t lane_bytes = 256 / 8;
-					memcpy(p_out_bytes, simd_emulator_._lane_0, lane_bytes);
-					memcpy(p_out_bytes + lane_bytes, simd_emulator_._lane_1, lane_bytes);
+					memcpy(p_out_bytes, &(simd_emulator_._lane_0), lane_bytes);
+					memcpy(p_out_bytes + lane_bytes, &(simd_emulator_._lane_1), lane_bytes);
+					// TODO: CHANGE TO THIS WHEN FORWARDED
+					//EmuSIMD::store(simd_emulator_._lane_0, p_out_bytes);
+					//EmuSIMD::store(simd_emulator_._lane_1, p_out_bytes + lane_bytes);
 				}
 			}
 		}

@@ -67,16 +67,18 @@ namespace EmuCore::TMP
 	[[nodiscard]] constexpr inline decltype(auto) forward_tuple_index(std::tuple<Elements_...>& tuple_) noexcept
 	{
 		static_assert(Index_ < sizeof...(Elements_), "Invalid call to EmuCore::TMP::forward_tuple_index: The provided Index_ exceeds the highest valid index of the tuple.");
-		using _get_result = decltype(std::get<Index_>(tuple_));
-		return std::forward<_get_result>(std::get<Index_>(tuple_));
+		using std::get;
+		using _get_result = decltype(get<Index_>(tuple_));
+		return std::forward<_get_result>(get<Index_>(tuple_));
 	}
 
 	template<std::size_t Index_, class...Elements_>
 	[[nodiscard]] constexpr inline decltype(auto) forward_tuple_index(const std::tuple<Elements_...>& tuple_) noexcept
 	{
 		static_assert(Index_ < sizeof...(Elements_), "Invalid call to EmuCore::TMP::forward_tuple_index: The provided Index_ exceeds the highest valid index of the tuple.");
-		using _get_result = decltype(std::get<Index_>(tuple_));
-		return std::forward<_get_result>(std::get<Index_>(tuple_));
+		using std::get;
+		using _get_result = decltype(get<Index_>(tuple_));
+		return std::forward<_get_result>(get<Index_>(tuple_));
 	}
 }
 

@@ -419,6 +419,22 @@ int main()
 		PrintIndexable<4>(setmask_dump);
 		std::cout << '\n';
 
+		std::cout << "\n---\nDUAL LANE TESTS\n";
+		using emulated_f32x8 = EmuSIMD::_underlying_impl::dual_lane_simd_emulator<256, EmuSIMD::f32x4>;
+		using emulated_ef32x8 = EmuSIMD::_underlying_impl::dual_lane_simd_emulator<256, EmuSIMD::_underlying_impl::single_lane_simd_emulator<4, float>>;
+
+		// TODO: MORE TESTS, SET SEEMS TO BE REVERSE ORDER (e.g. SEEM TO BE DOING setr INSTEAD OF set)
+		float big_dump[8];
+		emulated_f32x8 ef32x8_a = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<256, EmuSIMD::f32x4>(std::make_index_sequence<2>(), 1, 2, 3, 4, 5, 6, 7, 8);
+		emulated_ef32x8 eef32x8_a = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<256, emulated_ef32x8::lane_type>(std::make_index_sequence<2>(), 1, 2, 3, 4, 5, 6, 7, 8);
+		EmuSIMD::_underlying_impl::emulate_simd_store(ef32x8_a, big_dump);
+		std::cout << "reg lanes: ";
+		PrintIndexable<8>(big_dump);
+		std::cout << "\nemu lanes: ";
+		EmuSIMD::_underlying_impl::emulate_simd_store(eef32x8_a, big_dump);
+		PrintIndexable<8>(big_dump);
+		std::cout << '\n';
+
 		universal_pause();
 	}
 
