@@ -37,25 +37,25 @@ namespace EmuMath::Helpers
 
 #pragma region ROUND_ASSIGNS
 	template<EmuConcepts::EmuFastMatrix FastMatrix_>
-	[[nodiscard]] constexpr inline void fast_matrix_floor_assign(FastMatrix_&& fast_matrix_)
+	constexpr inline void fast_matrix_floor_assign(FastMatrix_&& fast_matrix_)
 	{
 		_fast_matrix_underlying::_fast_matrix_floor<true>(std::forward<FastMatrix_>(fast_matrix_));
 	}
 
 	template<EmuConcepts::EmuFastMatrix FastMatrix_>
-	[[nodiscard]] constexpr inline void fast_matrix_ceil_assign(FastMatrix_&& fast_matrix_)
+	constexpr inline void fast_matrix_ceil_assign(FastMatrix_&& fast_matrix_)
 	{
 		_fast_matrix_underlying::_fast_matrix_ceil<true>(std::forward<FastMatrix_>(fast_matrix_));
 	}
 
 	template<EmuConcepts::EmuFastMatrix FastMatrix_>
-	[[nodiscard]] constexpr inline void fast_matrix_trunc_assign(FastMatrix_&& fast_matrix_)
+	constexpr inline void fast_matrix_trunc_assign(FastMatrix_&& fast_matrix_)
 	{
 		_fast_matrix_underlying::_fast_matrix_trunc<true>(std::forward<FastMatrix_>(fast_matrix_));
 	}
 
 	template<int RoundingFlag_, EmuConcepts::EmuFastMatrix FastMatrix_>
-	[[nodiscard]] constexpr inline void fast_matrix_round_assign(FastMatrix_&& fast_matrix_)
+	constexpr inline void fast_matrix_round_assign(FastMatrix_&& fast_matrix_)
 	{
 		_fast_matrix_underlying::_fast_matrix_round<RoundingFlag_, true>(std::forward<FastMatrix_>(fast_matrix_));
 	}
