@@ -582,6 +582,45 @@ namespace EmuSIMD
 		{
 			return single_lane_simd_emulator<NumElements_, T_>(p_to_load_);
 		}
+
+		template<std::size_t EmulatedWidth_, class LaneT_>
+		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> load_dual_lane_simd_emulator(const void* p_to_load_)
+		{
+			constexpr std::size_t bytes_per_lane = (EmulatedWidth_ / 2) / 8;
+			const unsigned char* p_in_bytes = reinterpret_cast<const unsigned char*>(p_to_load_);
+			if constexpr (is_dual_lane_simd_emulator<LaneT_>::value)
+			{
+				// Loading two 256-bit emulator lanes
+				using _lane_lane_type = typename LaneT_::lane_type;
+				constexpr std::size_t half_width = EmulatedWidth_ / 2;
+				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+				(
+					load_dual_lane_simd_emulator<half_width, _lane_lane_type>(p_in_bytes),
+					load_dual_lane_simd_emulator<half_width, _lane_lane_type>(p_in_bytes + bytes_per_lane)
+				);
+
+			}
+			else if constexpr (is_single_lane_simd_emulator<LaneT_>::value)
+			{
+				// Loading two 128-bit emulator lanes
+				using _value_type = typename LaneT_::_value_type;
+				constexpr std::size_t lane_element_count = LaneT_::_num_elements;
+				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+				(
+					load_single_lane_simd_emulator<lane_element_count, _value_type>(p_in_bytes),
+					load_single_lane_simd_emulator<lane_element_count, _value_type>(p_in_bytes + bytes_per_lane)
+				);
+			}
+			else
+			{
+				// Loading into register lanes
+				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+				(
+					EmuSIMD::load<LaneT_>(p_in_bytes),
+					EmuSIMD::load<LaneT_>(p_in_bytes + bytes_per_lane)
+				);
+			}
+		}
 #pragma endregion
 
 #pragma region EMULATED_STORES
