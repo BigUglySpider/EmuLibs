@@ -15,7 +15,7 @@ namespace EmuSIMD::Funcs
 		return _mm256_set_epi32(e0, e1, e2, e3, e4, e5, e6, e7);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 setr_u16x16
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 setr_u32x8
 	(
 		std::uint32_t e0, std::uint32_t e1, std::uint32_t e2, std::uint32_t e3, std::uint32_t e4, std::uint32_t e5, std::uint32_t e6, std::uint32_t e7
 	)

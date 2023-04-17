@@ -1,7 +1,10 @@
 // GCC ONLY IGNORES - TEMPORARY
 // GCC Diagnistics - Should be temporary, but no estimate on when
+#pragma warning(push)
+#pragma warning(disable: 4068)
 #pragma GCC diagnostic ignored "-Wignored-attributes"
 #pragma GCC diagnostic ignored "-Wpsabi"
+#pragma warning(pop)
 
 // Helpful Functors
 #include "EmuCore/Functors/Analytics.h"

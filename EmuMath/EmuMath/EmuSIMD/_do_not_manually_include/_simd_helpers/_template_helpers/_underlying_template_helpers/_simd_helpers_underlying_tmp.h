@@ -1767,6 +1767,26 @@ namespace EmuSIMD::TMP
 			}
 		}
 	}
+
+	template<Concepts::KnownSIMD SIMDRegister_, std::size_t PerElementWidthIfGenericInt_ = 32>
+	[[nodiscard]] constexpr inline std::size_t determine_register_per_element_width()
+	{
+		if constexpr (EmuSIMD::TMP::is_generic_integer_simd_register_v<SIMDRegister_>)
+		{
+			static_assert
+			(
+				EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfGenericInt_>(),
+				"Invalid `PerElementWidthIfGenericInt_` passed to `EmuSIMD::TMP::determine_register_per_element_width` when determining the per-element-width of a generic integral register."
+			);
+			return PerElementWidthIfGenericInt_;
+		}
+		else
+		{
+			constexpr std::size_t num_elements = determine_register_element_count<SIMDRegister_, PerElementWidthIfGenericInt_>();
+			constexpr std::size_t register_width = EmuSIMD::TMP::simd_register_width_v<SIMDRegister_>;
+			return register_width / num_elements;
+		}
+	}
 #pragma endregion
 }
 
