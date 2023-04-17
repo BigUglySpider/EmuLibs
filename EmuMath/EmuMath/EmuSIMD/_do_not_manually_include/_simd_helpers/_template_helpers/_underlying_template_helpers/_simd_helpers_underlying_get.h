@@ -215,39 +215,135 @@ namespace EmuSIMD::_underlying_simd_helpers
 			using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				_mm_storeu_ps(reinterpret_cast<float*>(p_out_), register_);
+				EmuSIMD::Funcs::store_f32x4(reinterpret_cast<float*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				_mm_storeu_pd(reinterpret_cast<double*>(p_out_), register_);
+				EmuSIMD::Funcs::store_f64x2(reinterpret_cast<double*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				_mm256_storeu_ps(reinterpret_cast<float*>(p_out_), register_);
+				EmuSIMD::Funcs::store_f32x8(reinterpret_cast<float*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				_mm256_storeu_pd(reinterpret_cast<double*>(p_out_), register_);
+				EmuSIMD::Funcs::store_f64x4(reinterpret_cast<double*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				_mm512_storeu_ps(reinterpret_cast<void*>(p_out_), register_);
+				EmuSIMD::Funcs::store_f32x16(reinterpret_cast<void*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				_mm512_storeu_pd(reinterpret_cast<void*>(p_out_), register_);
+				EmuSIMD::Funcs::store_f64x8(reinterpret_cast<void*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 			{
-				_mm_storeu_si128(reinterpret_cast<EmuSIMD::i128_generic*>(p_out_), register_);
+				EmuSIMD::Funcs::store_i8x16(reinterpret_cast<std::int8_t*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 			{
-				_mm256_storeu_si256(reinterpret_cast<EmuSIMD::i256_generic*>(p_out_), register_);
+				EmuSIMD::Funcs::store_i8x32(reinterpret_cast<std::int8_t*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
 			{
-				_mm512_storeu_si512(reinterpret_cast<void*>(p_out_), register_);
+				EmuSIMD::Funcs::store_i8x64(reinterpret_cast<std::int8_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+			{
+				EmuSIMD::Funcs::store_i8x16(reinterpret_cast<std::int8_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+			{
+				EmuSIMD::Funcs::store_i8x32(reinterpret_cast<std::int8_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+			{
+				EmuSIMD::Funcs::store_i8x64(reinterpret_cast<std::int8_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+			{
+				EmuSIMD::Funcs::store_i16x8(reinterpret_cast<std::int16_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+			{
+				EmuSIMD::Funcs::store_i16x16(reinterpret_cast<std::int16_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+			{
+				EmuSIMD::Funcs::store_i16x32(reinterpret_cast<std::int16_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+			{
+				EmuSIMD::Funcs::store_i32x4(reinterpret_cast<std::int32_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+			{
+				EmuSIMD::Funcs::store_i32x8(reinterpret_cast<std::int32_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+			{
+				EmuSIMD::Funcs::store_i32x16(reinterpret_cast<std::int32_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+			{
+				EmuSIMD::Funcs::store_i64x2(reinterpret_cast<std::int64_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+			{
+				EmuSIMD::Funcs::store_i64x4(reinterpret_cast<std::int64_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+			{
+				EmuSIMD::Funcs::store_i64x8(reinterpret_cast<std::int64_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+			{
+				EmuSIMD::Funcs::store_u8x16(reinterpret_cast<std::uint8_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+			{
+				EmuSIMD::Funcs::store_u8x32(reinterpret_cast<std::uint8_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+			{
+				EmuSIMD::Funcs::store_u8x64(reinterpret_cast<std::uint8_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+			{
+				EmuSIMD::Funcs::store_u16x8(reinterpret_cast<std::uint16_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+			{
+				EmuSIMD::Funcs::store_u16x16(reinterpret_cast<std::uint16_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+			{
+				EmuSIMD::Funcs::store_u16x32(reinterpret_cast<std::uint16_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+			{
+				EmuSIMD::Funcs::store_u32x4(reinterpret_cast<std::uint32_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+			{
+				EmuSIMD::Funcs::store_u32x8(reinterpret_cast<std::uint32_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+			{
+				EmuSIMD::Funcs::store_u32x16(reinterpret_cast<std::uint32_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+			{
+				EmuSIMD::Funcs::store_u64x2(reinterpret_cast<std::uint64_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+			{
+				EmuSIMD::Funcs::store_u64x4(reinterpret_cast<std::uint64_t*>(p_out_), register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+			{
+				EmuSIMD::Funcs::store_u64x8(reinterpret_cast<std::uint64_t*>(p_out_), register_);
 			}
 			else
 			{

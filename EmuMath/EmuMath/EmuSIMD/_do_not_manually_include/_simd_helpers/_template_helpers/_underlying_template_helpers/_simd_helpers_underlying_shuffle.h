@@ -593,6 +593,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	}
 
 #pragma region M128_SPECIALISATIONS
+#if EMU_CORE_X86_X64 // TODO: standardise the used functions in the EmuSIMD::Funcs namespace
 	template<>
 	[[nodiscard]] inline EmuSIMD::f32x4 _execute_shuffle<0, 0, 2, 2>(EmuSIMD::f32x4 ab_)
 	{
@@ -604,6 +605,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	{
 		return _mm_movehdup_ps(ab_);
 	}
+#endif
 
 	template<>
 	[[nodiscard]] inline EmuSIMD::f32x4 _execute_shuffle<0, 1, 0, 1>(EmuSIMD::f32x4 ab_)
@@ -635,11 +637,13 @@ namespace EmuSIMD::_underlying_simd_helpers
 #pragma endregion
 
 #pragma region M128D_SPECIALISATIONS
+#if EMU_CORE_X86_X64 // TODO: standardise the used functions in the EmuSIMD::Funcs namespace
 	template<>
 	[[nodiscard]] inline EmuSIMD::f64x2 _execute_shuffle<0, 0>(EmuSIMD::f64x2 ab_)
 	{
 		return _mm_movedup_pd(ab_);
 	}
+#endif
 
 	template<>
 	[[nodiscard]] inline EmuSIMD::f64x2 _execute_shuffle<0, 1>(EmuSIMD::f64x2 ab_)
