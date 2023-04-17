@@ -14,6 +14,12 @@
 // --- setr_decrementing
 // --- set_incrementing
 // --- setr_incrementing
+// --- load
+// --- set_all_to_index
+// --- alternating_sign_mask
+// --- alternating_sign_mask_reverse
+// --- sign_mask
+// --- sign_mask_reverse
 
 namespace EmuSIMD
 {

@@ -437,13 +437,18 @@ int main()
 		float bigger_dump[16];
 		using emulated_f32x16 = EmuSIMD::_underlying_impl::dual_lane_simd_emulator<512, EmuSIMD::f32x8>;
 		using emulated_ef32x16 = EmuSIMD::_underlying_impl::dual_lane_simd_emulator<512, EmuSIMD::_underlying_impl::dual_lane_simd_emulator<256, EmuSIMD::_underlying_impl::single_lane_simd_emulator<4, float>>>;
-		emulated_f32x16 ef32x16_a = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<true, 512, EmuSIMD::f32x8>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-		emulated_ef32x16 eef32x16_a = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<true, 512, emulated_ef32x16::lane_type>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+		using emulated_erf32x16 = EmuSIMD::_underlying_impl::dual_lane_simd_emulator<512, EmuSIMD::_underlying_impl::dual_lane_simd_emulator<256, EmuSIMD::f32x4>>;
+		emulated_f32x16 ef32x16_a = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<false, 512, EmuSIMD::f32x8>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+		emulated_ef32x16 eef32x16_a = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<false, 512, emulated_ef32x16::lane_type>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+		emulated_erf32x16 eerf32x16_a = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<false, 512, emulated_erf32x16::lane_type>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 		EmuSIMD::_underlying_impl::emulate_simd_store(ef32x16_a, bigger_dump);
-		std::cout << "reg lanes (f32x16): ";
+		std::cout << "reg lanes (f32x16) [reg n/a]: ";
 		PrintIndexable<16>(bigger_dump);
-		std::cout << "\nemu lanes (f32x16): ";
+		std::cout << "\nemu lanes (f32x16) [emu emu]: ";
 		EmuSIMD::_underlying_impl::emulate_simd_store(eef32x16_a, bigger_dump);
+		PrintIndexable<16>(bigger_dump);
+		std::cout << "\nemu lanes (f32x16) [emu reg]: ";
+		EmuSIMD::_underlying_impl::emulate_simd_store(eerf32x16_a, bigger_dump);
 		PrintIndexable<16>(bigger_dump);
 		std::cout << '\n';
 

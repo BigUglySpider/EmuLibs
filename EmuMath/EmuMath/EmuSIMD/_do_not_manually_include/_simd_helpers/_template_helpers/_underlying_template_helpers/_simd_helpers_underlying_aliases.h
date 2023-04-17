@@ -175,10 +175,11 @@ namespace EmuSIMD
 			/// <para> `load`-emulating constructor for an emulated SIMD register. </para>
 			/// <para> This is non-standard and not safe to use; you should use the emulated-register's suitable `load` function from the `EmuSIMD` namespace. </para>
 			/// </summary>
-			template<std::size_t...Indices_>
-			inline single_lane_simd_emulator(const T_* p_to_load_)
-				: _data({ (*(p_to_load_ + Indices_))... })
+			inline single_lane_simd_emulator(const void* p_to_load_)
+				: _data()
 			{
+				constexpr std::size_t bytes_to_load = 128 / 8; // Guaranteed to be 128-bit as this template is only for emulating 128-bit registers
+				memcpy(_data.data(), p_to_load_, bytes_to_load);
 			}
 
 			/// <summary>
@@ -577,7 +578,7 @@ namespace EmuSIMD
 		}
 
 		template<std::size_t NumElements_, EmuConcepts::Arithmetic T_>
-		constexpr inline single_lane_simd_emulator<NumElements_, T_> load_single_lane_simd_emulator(const T_* p_to_load_)
+		constexpr inline single_lane_simd_emulator<NumElements_, T_> load_single_lane_simd_emulator(const void* p_to_load_)
 		{
 			return single_lane_simd_emulator<NumElements_, T_>(p_to_load_);
 		}
@@ -585,9 +586,10 @@ namespace EmuSIMD
 
 #pragma region EMULATED_STORES
 		template<std::size_t NumElements_, EmuConcepts::Arithmetic T_>
-		constexpr inline void emulate_simd_store(const single_lane_simd_emulator<NumElements_, T_>& simd_emulator_, T_* p_out_)
+		constexpr inline void emulate_simd_store(const single_lane_simd_emulator<NumElements_, T_>& simd_emulator_, void* p_out_)
 		{
-			memcpy(p_out_, simd_emulator_._data.data(), NumElements_ * sizeof(T_));
+			constexpr std::size_t num_bytes = 128 / 8; // Guaranteed to be 128-bit as we only use single_lane_simd_emulator for 128-bit
+			memcpy(p_out_, simd_emulator_._data.data(), num_bytes);
 		}
 
 		template<std::size_t EmulatedWidth_, class LaneT_>
@@ -596,47 +598,52 @@ namespace EmuSIMD
 			unsigned char* p_out_bytes = reinterpret_cast<unsigned char*>(p_out_);
 			if constexpr (EmulatedWidth_ == 256)
 			{
+				// Storing 256-bit emulator
 				constexpr std::size_t lane_bytes = 128 / 8;
 				if constexpr (is_simd_emulator<LaneT_>::value)
 				{
 					// Storing two 128-bit emulators
-					memcpy(p_out_bytes, simd_emulator_._lane_0._data.data(), lane_bytes);
-					memcpy(p_out_bytes + lane_bytes, simd_emulator_._lane_1._data.data(), lane_bytes);
+					emulate_simd_store(simd_emulator_._lane_0, p_out_bytes);
+					emulate_simd_store(simd_emulator_._lane_1, p_out_bytes + lane_bytes);
 				}
 				else
 				{
 					// Storing two 128-bit registers
-					memcpy(p_out_bytes, &(simd_emulator_._lane_0), lane_bytes);
-					memcpy(p_out_bytes + lane_bytes, &(simd_emulator_._lane_1), lane_bytes);
-					// TODO: CHANGE TO THIS WHEN FORWARDED
-					//EmuSIMD::store(simd_emulator_._lane_0, p_out_bytes);
-					//EmuSIMD::store(simd_emulator_._lane_1, p_out_bytes + lane_bytes);
+					EmuSIMD::store(simd_emulator_._lane_0, p_out_bytes);
+					EmuSIMD::store(simd_emulator_._lane_1, p_out_bytes + lane_bytes);
 				}
 			}
 			else
 			{
+				// Storing 512-bit emulator
 				if constexpr (is_simd_emulator<LaneT_>::value)
 				{
-					// Storing two 256-bit emulators, one 128-bit lane at a time
-					constexpr std::size_t lane_bytes = 128 / 8;
-					memcpy(p_out_bytes, simd_emulator_._lane_0._lane_0._data.data(), lane_bytes);
-					p_out_bytes += lane_bytes;
-					memcpy(p_out_bytes, simd_emulator_._lane_0._lane_1._data.data(), lane_bytes);
-					p_out_bytes += lane_bytes;
-					memcpy(p_out_bytes, simd_emulator_._lane_1._lane_0._data.data(), lane_bytes);
-					p_out_bytes += lane_bytes;
-					memcpy(p_out_bytes, simd_emulator_._lane_1._lane_1._data.data(), lane_bytes);
-					p_out_bytes += lane_bytes;
+					// Storing two 256-bit emulators
+					using _lane_lane_type = typename LaneT_::lane_type;
+					constexpr std::size_t lane_bytes_128 = 128 / 8;
+					if constexpr (is_simd_emulator<_lane_lane_type>::value)
+					{
+						// Storing four 128-bit emulators
+						emulate_simd_store(simd_emulator_._lane_0._lane_0, p_out_bytes);
+						emulate_simd_store(simd_emulator_._lane_0._lane_1, p_out_bytes += lane_bytes_128);
+						emulate_simd_store(simd_emulator_._lane_1._lane_0, p_out_bytes += lane_bytes_128);
+						emulate_simd_store(simd_emulator_._lane_1._lane_1, p_out_bytes + lane_bytes_128);
+					}
+					else
+					{
+						// Storing 4 128-bit registers
+						EmuSIMD::store(simd_emulator_._lane_0._lane_0, p_out_bytes);
+						EmuSIMD::store(simd_emulator_._lane_0._lane_1, p_out_bytes += lane_bytes_128);
+						EmuSIMD::store(simd_emulator_._lane_1._lane_0, p_out_bytes += lane_bytes_128);
+						EmuSIMD::store(simd_emulator_._lane_1._lane_1, p_out_bytes + lane_bytes_128);
+					}
 				}
 				else
 				{
 					// Storing two 256-bit registers
 					constexpr std::size_t lane_bytes = 256 / 8;
-					memcpy(p_out_bytes, &(simd_emulator_._lane_0), lane_bytes);
-					memcpy(p_out_bytes + lane_bytes, &(simd_emulator_._lane_1), lane_bytes);
-					// TODO: CHANGE TO THIS WHEN FORWARDED
-					//EmuSIMD::store(simd_emulator_._lane_0, p_out_bytes);
-					//EmuSIMD::store(simd_emulator_._lane_1, p_out_bytes + lane_bytes);
+					EmuSIMD::store(simd_emulator_._lane_0, p_out_bytes);
+					EmuSIMD::store(simd_emulator_._lane_1, p_out_bytes + lane_bytes);
 				}
 			}
 		}
