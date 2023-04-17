@@ -423,16 +423,28 @@ int main()
 		using emulated_f32x8 = EmuSIMD::_underlying_impl::dual_lane_simd_emulator<256, EmuSIMD::f32x4>;
 		using emulated_ef32x8 = EmuSIMD::_underlying_impl::dual_lane_simd_emulator<256, EmuSIMD::_underlying_impl::single_lane_simd_emulator<4, float>>;
 
-		// TODO: MORE TESTS, SET SEEMS TO BE REVERSE ORDER (e.g. SEEM TO BE DOING setr INSTEAD OF set)
 		float big_dump[8];
-		emulated_f32x8 ef32x8_a = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<256, EmuSIMD::f32x4>(std::make_index_sequence<2>(), 1, 2, 3, 4, 5, 6, 7, 8);
-		emulated_ef32x8 eef32x8_a = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<256, emulated_ef32x8::lane_type>(std::make_index_sequence<2>(), 1, 2, 3, 4, 5, 6, 7, 8);
+		emulated_f32x8 ef32x8_a = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<false, 256, EmuSIMD::f32x4>(1, 2, 3, 4, 5, 6, 7, 8);
+		emulated_ef32x8 eef32x8_a = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<false, 256, emulated_ef32x8::lane_type>(1, 2, 3, 4, 5, 6, 7, 8);
 		EmuSIMD::_underlying_impl::emulate_simd_store(ef32x8_a, big_dump);
-		std::cout << "reg lanes: ";
+		std::cout << "reg lanes (f32x8): ";
 		PrintIndexable<8>(big_dump);
-		std::cout << "\nemu lanes: ";
+		std::cout << "\nemu lanes (f32x8): ";
 		EmuSIMD::_underlying_impl::emulate_simd_store(eef32x8_a, big_dump);
 		PrintIndexable<8>(big_dump);
+		std::cout << '\n';
+
+		float bigger_dump[16];
+		using emulated_f32x16 = EmuSIMD::_underlying_impl::dual_lane_simd_emulator<512, EmuSIMD::f32x8>;
+		using emulated_ef32x16 = EmuSIMD::_underlying_impl::dual_lane_simd_emulator<512, EmuSIMD::_underlying_impl::dual_lane_simd_emulator<256, EmuSIMD::_underlying_impl::single_lane_simd_emulator<4, float>>>;
+		emulated_f32x16 ef32x16_a = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<true, 512, EmuSIMD::f32x8>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+		emulated_ef32x16 eef32x16_a = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<true, 512, emulated_ef32x16::lane_type>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+		EmuSIMD::_underlying_impl::emulate_simd_store(ef32x16_a, bigger_dump);
+		std::cout << "reg lanes (f32x16): ";
+		PrintIndexable<16>(bigger_dump);
+		std::cout << "\nemu lanes (f32x16): ";
+		EmuSIMD::_underlying_impl::emulate_simd_store(eef32x16_a, bigger_dump);
+		PrintIndexable<16>(bigger_dump);
 		std::cout << '\n';
 
 		universal_pause();

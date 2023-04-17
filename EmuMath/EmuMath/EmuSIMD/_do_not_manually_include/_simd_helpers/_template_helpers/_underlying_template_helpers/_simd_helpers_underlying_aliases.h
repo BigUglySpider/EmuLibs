@@ -131,8 +131,8 @@ namespace EmuSIMD
 		struct is_dual_lane_simd_emulator : public EmuCore::TMP::type_check_ignore_ref_cv_base<is_dual_lane_simd_emulator, std::false_type, T_>
 		{
 		};
-		template<std::size_t NumElements_, EmuConcepts::Arithmetic T_>
-		struct is_dual_lane_simd_emulator<dual_lane_simd_emulator<NumElements_, T_>>
+		template<std::size_t EmulatedWidth_, class LaneT_>
+		struct is_dual_lane_simd_emulator<dual_lane_simd_emulator<EmulatedWidth_, LaneT_>>
 		{
 			static constexpr bool value = true;
 		};
@@ -405,7 +405,7 @@ namespace EmuSIMD
 			);
 		}
 
-		template<std::size_t EmulatedWidth_, class LaneT_, std::size_t Offset_, std::size_t Layer_, EmuConcepts::Arithmetic...Args_, std::size_t...LaneIndices_>
+		template<bool IsSetr_, std::size_t EmulatedWidth_, class LaneT_, std::size_t Offset_, std::size_t Layer_, EmuConcepts::Arithmetic...Args_, std::size_t...LaneIndices_>
 		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> set_dual_lane_simd_emulator_with_offset_tuple(std::tuple<Args_...>& args_tuple_, std::index_sequence<LaneIndices_...> lane_indices_)
 		{
 			constexpr std::size_t num_args = sizeof...(Args_);
@@ -413,24 +413,27 @@ namespace EmuSIMD
 			if constexpr (is_dual_lane_simd_emulator<LaneT_>::value)
 			{
 				// Contains two dual-lane emulators
+				using lane_lane_type = typename LaneT_::lane_type;
+				using lanes_index_sequence = typename std::conditional<IsSetr_, std::make_index_sequence<2>, EmuCore::TMP::make_reverse_index_sequence<2>>::type;
 				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
 				(
-					set_dual_lane_simd_emulator_with_offset_tuple<EmulatedWidth_ / 2, LaneT_, Offset_ + (LaneIndices_ * args_per_lane), Layer_ + 1>
+					set_dual_lane_simd_emulator_with_offset_tuple<EmulatedWidth_ / 2, lane_lane_type, Offset_ + (LaneIndices_ * args_per_lane), Layer_ + 1>
 					(
 						args_tuple_,
-						std::make_index_sequence<2>()
+						lanes_index_sequence()
 					)...
 				);
 			}
 			else if constexpr (is_single_lane_simd_emulator<LaneT_>::value)
 			{
 				// Contains two single-lane emulators
+				using per_lane_index_sequence = typename std::conditional<IsSetr_, std::make_index_sequence<args_per_lane>, EmuCore::TMP::make_reverse_index_sequence<args_per_lane>>::type;
 				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
 				(
 					set_single_lane_simd_emulator_with_offset_tuple<LaneT_, Offset_ + (LaneIndices_ * args_per_lane)>
 					(
 						args_tuple_,
-						std::make_index_sequence<args_per_lane>()
+						per_lane_index_sequence()
 					)...
 				);
 			}
@@ -441,12 +444,13 @@ namespace EmuSIMD
 				constexpr std::size_t per_element_width = total_width_including_parent / num_args;
 				if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<per_element_width>())
 				{
+					using per_lane_index_sequence = typename std::conditional<IsSetr_, std::make_index_sequence<args_per_lane>, EmuCore::TMP::make_reverse_index_sequence<args_per_lane>>::type;
 					return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
 					(
 						set_simd_register_with_offset_tuple<LaneT_, per_element_width, Offset_ + (LaneIndices_ * args_per_lane)>
 						(
 							args_tuple_,
-							std::make_index_sequence<args_per_lane>()
+							per_lane_index_sequence()
 						)...
 					);
 				}
@@ -461,7 +465,7 @@ namespace EmuSIMD
 			}
 		}
 
-		template<std::size_t EmulatedWidth_, class LaneT_, EmuConcepts::Arithmetic...Args_, std::size_t...LaneIndices_>
+		template<bool IsSetr_, std::size_t EmulatedWidth_, class LaneT_, EmuConcepts::Arithmetic...Args_, std::size_t...LaneIndices_>
 		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> set_dual_lane_simd_emulator(std::tuple<Args_...>& args_tuple_, std::index_sequence<LaneIndices_...> lane_indices_)
 		{
 			constexpr std::size_t num_args = sizeof...(Args_);
@@ -469,24 +473,27 @@ namespace EmuSIMD
 			if constexpr (is_dual_lane_simd_emulator<LaneT_>::value)
 			{
 				// 2 dual-lane emulators (most probably constructing a 512-bit in this case)
+				using lanes_index_sequence = typename std::conditional<IsSetr_, std::make_index_sequence<2>, EmuCore::TMP::make_reverse_index_sequence<2>>::type;
+				using lane_lane_type = typename LaneT_::lane_type;
 				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
 				(
-					set_dual_lane_simd_emulator_with_offset_tuple<EmulatedWidth_ / 2, LaneT_, LaneIndices_ * args_per_lane, 1>
+					set_dual_lane_simd_emulator_with_offset_tuple<IsSetr_, EmulatedWidth_ / 2, lane_lane_type, LaneIndices_ * args_per_lane, 1>
 					(
 						args_tuple_,
-						std::make_index_sequence<2>()
+						lanes_index_sequence()
 					)...
 				);
 			}
 			else if constexpr (is_single_lane_simd_emulator<LaneT_>::value)
 			{
 				// 2 single-lane emulators (most probably constructing a 256-bit in this case)
+				using per_lane_index_sequence = typename std::conditional<IsSetr_, std::make_index_sequence<args_per_lane>, EmuCore::TMP::make_reverse_index_sequence<args_per_lane>>::type;
 				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
 				(
 					set_single_lane_simd_emulator_with_offset_tuple<LaneT_, LaneIndices_ * args_per_lane>
 					(
 						args_tuple_,
-						std::make_index_sequence<args_per_lane>()
+						per_lane_index_sequence()
 					)...
 				);
 			}
@@ -494,6 +501,7 @@ namespace EmuSIMD
 			{
 				// 2 actual SIMD registers
 				constexpr std::size_t per_element_width = EmulatedWidth_ / num_args;
+				using per_lane_index_sequence = typename std::conditional<IsSetr_, std::make_index_sequence<args_per_lane>, EmuCore::TMP::make_reverse_index_sequence<args_per_lane>>::type;
 				if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<per_element_width>())
 				{
 					return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
@@ -501,7 +509,7 @@ namespace EmuSIMD
 						set_simd_register_with_offset_tuple<LaneT_, per_element_width, (LaneIndices_ * args_per_lane)>
 						(
 							args_tuple_,
-							std::make_index_sequence<args_per_lane>()
+							per_lane_index_sequence()
 						)...
 					);
 				}
@@ -516,14 +524,15 @@ namespace EmuSIMD
 			}
 		}
 
-		template<std::size_t EmulatedWidth_, class LaneT_, EmuConcepts::Arithmetic...Args_, std::size_t...LaneIndices_>
-		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> set_dual_lane_simd_emulator(std::index_sequence<LaneIndices_...> lane_indices_, Args_&&...args_) noexcept
+		template<bool IsSetr_, std::size_t EmulatedWidth_, class LaneT_, EmuConcepts::Arithmetic...Args_>
+		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> set_dual_lane_simd_emulator(Args_&&...args_) noexcept
 		{
+			using lanes_index_sequence = typename std::conditional<IsSetr_, std::make_index_sequence<2>, EmuCore::TMP::make_reverse_index_sequence<2>>::type;
 			auto args_tuple = std::forward_as_tuple(std::forward<Args_>(args_)...);
-			return set_dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+			return set_dual_lane_simd_emulator<IsSetr_, EmulatedWidth_, LaneT_>
 			(
 				args_tuple,
-				std::index_sequence<LaneIndices_...>()
+				lanes_index_sequence()
 			);
 		}
 
