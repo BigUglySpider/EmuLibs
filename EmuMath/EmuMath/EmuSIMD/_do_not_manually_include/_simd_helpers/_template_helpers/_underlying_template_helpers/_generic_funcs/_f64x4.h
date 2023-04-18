@@ -268,7 +268,7 @@ namespace EmuSIMD::Funcs
 		else
 		{
 			return cast_i8x32_f64x4(_mm512_extracti32x8_epi32(a_, Index_));
-		}
+		} 
 	}
 
 	template<std::size_t Index_>
@@ -363,7 +363,7 @@ namespace EmuSIMD::Funcs
 	}
 
 	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 extract_u16x32_lane_f64x4(u16x32_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 extract_u16x32_lane_f64x4(u16x32_arg a_)
 	{
 		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting f64x4 lane from a u16x32 instance; the maximum index is 1 but this index has been exceeded.");
 		if constexpr (Index_ == 0)
