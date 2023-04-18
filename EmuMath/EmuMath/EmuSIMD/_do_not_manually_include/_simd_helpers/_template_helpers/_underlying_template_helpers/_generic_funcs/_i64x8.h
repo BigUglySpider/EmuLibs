@@ -255,7 +255,7 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 extract_i64x8_lane_i64x8(i64x8_arg a_)
 	{
 		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i64x8 lane from a i64x8 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_i64x8_i64x8(a_);
+		return a_;
 	}
 
 	template<std::size_t Index_>

@@ -542,7 +542,7 @@ namespace EmuSIMD::Funcs
 	template<std::size_t Index_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 extract_u32x16_lane_i8x16(u32x16_arg a_)
 	{
-		static_assert(Index_ <= 3, "Invalid SIMD lane extraction index: Extracting f32x4 lane from a ui8x16 instance; the maximum index is 3 but this index has been exceeded.");
+		static_assert(Index_ <= 3, "Invalid SIMD lane extraction index: Extracting i8x16 lane from a ui8x16 instance; the maximum index is 3 but this index has been exceeded.");
 		if constexpr (Index_ == 0)
 		{
 			return cast_u32x16_i8x16(a_);
