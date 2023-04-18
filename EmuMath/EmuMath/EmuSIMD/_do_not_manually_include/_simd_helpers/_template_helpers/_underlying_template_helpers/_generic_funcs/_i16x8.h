@@ -210,6 +210,358 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region EXTRACTION_TEMPLATES
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_f32x4_lane_i16x8(f32x4_arg a_)
+	{
+		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a f32x4 instance; the maximum index is 0 but this index has been exceeded");
+		return cast_f32x4_i16x8(a_);
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_f32x8_lane_i16x8(f32x8_arg a_)
+	{
+		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a f32x8 instance; the maximum index is 1 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_f32x8_i16x8(a_);
+		}
+		else
+		{
+			return cast_f32x4_i16x8(_mm256_extractf128_ps(a_, Index_));
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_f32x16_lane_i16x8(f32x16_arg a_)
+	{
+		static_assert(Index_ <= 3, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a f32x16 instance; the maximum index is 3 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_f32x16_i16x8(a_);
+		}
+		else
+		{
+			return cast_f32x4_i16x8(_mm512_extractf32x4_ps(a_, Index_));
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_f64x2_lane_i16x8(f64x2_arg a_)
+	{
+		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a f64x2 instance; the maximum index is 0 but this index has been exceeded.");
+		return cast_f64x2_i16x8(a_);
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_f64x4_lane_i16x8(f64x4_arg a_)
+	{
+		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a f64x4 instance; the maximum index is 1 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_f64x4_i16x8(a_);
+		}
+		else
+		{
+			return cast_f64x2_i16x8(_mm256_extractf128_pd(a_, Index_));
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_f64x8_lane_i16x8(f64x8_arg a_)
+	{
+		static_assert(Index_ <= 3, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a f64x8 instance; the maximum index is 3 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_f64x8_i16x8(a_);
+		}
+		else
+		{
+			return cast_f64x2_i16x8(_mm512_extractf64x2_pd(a_, Index_));
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_i8x16_lane_i16x8(i8x16_arg a_)
+	{
+		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a i8x16 instance; the maximum index is 0 but this index has been exceeded.");
+		return cast_i8x16_i16x8(a_);
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_i8x32_lane_i16x8(i8x32_arg a_)
+	{
+		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a i8x32 instance; the maximum index is 1 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_i8x32_i16x8(a_);
+		}
+		else
+		{
+			return _mm256_extracti128_si256(a_, Index_);
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_i8x64_lane_i16x8(i8x64_arg a_)
+	{
+		static_assert(Index_ <= 3, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a i8x64 instance; the maximum index is 3 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_i8x64_i16x8(a_);
+		}
+		else
+		{
+			return _mm512_extracti32x4_epi32(a_, Index_);
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_i16x8_lane_i16x8(i16x8_arg a_)
+	{
+		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a i16x8 instance; the maximum index is 0 but this index has been exceeded.");
+		return a_;
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_i16x16_lane_i16x8(i16x16_arg a_)
+	{
+		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a i16x16 instance; the maximum index is 1 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_i16x16_i16x8(a_);
+		}
+		else
+		{
+			return _mm256_extracti128_si256(a_, Index_);
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_i16x32_lane_i16x8(i16x32_arg a_)
+	{
+		static_assert(Index_ <= 3, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a i16x32 instance; the maximum index is 3 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_i16x32_i16x8(a_);
+		}
+		else
+		{
+			return _mm512_extracti32x4_epi32(a_, Index_);
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_i32x4_lane_i16x8(i32x4_arg a_)
+	{
+		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a i32x4 instance; the maximum index is 0 but this index has been exceeded.");
+		return cast_i32x4_i16x8(a_);
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_i32x8_lane_i16x8(i32x8_arg a_)
+	{
+		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a i32x8 instance; the maximum index is 1 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_i32x8_i16x8(a_);
+		}
+		else
+		{
+			return _mm256_extracti128_si256(a_, Index_);
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_i32x16_lane_i16x8(i32x16_arg a_)
+	{
+		static_assert(Index_ <= 3, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a i32x16 instance; the maximum index is 3 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_i32x16_i16x8(a_);
+		}
+		else
+		{
+			return _mm512_extracti32x4_epi32(a_, Index_);
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_i64x2_lane_i16x8(i64x2_arg a_)
+	{
+		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a i64x2 instance; the maximum index is 0 but this index has been exceeded.");
+		return cast_i64x2_i16x8(a_);
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_i64x4_lane_i16x8(i64x4_arg a_)
+	{
+		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a i64x4 instance; the maximum index is 1 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_i64x4_i16x8(a_);
+		}
+		else
+		{
+			return _mm256_extracti128_si256(a_, Index_);
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_i64x8_lane_i16x8(i64x8_arg a_)
+	{
+		static_assert(Index_ <= 3, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a i64x8 instance; the maximum index is 3 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_i64x8_i16x8(a_);
+		}
+		else
+		{
+			return _mm512_extracti32x4_epi32(a_, Index_);
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_u8x16_lane_i16x8(u8x16_arg a_)
+	{
+		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a u8x16 instance; the maximum index is 0 but this index has been exceeded.");
+		return cast_u8x16_i16x8(a_);
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_u8x32_lane_i16x8(u8x32_arg a_)
+	{
+		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a u8x32 instance; the maximum index is 1 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_u8x32_i16x8(a_);
+		}
+		else
+		{
+			return _mm256_extracti128_si256(a_, Index_);
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_u8x64_lane_i16x8(u8x64_arg a_)
+	{
+		static_assert(Index_ <= 3, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a u8x64 instance; the maximum index is 3 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_u8x64_i16x8(a_);
+		}
+		else
+		{
+			return _mm512_extracti32x4_epi32(a_, Index_);
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_u16x8_lane_i16x8(u16x8_arg a_)
+	{
+		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a u16x8 instance; the maximum index is 0 but this index has been exceeded.");
+		return cast_u16x8_i16x8(a_);
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_u16x16_lane_i16x8(u16x16_arg a_)
+	{
+		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a u16x16 instance; the maximum index is 1 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_u16x16_i16x8(a_);
+		}
+		else
+		{
+			return _mm256_extracti128_si256(a_, Index_);
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_u16x32_lane_i16x8(u16x32_arg a_)
+	{
+		static_assert(Index_ <= 3, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a u16x32 instance; the maximum index is 3 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_u16x32_i16x8(a_);
+		}
+		else
+		{
+			return _mm512_extracti32x4_epi32(a_, Index_);
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_u32x4_lane_i16x8(u32x4_arg a_)
+	{
+		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a i8x16 instance; the maximum index is 0 but this index has been exceeded.");
+		return cast_u32x4_i16x8(a_);
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_u32x8_lane_i16x8(u32x8_arg a_)
+	{
+		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a u32x8 instance; the maximum index is 1 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_u32x8_i16x8(a_);
+		}
+		else
+		{
+			return _mm256_extracti128_si256(a_, Index_);
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_u32x16_lane_i16x8(u32x16_arg a_)
+	{
+		static_assert(Index_ <= 3, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a ui8x16 instance; the maximum index is 3 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_u32x16_i16x8(a_);
+		}
+		else
+		{
+			return _mm512_extracti32x4_epi32(a_, Index_);
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_u64x2_lane_i16x8(u64x2_arg a_)
+	{
+		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a u64x2 instance; the maximum index is 0 but this index has been exceeded.");
+		return cast_u64x2_i16x8(a_);
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_u64x4_lane_i16x8(u64x4_arg a_)
+	{
+		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a u64x4 instance; the maximum index is 1 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_u64x4_i16x8(a_);
+		}
+		else
+		{
+			return _mm256_extracti128_si256(a_, Index_);
+		}
+	}
+
+	template<std::size_t Index_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 extract_u64x8_lane_i16x8(u64x8_arg a_)
+	{
+		static_assert(Index_ <= 3, "Invalid SIMD lane extraction index: Extracting i16x8 lane from a u64x8 instance; the maximum index is 3 but this index has been exceeded.");
+		if constexpr (Index_ == 0)
+		{
+			return cast_u64x8_i16x8(a_);
+		}
+		else
+		{
+			return _mm512_extracti32x4_epi32(a_, Index_);
+		}
+	}
+#pragma endregion
+
 #pragma region CONVERSIONS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 cvt_f32x4_i16x8(f32x4_arg a_)
 	{
