@@ -438,6 +438,10 @@
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_generic_funcs\_forward_declarations\_forward_template_sets.h" />
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_generic_funcs\_forward_declarations\_forward_tmp.h" />
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_generic_funcs\_generic_declarations\_decl_f32x8.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_generic_funcs\_generic_declarations\_decl_f32x16.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_generic_funcs\_generic_declarations\_decl_f64x2.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_generic_funcs\_generic_declarations\_decl_f64x4.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_generic_funcs\_generic_declarations\_decl_f64x8.h" />
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_generic_funcs\_i16x32.h" />
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_generic_funcs\_i16x16.h" />
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_generic_funcs\_f32x16.h" />

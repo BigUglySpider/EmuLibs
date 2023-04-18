@@ -1,20 +1,8 @@
 #ifndef EMU_SIMD_GENERIC_FUNCS_I8X16_H_INC_
 #define EMU_SIMD_GENERIC_FUNCS_I8X16_H_INC_ 1
 
+#include "_generic_declarations/_all_generic_declarations.h"
 #include "_common_generic_func_helpers.h"
-#include "_f32x4.h"
-#include "_i16x8.h"
-#include "_i16x16.h"
-#include "_i32x4.h"
-#include "_i32x8.h"
-#include "_i64x2.h"
-#include "_i64x4.h"
-#include "_u16x8.h"
-#include "_u16x16.h"
-#include "_u32x4.h"
-#include "_u32x8.h"
-#include "_u64x2.h"
-#include "_u64x4.h"
 
 namespace EmuSIMD::Funcs
 {

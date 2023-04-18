@@ -1,9 +1,8 @@
 #ifndef EMU_SIMD_GENERIC_FUNCS_I16X16_H_INC_
 #define EMU_SIMD_GENERIC_FUNCS_I16X16_H_INC_ 1
 
+#include "_generic_declarations/_all_generic_declarations.h"
 #include "_common_generic_func_helpers.h"
-#include "_f32x8.h"
-#include "_i32x8.h"
 
 namespace EmuSIMD::Funcs
 {

@@ -2,7 +2,6 @@
 #define EMU_SIMD_GENERIC_FUNCS_F32X8_DECL_H_INC_ 1
 
 #include "../_common_generic_func_helpers.h"
-#include "_decl_f32x4.h"
 
 namespace EmuSIMD::Funcs
 {
