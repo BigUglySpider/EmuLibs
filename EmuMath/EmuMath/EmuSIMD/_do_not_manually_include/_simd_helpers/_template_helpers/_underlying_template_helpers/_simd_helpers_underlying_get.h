@@ -362,39 +362,135 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x4>)
 		{
-			return EmuSIMD::f32x4(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f32x4_lane_f32x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x8>)
 		{
-			return _mm256_extractf128_ps(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_f32x8_lane_f32x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return _mm512_extractf32x4_ps(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_f32x16_lane_f32x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x2>)
 		{
-			return EmuSIMD::Funcs::cast_f64x2_f32x4(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x2_lane_f32x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x4>)
 		{
-			return EmuSIMD::Funcs::cast_f64x2_f32x4(_mm256_extractf128_pd(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f64x4_lane_f32x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return EmuSIMD::Funcs::cast_f64x2_f32x4(_mm512_extractf64x2_pd(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f64x8_lane_f32x4<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i128_generic, EmuSIMD::i8x16, EmuSIMD::i16x8, EmuSIMD::i32x4, EmuSIMD::i64x2>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i128_generic>)
 		{
-			return EmuSIMD::Funcs::cast_i32x4_f32x4(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x4_lane_f32x4<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i256_generic, EmuSIMD::i8x32, EmuSIMD::i16x16, EmuSIMD::i32x8, EmuSIMD::i64x4>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i256_generic>)
 		{
-			return EmuSIMD::Funcs::cast_i32x4_f32x4(_mm256_extracti128_si256(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_i32x8_lane_f32x4<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return EmuSIMD::Funcs::cast_i32x4_f32x4(_mm512_extracti32x4_epi32(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_i32x16_lane_f32x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x16>)
+		{
+			return EmuSIMD::Funcs::extract_i8x16_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x8>)
+		{
+			return EmuSIMD::Funcs::extract_i16x8_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x4>)
+		{
+			return EmuSIMD::Funcs::extract_i32x4_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x2>)
+		{
+			return EmuSIMD::Funcs::extract_i64x2_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x32>)
+		{
+			return EmuSIMD::Funcs::extract_i8x32_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x16>)
+		{
+			return EmuSIMD::Funcs::extract_i16x16_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x8>)
+		{
+			return EmuSIMD::Funcs::extract_i32x8_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x4>)
+		{
+			return EmuSIMD::Funcs::extract_i64x4_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x16>)
+		{
+			return EmuSIMD::Funcs::extract_u8x16_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x8>)
+		{
+			return EmuSIMD::Funcs::extract_u16x8_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x4>)
+		{
+			return EmuSIMD::Funcs::extract_u32x4_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x2>)
+		{
+			return EmuSIMD::Funcs::extract_u64x2_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x32>)
+		{
+			return EmuSIMD::Funcs::extract_u8x32_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x16>)
+		{
+			return EmuSIMD::Funcs::extract_u16x16_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x8>)
+		{
+			return EmuSIMD::Funcs::extract_u32x8_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x4>)
+		{
+			return EmuSIMD::Funcs::extract_u64x4_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_f32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_f32x4<LaneIndex_>(in_);
 		}
 		else
 		{
@@ -412,27 +508,91 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x8>)
 		{
-			return EmuSIMD::f32x8(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f32x8_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return _mm512_extractf32x8_ps(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_f32x16_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x4>)
 		{
-			return EmuSIMD::Funcs::cast_f64x4_f32x8(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x4_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return EmuSIMD::Funcs::cast_f64x4_f32x8(_mm512_extractf64x4_pd(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f64x8_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i256_generic, EmuSIMD::i8x32, EmuSIMD::i16x16, EmuSIMD::i32x8, EmuSIMD::i64x4>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i256_generic>)
 		{
-			return EmuSIMD::Funcs::cast_i32x8_f32x8(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x8_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return EmuSIMD::Funcs::cast_i32x8_f32x8(_mm512_extracti32x8_epi32(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_i32x16_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x32>)
+		{
+			return EmuSIMD::Funcs::extract_i8x32_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x16>)
+		{
+			return EmuSIMD::Funcs::extract_i16x16_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x8>)
+		{
+			return EmuSIMD::Funcs::extract_i32x8_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x4>)
+		{
+			return EmuSIMD::Funcs::extract_i64x4_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x32>)
+		{
+			return EmuSIMD::Funcs::extract_u8x32_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x16>)
+		{
+			return EmuSIMD::Funcs::extract_u16x16_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x8>)
+		{
+			return EmuSIMD::Funcs::extract_u32x8_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x4>)
+		{
+			return EmuSIMD::Funcs::extract_u64x4_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_f32x8<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else
 		{
@@ -450,15 +610,47 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::f32x16(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f32x16_lane_f32x16<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return EmuSIMD::Funcs::cast_f64x8_f32x16(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x8_lane_f32x16<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return EmuSIMD::Funcs::cast_i32x16_f32x16(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x16_lane_f32x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_f32x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_f32x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_f32x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_f32x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_f32x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_f32x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_f32x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_f32x16<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else
 		{
@@ -476,39 +668,135 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x4>)
 		{
-			return EmuSIMD::Funcs::cast_f32x4_f64x2(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f32x4_lane_f64x2<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x8>)
 		{
-			return EmuSIMD::Funcs::cast_f32x4_f64x2(_mm256_extractf128_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f32x8_lane_f64x2<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::Funcs::cast_f32x4_f64x2(_mm512_extractf32x4_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f32x16_lane_f64x2<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x2>)
 		{
-			return EmuSIMD::f64x2(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x2_lane_f64x2<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x4>)
 		{
-			return _mm256_extractf128_pd(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_f64x4_lane_f64x2<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return _mm512_extractf64x2_pd(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_f64x8_lane_f64x2<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i128_generic, EmuSIMD::i8x16, EmuSIMD::i16x8, EmuSIMD::i32x4, EmuSIMD::i64x2>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i128_generic>)
 		{
-			return EmuSIMD::Funcs::cast_i64x2_f64x2(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x4_lane_f64x2<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i256_generic, EmuSIMD::i8x32, EmuSIMD::i16x16, EmuSIMD::i32x8, EmuSIMD::i64x4>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i256_generic>)
 		{
-			return EmuSIMD::Funcs::cast_i64x2_f64x2(_mm256_extracti128_si256(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_i32x8_lane_f64x2<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return EmuSIMD::Funcs::cast_i64x2_f64x2(_mm512_extracti64x2_epi64(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_i32x16_lane_f64x2<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x16>)
+		{
+			return EmuSIMD::Funcs::extract_i8x16_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x8>)
+		{
+			return EmuSIMD::Funcs::extract_i16x8_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x4>)
+		{
+			return EmuSIMD::Funcs::extract_i32x4_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x2>)
+		{
+			return EmuSIMD::Funcs::extract_i64x2_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x32>)
+		{
+			return EmuSIMD::Funcs::extract_i8x32_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x16>)
+		{
+			return EmuSIMD::Funcs::extract_i16x16_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x8>)
+		{
+			return EmuSIMD::Funcs::extract_i32x8_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x4>)
+		{
+			return EmuSIMD::Funcs::extract_i64x4_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x16>)
+		{
+			return EmuSIMD::Funcs::extract_u8x16_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x8>)
+		{
+			return EmuSIMD::Funcs::extract_u16x8_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x4>)
+		{
+			return EmuSIMD::Funcs::extract_u32x4_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x2>)
+		{
+			return EmuSIMD::Funcs::extract_u64x2_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x32>)
+		{
+			return EmuSIMD::Funcs::extract_u8x32_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x16>)
+		{
+			return EmuSIMD::Funcs::extract_u16x16_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x8>)
+		{
+			return EmuSIMD::Funcs::extract_u32x8_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x4>)
+		{
+			return EmuSIMD::Funcs::extract_u64x4_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_f64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_f64x2<LaneIndex_>(in_);
 		}
 		else
 		{
@@ -526,27 +814,91 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x8>)
 		{
-			return EmuSIMD::Funcs::cast_f32x8_f64x4(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f32x8_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::Funcs::cast_f32x8_f64x4(_mm512_extractf32x8_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f32x16_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x4>)
 		{
-			return EmuSIMD::f64x4(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x4_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return _mm512_extractf64x4_pd(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_f64x8_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i256_generic, EmuSIMD::i8x32, EmuSIMD::i16x16, EmuSIMD::i32x8, EmuSIMD::i64x4>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i256_generic>)
 		{
-			return EmuSIMD::Funcs::cast_i64x4_f64x4(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x8_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return EmuSIMD::Funcs::cast_i64x4_f64x4(_mm512_extracti64x4_epi64(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_i32x16_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x32>)
+		{
+			return EmuSIMD::Funcs::extract_i8x32_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x16>)
+		{
+			return EmuSIMD::Funcs::extract_i16x16_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x8>)
+		{
+			return EmuSIMD::Funcs::extract_i32x8_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x4>)
+		{
+			return EmuSIMD::Funcs::extract_i64x4_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x32>)
+		{
+			return EmuSIMD::Funcs::extract_u8x32_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x16>)
+		{
+			return EmuSIMD::Funcs::extract_u16x16_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x8>)
+		{
+			return EmuSIMD::Funcs::extract_u32x8_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x4>)
+		{
+			return EmuSIMD::Funcs::extract_u64x4_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_f64x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else
 		{
@@ -564,15 +916,47 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::Funcs::cast_f32x8_f64x8(_mm512_extractf32x8_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f32x16_lane_f64x8<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return EmuSIMD::f64x8(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x8_lane_f64x8<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return EmuSIMD::Funcs::cast_i64x8_f64x8(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x16_lane_f64x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_f64x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_f64x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_f64x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_f64x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_f64x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_f64x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_f64x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_f64x8<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else
 		{
@@ -590,39 +974,135 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x4>)
 		{
-			return EmuSIMD::Funcs::cast_f32x4_i8x16(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f32x4_lane_i8x16<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x8>)
 		{
-			return EmuSIMD::Funcs::cast_f32x4_i8x16(_mm256_extractf128_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f32x8_lane_i8x16<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::Funcs::cast_f32x4_i8x16(_mm512_extractf32x4_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f32x16_lane_i8x16<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x2>)
 		{
-			return EmuSIMD::Funcs::cast_f64x2_i8x16(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x2_lane_i8x16<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x4>)
 		{
-			return EmuSIMD::Funcs::cast_f64x2_i8x16(_mm256_extractf128_pd(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f64x4_lane_i8x16<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return EmuSIMD::Funcs::cast_f64x2_i8x16(_mm512_extractf64x2_pd(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f64x8_lane_i8x16<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i128_generic, EmuSIMD::i8x16, EmuSIMD::i16x8, EmuSIMD::i32x4, EmuSIMD::i64x2>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i128_generic>)
 		{
-			return EmuSIMD::i8x16(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x4_lane_i8x16<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i256_generic, EmuSIMD::i8x32, EmuSIMD::i16x16, EmuSIMD::i32x8, EmuSIMD::i64x4>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i256_generic>)
 		{
-			return _mm256_extracti128_si256(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_i32x8_lane_i8x16<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return _mm512_extracti32x4_epi32(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_i32x16_lane_i8x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x16>)
+		{
+			return EmuSIMD::Funcs::extract_i8x16_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x8>)
+		{
+			return EmuSIMD::Funcs::extract_i16x8_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x4>)
+		{
+			return EmuSIMD::Funcs::extract_i32x4_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x2>)
+		{
+			return EmuSIMD::Funcs::extract_i64x2_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x32>)
+		{
+			return EmuSIMD::Funcs::extract_i8x32_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x16>)
+		{
+			return EmuSIMD::Funcs::extract_i16x16_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x8>)
+		{
+			return EmuSIMD::Funcs::extract_i32x8_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x4>)
+		{
+			return EmuSIMD::Funcs::extract_i64x4_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x16>)
+		{
+			return EmuSIMD::Funcs::extract_u8x16_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x8>)
+		{
+			return EmuSIMD::Funcs::extract_u16x8_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x4>)
+		{
+			return EmuSIMD::Funcs::extract_u32x4_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x2>)
+		{
+			return EmuSIMD::Funcs::extract_u64x2_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x32>)
+		{
+			return EmuSIMD::Funcs::extract_u8x32_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x16>)
+		{
+			return EmuSIMD::Funcs::extract_u16x16_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x8>)
+		{
+			return EmuSIMD::Funcs::extract_u32x8_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x4>)
+		{
+			return EmuSIMD::Funcs::extract_u64x4_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_i8x16<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_i8x16<LaneIndex_>(in_);
 		}
 		else
 		{
@@ -640,27 +1120,91 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x8>)
 		{
-			return EmuSIMD::Funcs::cast_f32x8_i8x32(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f32x8_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::Funcs::cast_f32x8_i8x32(_mm512_extractf32x8_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f32x16_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x4>)
 		{
-			return EmuSIMD::Funcs::cast_f64x4_i8x32(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x4_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return EmuSIMD::Funcs::cast_f64x4_i8x32(_mm512_extractf64x4_pd(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f64x8_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i256_generic, EmuSIMD::i8x32, EmuSIMD::i16x16, EmuSIMD::i32x8, EmuSIMD::i64x4>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i256_generic>)
 		{
-			return EmuSIMD::i8x32(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x8_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return _mm512_extracti32x8_epi32(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_i32x16_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x32>)
+		{
+			return EmuSIMD::Funcs::extract_i8x32_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x16>)
+		{
+			return EmuSIMD::Funcs::extract_i16x16_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x8>)
+		{
+			return EmuSIMD::Funcs::extract_i32x8_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x4>)
+		{
+			return EmuSIMD::Funcs::extract_i64x4_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x32>)
+		{
+			return EmuSIMD::Funcs::extract_u8x32_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x16>)
+		{
+			return EmuSIMD::Funcs::extract_u16x16_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x8>)
+		{
+			return EmuSIMD::Funcs::extract_u32x8_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x4>)
+		{
+			return EmuSIMD::Funcs::extract_u64x4_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_i8x32<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else
 		{
@@ -678,15 +1222,47 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::Funcs::cast_f32x16_i8x64(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f32x16_lane_i8x64<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return EmuSIMD::Funcs::cast_f64x8_i8x64(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x8_lane_i8x64<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return EmuSIMD::i8x64(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x16_lane_i8x64<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_i8x64<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_i8x64<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_i8x64<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_i8x64<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_i8x64<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_i8x64<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_i8x64<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_i8x64<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else
 		{
@@ -699,44 +1275,140 @@ namespace EmuSIMD::_underlying_simd_helpers
 	}
 
 	template<std::size_t LaneIndex_, class In_>
-	[[nodiscard]] constexpr inline EmuSIMD::i8x16 _extract_lane_i16x8_prevalidated(In_&& in_)
+	[[nodiscard]] constexpr inline EmuSIMD::i16x8 _extract_lane_i16x8_prevalidated(In_&& in_)
 	{
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x4>)
 		{
-			return EmuSIMD::Funcs::cast_f32x4_i16x8(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f32x4_lane_i16x8<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x8>)
 		{
-			return EmuSIMD::Funcs::cast_f32x4_i16x8(_mm256_extractf128_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f32x8_lane_i16x8<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::Funcs::cast_f32x4_i16x8(_mm512_extractf32x4_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f32x16_lane_i16x8<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x2>)
 		{
-			return EmuSIMD::Funcs::cast_f64x2_i16x8(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x2_lane_i16x8<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x4>)
 		{
-			return EmuSIMD::Funcs::cast_f64x2_i16x8(_mm256_extractf128_pd(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f64x4_lane_i16x8<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return EmuSIMD::Funcs::cast_f64x2_i16x8(_mm512_extractf64x2_pd(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f64x8_lane_i16x8<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i128_generic, EmuSIMD::i8x16, EmuSIMD::i16x8, EmuSIMD::i32x4, EmuSIMD::i64x2>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i128_generic>)
 		{
-			return EmuSIMD::i8x16(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x4_lane_i16x8<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i256_generic, EmuSIMD::i8x32, EmuSIMD::i16x16, EmuSIMD::i32x8, EmuSIMD::i64x4>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i256_generic>)
 		{
-			return _mm256_extracti128_si256(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_i32x8_lane_i16x8<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return _mm512_extracti32x4_epi32(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_i32x16_lane_i16x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x16>)
+		{
+			return EmuSIMD::Funcs::extract_i8x16_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x8>)
+		{
+			return EmuSIMD::Funcs::extract_i16x8_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x4>)
+		{
+			return EmuSIMD::Funcs::extract_i32x4_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x2>)
+		{
+			return EmuSIMD::Funcs::extract_i64x2_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x32>)
+		{
+			return EmuSIMD::Funcs::extract_i8x32_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x16>)
+		{
+			return EmuSIMD::Funcs::extract_i16x16_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x8>)
+		{
+			return EmuSIMD::Funcs::extract_i32x8_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x4>)
+		{
+			return EmuSIMD::Funcs::extract_i64x4_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x16>)
+		{
+			return EmuSIMD::Funcs::extract_u8x16_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x8>)
+		{
+			return EmuSIMD::Funcs::extract_u16x8_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x4>)
+		{
+			return EmuSIMD::Funcs::extract_u32x4_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x2>)
+		{
+			return EmuSIMD::Funcs::extract_u64x2_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x32>)
+		{
+			return EmuSIMD::Funcs::extract_u8x32_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x16>)
+		{
+			return EmuSIMD::Funcs::extract_u16x16_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x8>)
+		{
+			return EmuSIMD::Funcs::extract_u32x8_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x4>)
+		{
+			return EmuSIMD::Funcs::extract_u64x4_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_i16x8<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_i16x8<LaneIndex_>(in_);
 		}
 		else
 		{
@@ -754,27 +1426,91 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x8>)
 		{
-			return EmuSIMD::Funcs::cast_f32x8_i16x16(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f32x8_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::Funcs::cast_f32x8_i16x16(_mm512_extractf32x8_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f32x16_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x4>)
 		{
-			return EmuSIMD::Funcs::cast_f64x4_i16x16(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x4_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return EmuSIMD::Funcs::cast_f64x4_i16x16(_mm512_extractf64x4_pd(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f64x8_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i256_generic, EmuSIMD::i8x32, EmuSIMD::i16x16, EmuSIMD::i32x8, EmuSIMD::i64x4>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i256_generic>)
 		{
-			return EmuSIMD::i16x16(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x8_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return _mm512_extracti32x8_epi32(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_i32x16_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x32>)
+		{
+			return EmuSIMD::Funcs::extract_i8x32_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x16>)
+		{
+			return EmuSIMD::Funcs::extract_i16x16_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x8>)
+		{
+			return EmuSIMD::Funcs::extract_i32x8_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x4>)
+		{
+			return EmuSIMD::Funcs::extract_i64x4_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x32>)
+		{
+			return EmuSIMD::Funcs::extract_u8x32_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x16>)
+		{
+			return EmuSIMD::Funcs::extract_u16x16_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x8>)
+		{
+			return EmuSIMD::Funcs::extract_u32x8_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x4>)
+		{
+			return EmuSIMD::Funcs::extract_u64x4_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_i16x16<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else
 		{
@@ -792,15 +1528,47 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::Funcs::cast_f32x16_i16x32(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f32x16_lane_i16x32<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return EmuSIMD::Funcs::cast_f64x8_i16x32(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x8_lane_i16x32<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return EmuSIMD::i16x32(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x16_lane_i16x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_i16x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_i16x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_i16x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_i16x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_i16x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_i16x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_i16x32<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_i16x32<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else
 		{
@@ -818,39 +1586,135 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x4>)
 		{
-			return EmuSIMD::Funcs::cast_f32x4_i32x4(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f32x4_lane_i32x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x8>)
 		{
-			return EmuSIMD::Funcs::cast_f32x4_i32x4(_mm256_extractf128_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f32x8_lane_i32x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::Funcs::cast_f32x4_i32x4(_mm512_extractf32x4_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f32x16_lane_i32x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x2>)
 		{
-			return EmuSIMD::Funcs::cast_f64x2_i32x4(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x2_lane_i32x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x4>)
 		{
-			return EmuSIMD::Funcs::cast_f64x2_i32x4(_mm256_extractf128_pd(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f64x4_lane_i32x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return EmuSIMD::Funcs::cast_f64x2_i32x4(_mm512_extractf64x2_pd(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f64x8_lane_i32x4<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i128_generic, EmuSIMD::i8x16, EmuSIMD::i16x8, EmuSIMD::i32x4, EmuSIMD::i64x2>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i128_generic>)
 		{
-			return EmuSIMD::i32x4(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x4_lane_i32x4<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i256_generic, EmuSIMD::i8x32, EmuSIMD::i16x16, EmuSIMD::i32x8, EmuSIMD::i64x4>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i256_generic>)
 		{
-			return _mm256_extracti128_si256(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_i32x8_lane_i32x4<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return _mm512_extracti32x4_epi32(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_i32x16_lane_i32x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x16>)
+		{
+			return EmuSIMD::Funcs::extract_i8x16_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x8>)
+		{
+			return EmuSIMD::Funcs::extract_i16x8_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x4>)
+		{
+			return EmuSIMD::Funcs::extract_i32x4_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x2>)
+		{
+			return EmuSIMD::Funcs::extract_i64x2_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x32>)
+		{
+			return EmuSIMD::Funcs::extract_i8x32_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x16>)
+		{
+			return EmuSIMD::Funcs::extract_i16x16_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x8>)
+		{
+			return EmuSIMD::Funcs::extract_i32x8_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x4>)
+		{
+			return EmuSIMD::Funcs::extract_i64x4_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x16>)
+		{
+			return EmuSIMD::Funcs::extract_u8x16_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x8>)
+		{
+			return EmuSIMD::Funcs::extract_u16x8_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x4>)
+		{
+			return EmuSIMD::Funcs::extract_u32x4_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x2>)
+		{
+			return EmuSIMD::Funcs::extract_u64x2_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x32>)
+		{
+			return EmuSIMD::Funcs::extract_u8x32_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x16>)
+		{
+			return EmuSIMD::Funcs::extract_u16x16_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x8>)
+		{
+			return EmuSIMD::Funcs::extract_u32x8_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x4>)
+		{
+			return EmuSIMD::Funcs::extract_u64x4_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_i32x4<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_i32x4<LaneIndex_>(in_);
 		}
 		else
 		{
@@ -868,27 +1732,91 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x8>)
 		{
-			return EmuSIMD::Funcs::cast_f32x8_i32x8(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f32x8_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::Funcs::cast_f32x8_i32x8(_mm512_extractf32x8_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f32x16_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x4>)
 		{
-			return EmuSIMD::Funcs::cast_f64x4_i32x8(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x4_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return EmuSIMD::Funcs::cast_f64x4_i32x8(_mm512_extractf64x4_pd(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f64x8_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i256_generic, EmuSIMD::i8x32, EmuSIMD::i16x16, EmuSIMD::i32x8, EmuSIMD::i64x4>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i256_generic>)
 		{
-			return EmuSIMD::i32x8(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x8_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return _mm512_extracti32x8_epi32(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_i32x16_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x32>)
+		{
+			return EmuSIMD::Funcs::extract_i8x32_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x16>)
+		{
+			return EmuSIMD::Funcs::extract_i16x16_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x8>)
+		{
+			return EmuSIMD::Funcs::extract_i32x8_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x4>)
+		{
+			return EmuSIMD::Funcs::extract_i64x4_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x32>)
+		{
+			return EmuSIMD::Funcs::extract_u8x32_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x16>)
+		{
+			return EmuSIMD::Funcs::extract_u16x16_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x8>)
+		{
+			return EmuSIMD::Funcs::extract_u32x8_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x4>)
+		{
+			return EmuSIMD::Funcs::extract_u64x4_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_i32x8<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else
 		{
@@ -906,15 +1834,47 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::Funcs::cast_f32x16_i32x16(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f32x16_lane_i32x16<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return EmuSIMD::Funcs::cast_f64x8_i32x16(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x8_lane_i32x16<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return EmuSIMD::i32x16(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x16_lane_i32x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_i32x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_i32x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_i32x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_i32x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_i32x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_i32x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_i32x16<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_i32x16<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else
 		{
@@ -932,39 +1892,135 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x4>)
 		{
-			return EmuSIMD::Funcs::cast_f32x4_i64x2(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f32x4_lane_i64x2<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x8>)
 		{
-			return EmuSIMD::Funcs::cast_f32x4_i64x2(_mm256_extractf128_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f32x8_lane_i64x2<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::Funcs::cast_f32x4_i64x2(_mm512_extractf32x4_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f32x16_lane_i64x2<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x2>)
 		{
-			return EmuSIMD::Funcs::cast_f64x2_i64x2(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x2_lane_i64x2<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x4>)
 		{
-			return EmuSIMD::Funcs::cast_f64x2_i64x2(_mm256_extractf128_pd(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f64x4_lane_i64x2<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return EmuSIMD::Funcs::cast_f64x2_i64x2(_mm512_extractf64x2_pd(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f64x8_lane_i64x2<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i128_generic, EmuSIMD::i8x16, EmuSIMD::i16x8, EmuSIMD::i32x4, EmuSIMD::i64x2>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i128_generic>)
 		{
-			return EmuSIMD::i64x2(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x4_lane_i64x2<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i256_generic, EmuSIMD::i8x32, EmuSIMD::i16x16, EmuSIMD::i32x8, EmuSIMD::i64x4>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i256_generic>)
 		{
-			return _mm256_extracti128_si256(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_i32x8_lane_i64x2<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return _mm512_extracti64x2_epi64(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_i32x16_lane_i64x2<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x16>)
+		{
+			return EmuSIMD::Funcs::extract_i8x16_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x8>)
+		{
+			return EmuSIMD::Funcs::extract_i16x8_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x4>)
+		{
+			return EmuSIMD::Funcs::extract_i32x4_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x2>)
+		{
+			return EmuSIMD::Funcs::extract_i64x2_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x32>)
+		{
+			return EmuSIMD::Funcs::extract_i8x32_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x16>)
+		{
+			return EmuSIMD::Funcs::extract_i16x16_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x8>)
+		{
+			return EmuSIMD::Funcs::extract_i32x8_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x4>)
+		{
+			return EmuSIMD::Funcs::extract_i64x4_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x16>)
+		{
+			return EmuSIMD::Funcs::extract_u8x16_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x8>)
+		{
+			return EmuSIMD::Funcs::extract_u16x8_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x4>)
+		{
+			return EmuSIMD::Funcs::extract_u32x4_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x2>)
+		{
+			return EmuSIMD::Funcs::extract_u64x2_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x32>)
+		{
+			return EmuSIMD::Funcs::extract_u8x32_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x16>)
+		{
+			return EmuSIMD::Funcs::extract_u16x16_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x8>)
+		{
+			return EmuSIMD::Funcs::extract_u32x8_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x4>)
+		{
+			return EmuSIMD::Funcs::extract_u64x4_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_i64x2<LaneIndex_>(in_);
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_i64x2<LaneIndex_>(in_);
 		}
 		else
 		{
@@ -982,27 +2038,91 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x8>)
 		{
-			return EmuSIMD::Funcs::cast_f32x8_i64x4(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f32x8_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::Funcs::cast_f32x8_i64x4(_mm512_extractf32x8_ps(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f32x16_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x4>)
 		{
-			return EmuSIMD::Funcs::cast_f64x4_i64x4(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x4_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return EmuSIMD::Funcs::cast_f64x4_i64x4(_mm512_extractf64x4_pd(std::forward<In_>(in_), LaneIndex_));
+			return EmuSIMD::Funcs::extract_f64x8_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i256_generic, EmuSIMD::i8x32, EmuSIMD::i16x16, EmuSIMD::i32x8, EmuSIMD::i64x4>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i256_generic>)
 		{
-			return EmuSIMD::i64x4(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x8_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return _mm512_extracti64x4_epi64(std::forward<In_>(in_), LaneIndex_);
+			return EmuSIMD::Funcs::extract_i32x16_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x32>)
+		{
+			return EmuSIMD::Funcs::extract_i8x32_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x16>)
+		{
+			return EmuSIMD::Funcs::extract_i16x16_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x8>)
+		{
+			return EmuSIMD::Funcs::extract_i32x8_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x4>)
+		{
+			return EmuSIMD::Funcs::extract_i64x4_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x32>)
+		{
+			return EmuSIMD::Funcs::extract_u8x32_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x16>)
+		{
+			return EmuSIMD::Funcs::extract_u16x16_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x8>)
+		{
+			return EmuSIMD::Funcs::extract_u32x8_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x4>)
+		{
+			return EmuSIMD::Funcs::extract_u64x4_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_i64x4<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else
 		{
@@ -1020,15 +2140,47 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
 		if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
 		{
-			return EmuSIMD::Funcs::cast_f32x16_i64x8(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f32x16_lane_i64x8<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
 		{
-			return EmuSIMD::Funcs::cast_f64x8_i64x8(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_f64x8_lane_i64x8<LaneIndex_>(std::forward<In_>(in_));
 		}
-		else if constexpr (EmuCore::TMP::is_any_same_v<in_uq, EmuSIMD::i512_generic, EmuSIMD::i8x64, EmuSIMD::i16x32, EmuSIMD::i32x16, EmuSIMD::i64x8>)
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
 		{
-			return EmuSIMD::i64x8(std::forward<In_>(in_));
+			return EmuSIMD::Funcs::extract_i32x16_lane_i64x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::extract_i8x64_lane_i64x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::extract_i16x32_lane_i64x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::extract_i32x16_lane_i64x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::extract_i64x8_lane_i64x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::extract_u8x64_lane_i64x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::extract_u16x32_lane_i64x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::extract_u32x16_lane_i64x8<LaneIndex_>(std::forward<In_>(in_));
+		}
+		else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::extract_u64x8_lane_i64x8<LaneIndex_>(std::forward<In_>(in_));
 		}
 		else
 		{
