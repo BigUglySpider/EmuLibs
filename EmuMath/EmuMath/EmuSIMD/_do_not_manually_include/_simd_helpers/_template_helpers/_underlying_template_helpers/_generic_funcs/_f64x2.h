@@ -52,6 +52,11 @@ namespace EmuSIMD::Funcs
 	{
 		_mm_store_pd(p_out_, a_);
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC double get_first_f64x2(f64x2_arg a_)
+	{
+		return _mm_cvtsd_f64(a_);
+	}
 #pragma endregion
 
 #pragma region CASTS

@@ -16,6 +16,7 @@ namespace EmuSIMD::Funcs
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_f32x4(float* p_out_, f32x4_arg a_);
+	EMU_SIMD_COMMON_FUNC_SPEC float get_first_f32x4(f32x4_arg a_);
 #pragma endregion
 
 #pragma region CASTS
@@ -535,6 +536,34 @@ namespace EmuSIMD::Funcs
 		else
 		{
 			return cast_u64x2_f32x4(_mm512_extracti32x4_epi32(a_, Index_));
+		}
+	}
+#pragma endregion
+
+#pragma region GET_TEMPLATES
+	template<std::size_t Index_, typename OutT_ = float>
+	EMU_SIMD_COMMON_FUNC_SPEC auto extract_element_f32x4(f32x4_arg in_)
+		-> typename std::remove_cvref<OutT_>::type
+	{
+		if constexpr (Index_ == 0)
+		{
+			return static_cast<OutT_>(EmuSIMD::Funcs::get_first_f32x4(in_));
+		}
+		else
+		{
+			if constexpr (Index_ <= 3)
+			{
+				constexpr std::size_t shuffle_mask = make_shuffle_mask_32<Index_, Index_, Index_, Index_>();
+				return static_cast<OutT_>(EmuSIMD::Funcs::get_first_f32x4(permute_f32x4<shuffle_mask>(in_)));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, Index_>(),
+					"Invalid index provided when extracting an element from a f32x4 instance. Valid indices are 0, 1, 2, 3."
+				);
+			}
 		}
 	}
 #pragma endregion

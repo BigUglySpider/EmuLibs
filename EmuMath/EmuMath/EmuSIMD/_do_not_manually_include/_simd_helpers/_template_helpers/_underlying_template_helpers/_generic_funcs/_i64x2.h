@@ -48,6 +48,11 @@ namespace EmuSIMD::Funcs
 	{
 		_mm_store_si128(reinterpret_cast<__m128i*>(p_out_), a_);
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC std::int64_t get_first_i64x2(i64x2_arg a_)
+	{
+		return _mm_cvtsi128_si64(a_);
+	}
 #pragma endregion
 
 #pragma region CASTS

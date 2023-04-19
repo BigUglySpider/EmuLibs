@@ -50,6 +50,11 @@ namespace EmuSIMD::Funcs
 	{
 		_mm256_store_si256(reinterpret_cast<__m256i*>(p_out_), a_);
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC std::int64_t get_first_i64x4(i64x4_arg a_)
+	{
+		return get_first_i64x2(cast_i64x4_i64x2(a_));
+	}
 #pragma endregion
 
 #pragma region CASTS

@@ -17,6 +17,7 @@ namespace EmuSIMD::Funcs
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_i64x2(std::int64_t* p_out_, i64x2_arg a_);
+	EMU_SIMD_COMMON_FUNC_SPEC std::int64_t get_first_i64x2(i64x2_arg a_);
 #pragma endregion
 
 #pragma region CASTS

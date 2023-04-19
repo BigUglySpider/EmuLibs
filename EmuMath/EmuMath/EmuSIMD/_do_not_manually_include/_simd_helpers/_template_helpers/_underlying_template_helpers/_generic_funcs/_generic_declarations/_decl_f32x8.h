@@ -2,6 +2,7 @@
 #define EMU_SIMD_GENERIC_FUNCS_F32X8_DECL_H_INC_ 1
 
 #include "../_common_generic_func_helpers.h"
+#include "_decl_f32x4.h"
 
 namespace EmuSIMD::Funcs
 {
@@ -16,6 +17,7 @@ namespace EmuSIMD::Funcs
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_f32x8(float* p_out_, f32x8_arg a_);
+	EMU_SIMD_COMMON_FUNC_SPEC float get_first_f32x8(f32x8_arg a_);
 #pragma endregion
 
 #pragma region CASTS
@@ -396,6 +398,35 @@ namespace EmuSIMD::Funcs
 		else
 		{
 			return cast_u64x4_f32x8(_mm512_extracti32x8_epi32(a_, Index_));
+		}
+	}
+#pragma endregion
+
+#pragma region GET_TEMPLATES
+	template<std::size_t Index_, typename OutT_ = float>
+	EMU_SIMD_COMMON_FUNC_SPEC auto extract_element_f32x8(f32x8_arg in_)
+		-> typename std::remove_cvref<OutT_>::type
+	{
+		if constexpr (Index_ == 0)
+		{
+			return get_first_f32x8(in_);
+		}
+		else
+		{
+			if constexpr (Index_ <= 7)
+			{
+				constexpr int is_hi = static_cast<int>(Index_ >= 4);
+				constexpr std::size_t index_in_half = Index_ - (4 * is_hi);
+				return EmuSIMD::Funcs::extract_element_f32x4<index_in_half>(EmuSIMD::Funcs::extract_f32x8_lane_f32x4<is_hi>(in_));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, Index_>(),
+					"Invalid index provided when extracting an element from a f32x8 instance. Valid indices are 0, 1, 2, 3, 4, 5, 6, 7."
+				);
+			}
 		}
 	}
 #pragma endregion

@@ -135,6 +135,54 @@ namespace EmuSIMD
 						{
 							return EmuSIMD::_underlying_simd_helpers::_extract_lane_i64x8_prevalidated<LaneIndex_>(std::forward<InSIMDRegister_>(in_multi_lane_simd_register_));
 						}
+						else if constexpr (std::is_same_v<EmuSIMD::u8x16, out_uq>)
+						{
+							return EmuSIMD::_underlying_simd_helpers::_extract_lane_u8x16_prevalidated<LaneIndex_>(std::forward<InSIMDRegister_>(in_multi_lane_simd_register_));
+						}
+						else if constexpr (std::is_same_v<EmuSIMD::u8x32, out_uq>)
+						{
+							return EmuSIMD::_underlying_simd_helpers::_extract_lane_u8x32_prevalidated<LaneIndex_>(std::forward<InSIMDRegister_>(in_multi_lane_simd_register_));
+						}
+						else if constexpr (std::is_same_v<EmuSIMD::u8x64, out_uq>)
+						{
+							return EmuSIMD::_underlying_simd_helpers::_extract_lane_u8x64_prevalidated<LaneIndex_>(std::forward<InSIMDRegister_>(in_multi_lane_simd_register_));
+						}
+						else if constexpr (std::is_same_v<EmuSIMD::u16x8, out_uq>)
+						{
+							return EmuSIMD::_underlying_simd_helpers::_extract_lane_u16x8_prevalidated<LaneIndex_>(std::forward<InSIMDRegister_>(in_multi_lane_simd_register_));
+						}
+						else if constexpr (std::is_same_v<EmuSIMD::u16x16, out_uq>)
+						{
+							return EmuSIMD::_underlying_simd_helpers::_extract_lane_u16x16_prevalidated<LaneIndex_>(std::forward<InSIMDRegister_>(in_multi_lane_simd_register_));
+						}
+						else if constexpr (std::is_same_v<EmuSIMD::u16x32, out_uq>)
+						{
+							return EmuSIMD::_underlying_simd_helpers::_extract_lane_u16x32_prevalidated<LaneIndex_>(std::forward<InSIMDRegister_>(in_multi_lane_simd_register_));
+						}
+						else if constexpr (std::is_same_v<EmuSIMD::u32x4, out_uq>)
+						{
+							return EmuSIMD::_underlying_simd_helpers::_extract_lane_u32x4_prevalidated<LaneIndex_>(std::forward<InSIMDRegister_>(in_multi_lane_simd_register_));
+						}
+						else if constexpr (std::is_same_v<EmuSIMD::u32x8, out_uq>)
+						{
+							return EmuSIMD::_underlying_simd_helpers::_extract_lane_u32x8_prevalidated<LaneIndex_>(std::forward<InSIMDRegister_>(in_multi_lane_simd_register_));
+						}
+						else if constexpr (std::is_same_v<EmuSIMD::u32x16, out_uq>)
+						{
+							return EmuSIMD::_underlying_simd_helpers::_extract_lane_u32x16_prevalidated<LaneIndex_>(std::forward<InSIMDRegister_>(in_multi_lane_simd_register_));
+						}
+						else if constexpr (std::is_same_v<EmuSIMD::u64x2, out_uq>)
+						{
+							return EmuSIMD::_underlying_simd_helpers::_extract_lane_u64x2_prevalidated<LaneIndex_>(std::forward<InSIMDRegister_>(in_multi_lane_simd_register_));
+						}
+						else if constexpr (std::is_same_v<EmuSIMD::u64x4, out_uq>)
+						{
+							return EmuSIMD::_underlying_simd_helpers::_extract_lane_u64x4_prevalidated<LaneIndex_>(std::forward<InSIMDRegister_>(in_multi_lane_simd_register_));
+						}
+						else if constexpr (std::is_same_v<EmuSIMD::u64x8, out_uq>)
+						{
+							return EmuSIMD::_underlying_simd_helpers::_extract_lane_u64x8_prevalidated<LaneIndex_>(std::forward<InSIMDRegister_>(in_multi_lane_simd_register_));
+						}
 						else
 						{
 							static_assert

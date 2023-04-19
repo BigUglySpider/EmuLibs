@@ -16,6 +16,7 @@ namespace EmuSIMD::Funcs
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_f64x2(double* p_out_, f64x2_arg a_);
+	EMU_SIMD_COMMON_FUNC_SPEC double get_first_f64x2(f64x2_arg a_);
 #pragma endregion
 
 #pragma region CASTS
@@ -533,6 +534,33 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 blend_f64x2(EmuSIMD::f64x2_arg a_, EmuSIMD::f64x2_arg b_)
 	{
 		return _mm_blend_pd(a_, b_, BlendMask);
+	}
+#pragma endregion
+
+#pragma region GET_TEMPLATES
+	template<std::size_t Index_, typename OutT_ = double>
+	EMU_SIMD_COMMON_FUNC_SPEC auto extract_element_f64x2(f64x2_arg in_)
+		-> typename std::remove_cvref<OutT_>::type
+	{
+		if constexpr (Index_ == 0)
+		{
+			return static_cast<OutT_>(EmuSIMD::Funcs::get_first_f64x2(in_));
+		}
+		else
+		{
+			if constexpr (Index_ <= 1)
+			{
+				return static_cast<OutT_>(EmuSIMD::Funcs::get_first_f64x2(EmuSIMD::Funcs::movehl_f64x2(in_, in_)));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, Index_>(),
+					"Invalid index provided when extracting an element from a f64x2 instance. Valid indices are 0, 1."
+				);
+			}
+		}
 	}
 #pragma endregion
 }

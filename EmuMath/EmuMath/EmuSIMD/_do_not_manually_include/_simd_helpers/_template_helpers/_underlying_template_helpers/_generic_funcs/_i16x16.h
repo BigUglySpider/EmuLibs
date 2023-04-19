@@ -71,6 +71,11 @@ namespace EmuSIMD::Funcs
 	{
 		_mm256_store_si256(reinterpret_cast<__m256i*>(p_out_), a_);
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC std::int16_t get_first_i16x16(i16x16_arg a_)
+	{
+		return get_first_i16x8(cast_i16x16_i16x8(a_));
+	}
 #pragma endregion
 
 #pragma region CASTS

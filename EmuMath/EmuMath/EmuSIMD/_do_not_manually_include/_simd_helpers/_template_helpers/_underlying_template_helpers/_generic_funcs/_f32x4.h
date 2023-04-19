@@ -83,6 +83,11 @@ namespace EmuSIMD::Funcs
 		_underlying_impl::emulate_simd_store(a_, p_out_);
 #endif
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC float get_first_f32x4(f32x4_arg a_)
+	{
+		return _mm_cvtss_f32(a_);
+	}
 #pragma endregion
 
 #pragma region CASTS

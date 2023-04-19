@@ -2,6 +2,7 @@
 #define EMU_SIMD_GENERIC_FUNCS_F64X4_DECL_H_INC_ 1
 
 #include "../_common_generic_func_helpers.h"
+#include "_decl_f64x2.h"
 
 namespace EmuSIMD::Funcs
 {
@@ -16,6 +17,7 @@ namespace EmuSIMD::Funcs
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_f64x4(double* p_out_, f64x4_arg a_);
+	EMU_SIMD_COMMON_FUNC_SPEC double get_first_f64x4(f64x4_arg a_);
 #pragma endregion
 
 #pragma region CASTS
@@ -393,6 +395,35 @@ namespace EmuSIMD::Funcs
 		else
 		{
 			return cast_u64x4_f64x4(_mm512_extracti32x8_epi32(a_, Index_));
+		}
+	}
+#pragma endregion
+
+#pragma region GET_TEMPLATES
+	template<std::size_t Index_, typename OutT_ = double>
+	EMU_SIMD_COMMON_FUNC_SPEC auto extract_element_f64x4(f64x4_arg in_)
+		-> typename std::remove_cvref<OutT_>::type
+	{
+		if constexpr (Index_ == 0)
+		{
+			return get_first_f64x4(in_);
+		}
+		else
+		{
+			if constexpr (Index_ <= 3)
+			{
+				constexpr int is_hi = static_cast<int>(Index_ >= 2);
+				constexpr std::size_t index_128 = Index_ - (2 * is_hi);
+				return EmuSIMD::Funcs::extract_element_f64x2<index_128>(EmuSIMD::Funcs::extract_f64x4_lane_f64x2<is_hi>(in_));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, Index_>(),
+					"Invalid index provided when extracting an element from a f64x4 instance. Valid indices are 0, 1, 2, 3."
+				);
+			}
 		}
 	}
 #pragma endregion

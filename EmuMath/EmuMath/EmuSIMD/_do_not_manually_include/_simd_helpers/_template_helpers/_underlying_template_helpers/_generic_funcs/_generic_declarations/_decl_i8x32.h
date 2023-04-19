@@ -29,6 +29,7 @@ namespace EmuSIMD::Funcs
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_i8x32(std::int8_t* p_out_, i8x32_arg a_);
+	EMU_SIMD_COMMON_FUNC_SPEC std::int8_t get_first_i8x32(i8x32_arg a_);
 #pragma endregion
 
 #pragma region CASTS
@@ -510,6 +511,33 @@ namespace EmuSIMD::Funcs
 		else
 		{
 			return _mm512_extracti32x8_epi32(a_, Index_);
+		}
+	}
+#pragma endregion
+
+#pragma region GET_TEMPLATES
+	template<std::size_t Index_, typename OutT_ = std::int8_t>
+	EMU_SIMD_COMMON_FUNC_SPEC auto extract_element_i8x16(i8x16_arg in_)
+		-> typename std::remove_cvref<OutT_>::type
+	{
+		if constexpr (Index_ == 0)
+		{
+			return static_cast<OutT_>(EmuSIMD::Funcs::get_first_i8x32(in_));
+		}
+		else
+		{
+			if constexpr (Index_ <= 15)
+			{
+				return static_cast<OutT_>(_mm256_extract_epi8(in_, Index_));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, Index_>(),
+					"Invalid index provided when extracting an element from a i8x32 instance. Valid indices are 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31."
+				);
+			}
 		}
 	}
 #pragma endregion

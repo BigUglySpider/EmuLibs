@@ -74,6 +74,11 @@ namespace EmuSIMD::Funcs
 	{
 		_mm512_store_ps(p_out_, a_);
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC float get_first_f32x16(f32x16_arg a_)
+	{
+		return get_first_f32x4(cast_f32x16_f32x4(a_));
+	}
 #pragma endregion
 
 #pragma region CASTS

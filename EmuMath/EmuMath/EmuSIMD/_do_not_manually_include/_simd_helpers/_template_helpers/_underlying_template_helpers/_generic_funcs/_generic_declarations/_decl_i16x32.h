@@ -29,6 +29,7 @@ namespace EmuSIMD::Funcs
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_i16x32(std::int16_t* p_out_, i16x32_arg a_);
+	EMU_SIMD_COMMON_FUNC_SPEC std::int16_t get_first_i16x32(i16x32_arg a_);
 #pragma endregion
 
 #pragma region CASTS
