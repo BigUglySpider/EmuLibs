@@ -1,5 +1,5 @@
-#ifndef EMU_SIMD_GENERIC_FUNCS_F32X16_H_INC_
-#define EMU_SIMD_GENERIC_FUNCS_F32X16_H_INC_ 1
+#ifndef EMU_SIMD_GENERIC_FUNCS_F32X16_DECL_H_INC_
+#define EMU_SIMD_GENERIC_FUNCS_F32X16_DECL_H_INC_ 1
 
 #include "../_common_generic_func_helpers.h"
 

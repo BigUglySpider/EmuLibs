@@ -597,7 +597,7 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 
 #pragma region NEAR_COMPARISONS
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 cmpnear_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_, EmuSIMD::f32x16_arg epsilon = set1_f32x16(EmuCore::epsilon<float>::get()))
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 cmpnear_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_, EmuSIMD::f32x16_arg epsilon)
 	{
 		return cmple_f32x16(abs_f32x16(sub_f32x16(lhs_, rhs_)), epsilon);
 	}

@@ -225,218 +225,6 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
-#pragma region EXTRACTION_TEMPLATES
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_f32x8_lane_u16x16(f32x8_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a f32x8 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_f32x8_u16x16(a_);
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_f32x16_lane_u16x16(f32x16_arg a_)
-	{
-		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a f32x16 instance; the maximum index is 1 but this index has been exceeded.");
-		if constexpr (Index_ == 0)
-		{
-			return cast_f32x16_u16x16(a_);
-		}
-		else
-		{
-			return cast_f32x8_u16x16(_mm512_extractf32x8_ps(a_, Index_));
-		}
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_f64x4_lane_u16x16(f64x4_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a f64x4 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_f64x4_u16x16(a_);
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_f64x8_lane_u16x16(f64x8_arg a_)
-	{
-		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a f64x8 instance; the maximum index is 1 but this index has been exceeded.");
-		if constexpr (Index_ == 0)
-		{
-			return cast_f64x8_u16x16(a_);
-		}
-		else
-		{
-			return cast_f64x4_u16x16(_mm512_extractf64x4_pd(a_, Index_));
-		}
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_i8x32_lane_u16x16(i8x32_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a i8x32 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_i8x32_u16x16(a_);
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_i8x64_lane_u16x16(i8x64_arg a_)
-	{
-		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a i8x64 instance; the maximum index is 1 but this index has been exceeded.");
-		if constexpr (Index_ == 0)
-		{
-			return cast_i8x64_u16x16(a_);
-		}
-		else
-		{
-			return _mm512_extracti32x8_epi32(a_, Index_);
-		}
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_i16x16_lane_u16x16(i16x16_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a i16x16 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_i16x16_u16x16(a_);
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_i16x32_lane_u16x16(i16x32_arg a_)
-	{
-		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a i16x32 instance; the maximum index is 1 but this index has been exceeded.");
-		if constexpr (Index_ == 0)
-		{
-			return cast_i16x32_u16x16(a_);
-		}
-		else
-		{
-			return _mm512_extracti32x8_epi32(a_, Index_);
-		}
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_i32x8_lane_u16x16(i32x8_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a i32x8 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_i32x8_u16x16(a_);
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_i32x16_lane_u16x16(i32x16_arg a_)
-	{
-		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a i32x16 instance; the maximum index is 1 but this index has been exceeded.");
-		if constexpr (Index_ == 0)
-		{
-			return cast_i32x16_u16x16(a_);
-		}
-		else
-		{
-			return _mm512_extracti32x8_epi32(a_, Index_);
-		}
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_i64x4_lane_u16x16(i64x4_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a i64x4 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_i64x4_u16x16(a_);
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_i64x8_lane_u16x16(i64x8_arg a_)
-	{
-		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a i64x8 instance; the maximum index is 1 but this index has been exceeded.");
-		if constexpr (Index_ == 0)
-		{
-			return cast_i64x8_u16x16(a_);
-		}
-		else
-		{
-			return _mm512_extracti32x8_epi32(a_, Index_);
-		}
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_u8x32_lane_u16x16(u8x32_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a u8x32 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_u8x32_u16x16(a_);
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_u8x64_lane_u16x16(u8x64_arg a_)
-	{
-		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a u8x64 instance; the maximum index is 1 but this index has been exceeded.");
-		if constexpr (Index_ == 0)
-		{
-			return cast_u8x64_u16x16(a_);
-		}
-		else
-		{
-			return _mm512_extracti32x8_epi32(a_, Index_);
-		}
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_u16x16_lane_u16x16(u16x16_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a u16x16 instance; the maximum index is 0 but this index has been exceeded.");
-		return a_;
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_u16x32_lane_u16x16(u16x32_arg a_)
-	{
-		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a u16x32 instance; the maximum index is 1 but this index has been exceeded.");
-		if constexpr (Index_ == 0)
-		{
-			return cast_u16x32_u16x16(a_);
-		}
-		else
-		{
-			return _mm512_extracti32x8_epi32(a_, Index_);
-		}
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_u32x8_lane_u16x16(u32x8_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a u32x8 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_u32x8_u16x16(a_);
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_u32x16_lane_u16x16(u32x16_arg a_)
-	{
-		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a u32x16 instance; the maximum index is 1 but this index has been exceeded.");
-		if constexpr (Index_ == 0)
-		{
-			return cast_u32x16_u16x16(a_);
-		}
-		else
-		{
-			return _mm512_extracti32x8_epi32(a_, Index_);
-		}
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_u64x4_lane_u16x16(u64x4_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a u64x4 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_u64x4_u16x16(a_);
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 extract_u64x8_lane_u16x16(u64x8_arg a_)
-	{
-		static_assert(Index_ <= 1, "Invalid SIMD lane extraction index: Extracting u16x16 lane from a u64x8 instance; the maximum index is 1 but this index has been exceeded.");
-		if constexpr (Index_ == 0)
-		{
-			return cast_u64x8_u16x16(a_);
-		}
-		else
-		{
-			return _mm512_extracti32x8_epi32(a_, Index_);
-		}
-	}
-#pragma endregion
-
 #pragma region CONVERSIONS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 cvt_f32x4_u16x16(f32x4_arg a_)
 	{
@@ -615,64 +403,6 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
-#pragma region TEMPLATES
-	/// <summary>
-	/// <para> Template helper for performing a floating-point operation on an integral register. The floating-point operation is provided by Func_. </para>
-	/// <para>
-	///		The used floating-point register is the first with element width greater than or equal to the width of elements in the integer register. 
-	///		The full width of the registers will match fully. 
-	/// </para>
-	/// </summary>
-	/// <param name="func_">Floating-point function to execute.</param>
-	/// <param name="in_">Integral register to emulate the fp operation with.</param>
-	/// <returns>The results of the floating-point operation with the provided register elements.</returns>
-	template<class Func_>
-	EMU_SIMD_COMMON_FUNC_SPEC auto emulate_fp_u16x16(Func_ func_, EmuSIMD::u16x16_arg in_)
-		-> std::enable_if_t<std::is_invocable_r_v<EmuSIMD::f32x8, decltype(func_), EmuSIMD::f32x8>, EmuSIMD::u16x16>
-	{
-		constexpr std::size_t num_elements = 16;
-		constexpr std::size_t elements_per_register = 8;
-		std::uint16_t data[num_elements];
-		float results[num_elements];
-
-		store_u16x16(data, in_);
-		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
-		{
-			store_f32x8
-			(
-				results + i, func_
-				(
-					set_f32x8
-					(
-						static_cast<float>(data[i + 7]), static_cast<float>(data[i + 6]), static_cast<float>(data[i + 5]), static_cast<float>(data[i + 4]),
-						static_cast<float>(data[i + 3]), static_cast<float>(data[i + 2]), static_cast<float>(data[i + 1]), static_cast<float>(data[i])
-					)
-				)
-			);
-		}
-
-		return set_u16x16
-		(
-			static_cast<std::uint16_t>(results[15]),
-			static_cast<std::uint16_t>(results[14]),
-			static_cast<std::uint16_t>(results[13]),
-			static_cast<std::uint16_t>(results[12]),
-			static_cast<std::uint16_t>(results[11]),
-			static_cast<std::uint16_t>(results[10]),
-			static_cast<std::uint16_t>(results[9]),
-			static_cast<std::uint16_t>(results[8]),
-			static_cast<std::uint16_t>(results[7]),
-			static_cast<std::uint16_t>(results[6]),
-			static_cast<std::uint16_t>(results[5]),
-			static_cast<std::uint16_t>(results[4]),
-			static_cast<std::uint16_t>(results[3]),
-			static_cast<std::uint16_t>(results[2]),
-			static_cast<std::uint16_t>(results[1]),
-			static_cast<std::uint16_t>(results[0])
-		);
-	}
-#pragma endregion
-
 #pragma region COMPARISONS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 cmpeq_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)
 	{
@@ -730,12 +460,6 @@ namespace EmuSIMD::Funcs
 			blend_mask_vector_16_to_8(shuffle_mask_vec_)
 		);
 	}
-
-	template<EmuSIMD::Funcs::blend_mask_type BlendMask_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 blend_u16x16(EmuSIMD::u16x16_arg a_, EmuSIMD::u16x16_arg b_)
-	{
-		return _mm256_blend_epi16(a_, b_, BlendMask_);
-	}
 #pragma endregion
 
 #pragma region MINMAX_FUNCS
@@ -747,22 +471,6 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 max_u16x16(EmuSIMD::u16x16_arg a_, EmuSIMD::u16x16_arg b_)
 	{
 		return _mm256_max_epu16(a_, b_);
-	}
-#pragma endregion
-
-#pragma region SHUFFLES
-	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 permute_u16x16(EmuSIMD::u16x16_arg a_)
-	{
-		static_assert(EmuCore::TMP::get_false<ShuffleMask_>(), "NO SUPPORT ERROR: EmuSIMD does not provide support for permuting u16x16 (256-bit registers containing 16 16-bit unsigned integer elements) [permute_u16x16].");
-		return EmuSIMD::u16x16{};
-	}
-
-	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 shuffle_u16x16(EmuSIMD::u16x16_arg a_, EmuSIMD::u16x16_arg b_)
-	{
-		static_assert(EmuCore::TMP::get_false<ShuffleMask_>(), "NO SUPPORT ERROR: EmuSIMD does not provide support for shuffling u16x16 (256-bit registers containing 16 16-bit unsigned integer elements) [shuffle_u16x16].");
-		return EmuSIMD::u16x16{};
 	}
 #pragma endregion
 
@@ -874,12 +582,6 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 trunc_u16x16(EmuSIMD::u16x16_arg to_trunc_)
 	{
 		return to_trunc_;
-	}
-
-	template<int RoundingFlag_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 round_u16x16(EmuSIMD::u16x16_arg to_round_)
-	{
-		return to_round_;
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 mod_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)

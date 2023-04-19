@@ -215,78 +215,6 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
-#pragma region EXTRACTION_TEMPLATES
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 extract_f32x16_lane_i64x8(f32x16_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i64x8 lane from a f32x16 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_f32x16_i64x8(a_);
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 extract_f64x8_lane_i64x8(f64x8_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i64x8 lane from a f64x8 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_f64x8_i64x8(a_);
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 extract_i8x64_lane_i64x8(i8x64_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i64x8 lane from a i8x64 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_i8x64_i64x8(a_);
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 extract_i16x32_lane_i64x8(i16x32_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i64x8 lane from a i16x32 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_i16x32_i64x8(a_);
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 extract_i32x16_lane_i64x8(i32x16_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i64x8 lane from a i32x16 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_i32x16_i64x8(a_);
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 extract_i64x8_lane_i64x8(i64x8_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i64x8 lane from a i64x8 instance; the maximum index is 0 but this index has been exceeded.");
-		return a_;
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 extract_u8x64_lane_i64x8(u8x64_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i64x8 lane from a u8x64 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_u8x64_i64x8(a_);
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 extract_u16x32_lane_i64x8(u16x32_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i64x8 lane from a u16x32 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_u16x32_i64x8(a_);
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 extract_u32x16_lane_i64x8(u32x16_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i64x8 lane from a u32x16 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_u32x16_i64x8(a_);
-	}
-
-	template<std::size_t Index_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 extract_u64x8_lane_i64x8(u64x8_arg a_)
-	{
-		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i64x8 lane from a u64x8 instance; the maximum index is 0 but this index has been exceeded.");
-		return cast_u64x8_i64x8(a_);
-	}
-#pragma endregion
-
 #pragma region CONVERSIONS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 cvt_f32x4_i64x8(f32x4_arg a_)
 	{
@@ -439,28 +367,6 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
-#pragma region TEMPLATES
-	/// <summary>
-	/// <para> Template helper for performing a floating-point operation on an integral register. The floating-point operation is provided by Func_. </para>
-	/// <para>
-	///		The used floating-point register is the first with element width greater than or equal to the width of elements in the integer register. 
-	///		The full width of the registers will match fully. 
-	/// </para>
-	/// </summary>
-	/// <param name="func_">Floating-point function to execute.</param>
-	/// <param name="in_">Integral register to emulate the fp operation with.</param>
-	/// <returns>The results of the floating-point operation with the provided register elements.</returns>
-	template<class Func_>
-	EMU_SIMD_COMMON_FUNC_SPEC auto emulate_fp_i64x8(Func_ func_, EmuSIMD::i64x8_arg in_)
-		-> std::enable_if_t<std::is_invocable_r_v<EmuSIMD::f64x8, decltype(func_), EmuSIMD::f64x8>, EmuSIMD::i64x8>
-	{
-		return cvt_f64x8_i64x8
-		(
-			func_(cvt_i64x8_f64x8(in_))
-		);
-	}
-#pragma endregion
-
 #pragma region COMPARISONS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 cmpeq_i64x8(EmuSIMD::i64x8_arg lhs_, EmuSIMD::i64x8_arg rhs_)
 	{
@@ -518,19 +424,6 @@ namespace EmuSIMD::Funcs
 			)
 		);
 	}
-
-	template<blend_mask_type BlendMask_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 blend_i64x8(EmuSIMD::i64x8_arg a_, EmuSIMD::i64x8_arg b_)
-	{
-		return cast_f64x8_i64x8
-		(
-			blend_f64x8<BlendMask_>
-			(
-				cast_i64x8_f64x8(a_),
-				cast_i64x8_f64x8(b_)
-			)
-		);
-	}
 #pragma endregion
 
 #pragma region MINMAX_FUNCS
@@ -542,26 +435,6 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 max_i64x8(EmuSIMD::i64x8_arg a_, EmuSIMD::i64x8_arg b_)
 	{
 		return _mm512_max_epi64(a_, b_);
-	}
-#pragma endregion
-
-#pragma region SHUFFLES
-	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 permute_i64x8(EmuSIMD::i64x8_arg a_)
-	{
-		return cast_f64x8_i64x8
-		(
-			permute_f64x8<ShuffleMask_>(cast_i64x8_f64x8(a_))
-		);
-	}
-
-	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 shuffle_i64x8(EmuSIMD::i64x8_arg a_, EmuSIMD::i64x8_arg b_)
-	{
-		return cast_f64x8_i64x8
-		(
-			shuffle_f64x8<ShuffleMask_>(cast_i64x8_f64x8(a_), cast_i64x8_f64x8(b_))
-		);
 	}
 #pragma endregion
 
@@ -661,12 +534,6 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 trunc_i64x8(EmuSIMD::i64x8_arg to_trunc_)
 	{
 		return to_trunc_;
-	}
-
-	template<int RoundingFlag_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 round_i64x8(EmuSIMD::i64x8_arg to_round_)
-	{
-		return to_round_;
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 mod_i64x8(EmuSIMD::i64x8_arg lhs_, EmuSIMD::i64x8_arg rhs_)
