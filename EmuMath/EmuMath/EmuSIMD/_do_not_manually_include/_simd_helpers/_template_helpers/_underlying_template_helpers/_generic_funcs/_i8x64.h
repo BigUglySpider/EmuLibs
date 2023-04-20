@@ -598,6 +598,10 @@ namespace EmuSIMD::Funcs
 #endif
 		}
 	}
+
+	// ###############################################################
+	// # TODO: IMPLEMENT REMAINING SHUFFLES: NEED ALL INTS EXCEPT i8 #
+	// ###############################################################
 #pragma endregion
 
 #pragma region BLENDS

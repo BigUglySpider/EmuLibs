@@ -5,6 +5,7 @@
 #include "../TMPHelpers/TypeConvertors.h"
 #include "../TMPHelpers/Values.h"
 #include "../CommonConcepts/CommonRequirements.h"
+#include <bit>
 #include <cstddef>
 #include <cstring>
 #include <functional>
