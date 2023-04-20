@@ -547,14 +547,18 @@ namespace EmuSIMD::Funcs
 	{
 		if constexpr (Index_ == 0)
 		{
-			return static_cast<OutT_>(EmuSIMD::Funcs::get_first_f32x4(in_));
+			return static_cast<typename std::remove_cvref<OutT_>::type>(EmuSIMD::Funcs::get_first_f32x4(in_));
 		}
 		else
 		{
 			if constexpr (Index_ <= 3)
 			{
-				constexpr std::size_t shuffle_mask = make_shuffle_mask_32<Index_, Index_, Index_, Index_>();
-				return static_cast<OutT_>(EmuSIMD::Funcs::get_first_f32x4(permute_f32x4<shuffle_mask>(in_)));
+#if EMU_SIMD_USE_128_REGISTERS
+				constexpr auto shuffle_mask = make_shuffle_mask_32<Index_, Index_, Index_, Index_>();
+				return static_cast<typename std::remove_cvref<OutT_>::type>(EmuSIMD::Funcs::get_first_f32x4(permute_f32x4<shuffle_mask>(in_)));
+#else
+				return EmuSIMD::_underlying_impl::retrieve_emulated_single_lane_simd_element<OutT_, Index_, false>(in_);
+#endif
 			}
 			else
 			{

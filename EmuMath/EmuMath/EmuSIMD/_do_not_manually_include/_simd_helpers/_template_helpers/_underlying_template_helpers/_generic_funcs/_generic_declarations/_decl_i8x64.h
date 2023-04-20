@@ -3,6 +3,7 @@
 
 #include "../_common_generic_func_helpers.h"
 #include "_decl_f32x16.h"
+#include "_decl_i8x16.h"
 
 namespace EmuSIMD::Funcs
 {
@@ -413,6 +414,40 @@ namespace EmuSIMD::Funcs
 	{
 		static_assert(Index_ == 0, "Invalid SIMD lane extraction index: Extracting i8x64 lane from a u64x8 instance; the maximum index is 0 but this index has been exceeded.");
 		return cast_u64x8_i8x64(a_);
+	}
+#pragma endregion
+
+#pragma region GET_TEMPLATES
+	template<std::size_t Index_, typename OutT_ = std::int8_t>
+	EMU_SIMD_COMMON_FUNC_SPEC auto extract_element_i8x64(i8x64_arg in_)
+		-> typename std::remove_cvref<OutT_>::type
+	{
+		if constexpr (Index_ == 0)
+		{
+			return static_cast<typename std::remove_cvref<OutT_>::type>(EmuSIMD::Funcs::get_first_i8x64(in_));
+		}
+		else
+		{
+			if constexpr (Index_ <= 63)
+			{
+#if EMU_SIMD_USE_512_REGISTERS
+				constexpr std::size_t elements_per_chunk = 16;
+				constexpr std::size_t chunk_index = static_cast<std::size_t>(Index_ / elements_per_chunk);
+				constexpr std::size_t index_in_chunk = Index_ - (chunk_index * elements_per_chunk);
+				return EmuSIMD::Funcs::extract_element_i8x16<index_in_chunk, OutT_>(EmuSIMD::Funcs::extract_i8x64_lane_i8x16<chunk_index>(in_));
+#else
+				return EmuSIMD::_underlying_impl::retrieve_emulated_dual_lane_simd_element<OutT_, Index_, false, 32>(in_);
+#endif
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, Index_>(),
+					"Invalid index provided when extracting an element from a i8x64 instance. Valid indices are 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63."
+				);
+			}
+		}
 	}
 #pragma endregion
 }

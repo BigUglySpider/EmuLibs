@@ -324,42 +324,96 @@ namespace EmuSIMD
 #pragma endregion
 
 #pragma region EMULATED_ELEMENT_GETS
-		template<std::size_t Index_, bool AllowTheoreticalIndices_, std::size_t NumElements_, typename T_>
-		[[nodiscard]] constexpr inline decltype(auto) retrieve_emulated_simd_element(const single_lane_simd_emulator<NumElements_, T_>& simd_emulator_) noexcept
+		template<typename OutT_, std::size_t Index_, bool AllowTheoreticalIndices_, std::size_t NumElements_, typename T_>
+		[[nodiscard]] constexpr inline auto retrieve_emulated_single_lane_simd_element(const single_lane_simd_emulator<NumElements_, T_>& simd_emulator_) noexcept
+			-> typename std::remove_cvref<OutT_>::type
 		{
 			if constexpr (Index_ < NumElements_)
 			{
-				return simd_emulator_._data[Index_];
+				if constexpr (std::is_same_v<T_, typename std::remove_cvref<OutT_>::type>)
+				{
+					return simd_emulator_._data[Index_];
+				}
+				else
+				{
+					return static_cast<typename std::remove_cvref<OutT_>::type>(simd_emulator_._data[Index_]);
+				}
 			}
 			else
 			{
 				if constexpr (AllowTheoreticalIndices_)
 				{
-					return T_(0);
+					return typename std::remove_cvref<OutT_>::type(0);
 				}
 				else
 				{
-					static_assert(EmuCore::TMP::get_false<std::size_t, Index_>(), "INTERNAL EMUSIMD ERROR: `retrieve_emulated_simd_element` called with an out-of-range index, with theoretical indices disallowed.");
+					static_assert(EmuCore::TMP::get_false<std::size_t, Index_>(), "INTERNAL EMUSIMD ERROR: `retrieve_emulated_single_lane_simd_element` called with an out-of-range index, with theoretical indices disallowed.");
 				}
 			}
 		}
 
-		template<std::size_t Index_, bool AllowTheoreticalIndices_, std::size_t NumElements_, typename T_>
-		[[nodiscard]] constexpr inline decltype(auto) retrieve_emulated_simd_element(single_lane_simd_emulator<NumElements_, T_>& simd_emulator_) noexcept
+		template<typename OutT_, std::size_t Index_, bool AllowTheoreticalIndices_, std::size_t ElementsPerLane_, std::size_t EmulatedWidth_, typename LaneT_>
+		[[nodiscard]] constexpr inline auto retrieve_emulated_dual_lane_simd_element(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& simd_emulator_) noexcept
+			-> typename std::remove_cvref<OutT_>::type
 		{
-			if constexpr (Index_ < NumElements_)
+			constexpr std::size_t num_elements = ElementsPerLane_ * 2;
+			constexpr std::size_t per_element_width = EmulatedWidth_ / num_elements;
+			constexpr bool is_lo_lane = (Index_ < ElementsPerLane_);
+			if constexpr (Index_ < num_elements)
 			{
-				return simd_emulator_._data[Index_];
+				if constexpr (is_dual_lane_simd_emulator<LaneT_>::value)
+				{
+					// Input: 512-bit emulator
+					// Output: From one 256-bit lane which itself is emulated
+					// --- Defer to this function for an underlying layer
+					if constexpr (is_lo_lane)
+					{
+						return retrieve_emulated_dual_lane_simd_element<OutT_, Index_, false, ElementsPerLane_ / 2>(simd_emulator_._lane_0);
+					}
+					else
+					{
+						return retrieve_emulated_dual_lane_simd_element<OutT_, Index_ - ElementsPerLane_, false, ElementsPerLane_ / 2>(simd_emulator_._lane_0);
+					}
+				}
+				else if constexpr (is_single_lane_simd_emulator<LaneT_>::value)
+				{
+					// Input: 256-bit emulator
+					// Output: From one of the 128-bit lanes which are emulated
+					// --- Defer to retrieve_emulated_single_lane_simd_element for the correct lane
+					// --- `false` for allowing theoretical indices as they are already handled here, so using theoretical indices would be an invalid result
+					if constexpr (is_lo_lane)
+					{
+						return retrieve_emulated_single_lane_simd_element<OutT_, Index_, false>(simd_emulator_._lane_0);
+					}
+					else
+					{
+						return retrieve_emulated_single_lane_simd_element<OutT_, Index_ - ElementsPerLane_, false>(simd_emulator_._lane_0);
+					}
+				}
+				else
+				{
+					// Input: 512-bit or 256-bit emulator
+					// Output: From 256-bit or 128-bit SIMD register
+					// Output is from an actual SIMD register, so defer output to the templatised get_index with the correct lane
+					if constexpr (is_lo_lane)
+					{
+						return EmuSIMD::get_index<Index_, typename std::remove_cvref<OutT_>::type, per_element_width>(simd_emulator_._lane_0);
+					}
+					else
+					{
+						return EmuSIMD::get_index<Index_ - ElementsPerLane_, typename std::remove_cvref<OutT_>::type, per_element_width>(simd_emulator_._lane_1);
+					}
+				}
 			}
 			else
 			{
 				if constexpr (AllowTheoreticalIndices_)
 				{
-					return T_(0);
+					return typename std::remove_cvref<OutT_>::type(0);
 				}
 				else
 				{
-					static_assert(EmuCore::TMP::get_false<std::size_t, Index_>(), "INTERNAL EMUSIMD ERROR: `retrieve_emulated_simd_element` called with an out-of-range index, with theoretical indices disallowed.");
+					static_assert(EmuCore::TMP::get_false<std::size_t, Index_>(), "INTERNAL EMUSIMD ERROR: `retrieve_emulated_dual_lane_simd_element` called with an out-of-range index, with theoretical indices disallowed.");
 				}
 			}
 		}
@@ -695,7 +749,7 @@ namespace EmuSIMD
 			static_assert(sizeof...(OutIndices_) == NumElements_, "INTERNAL EMUSIMD ERROR: `emulate_simd_basic` called with a number of indices not equal to the number of elements in the output emulated register.");
 			return single_lane_simd_emulator<NumElements_, T_>
 			(
-				func_(retrieve_emulated_simd_element<OutIndices_, AllowTheoreticalIndices_>(simd_emulator_))...
+				func_(retrieve_emulated_single_lane_simd_element<T_, OutIndices_, AllowTheoreticalIndices_>(simd_emulator_))...
 			);
 		}
 
@@ -713,8 +767,8 @@ namespace EmuSIMD
 			(
 				func_
 				(
-					retrieve_emulated_simd_element<OutIndices_, AllowTheoreticalIndices_>(simd_emulator_a_),
-					retrieve_emulated_simd_element<OutIndices_, AllowTheoreticalIndices_>(simd_emulator_b_)
+					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, AllowTheoreticalIndices_>(simd_emulator_a_),
+					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, AllowTheoreticalIndices_>(simd_emulator_b_)
 				)...
 			);
 		}
@@ -734,9 +788,9 @@ namespace EmuSIMD
 			(
 				func_
 				(
-					retrieve_emulated_simd_element<OutIndices_, AllowTheoreticalIndices_>(simd_emulator_a_),
-					retrieve_emulated_simd_element<OutIndices_, AllowTheoreticalIndices_>(simd_emulator_b_),
-					retrieve_emulated_simd_element<OutIndices_, AllowTheoreticalIndices_>(simd_emulator_c_)
+					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, AllowTheoreticalIndices_>(simd_emulator_a_),
+					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, AllowTheoreticalIndices_>(simd_emulator_b_),
+					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, AllowTheoreticalIndices_>(simd_emulator_c_)
 				)...
 			);
 		}

@@ -177,7 +177,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 							if constexpr (Index_ < first_invalid_index_)
 							{
 								constexpr int chunk_index_ = static_cast<int>(Index_ / chunk_divisor_);
-								constexpr std::size_t index_in_chunk_ = Index_ - (index_in_chunk_ * chunk_divisor_);
+								constexpr std::size_t index_in_chunk_ = Index_ - (chunk_index_ * chunk_divisor_);
 								return _get_register_index<index_in_chunk_, OutT_, PerElementWidthIfInt_>(_mm512_extracti32x4_epi32(register_, chunk_index_));
 							}
 							else

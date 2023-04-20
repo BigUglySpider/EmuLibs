@@ -423,6 +423,37 @@ namespace EmuSIMD::Funcs
 		}
 	}
 #pragma endregion
+
+#pragma region GET_TEMPLATES
+	template<std::size_t Index_, typename OutT_ = std::int64_t>
+	EMU_SIMD_COMMON_FUNC_SPEC auto extract_element_i64x4(i64x4_arg in_)
+		-> typename std::remove_cvref<OutT_>::type
+	{
+		if constexpr (Index_ == 0)
+		{
+			return static_cast<typename std::remove_cvref<OutT_>::type>(EmuSIMD::Funcs::get_first_i64x4(in_));
+		}
+		else
+		{
+			if constexpr (Index_ <= 3)
+			{
+#if EMU_SIMD_USE_256_REGISTERS
+				return static_cast<typename std::remove_cvref<OutT_>::type>(_mm256_extract_epi64(in_, Index_));
+#else
+				return EmuSIMD::_underlying_impl::retrieve_emulated_dual_lane_simd_element<OutT_, Index_, false, 2>(in_);
+#endif
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, Index_>(),
+					"Invalid index provided when extracting an element from a i64x4 instance. Valid indices are 0, 1, 2, 3."
+				);
+			}
+		}
+	}
+#pragma endregion
 }
 
 #endif

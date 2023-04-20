@@ -639,13 +639,17 @@ namespace EmuSIMD::Funcs
 	{
 		if constexpr (Index_ == 0)
 		{
-			return static_cast<OutT_>(EmuSIMD::Funcs::get_first_i8x16(in_));
+			return static_cast<typename std::remove_cvref<OutT_>::type>(EmuSIMD::Funcs::get_first_i8x16(in_));
 		}
 		else
 		{
 			if constexpr (Index_ <= 15)
 			{
-				return static_cast<OutT_>(_mm_extract_epi8(in_, Index_));
+#if EMU_SIMD_USE_128_REGISTERS
+				return static_cast<typename std::remove_cvref<OutT_>::type>(_mm_extract_epi8(in_, Index_));
+#else
+				return EmuSIMD::_underlying_impl::retrieve_emulated_single_lane_simd_element<OutT_, Index_, false>(in_);
+#endif
 			}
 			else
 			{
@@ -657,9 +661,6 @@ namespace EmuSIMD::Funcs
 			}
 		}
 	}
-	// ################################################################################
-	// TODO: Continue element extraction; this is for the underlying get_index template
-	// ################################################################################
 #pragma endregion
 }
 

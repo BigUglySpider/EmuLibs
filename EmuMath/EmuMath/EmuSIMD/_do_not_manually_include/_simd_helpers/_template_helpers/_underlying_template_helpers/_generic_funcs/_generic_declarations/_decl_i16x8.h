@@ -570,6 +570,37 @@ namespace EmuSIMD::Funcs
 		}
 	}
 #pragma endregion
+
+#pragma region GET_TEMPLATES
+	template<std::size_t Index_, typename OutT_ = std::int16_t>
+	EMU_SIMD_COMMON_FUNC_SPEC auto extract_element_i16x8(i16x8_arg in_)
+		-> typename std::remove_cvref<OutT_>::type
+	{
+		if constexpr (Index_ == 0)
+		{
+			return static_cast<typename std::remove_cvref<OutT_>::type>(EmuSIMD::Funcs::get_first_i16x8(in_));
+		}
+		else
+		{
+			if constexpr (Index_ <= 7)
+			{
+#if EMU_SIMD_USE_128_REGISTERS
+				return static_cast<typename std::remove_cvref<OutT_>::type>(_mm_extract_epi16(in_, Index_));
+#else
+				return EmuSIMD::_underlying_impl::retrieve_emulated_single_lane_simd_element<OutT_, Index_, false>(in_);
+#endif
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, Index_>(),
+					"Invalid index provided when extracting an element from a i16x8 instance. Valid indices are 0, 1, 2, 3, 4, 5, 6, 7."
+				);
+			}
+		}
+	}
+#pragma endregion
 }
 
 #endif

@@ -409,15 +409,19 @@ namespace EmuSIMD::Funcs
 	{
 		if constexpr (Index_ == 0)
 		{
-			return get_first_f32x8(in_);
+			return static_cast<typename std::remove_cvref<OutT_>::type>(get_first_f32x8(in_));
 		}
 		else
 		{
 			if constexpr (Index_ <= 7)
 			{
-				constexpr int is_hi = static_cast<int>(Index_ >= 4);
+#if EMU_SIMD_USE_256_REGISTERS
+				constexpr std::size_t is_hi = static_cast<std::size_t>(Index_ >= 4);
 				constexpr std::size_t index_in_half = Index_ - (4 * is_hi);
-				return EmuSIMD::Funcs::extract_element_f32x4<index_in_half>(EmuSIMD::Funcs::extract_f32x8_lane_f32x4<is_hi>(in_));
+				return EmuSIMD::Funcs::extract_element_f32x4<index_in_half, OutT_>(EmuSIMD::Funcs::extract_f32x8_lane_f32x4<is_hi>(in_));
+#else
+				return EmuSIMD::_underlying_impl::retrieve_emulated_dual_lane_simd_element<OutT_, Index_, false, 4>(in_);
+#endif
 			}
 			else
 			{

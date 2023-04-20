@@ -514,6 +514,37 @@ namespace EmuSIMD::Funcs
 		}
 	}
 #pragma endregion
+
+#pragma region GET_TEMPLATES
+	template<std::size_t Index_, typename OutT_ = std::uint8_t>
+	EMU_SIMD_COMMON_FUNC_SPEC auto extract_element_u8x32(u8x32_arg in_)
+		-> typename std::remove_cvref<OutT_>::type
+	{
+		if constexpr (Index_ == 0)
+		{
+			return static_cast<typename std::remove_cvref<OutT_>::type>(EmuSIMD::Funcs::get_first_u8x32(in_));
+		}
+		else
+		{
+			if constexpr (Index_ <= 31)
+			{
+#if EMU_SIMD_USE_256_REGISTERS
+				return static_cast<typename std::remove_cvref<OutT_>::type>(_mm256_extract_epi8(in_, Index_));
+#else
+				return EmuSIMD::_underlying_impl::retrieve_emulated_dual_lane_simd_element<OutT_, Index_, false, 16>(in_);
+#endif
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, Index_>(),
+					"Invalid index provided when extracting an element from a u8x32 instance. Valid indices are 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31."
+				);
+			}
+		}
+	}
+#pragma endregion
 }
 
 #endif

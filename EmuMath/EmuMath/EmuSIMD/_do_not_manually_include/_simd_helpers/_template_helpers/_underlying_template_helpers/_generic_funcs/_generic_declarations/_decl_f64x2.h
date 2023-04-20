@@ -544,13 +544,17 @@ namespace EmuSIMD::Funcs
 	{
 		if constexpr (Index_ == 0)
 		{
-			return static_cast<OutT_>(EmuSIMD::Funcs::get_first_f64x2(in_));
+			return static_cast<typename std::remove_cvref<OutT_>::type>(EmuSIMD::Funcs::get_first_f64x2(in_));
 		}
 		else
 		{
 			if constexpr (Index_ <= 1)
 			{
-				return static_cast<OutT_>(EmuSIMD::Funcs::get_first_f64x2(EmuSIMD::Funcs::movehl_f64x2(in_, in_)));
+#if EMU_SIMD_USE_128_REGISTERS
+				return static_cast<typename std::remove_cvref<OutT_>::type>(EmuSIMD::Funcs::get_first_f64x2(EmuSIMD::Funcs::movehl_f64x2(in_, in_)));
+#else
+				return EmuSIMD::_underlying_impl::retrieve_emulated_single_lane_simd_element<OutT_, Index_, false>(in_);
+#endif
 			}
 			else
 			{
