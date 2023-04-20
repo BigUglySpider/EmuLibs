@@ -116,39 +116,87 @@ namespace EmuSIMD::_underlying_simd_helpers
 		{
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_or_ps(lhs_, rhs_);
+				return EmuSIMD::Funcs::or_f32x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_or_ps(lhs_, rhs_);
+				return EmuSIMD::Funcs::or_f32x8(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _mm512_or_ps(lhs_, rhs_);
+				return EmuSIMD::Funcs::or_f32x16(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_or_pd(lhs_, rhs_);
+				return EmuSIMD::Funcs::or_f64x2(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_or_pd(lhs_, rhs_);
+				return EmuSIMD::Funcs::or_f64x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _mm512_or_pd(lhs_, rhs_);
+				return EmuSIMD::Funcs::or_f64x8(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 			{
-				return _mm_or_si128(lhs_, rhs_);
+				return EmuSIMD::Funcs::or_i32x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 			{
-				return _mm256_or_si256(lhs_, rhs_);
+				return EmuSIMD::Funcs::or_i32x8(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
 			{
-				return _mm512_or_si512(lhs_, rhs_);
+				return EmuSIMD::Funcs::or_i32x16(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+			{
+				return EmuSIMD::Funcs::or_i8x16(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+			{
+				return EmuSIMD::Funcs::or_i16x8(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+			{
+				return EmuSIMD::Funcs::or_i32x4(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+			{
+				return EmuSIMD::Funcs::or_i64x2(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+			{
+				return EmuSIMD::Funcs::or_i8x32(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+			{
+				return EmuSIMD::Funcs::or_i16x16(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+			{
+				return EmuSIMD::Funcs::or_i32x8(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+			{
+				return EmuSIMD::Funcs::or_i64x4(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+			{
+				return EmuSIMD::Funcs::or_i8x64(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+			{
+				return EmuSIMD::Funcs::or_i16x32(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+			{
+				return EmuSIMD::Funcs::or_i32x16(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+			{
+				return EmuSIMD::Funcs::or_i64x8(lhs_, rhs_);
 			}
 			else
 			{
@@ -169,39 +217,87 @@ namespace EmuSIMD::_underlying_simd_helpers
 		{
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_xor_ps(lhs_, rhs_);
+				return EmuSIMD::Funcs::xor_f32x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_xor_ps(lhs_, rhs_);
+				return EmuSIMD::Funcs::xor_f32x8(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _mm512_xor_ps(lhs_, rhs_);
+				return EmuSIMD::Funcs::xor_f32x16(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_xor_pd(lhs_, rhs_);
+				return EmuSIMD::Funcs::xor_f64x2(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_xor_pd(lhs_, rhs_);
+				return EmuSIMD::Funcs::xor_f64x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _mm512_xor_pd(lhs_, rhs_);
+				return EmuSIMD::Funcs::xor_f64x8(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 			{
-				return _mm_xor_si128(lhs_, rhs_);
+				return EmuSIMD::Funcs::xor_i32x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 			{
-				return _mm256_xor_si256(lhs_, rhs_);
+				return EmuSIMD::Funcs::xor_i32x8(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
 			{
-				return _mm512_xor_si512(lhs_, rhs_);
+				return EmuSIMD::Funcs::xor_i32x16(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+			{
+				return EmuSIMD::Funcs::xor_i8x16(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+			{
+				return EmuSIMD::Funcs::xor_i16x8(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+			{
+				return EmuSIMD::Funcs::xor_i32x4(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+			{
+				return EmuSIMD::Funcs::xor_i64x2(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+			{
+				return EmuSIMD::Funcs::xor_i8x32(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+			{
+				return EmuSIMD::Funcs::xor_i16x16(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+			{
+				return EmuSIMD::Funcs::xor_i32x8(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+			{
+				return EmuSIMD::Funcs::xor_i64x4(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+			{
+				return EmuSIMD::Funcs::xor_i8x64(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+			{
+				return EmuSIMD::Funcs::xor_i16x32(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+			{
+				return EmuSIMD::Funcs::xor_i32x16(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+			{
+				return EmuSIMD::Funcs::xor_i64x8(lhs_, rhs_);
 			}
 			else
 			{
@@ -222,39 +318,87 @@ namespace EmuSIMD::_underlying_simd_helpers
 		{
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return _mm_andnot_ps(lhs_, rhs_);
+				return EmuSIMD::Funcs::andnot_f32x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return _mm256_andnot_ps(lhs_, rhs_);
+				return EmuSIMD::Funcs::andnot_f32x8(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return _mm512_andnot_ps(lhs_, rhs_);
+				return EmuSIMD::Funcs::andnot_f32x16(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return _mm_andnot_pd(lhs_, rhs_);
+				return EmuSIMD::Funcs::andnot_f64x2(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return _mm256_andnot_pd(lhs_, rhs_);
+				return EmuSIMD::Funcs::andnot_f64x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return _mm512_andnot_pd(lhs_, rhs_);
+				return EmuSIMD::Funcs::andnot_f64x8(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 			{
-				return _mm_andnot_si128(lhs_, rhs_);
+				return EmuSIMD::Funcs::andnot_i32x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 			{
-				return _mm256_andnot_si256(lhs_, rhs_);
+				return EmuSIMD::Funcs::andnot_i32x8(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
 			{
-				return _mm512_andnot_si512(lhs_, rhs_);
+				return EmuSIMD::Funcs::andnot_i32x16(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+			{
+				return EmuSIMD::Funcs::andnot_i8x16(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+			{
+				return EmuSIMD::Funcs::andnot_i16x8(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+			{
+				return EmuSIMD::Funcs::andnot_i32x4(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+			{
+				return EmuSIMD::Funcs::andnot_i64x2(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+			{
+				return EmuSIMD::Funcs::andnot_i8x32(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+			{
+				return EmuSIMD::Funcs::andnot_i16x16(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+			{
+				return EmuSIMD::Funcs::andnot_i32x8(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+			{
+				return EmuSIMD::Funcs::andnot_i64x4(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+			{
+				return EmuSIMD::Funcs::andnot_i8x64(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+			{
+				return EmuSIMD::Funcs::andnot_i16x32(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+			{
+				return EmuSIMD::Funcs::andnot_i32x16(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+			{
+				return EmuSIMD::Funcs::andnot_i64x8(lhs_, rhs_);
 			}
 			else
 			{
@@ -267,10 +411,11 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	}
 
-	template<class Register_>
-	[[nodiscard]] inline Register_ _not(Register_ to_not_)
+	template<class SIMDRegister_>
+	[[nodiscard]] inline auto _not(SIMDRegister_&& to_not_)
+		-> typename std::remove_cvref<SIMDRegister_>::type
 	{
-		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<SIMDRegister_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			constexpr bool is_supported_register_ = EmuCore::TMP::is_any_comparison_true
@@ -287,21 +432,21 @@ namespace EmuSIMD::_underlying_simd_helpers
 				if constexpr (_is_valid_per_index_mask_instance<all_indices_mask_generator>::value)
 				{
 					// A XOR (11...11) == ~A
-					return _xor(to_not_, all_indices_mask_generator::get());
+					return _xor(std::forward<SIMDRegister_>(to_not_), all_indices_mask_generator::get());
 				}
 				else
 				{
-					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform bitwise NOT of a SIMD register using EmuSIMD helpers, but a mask to perform the operation could not be successfully generated.");
+					static_assert(EmuCore::TMP::get_false<SIMDRegister_>(), "Attempted to perform bitwise NOT of a SIMD register using EmuSIMD helpers, but a mask to perform the operation could not be successfully generated.");
 				}
 			}
 			else
 			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform bitwise NOT of a SIMD register using EmuSIMD helpers, but provided a SIMD register that is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<SIMDRegister_>(), "Attempted to perform bitwise NOT of a SIMD register using EmuSIMD helpers, but provided a SIMD register that is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform bitwise NOT of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<SIMDRegister_>(), "Attempted to perform bitwise NOT of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register.");
 		}
 	}
 
