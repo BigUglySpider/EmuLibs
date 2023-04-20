@@ -121,6 +121,13 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 movelh_i8x64(EmuSIMD::i8x64_arg lhs_, EmuSIMD::i8x64_arg rhs_);
 #pragma endregion
 
+#pragma region BITWISE_ARITHMETIC
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 and_i8x64(EmuSIMD::i8x64_arg lhs_, EmuSIMD::i8x64_arg rhs_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 or_i8x64(EmuSIMD::i8x64_arg lhs_, EmuSIMD::i8x64_arg rhs_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 xor_i8x64(EmuSIMD::i8x64_arg lhs_, EmuSIMD::i8x64_arg rhs_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 andnot_i8x64(EmuSIMD::i8x64_arg not_lhs_, EmuSIMD::i8x64_arg rhs_);
+#pragma endregion
+
 #pragma region BLENDS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 blendv_i8x64(EmuSIMD::i8x64_arg a_, EmuSIMD::i8x64_arg b_, EmuSIMD::i8x64_arg shuffle_mask_vec_);
 #pragma endregion

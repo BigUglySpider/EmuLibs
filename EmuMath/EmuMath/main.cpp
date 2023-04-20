@@ -390,7 +390,7 @@ int main()
 		PrintIndexable<num_elements>(data_dump);
 		std::cout << '\n';
 
-		ef32x4_a = EmuSIMD::_underlying_impl::emulate_simd_basic<true>(EmuCore::do_lerp<float>(), ef32x4_a, ef32x4_b, ef32x4_c, store_index_sequence());
+		ef32x4_a = EmuSIMD::_underlying_impl::emulate_simd_basic(EmuCore::do_lerp<float>(), ef32x4_a, ef32x4_b, ef32x4_c, store_index_sequence());
 		EmuSIMD::_underlying_impl::emulate_simd_store(ef32x4_a, data_dump);
 		PrintIndexable<num_elements>(data_dump);
 		std::cout << '\n';

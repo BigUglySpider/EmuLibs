@@ -455,6 +455,48 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region BITWISE_ARITHMETIC
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 and_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)
+	{
+#if EMU_SIMD_USE_256_REGISTERS
+		return _mm256_and_si256(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](u16x8_arg a_, u16x8_arg b_) { return EmuSIMD::Funcs::and_u16x8(a_, b_); }, lhs_, rhs_);
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 or_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)
+	{
+#if EMU_SIMD_USE_256_REGISTERS
+		return _mm256_or_si256(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](u16x8_arg a_, u16x8_arg b_) { return EmuSIMD::Funcs::or_u16x8(a_, b_); }, lhs_, rhs_);
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 xor_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)
+	{
+#if EMU_SIMD_USE_256_REGISTERS
+		return _mm256_xor_si256(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](u16x8_arg a_, u16x8_arg b_) { return EmuSIMD::Funcs::xor_u16x8(a_, b_); }, lhs_, rhs_);
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 andnot_u16x16(EmuSIMD::u16x16_arg not_lhs_, EmuSIMD::u16x16_arg rhs_)
+	{
+#if EMU_SIMD_USE_256_REGISTERS
+		return _mm256_andnot_si256(not_lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](u16x8_arg a_, u16x8_arg b_) { return EmuSIMD::Funcs::andnot_u16x8(a_, b_); }, not_lhs_, rhs_);
+#endif
+	}
+#pragma endregion
+
 #pragma region BLENDS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 blendv_u16x16(EmuSIMD::u16x16_arg a_, EmuSIMD::u16x16_arg b_, EmuSIMD::u16x16_arg shuffle_mask_vec_)
 	{

@@ -443,22 +443,42 @@ namespace EmuSIMD::Funcs
 #pragma region BITWISE_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 and_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_and_ps(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](f32x8_arg a_, f32x8_arg b_) { return EmuSIMD::Funcs::and_f32x8(a_, b_); }, lhs_, rhs_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 or_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_or_ps(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](f32x8_arg a_, f32x8_arg b_) { return EmuSIMD::Funcs::or_f32x8(a_, b_); }, lhs_, rhs_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 xor_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_xor_ps(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](f32x8_arg a_, f32x8_arg b_) { return EmuSIMD::Funcs::xor_f32x8(a_, b_); }, lhs_, rhs_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 andnot_f32x16(EmuSIMD::f32x16_arg not_lhs_, EmuSIMD::f32x16_arg rhs_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_andnot_ps(not_lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](f32x8_arg a_, f32x8_arg b_) { return EmuSIMD::Funcs::andnot_f32x8(a_, b_); }, not_lhs_, rhs_);
+#endif
 	}
 #pragma endregion
 

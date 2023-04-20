@@ -4,6 +4,7 @@
 #include "../TMPHelpers/OperatorChecks.h"
 #include "../TMPHelpers/TypeConvertors.h"
 #include "../TMPHelpers/Values.h"
+#include "../CommonConcepts/CommonRequirements.h"
 #include <cstddef>
 #include <cstring>
 #include <functional>
@@ -17,23 +18,20 @@ namespace EmuCore
 		constexpr do_bitwise_and()
 		{
 		}
-		constexpr inline EmuCore::TMP::bitwise_and_operator_result_t<const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline decltype(auto) operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			if constexpr (EmuCore::TMP::has_bitwise_and_operator_v<const Lhs_&, const Rhs_&>)
 			{
 				return lhs_ & rhs_;
 			}
-			else if constexpr (std::is_floating_point_v<Lhs_>)
+			else if constexpr (std::is_floating_point_v<Lhs_> && (sizeof(Lhs_) == sizeof(Rhs_)))
 			{
 				using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(Lhs_)>;
-				if constexpr (!std::is_same_v<uint_type, std::false_type>)
+				if constexpr (!std::is_same_v<uint_type, EmuCore::TMP::emu_tmp_err>)
 				{
-					uint_type as_uint_;
-					std::memcpy(&as_uint_, &lhs_, sizeof(uint_type));
-					as_uint_ = do_bitwise_and<uint_type, Rhs_>()(as_uint_, rhs_);
-					Lhs_ out_lhs_;
-					std::memcpy(&out_lhs_, &as_uint_, sizeof(uint_type));
-					return out_lhs_;
+					uint_type as_uint = std::bit_cast<uint_type>(lhs_);
+					as_uint &= as_uint & std::bit_cast<uint_type>(rhs_);
+					return std::bit_cast<typename std::remove_cvref<Lhs_>::type>(as_uint);
 				}
 				else
 				{
@@ -53,9 +51,9 @@ namespace EmuCore
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		constexpr inline std::invoke_result_t<do_bitwise_and<Lhs_, Rhs_>, const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline decltype(auto) operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return do_bitwise_and<Lhs_, Rhs_>()(lhs_, rhs_);
+			return do_bitwise_and<typename std::remove_cvref<Lhs_>::type, typename std::remove_cvref<Rhs_>::type>()(lhs_, rhs_);
 		}
 	};
 
@@ -65,23 +63,20 @@ namespace EmuCore
 		constexpr do_bitwise_or()
 		{
 		}
-		constexpr inline EmuCore::TMP::bitwise_or_operator_result_t<const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline decltype(auto) operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			if constexpr (EmuCore::TMP::has_bitwise_or_operator_v<const Lhs_&, const Rhs_&>)
 			{
 				return lhs_ | rhs_;
 			}
-			else if constexpr (std::is_floating_point_v<Lhs_>)
+			else if constexpr (std::is_floating_point_v<Lhs_> && (sizeof(Lhs_) == sizeof(Rhs_)))
 			{
 				using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(Lhs_)>;
 				if constexpr (!std::is_same_v<uint_type, std::false_type>)
 				{
-					uint_type as_uint_;
-					std::memcpy(&as_uint_, &lhs_, sizeof(uint_type));
-					as_uint_ = do_bitwise_or<uint_type, Rhs_>()(as_uint_, rhs_);
-					Lhs_ out_lhs_;
-					std::memcpy(&out_lhs_, &as_uint_, sizeof(uint_type));
-					return out_lhs_;
+					uint_type as_uint = std::bit_cast<uint_type>(lhs_);
+					as_uint |= std::bit_cast<uint_type>(rhs_);
+					return std::bit_cast<typename std::remove_cvref<Lhs_>::type>(as_uint);
 				}
 				else
 				{
@@ -101,9 +96,9 @@ namespace EmuCore
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		[[nodiscard]] constexpr inline std::invoke_result_t<do_bitwise_or<Lhs_, Rhs_>, const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline decltype(auto) operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return do_bitwise_or<Lhs_, Rhs_>()(lhs_, rhs_);
+			return do_bitwise_or<typename std::remove_cvref<Lhs_>::type, typename std::remove_cvref<Rhs_>::type>()(lhs_, rhs_);
 		}
 	};
 
@@ -113,23 +108,20 @@ namespace EmuCore
 		constexpr do_bitwise_xor()
 		{
 		}
-		constexpr inline EmuCore::TMP::bitwise_xor_operator_result_t<const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline decltype(auto) operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			if constexpr (EmuCore::TMP::has_bitwise_xor_operator_v<const Lhs_&, const Rhs_&>)
 			{
 				return lhs_ ^ rhs_;
 			}
-			else if constexpr (std::is_floating_point_v<Lhs_>)
+			else if constexpr (std::is_floating_point_v<Lhs_> && (sizeof(Lhs_) == sizeof(Rhs_)))
 			{
 				using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(Lhs_)>;
 				if constexpr (!std::is_same_v<uint_type, std::false_type>)
 				{
-					uint_type as_uint_;
-					std::memcpy(&as_uint_, &lhs_, sizeof(uint_type));
-					as_uint_ = do_bitwise_xor<uint_type, Rhs_>()(as_uint_, rhs_);
-					Lhs_ out_lhs_;
-					std::memcpy(&out_lhs_, &as_uint_, sizeof(uint_type));
-					return out_lhs_;
+					uint_type as_uint = std::bit_cast<uint_type>(lhs_);
+					as_uint ^= std::bit_cast<uint_type>(rhs_);
+					return std::bit_cast<typename std::remove_cvref<Lhs_>::type>(as_uint);
 				}
 				else
 				{
@@ -149,9 +141,9 @@ namespace EmuCore
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		constexpr inline std::invoke_result_t<do_bitwise_xor<Lhs_, Rhs_>, const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline decltype(auto) operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return do_bitwise_xor<Lhs_, Rhs_>()(lhs_, rhs_);
+			return do_bitwise_xor<typename std::remove_cvref<Lhs_>::type, typename std::remove_cvref<Rhs_>::type>()(lhs_, rhs_);
 		}
 	};
 
@@ -161,7 +153,7 @@ namespace EmuCore
 		constexpr do_bitwise_not()
 		{
 		}
-		constexpr inline EmuCore::TMP::bitwise_not_operator_result_t<const T_&> operator()(const T_& val_) const
+		constexpr inline decltype(auto) operator()(const T_& val_) const
 		{
 			if constexpr (EmuCore::TMP::has_bitwise_not_operator_v<const T_&>)
 			{
@@ -172,12 +164,8 @@ namespace EmuCore
 				using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(T_)>;
 				if constexpr (!std::is_same_v<uint_type, std::false_type>)
 				{
-					uint_type as_uint_;
-					std::memcpy(&as_uint_, &val_, sizeof(uint_type));
-					as_uint_ = do_bitwise_not<uint_type>()(as_uint_);
-					T_ out_;
-					std::memcpy(&out_, &as_uint_, sizeof(uint_type));
-					return out_;
+					uint_type as_uint = ~(std::bit_cast<uint_type>(val_));
+					return std::bit_cast<typename std::remove_cvref<T_>::type>(as_uint);
 				}
 				else
 				{
@@ -197,9 +185,9 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		constexpr inline std::invoke_result_t<do_bitwise_not<T_>, const T_&> operator()(const T_& val_) const
+		constexpr inline decltype(auto) operator()(const T_& val_) const
 		{
-			return do_bitwise_not<T_>()(val_);
+			return do_bitwise_not<typename std::remove_cvref<T_>::type>()(val_);
 		}
 	};
 
@@ -209,7 +197,7 @@ namespace EmuCore
 		constexpr do_left_shift()
 		{
 		}
-		constexpr inline EmuCore::TMP::left_shift_operator_result_t<const T_&, const Shifts_&> operator()(const T_& val_, const Shifts_& num_shifts_) const
+		constexpr inline decltype(auto) operator()(const T_& val_, const Shifts_& num_shifts_) const
 		{
 			if constexpr (EmuCore::TMP::has_left_shift_operator_v<const T_&, const Shifts_&>)
 			{
@@ -220,12 +208,8 @@ namespace EmuCore
 				using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(T_)>;
 				if constexpr (!std::is_same_v<uint_type, std::false_type>)
 				{
-					uint_type as_uint_;
-					std::memcpy(&as_uint_, &val_, sizeof(uint_type));
-					as_uint_ = do_left_shift<uint_type, Shifts_>()(as_uint_, num_shifts_);
-					T_ out_;
-					std::memcpy(&out_, &as_uint_, sizeof(uint_type));
-					return out_;
+					uint_type as_uint = (std::bit_cast<uint_type>(val_)) << num_shifts_;
+					return std::bit_cast<typename std::remove_cvref<T_>::type>(as_uint);
 				}
 				else
 				{
@@ -245,9 +229,9 @@ namespace EmuCore
 		{
 		}
 		template<typename T_, typename Shifts_>
-		constexpr inline std::invoke_result_t<do_left_shift<T_, Shifts_>, const T_&, const Shifts_&> operator()(const T_& val_, const Shifts_& num_shifts_) const
+		constexpr inline decltype(auto) operator()(const T_& val_, const Shifts_& num_shifts_) const
 		{
-			return do_left_shift<T_, Shifts_>()(val_, num_shifts_);
+			return do_left_shift<typename std::remove_cvref<T_>::type, typename std::remove_cvref<Shifts_>::type>()(val_, num_shifts_);
 		}
 	};
 
@@ -257,7 +241,7 @@ namespace EmuCore
 		constexpr do_right_shift()
 		{
 		}
-		constexpr inline EmuCore::TMP::right_shift_operator_result_t<const T_&, const Shifts_&> operator()(const T_& val_, const Shifts_& num_shifts_) const
+		constexpr inline decltype(auto) operator()(const T_& val_, const Shifts_& num_shifts_) const
 		{
 			if constexpr (EmuCore::TMP::has_right_shift_operator_v<const T_&, const Shifts_&>)
 			{
@@ -268,12 +252,8 @@ namespace EmuCore
 				using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(T_)>;
 				if constexpr (!std::is_same_v<uint_type, std::false_type>)
 				{
-					uint_type as_uint_;
-					std::memcpy(&as_uint_, &val_, sizeof(uint_type));
-					as_uint_ = do_right_shift<uint_type, Shifts_>()(as_uint_, num_shifts_);
-					T_ out_;
-					std::memcpy(&out_, &as_uint_, sizeof(uint_type));
-					return out_;
+					uint_type as_uint = (std::bit_cast<uint_type>(val_)) << num_shifts_;
+					return std::bit_cast<typename std::remove_cvref<T_>::type>(as_uint);
 				}
 				else
 				{
@@ -293,9 +273,37 @@ namespace EmuCore
 		{
 		}
 		template<typename T_, typename Shifts_>
-		constexpr inline std::invoke_result_t<do_right_shift<T_, Shifts_>, const T_&, const Shifts_&> operator()(const T_& val_, const Shifts_& num_shifts_) const
+		constexpr inline decltype(auto) operator()(const T_& val_, const Shifts_& num_shifts_) const
 		{
-			return do_right_shift<T_, Shifts_>()(val_, num_shifts_);
+			return do_right_shift<typename std::remove_cvref<T_>::type, typename std::remove_cvref<Shifts_>::type>()(val_, num_shifts_);
+		}
+	};
+
+	template<typename NotLhs_, typename Rhs_ = NotLhs_>
+	struct do_bitwise_andnot
+	{
+		constexpr do_bitwise_andnot()
+		{
+		}
+		constexpr inline decltype(auto) operator()(const NotLhs_& not_lhs_, const Rhs_& rhs_) const
+		{
+			using not_func = do_bitwise_not<NotLhs_>;
+			using not_result = decltype(not_func()(not_lhs_));
+			using and_func = do_bitwise_and<typename std::remove_cvref<not_result>::type, Rhs_>;
+			return and_func()(not_func()(not_lhs_), rhs_);
+		}
+	};
+
+	template<>
+	struct do_bitwise_andnot<void, void>
+	{
+		constexpr do_bitwise_andnot()
+		{
+		}
+		template<typename NotLhs_, typename Rhs_>
+		constexpr inline decltype(auto) operator()(const NotLhs_& not_lhs_, const Rhs_& rhs_) const
+		{
+			return do_bitwise_andnot<typename std::remove_cvref<NotLhs_>::type, typename std::remove_cvref<Rhs_>::type>()(not_lhs_, rhs_);
 		}
 	};
 #pragma endregion
@@ -304,16 +312,10 @@ namespace EmuCore
 	template<typename Lhs_, typename Rhs_ = Lhs_>
 	struct do_bitwise_and_assign
 	{
-		using result_type = std::conditional_t
-		<
-			EmuCore::TMP::has_bitwise_and_assign_operator_v<Lhs_&, const Rhs_&>,
-			EmuCore::TMP::bitwise_and_assign_operator_result_t<Lhs_&, const Rhs_&>,
-			Lhs_&
-		>;
 		constexpr do_bitwise_and_assign()
 		{
 		}
-		constexpr inline result_type operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline decltype(auto) operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			if constexpr (EmuCore::TMP::has_bitwise_and_assign_operator_v<Lhs_&, const Rhs_&>)
 			{
@@ -322,7 +324,7 @@ namespace EmuCore
 			else
 			{
 				using const_op = do_bitwise_and<Lhs_, Rhs_>;
-				using const_op_result = std::invoke_result_t<const_op, Lhs_&, const Rhs_&>;
+				using const_op_result = decltype(const_op()(lhs_, rhs_));
 				if constexpr (std::is_assignable_v<Lhs_&, const_op_result>)
 				{
 					lhs_ = const_op()(lhs_, rhs_);
@@ -341,26 +343,20 @@ namespace EmuCore
 		constexpr do_bitwise_and_assign()
 		{
 		}
-		template<typename Lhs_, typename Rhs_>
-		constexpr inline std::invoke_result_t<do_bitwise_and_assign<Lhs_, Rhs_>, Lhs_&, const Rhs_&> operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		template<EmuConcepts::Writable Lhs_, typename Rhs_>
+		constexpr inline decltype(auto) operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return do_bitwise_and_assign<Lhs_, Rhs_>()(lhs_, rhs_);
+			return do_bitwise_and_assign<typename std::remove_cvref<Lhs_>::type, typename std::remove_cvref<Rhs_>::type>()(lhs_, rhs_);
 		}
 	};
 
 	template<typename Lhs_, typename Rhs_ = Lhs_>
 	struct do_bitwise_or_assign
 	{
-		using result_type = std::conditional_t
-		<
-			EmuCore::TMP::has_bitwise_or_assign_operator_v<Lhs_&, const Rhs_&>,
-			EmuCore::TMP::bitwise_or_assign_operator_result_t<Lhs_&, const Rhs_&>,
-			Lhs_&
-		>;
 		constexpr do_bitwise_or_assign()
 		{
 		}
-		constexpr inline result_type operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline decltype(auto) operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			if constexpr (EmuCore::TMP::has_bitwise_or_assign_operator_v<Lhs_&, const Rhs_&>)
 			{
@@ -369,7 +365,7 @@ namespace EmuCore
 			else
 			{
 				using const_op = do_bitwise_or<Lhs_, Rhs_>;
-				using const_op_result = std::invoke_result_t<const_op, Lhs_&, const Rhs_&>;
+				using const_op_result = decltype(const_op()(lhs_, rhs_));
 				if constexpr (std::is_assignable_v<Lhs_&, const_op_result>)
 				{
 					lhs_ = const_op()(lhs_, rhs_);
@@ -388,26 +384,20 @@ namespace EmuCore
 		constexpr do_bitwise_or_assign()
 		{
 		}
-		template<typename Lhs_, typename Rhs_>
-		constexpr inline std::invoke_result_t<do_bitwise_or_assign<Lhs_, Rhs_>, Lhs_&, const Rhs_&> operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		template<EmuConcepts::Writable Lhs_, typename Rhs_>
+		constexpr inline decltype(auto) operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return do_bitwise_or_assign<Lhs_, Rhs_>()(lhs_, rhs_);
+			return do_bitwise_or_assign<typename std::remove_cvref<Lhs_>::type, typename std::remove_cvref<Rhs_>::type>()(lhs_, rhs_);
 		}
 	};
 
 	template<typename Lhs_, typename Rhs_ = Lhs_>
 	struct do_bitwise_xor_assign
 	{
-		using result_type = std::conditional_t
-		<
-			EmuCore::TMP::has_bitwise_xor_assign_operator_v<Lhs_&, const Rhs_&>,
-			EmuCore::TMP::bitwise_xor_assign_operator_result_t<Lhs_&, const Rhs_&>,
-			Lhs_&
-		>;
 		constexpr do_bitwise_xor_assign()
 		{
 		}
-		constexpr inline result_type operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline decltype(auto) operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			if constexpr (EmuCore::TMP::has_bitwise_xor_assign_operator_v<Lhs_&, const Rhs_&>)
 			{
@@ -416,7 +406,7 @@ namespace EmuCore
 			else
 			{
 				using const_op = do_bitwise_xor<Lhs_, Rhs_>;
-				using const_op_result = std::invoke_result_t<const_op, Lhs_&, const Rhs_&>;
+				using const_op_result = decltype(const_op()(lhs_, rhs_));
 				if constexpr (std::is_assignable_v<Lhs_&, const_op_result>)
 				{
 					lhs_ = const_op()(lhs_, rhs_);
@@ -435,26 +425,20 @@ namespace EmuCore
 		constexpr do_bitwise_xor_assign()
 		{
 		}
-		template<typename Lhs_, typename Rhs_>
-		constexpr inline std::invoke_result_t<do_bitwise_xor_assign<Lhs_, Rhs_>, Lhs_&, const Rhs_&> operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		template<EmuConcepts::Writable Lhs_, typename Rhs_>
+		constexpr inline decltype(auto) operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return do_bitwise_xor_assign<Lhs_, Rhs_>()(lhs_, rhs_);
+			return do_bitwise_xor_assign<typename std::remove_cvref<Lhs_>::type, typename std::remove_cvref<Rhs_>::type>()(lhs_, rhs_);
 		}
 	};
 
 	template<typename Lhs_, typename Rhs_ = Lhs_>
 	struct do_left_shift_assign
 	{
-		using result_type = std::conditional_t
-		<
-			EmuCore::TMP::has_left_shift_assign_operator_v<Lhs_&, const Rhs_&>,
-			EmuCore::TMP::left_shift_assign_operator_result_t<Lhs_&, const Rhs_&>,
-			Lhs_&
-		>;
 		constexpr do_left_shift_assign()
 		{
 		}
-		constexpr inline result_type operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline decltype(auto) operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			if constexpr (EmuCore::TMP::has_left_shift_assign_operator_v<Lhs_&, const Rhs_&>)
 			{
@@ -463,7 +447,7 @@ namespace EmuCore
 			else
 			{
 				using const_op = do_left_shift<Lhs_, Rhs_>;
-				using const_op_result = std::invoke_result_t<const_op, Lhs_&, const Rhs_&>;
+				using const_op_result = decltype(const_op()(lhs_, rhs_));
 				if constexpr (std::is_assignable_v<Lhs_&, const_op_result>)
 				{
 					lhs_ = const_op()(lhs_, rhs_);
@@ -482,26 +466,20 @@ namespace EmuCore
 		constexpr do_left_shift_assign()
 		{
 		}
-		template<typename Lhs_, typename Rhs_>
-		constexpr inline std::invoke_result_t<do_left_shift_assign<Lhs_, Rhs_>, Lhs_&, const Rhs_&> operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		template<EmuConcepts::Writable Lhs_, typename Rhs_>
+		constexpr inline decltype(auto) operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return do_left_shift_assign<Lhs_, Rhs_>()(lhs_, rhs_);
+			return do_left_shift_assign<typename std::remove_cvref<Lhs_>::type, typename std::remove_cvref<Rhs_>::type>()(lhs_, rhs_);
 		}
 	};
 
 	template<typename Lhs_, typename Rhs_ = Lhs_>
 	struct do_right_shift_assign
 	{
-		using result_type = std::conditional_t
-		<
-			EmuCore::TMP::has_right_shift_assign_operator_v<Lhs_&, const Rhs_&>,
-			EmuCore::TMP::right_shift_assign_operator_result_t<Lhs_&, const Rhs_&>,
-			Lhs_&
-		>;
 		constexpr do_right_shift_assign()
 		{
 		}
-		constexpr inline result_type operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline decltype(auto) operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			if constexpr (EmuCore::TMP::has_right_shift_assign_operator_v<Lhs_&, const Rhs_&>)
 			{
@@ -510,7 +488,7 @@ namespace EmuCore
 			else
 			{
 				using const_op = do_right_shift<Lhs_, Rhs_>;
-				using const_op_result = std::invoke_result_t<const_op, Lhs_&, const Rhs_&>;
+				using const_op_result = decltype(const_op()(lhs_, rhs_));
 				if constexpr (std::is_assignable_v<Lhs_&, const_op_result>)
 				{
 					lhs_ = const_op()(lhs_, rhs_);
@@ -529,8 +507,8 @@ namespace EmuCore
 		constexpr do_right_shift_assign()
 		{
 		}
-		template<typename Lhs_, typename Rhs_>
-		constexpr inline std::invoke_result_t<do_right_shift_assign<Lhs_, Rhs_>, Lhs_&, const Rhs_&> operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		template<EmuConcepts::Writable Lhs_, typename Rhs_>
+		constexpr inline decltype(auto) operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return do_right_shift_assign<Lhs_, Rhs_>()(lhs_, rhs_);
 		}

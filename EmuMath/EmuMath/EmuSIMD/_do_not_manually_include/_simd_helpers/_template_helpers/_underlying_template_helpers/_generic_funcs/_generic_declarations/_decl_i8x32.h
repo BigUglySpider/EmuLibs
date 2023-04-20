@@ -116,6 +116,13 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 movelh_i8x32(EmuSIMD::i8x32_arg lhs_, EmuSIMD::i8x32_arg rhs_);
 #pragma endregion
 
+#pragma region BITWISE_ARITHMETIC
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 and_i8x32(EmuSIMD::i8x32_arg lhs_, EmuSIMD::i8x32_arg rhs_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 or_i8x32(EmuSIMD::i8x32_arg lhs_, EmuSIMD::i8x32_arg rhs_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 xor_i8x32(EmuSIMD::i8x32_arg lhs_, EmuSIMD::i8x32_arg rhs_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 andnot_i8x32(EmuSIMD::i8x32_arg not_lhs_, EmuSIMD::i8x32_arg rhs_);
+#pragma endregion
+
 #pragma region MINMAX_FUNCS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 min_i8x32(EmuSIMD::i8x32_arg a_, EmuSIMD::i8x32_arg b_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 max_i8x32(EmuSIMD::i8x32_arg a_, EmuSIMD::i8x32_arg b_);

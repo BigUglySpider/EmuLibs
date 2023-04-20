@@ -421,22 +421,42 @@ namespace EmuSIMD::Funcs
 #pragma region BITWISE_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 and_f64x4(EmuSIMD::f64x4_arg lhs_, EmuSIMD::f64x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_256_REGISTERS
 		return _mm256_and_pd(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](f64x2_arg a_, f64x2_arg b_) { return EmuSIMD::Funcs::and_f64x2(a_, b_); }, lhs_, rhs_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 or_f64x4(EmuSIMD::f64x4_arg lhs_, EmuSIMD::f64x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_256_REGISTERS
 		return _mm256_or_pd(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](f64x2_arg a_, f64x2_arg b_) { return EmuSIMD::Funcs::or_f64x2(a_, b_); }, lhs_, rhs_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 xor_f64x4(EmuSIMD::f64x4_arg lhs_, EmuSIMD::f64x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_256_REGISTERS
 		return _mm256_xor_pd(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](f64x2_arg a_, f64x2_arg b_) { return EmuSIMD::Funcs::xor_f64x2(a_, b_); }, lhs_, rhs_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 andnot_f64x4(EmuSIMD::f64x4_arg not_lhs_, EmuSIMD::f64x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_256_REGISTERS
 		return _mm256_andnot_pd(not_lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](f64x2_arg a_, f64x2_arg b_) { return EmuSIMD::Funcs::andnot_f64x2(a_, b_); }, not_lhs_, rhs_);
+#endif
 	}
 #pragma endregion
 

@@ -108,6 +108,13 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 movelh_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_);
 #pragma endregion
 
+#pragma region BITWISE_ARITHMETIC
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 and_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 or_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 xor_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 andnot_u16x16(EmuSIMD::u16x16_arg not_lhs_, EmuSIMD::u16x16_arg rhs_);
+#pragma endregion
+
 #pragma region BLENDS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 blendv_u16x16(EmuSIMD::u16x16_arg a_, EmuSIMD::u16x16_arg b_, EmuSIMD::u16x16_arg shuffle_mask_vec_);
 #pragma endregion

@@ -409,6 +409,52 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region BITWISE_ARITHMETIC
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 and_u32x4(EmuSIMD::u32x4_arg lhs_, EmuSIMD::u32x4_arg rhs_)
+	{
+#if EMU_SIMD_USE_128_REGISTERS
+		return _mm_and_si128(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_bitwise_and<std::uint32_t>(), lhs_, rhs_, index_sequence());
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 or_u32x4(EmuSIMD::u32x4_arg lhs_, EmuSIMD::u32x4_arg rhs_)
+	{
+#if EMU_SIMD_USE_128_REGISTERS
+		return _mm_or_si128(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_bitwise_or<std::uint32_t>(), lhs_, rhs_, index_sequence());
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 xor_u32x4(EmuSIMD::u32x4_arg lhs_, EmuSIMD::u32x4_arg rhs_)
+	{
+#if EMU_SIMD_USE_128_REGISTERS
+		return _mm_xor_si128(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_bitwise_xor<std::uint32_t>(), lhs_, rhs_, index_sequence());
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 andnot_u32x4(EmuSIMD::u32x4_arg not_lhs_, EmuSIMD::u32x4_arg rhs_)
+	{
+#if EMU_SIMD_USE_128_REGISTERS
+		return _mm_andnot_si128(not_lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_bitwise_andnot<std::uint32_t>(), not_lhs_, rhs_, index_sequence());
+#endif
+	}
+#pragma endregion
+
 #pragma region BLENDS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 blendv_u32x4(EmuSIMD::u32x4_arg a_, EmuSIMD::u32x4_arg b_, EmuSIMD::u32x4_arg shuffle_mask_vec_)
 	{

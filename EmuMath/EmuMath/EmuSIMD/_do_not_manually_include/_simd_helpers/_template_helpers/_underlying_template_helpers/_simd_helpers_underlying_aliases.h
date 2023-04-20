@@ -743,17 +743,17 @@ namespace EmuSIMD
 #pragma endregion
 
 #pragma region EMULATED_BASIC_GENERIC_OPS
-		template<bool AllowTheoreticalIndices_, class Func_, std::size_t NumElements_, EmuConcepts::Arithmetic T_, std::size_t...OutIndices_>
+		template<class Func_, std::size_t NumElements_, EmuConcepts::Arithmetic T_, std::size_t...OutIndices_>
 		constexpr inline single_lane_simd_emulator<NumElements_, T_> emulate_simd_basic(const Func_& func_, const single_lane_simd_emulator<NumElements_, T_>& simd_emulator_, std::index_sequence<OutIndices_...> out_indices_)
 		{
 			static_assert(sizeof...(OutIndices_) == NumElements_, "INTERNAL EMUSIMD ERROR: `emulate_simd_basic` called with a number of indices not equal to the number of elements in the output emulated register.");
 			return single_lane_simd_emulator<NumElements_, T_>
 			(
-				func_(retrieve_emulated_single_lane_simd_element<T_, OutIndices_, AllowTheoreticalIndices_>(simd_emulator_))...
+				func_(retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_))...
 			);
 		}
 
-		template<bool AllowTheoreticalIndices_, class Func_, std::size_t NumElements_, EmuConcepts::Arithmetic T_, std::size_t...OutIndices_>
+		template<class Func_, std::size_t NumElements_, EmuConcepts::Arithmetic T_, std::size_t...OutIndices_>
 		constexpr inline single_lane_simd_emulator<NumElements_, T_> emulate_simd_basic
 		(
 			const Func_& func_,
@@ -767,13 +767,13 @@ namespace EmuSIMD
 			(
 				func_
 				(
-					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, AllowTheoreticalIndices_>(simd_emulator_a_),
-					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, AllowTheoreticalIndices_>(simd_emulator_b_)
+					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_a_),
+					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_b_)
 				)...
 			);
 		}
 
-		template<bool AllowTheoreticalIndices_, class Func_, std::size_t NumElements_, EmuConcepts::Arithmetic T_, std::size_t...OutIndices_>
+		template<class Func_, std::size_t NumElements_, EmuConcepts::Arithmetic T_, std::size_t...OutIndices_>
 		constexpr inline single_lane_simd_emulator<NumElements_, T_> emulate_simd_basic
 		(
 			const Func_& func_,
@@ -788,10 +788,51 @@ namespace EmuSIMD
 			(
 				func_
 				(
-					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, AllowTheoreticalIndices_>(simd_emulator_a_),
-					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, AllowTheoreticalIndices_>(simd_emulator_b_),
-					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, AllowTheoreticalIndices_>(simd_emulator_c_)
+					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_a_),
+					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_b_),
+					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_c_)
 				)...
+			);
+		}
+
+		template<class LaneFunc_, std::size_t EmulatedWidth_, class LaneT_>
+		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> emulate_simd_basic(const LaneFunc_& lane_func_, const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& simd_emulator_)
+		{
+			return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+			(
+				lane_func_(simd_emulator_._lane_0),
+				lane_func_(simd_emulator_._lane_1)
+			);
+		}
+
+		template<class LaneFunc_, std::size_t EmulatedWidth_, class LaneT_>
+		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> emulate_simd_basic
+		(
+			const LaneFunc_& lane_func_,
+			const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& simd_emulator_a_,
+			const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& simd_emulator_b_
+		)
+		{
+			return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+			(
+				lane_func_(simd_emulator_a_._lane_0, simd_emulator_b_._lane_0),
+				lane_func_(simd_emulator_a_._lane_1, simd_emulator_b_._lane_1)
+			);
+		}
+
+		template<class LaneFunc_, std::size_t EmulatedWidth_, class LaneT_>
+		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> emulate_simd_basic
+		(
+			const LaneFunc_& lane_func_,
+			const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& simd_emulator_a_,
+			const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& simd_emulator_b_,
+			const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& simd_emulator_c_
+		)
+		{
+			return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+			(
+				lane_func_(simd_emulator_a_._lane_0, simd_emulator_b_._lane_0, simd_emulator_c_._lane_0),
+				lane_func_(simd_emulator_a_._lane_1, simd_emulator_b_._lane_1, simd_emulator_c_._lane_1)
 			);
 		}
 #pragma endregion

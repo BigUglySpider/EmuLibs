@@ -564,22 +564,46 @@ namespace EmuSIMD::Funcs
 #pragma region BITWISE_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 and_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_and_ps(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_bitwise_and<float>(), lhs_, rhs_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 or_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_or_ps(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_bitwise_or<float>(), lhs_, rhs_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 xor_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_xor_ps(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_bitwise_xor<float>(), lhs_, rhs_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 andnot_f32x4(EmuSIMD::f32x4_arg not_lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_andnot_ps(not_lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_bitwise_andnot<float>(), not_lhs_, rhs_, index_sequence());
+#endif
 	}
 #pragma endregion
 
