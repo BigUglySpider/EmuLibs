@@ -605,6 +605,33 @@ namespace EmuSIMD::Funcs
 		return emulate_simd_basic(EmuCore::do_bitwise_andnot<float>(), not_lhs_, rhs_, index_sequence());
 #endif
 	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 shift_left_f32x4(EmuSIMD::f32x4_arg lhs_)
+	{
+		return cast_i32x4_f32x4
+		(
+			shift_left_i32x4<NumShifts_>(cast_f32x4_i32x4(lhs_))
+		);
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 shift_right_logical_f32x4(EmuSIMD::f32x4_arg lhs_)
+	{
+		return cast_i32x4_f32x4
+		(
+			shift_right_logical_i32x4<NumShifts_>(cast_f32x4_i32x4(lhs_))
+		);
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 shift_right_arithmetic_f32x4(EmuSIMD::f32x4_arg lhs_)
+	{
+		return cast_i32x4_f32x4
+		(
+			shift_right_arithmetic_i32x4<NumShifts_>(cast_f32x4_i32x4(lhs_))
+		);
+	}
 #pragma endregion
 
 #pragma region MINMAX_FUNCS

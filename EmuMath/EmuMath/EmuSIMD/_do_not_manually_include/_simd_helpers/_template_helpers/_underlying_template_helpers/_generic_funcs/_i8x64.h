@@ -538,6 +538,66 @@ namespace EmuSIMD::Funcs
 		return emulate_simd_basic([](i8x32_arg a_, i8x32_arg b_) { return EmuSIMD::Funcs::andnot_i8x32(a_, b_); }, not_lhs_, rhs_);
 #endif
 	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 shift_left_i8x64(EmuSIMD::i8x64_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 8)
+		{
+			return setzero_i8x64();
+		}
+		else
+		{
+#if EMU_SIMD_USE_512_REGISTERS
+			constexpr std::int8_t remaining_bits = 0xFF << NumShifts_;
+			EmuSIMD::i8x32 remaining_bits_mask = set1_i8x64(remaining_bits);
+			return and_i8x64(remaining_bits_mask, _mm512_slli_epi32(lhs_, NumShifts_));
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			return emulate_simd_basic([](i8x32_arg a_) { return shift_left_i8x32(a_); }, lhs_);
+#endif
+		}
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 shift_right_arithmetic_i8x64(EmuSIMD::i8x64_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 8)
+		{
+			return setzero_i8x64();
+		}
+		else
+		{
+#if EMU_SIMD_USE_512_REGISTERS
+			constexpr std::int8_t sign_bit = std::int8_t(0b10000000);
+			EmuSIMD::i8x64 signs_mask = and_i8x64(set1_i8x64(sign_bit), lhs_);
+			return or_i8x64(signs_mask, shift_right_logical_i8x64<NumShifts_>(lhs_));
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			return emulate_simd_basic([](i8x32_arg a_) { return shift_right_arithmetic_i8x32(a_); }, lhs_);
+#endif
+		}
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 shift_right_logical_i8x64(EmuSIMD::i8x64_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 8)
+		{
+			return setzero_i8x32();
+		}
+		else
+		{
+#if EMU_SIMD_USE_512_REGISTERS
+			constexpr std::int8_t remaining_bits = 0xFF >> NumShifts_;
+			EmuSIMD::i8x64 remaining_bits_mask = set1_i8x64(remaining_bits);
+			return and_i8x64(remaining_bits_mask, _mm512_slli_epi32(lhs_, NumShifts_));
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			return emulate_simd_basic([](i8x32_arg a_) { return shift_right_logical_i8x32(a_); }, lhs_);
+#endif
+		}
+	}
 #pragma endregion
 
 #pragma region BLENDS

@@ -117,6 +117,12 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 or_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 xor_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 andnot_f32x16(EmuSIMD::f32x16_arg not_lhs_, EmuSIMD::f32x16_arg rhs_);
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 shift_left_f32x16(EmuSIMD::f32x16_arg lhs_);
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 shift_right_arithmetic_f32x16(EmuSIMD::f32x16_arg lhs_);
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 shift_right_logical_f32x16(EmuSIMD::f32x16_arg lhs_);
 #pragma endregion
 
 #pragma region MINMAX_FUNCS

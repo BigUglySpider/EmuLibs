@@ -767,6 +767,74 @@ namespace EmuSIMD::Funcs
 		return emulate_simd_basic(EmuCore::do_bitwise_andnot<std::int8_t>(), not_lhs_, rhs_, index_sequence());
 #endif
 	}
+
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 shift_left_i8x16(EmuSIMD::i8x16_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 8)
+		{
+			return setzero_i8x16();
+		}
+		else
+		{
+#if EMU_SIMD_USE_128_REGISTERS
+			constexpr std::int8_t remaining_bits = 0xFF << NumShifts_;
+			EmuSIMD::i8x16 remaining_bits_mask = set1_i8x16(remaining_bits);
+			return and_i8x16(remaining_bits_mask, _mm_slli_epi32(lhs_, NumShifts_));
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			using index_sequence = std::make_index_sequence<16>;
+			auto func = [](const std::int8_t& a_) { return (a_ << NumShifts_); };
+			return emulate_simd_basic(func, lhs_, index_sequence());
+#endif
+		}
+
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 shift_right_arithmetic_i8x16(EmuSIMD::i8x16_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 8)
+		{
+			return setzero_i8x16();
+		}
+		else
+		{
+			constexpr std::int8_t sign_bit = std::int8_t(0b10000000);
+#if EMU_SIMD_USE_128_REGISTERS
+			EmuSIMD::i8x16 signs_mask = and_i8x16(set1_i8x16(sign_bit), lhs_);
+			return or_i8x16(signs_mask, shift_right_logical_i8x16<NumShifts_>(lhs_));
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			using index_sequence = std::make_index_sequence<16>;
+			auto func = [](const std::int8_t& a_) { return (a_ >> NumShifts_) | (sign_bit & a_); };
+			return emulate_simd_basic(func, lhs_, index_sequence());
+#endif
+		}
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 shift_right_logical_i8x16(EmuSIMD::i8x16_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 8)
+		{
+			return setzero_i8x16();
+		}
+		else
+		{
+#if EMU_SIMD_USE_128_REGISTERS
+			constexpr std::int8_t remaining_bits = 0xFF >> NumShifts_;
+			EmuSIMD::i8x16 remaining_bits_mask = set1_i8x16(remaining_bits);
+			return and_i8x16(remaining_bits_mask, _mm_srli_epi32(lhs_, NumShifts_));
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			using index_sequence = std::make_index_sequence<16>;
+			auto func = [](const std::int8_t& a_) { return (a_ >> NumShifts_); };
+			return emulate_simd_basic(func, lhs_, index_sequence());
+#endif
+		}
+	}
 #pragma endregion
 
 #pragma region MINMAX_FUNCS

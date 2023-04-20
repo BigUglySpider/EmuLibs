@@ -105,6 +105,12 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 or_u64x2(EmuSIMD::u64x2_arg lhs_, EmuSIMD::u64x2_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 xor_u64x2(EmuSIMD::u64x2_arg lhs_, EmuSIMD::u64x2_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 andnot_u64x2(EmuSIMD::u64x2_arg not_lhs_, EmuSIMD::u64x2_arg rhs_);
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 shift_left_u64x2(EmuSIMD::u64x2_arg lhs_);
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 shift_right_arithmetic_u64x2(EmuSIMD::u64x2_arg lhs_);
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 shift_right_logical_u64x2(EmuSIMD::u64x2_arg lhs_);
 #pragma endregion
 
 #pragma region BLENDS

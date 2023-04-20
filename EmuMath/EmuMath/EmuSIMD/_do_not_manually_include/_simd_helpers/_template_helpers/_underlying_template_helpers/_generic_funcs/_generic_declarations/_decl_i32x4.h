@@ -100,6 +100,12 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 or_i32x4(EmuSIMD::i32x4_arg lhs_, EmuSIMD::i32x4_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 xor_i32x4(EmuSIMD::i32x4_arg lhs_, EmuSIMD::i32x4_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 andnot_i32x4(EmuSIMD::i32x4_arg not_lhs_, EmuSIMD::i32x4_arg rhs_);
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 shift_left_i32x4(EmuSIMD::i32x4_arg lhs_);
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 shift_right_arithmetic_i32x4(EmuSIMD::i32x4_arg lhs_);
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 shift_right_logical_i32x4(EmuSIMD::i32x4_arg lhs_);
 #pragma endregion
 
 #pragma region MOVES
