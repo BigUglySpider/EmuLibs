@@ -7,216 +7,219 @@
 
 namespace EmuSIMD::_underlying_simd_helpers
 {
-	template<std::size_t Index_, typename OutT_, std::size_t PerElementWidthIfInt_ = 32, class Register_>
-	[[nodiscard]] inline OutT_ _get_register_index(Register_ register_)
+	template<std::size_t Index_, typename OutT_, std::size_t PerElementWidthIfGenericInt_ = 32, class SIMDRegister_>
+	[[nodiscard]] inline auto _get_register_index(SIMDRegister_&& register_)
+		-> typename std::remove_cvref<OutT_>::type
 	{
-		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<SIMDRegister_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
-			if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::f32x4, EmuSIMD::f32x8, EmuSIMD::f32x16>::value)
+			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				if constexpr (EmuCore::TMP::is_static_castable_v<float, OutT_>)
+				return EmuSIMD::Funcs::extract_element_f32x4<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
+			{
+				return EmuSIMD::Funcs::extract_element_f32x8<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
+			{
+				return EmuSIMD::Funcs::extract_element_f32x16<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
+			{
+				return EmuSIMD::Funcs::extract_element_f64x2<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
+			{
+				return EmuSIMD::Funcs::extract_element_f64x4<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
+			{
+				return EmuSIMD::Funcs::extract_element_f64x8<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
+			{
+				if constexpr (PerElementWidthIfGenericInt_ == 8)
 				{
-					if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
-					{
-						if constexpr (Index_ <= 3)
-						{
-							if constexpr (Index_ != 0)
-							{
-								return static_cast<OutT_>(EmuSIMD::Funcs::get_first_f32x4(_execute_shuffle<Index_>(register_)));
-							}
-							else
-							{
-								return static_cast<OutT_>(EmuSIMD::Funcs::get_first_f32x4(register_));
-							}
-						}
-						else
-						{
-							static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 128-bit float SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1, 2, 3.");
-						}
-					}
-					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
-					{
-						if constexpr (Index_ <= 7)
-						{
-							constexpr int is_hi_ = static_cast<int>(Index_ >= 4);
-							constexpr std::size_t index_in_half_ = Index_ - (4 * is_hi_);
-							return _get_register_index<index_in_half_, OutT_, PerElementWidthIfInt_>(EmuSIMD::Funcs::extract_f32x8_lane_f32x4<is_hi_>(register_));
-						}
-						else
-						{
-							static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 256-bit float SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1, 2, 3, 4, 5, 6, 7.");
-						}
-					}
-					else
-					{
-						if constexpr (Index_ <= 15)
-						{
-							constexpr int chunk_index_ = static_cast<int>(Index_ / 4);
-							constexpr std::size_t index_128_ = Index_ - (4 * chunk_index_);
-							return _get_register_index<index_128_, OutT_, PerElementWidthIfInt_>(EmuSIMD::Funcs::extract_f32x16_lane_f32x4<chunk_index_>(register_));
-						}
-						else
-						{
-							static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 512-bit float SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15.");
-						}
-					}
+					return EmuSIMD::Funcs::extract_element_i8x16<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 16)
+				{
+					return EmuSIMD::Funcs::extract_element_i16x8<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 32)
+				{
+					return EmuSIMD::Funcs::extract_element_i32x4<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 64)
+				{
+					return EmuSIMD::Funcs::extract_element_i64x2<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
 				}
 				else
 				{
-					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a float-containing SIMD register using EmuSIMD helpers, but the provided output type cannot be created from a float value.");
+					static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidthIfGenericInt_>(), "Invalid PerElementWidthIfGenericInt_ passed when retrieving an element at a specified index of a 128-bit generic integral SIMD register. Valid values are 8, 16, 32, 64.");
 				}
 			}
-			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::f64x2, EmuSIMD::f64x4, EmuSIMD::f64x8>::value)
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 			{
-				if constexpr (EmuCore::TMP::is_static_castable_v<double, OutT_>)
+				if constexpr (PerElementWidthIfGenericInt_ == 8)
 				{
-					if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
-					{
-						if constexpr (Index_ <= 1)
-						{
-							if constexpr (Index_ != 0)
-							{
-								return static_cast<OutT_>(EmuSIMD::Funcs::get_first_f64x2(_execute_shuffle<Index_>(register_)));
-							}
-							else
-							{
-								return static_cast<OutT_>(EmuSIMD::Funcs::get_first_f64x2(register_));
-							}
-						}
-						else
-						{
-							static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 128-bit double SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1.");
-						}
-					}
-					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
-					{
-						if constexpr (Index_ <= 3)
-						{
-							constexpr int is_hi_ = static_cast<int>(Index_ >= 2);
-							constexpr std::size_t index_128_ = Index_ - (2 * is_hi_);
-							return _get_register_index<index_128_, OutT_, PerElementWidthIfInt_>(EmuSIMD::Funcs::extract_f64x4_lane_f64x2<is_hi_>(register_));
-						}
-						else
-						{
-							static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 256-bit double SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1, 2, 3.");
-						}
-					}
-					else
-					{
-						if constexpr (Index_ <= 7)
-						{
-							constexpr int chunk_index_ = static_cast<int>(Index_ / 2);
-							constexpr std::size_t index_128_ = Index_ - (2 * chunk_index_);
-							return _get_register_index<index_128_, OutT_, PerElementWidthIfInt_>(EmuSIMD::Funcs::extract_f64x8_lane_f64x2<chunk_index_>(register_));
-						}
-						else
-						{
-							static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 512-bit double SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1, 2, 3, 4, 5, 6, 7.");
-						}
-					}
+					return EmuSIMD::Funcs::extract_element_i8x32<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 16)
+				{
+					return EmuSIMD::Funcs::extract_element_i16x16<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 32)
+				{
+					return EmuSIMD::Funcs::extract_element_i32x8<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 64)
+				{
+					return EmuSIMD::Funcs::extract_element_i64x4<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
 				}
 				else
 				{
-					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a double-containing SIMD register using EmuSIMD helpers, but the provided output type cannot be created from a double value.");
+					static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidthIfGenericInt_>(), "Invalid PerElementWidthIfGenericInt_ passed when retrieving an element at a specified index of a 256-bit generic integral SIMD register. Valid values are 8, 16, 32, 64.");
 				}
 			}
-			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::i128_generic, EmuSIMD::i256_generic, EmuSIMD::i512_generic>::value)
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
 			{
-				if constexpr(EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfInt_>())
+				if constexpr (PerElementWidthIfGenericInt_ == 8)
 				{
-					using int_type = EmuCore::TMP::int_of_size_t<PerElementWidthIfInt_ / 8>;
-					if constexpr (EmuCore::TMP::is_static_castable_v<int_type, OutT_>)
-					{
-						constexpr std::size_t chunk_divisor_ = std::size_t(128) / PerElementWidthIfInt_;
-						if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
-						{
-							constexpr std::size_t first_invalid_index_ = chunk_divisor_;
-							if constexpr (Index_ < first_invalid_index_)
-							{
-								constexpr int index_as_int_ = static_cast<int>(Index_);
-								if constexpr (PerElementWidthIfInt_ == 8)
-								{
-									return static_cast<OutT_>(_mm_extract_epi8(register_, index_as_int_));
-								}
-								else if constexpr (PerElementWidthIfInt_ == 16)
-								{
-									return static_cast<OutT_>(_mm_extract_epi16(register_, index_as_int_));
-								}
-								else if constexpr (PerElementWidthIfInt_ == 32)
-								{
-									return static_cast<OutT_>(_mm_extract_epi32(register_, index_as_int_));
-								}
-								else
-								{
-									return static_cast<OutT_>(_mm_extract_epi64(register_, index_as_int_));
-								}
-							}
-							else
-							{
-								static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 128-bit integral SIMD register using EmuSIMD helpers, but the provided index is invalid for the provided width. The valid index range is 0:(128 / PerElementWidthIfInt_)-1.");
-							}
-						}
-						else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
-						{
-							constexpr std::size_t first_invalid_index_ = std::size_t(256) / PerElementWidthIfInt_;
-							if constexpr (Index_ < first_invalid_index_)
-							{
-								constexpr int is_hi_ = static_cast<int>(Index_ >= chunk_divisor_);
-								constexpr std::size_t index_in_chunk_ = Index_ - (chunk_divisor_ * is_hi_);
-								return _get_register_index<index_in_chunk_, OutT_, PerElementWidthIfInt_>(_mm256_extractf128_si256(register_, is_hi_));
-							}
-							else
-							{
-								static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 256-bit integral SIMD register using EmuSIMD helpers, but the provided index is invalid for the provided width. The valid index range is 0:(256 / PerElementWidthIfInt_)-1.");
-							}
-						}
-						else
-						{
-							constexpr std::size_t first_invalid_index_ = std::size_t(512) / PerElementWidthIfInt_;
-							if constexpr (Index_ < first_invalid_index_)
-							{
-								constexpr int chunk_index_ = static_cast<int>(Index_ / chunk_divisor_);
-								constexpr std::size_t index_in_chunk_ = Index_ - (chunk_index_ * chunk_divisor_);
-								return _get_register_index<index_in_chunk_, OutT_, PerElementWidthIfInt_>(_mm512_extracti32x4_epi32(register_, chunk_index_));
-							}
-							else
-							{
-								static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 512-bit integral SIMD register using EmuSIMD helpers, but the provided index is invalid for the provided width. The valid index range is 0:(512 / PerElementWidthIfInt_)-1.");
-							}
-						}
-					}
-					else
-					{
-						static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from an integral SIMD register using EmuSIMD helpers, but the provided output type cannot be created from an integer of the provided width.");
-					}
+					return EmuSIMD::Funcs::extract_element_i8x64<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 16)
+				{
+					return EmuSIMD::Funcs::extract_element_i16x32<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 32)
+				{
+					return EmuSIMD::Funcs::extract_element_i32x16<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 64)
+				{
+					return EmuSIMD::Funcs::extract_element_i64x8<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
 				}
 				else
 				{
-					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from an integral SIMD register using EmuSIMD helpers, but the provided bit width per element is invalid.");
+					static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidthIfGenericInt_>(), "Invalid PerElementWidthIfGenericInt_ passed when retrieving an element at a specified index of a 512-bit generic integral SIMD register. Valid values are 8, 16, 32, 64.");
 				}
 			}
-			else if constexpr (std::is_same_v<void, void>)
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
 			{
-				// TODO: NON-GENERIC INTS
+				return EmuSIMD::Funcs::extract_element_i8x16<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+			{
+				return EmuSIMD::Funcs::extract_element_i16x8<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+			{
+				return EmuSIMD::Funcs::extract_element_i32x4<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+			{
+				return EmuSIMD::Funcs::extract_element_i64x2<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}			
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+			{
+				return EmuSIMD::Funcs::extract_element_i8x32<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+			{
+				return EmuSIMD::Funcs::extract_element_i16x16<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+			{
+				return EmuSIMD::Funcs::extract_element_i32x8<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+			{
+				return EmuSIMD::Funcs::extract_element_i64x4<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}			
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+			{
+				return EmuSIMD::Funcs::extract_element_i8x64<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+			{
+				return EmuSIMD::Funcs::extract_element_i16x32<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+			{
+				return EmuSIMD::Funcs::extract_element_i32x16<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+			{
+				return EmuSIMD::Funcs::extract_element_i64x8<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+			{
+				return EmuSIMD::Funcs::extract_element_u8x16<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+			{
+				return EmuSIMD::Funcs::extract_element_u16x8<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+			{
+				return EmuSIMD::Funcs::extract_element_u32x4<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+			{
+				return EmuSIMD::Funcs::extract_element_u64x2<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}			
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+			{
+				return EmuSIMD::Funcs::extract_element_u8x32<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+			{
+				return EmuSIMD::Funcs::extract_element_u16x16<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+			{
+				return EmuSIMD::Funcs::extract_element_u32x8<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+			{
+				return EmuSIMD::Funcs::extract_element_u64x4<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}			
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+			{
+				return EmuSIMD::Funcs::extract_element_u8x64<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+			{
+				return EmuSIMD::Funcs::extract_element_u16x32<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+			{
+				return EmuSIMD::Funcs::extract_element_u32x16<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+			{
+				return EmuSIMD::Funcs::extract_element_u64x8<Index_, OutT_>(std::forward<SIMDRegister_>(register_));
 			}
 			else
 			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<SIMDRegister_>(), "Attempted to extract an index from a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a SIMD register using EmuSIMD helpers, but the provided register is not a supported SIMD register type.");
+			static_assert(EmuCore::TMP::get_false<SIMDRegister_>(), "Attempted to extract an index from a SIMD register using EmuSIMD helpers, but the provided register is not a supported SIMD register type.");
 		}
 	}
 
 	template<typename Out_, class Register_, typename NoConstReq_ = std::enable_if_t<!std::is_const_v<Out_>>>
 	inline void _store_register(Register_ register_, Out_* p_out_)
 	{
-		if constexpr (EmuSIMD::TMP::is_simd_register_v<Register_>)
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
-			using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
 				EmuSIMD::Funcs::store_f32x4(reinterpret_cast<float*>(p_out_), register_);
