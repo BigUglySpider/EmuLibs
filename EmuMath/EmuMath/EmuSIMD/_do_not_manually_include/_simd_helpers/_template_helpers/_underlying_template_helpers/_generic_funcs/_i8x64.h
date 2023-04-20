@@ -584,7 +584,7 @@ namespace EmuSIMD::Funcs
 	{
 		if constexpr (NumShifts_ >= 8)
 		{
-			return setzero_i8x32();
+			return setzero_i8x64();
 		}
 		else
 		{
