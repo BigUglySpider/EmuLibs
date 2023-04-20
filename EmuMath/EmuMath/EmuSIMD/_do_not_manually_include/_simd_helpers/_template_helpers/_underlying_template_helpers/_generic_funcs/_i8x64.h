@@ -550,7 +550,7 @@ namespace EmuSIMD::Funcs
 		{
 #if EMU_SIMD_USE_512_REGISTERS
 			constexpr std::int8_t remaining_bits = 0xFF << NumShifts_;
-			EmuSIMD::i8x32 remaining_bits_mask = set1_i8x64(remaining_bits);
+			EmuSIMD::i8x64 remaining_bits_mask = set1_i8x64(remaining_bits);
 			return and_i8x64(remaining_bits_mask, _mm512_slli_epi32(lhs_, NumShifts_));
 #else
 			using EmuSIMD::_underlying_impl::emulate_simd_basic;
@@ -600,7 +600,7 @@ namespace EmuSIMD::Funcs
 	}
 
 	// ###############################################################
-	// # TODO: IMPLEMENT REMAINING SHUFFLES: NEED ALL INTS EXCEPT i8 #
+	// # TODO: IMPLEMENT REMAINING SHIFTS: NEED ALL INTS EXCEPT i8 #
 	// ###############################################################
 #pragma endregion
 
