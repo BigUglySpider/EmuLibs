@@ -475,20 +475,27 @@ namespace EmuSIMD::Funcs
 	}
 
 	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 shift_right_arithmetic_f64x8(EmuSIMD::f64x8_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 64)
+		{
+			return setzero_f64x8();
+		}
+		else
+		{
+			constexpr double sign_bit = -0.0;
+			f64x8 sign_mask = set1_f64x8(sign_bit);
+			sign_mask = and_f64x8(sign_mask, lhs_);
+			return or_f64x8(sign_mask, shift_right_logical_f64x8<NumShifts_>(lhs_));
+		}
+	}
+
+	template<std::int32_t NumShifts_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 shift_right_logical_f64x8(EmuSIMD::f64x8_arg lhs_)
 	{
 		return cast_i64x2_f64x8
 		(
 			shift_right_logical_i64x8<NumShifts_>(cast_f64x8_i64x8(lhs_))
-		);
-	}
-
-	template<std::int32_t NumShifts_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 shift_right_arithmetic_f64x8(EmuSIMD::f64x8_arg lhs_)
-	{
-		return cast_i64x2_f64x8
-		(
-			shift_right_arithmetic_i64x8<NumShifts_>(cast_f64x8_i64x8(lhs_))
 		);
 	}
 #pragma endregion

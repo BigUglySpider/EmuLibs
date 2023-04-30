@@ -468,6 +468,68 @@ namespace EmuSIMD::Funcs
 		return emulate_simd_basic(EmuCore::do_bitwise_andnot<std::int16_t>(), not_lhs_, rhs_, index_sequence());
 #endif
 	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 shift_left_i16x8(EmuSIMD::i16x8_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 16)
+		{
+			return setzero_i16x8();
+		}
+		else
+		{
+#if EMU_SIMD_USE_128_REGISTERS
+			return _mm_slli_epi16(lhs_, NumShifts_);
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			using index_sequence = std::make_index_sequence<8>;
+			auto func = [](const std::int16_t& a_) { return (a_ << NumShifts_); };
+			return emulate_simd_basic(func, lhs_, index_sequence());
+#endif
+		}
+
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 shift_right_arithmetic_i16x8(EmuSIMD::i16x8_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 16)
+		{
+			return setzero_i16x8();
+		}
+		else
+		{
+#if EMU_SIMD_USE_128_REGISTERS
+			return _mm_srai_epi16(lhs_, NumShifts_);
+#else
+			constexpr std::int16_t sign_bit = std::int16_t(0b1000000000000000);
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			using index_sequence = std::make_index_sequence<8>;
+			auto func = [](const std::int16_t& a_) { return (a_ >> NumShifts_) | (sign_bit & a_); };
+			return emulate_simd_basic(func, lhs_, index_sequence());
+#endif
+		}
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 shift_right_logical_i16x8(EmuSIMD::i16x8_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 16)
+		{
+			return setzero_i16x8();
+		}
+		else
+		{
+#if EMU_SIMD_USE_128_REGISTERS
+			return _mm_srli_epi16(lhs_, NumShifts_);
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			using index_sequence = std::make_index_sequence<8>;
+			auto func = [](const std::int16_t& a_) { return (a_ >> NumShifts_); };
+			return emulate_simd_basic(func, lhs_, index_sequence());
+#endif
+		}
+	}
 #pragma endregion
 
 #pragma region BLENDS

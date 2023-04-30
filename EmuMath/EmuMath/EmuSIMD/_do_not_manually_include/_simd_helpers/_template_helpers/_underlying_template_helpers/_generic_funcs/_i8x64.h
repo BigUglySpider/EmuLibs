@@ -549,12 +549,12 @@ namespace EmuSIMD::Funcs
 		else
 		{
 #if EMU_SIMD_USE_512_REGISTERS
-			constexpr std::int8_t remaining_bits = 0xFF << NumShifts_;
+			constexpr std::int8_t remaining_bits = std::int8_t(0xFF << NumShifts_);
 			EmuSIMD::i8x64 remaining_bits_mask = set1_i8x64(remaining_bits);
 			return and_i8x64(remaining_bits_mask, _mm512_slli_epi32(lhs_, NumShifts_));
 #else
 			using EmuSIMD::_underlying_impl::emulate_simd_basic;
-			return emulate_simd_basic([](i8x32_arg a_) { return shift_left_i8x32(a_); }, lhs_);
+			return emulate_simd_basic([](i8x32_arg a_) { return shift_left_i8x32<NumShifts_>(a_); }, lhs_);
 #endif
 		}
 	}
@@ -574,7 +574,7 @@ namespace EmuSIMD::Funcs
 			return or_i8x64(signs_mask, shift_right_logical_i8x64<NumShifts_>(lhs_));
 #else
 			using EmuSIMD::_underlying_impl::emulate_simd_basic;
-			return emulate_simd_basic([](i8x32_arg a_) { return shift_right_arithmetic_i8x32(a_); }, lhs_);
+			return emulate_simd_basic([](i8x32_arg a_) { return shift_right_arithmetic_i8x32<NumShifts_>(a_); }, lhs_);
 #endif
 		}
 	}
@@ -589,19 +589,15 @@ namespace EmuSIMD::Funcs
 		else
 		{
 #if EMU_SIMD_USE_512_REGISTERS
-			constexpr std::int8_t remaining_bits = 0xFF >> NumShifts_;
+			constexpr std::int8_t remaining_bits = std::int8_t(0xFF >> NumShifts_);
 			EmuSIMD::i8x64 remaining_bits_mask = set1_i8x64(remaining_bits);
 			return and_i8x64(remaining_bits_mask, _mm512_slli_epi32(lhs_, NumShifts_));
 #else
 			using EmuSIMD::_underlying_impl::emulate_simd_basic;
-			return emulate_simd_basic([](i8x32_arg a_) { return shift_right_logical_i8x32(a_); }, lhs_);
+			return emulate_simd_basic([](i8x32_arg a_) { return shift_right_logical_i8x32<NumShifts_>(a_); }, lhs_);
 #endif
 		}
 	}
-
-	// ###############################################################
-	// # TODO: IMPLEMENT REMAINING SHIFTS: NEED ALL INTS EXCEPT i8 #
-	// ###############################################################
 #pragma endregion
 
 #pragma region BLENDS

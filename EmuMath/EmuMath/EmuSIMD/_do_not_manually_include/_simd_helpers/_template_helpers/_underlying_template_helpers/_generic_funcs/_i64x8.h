@@ -456,6 +456,60 @@ namespace EmuSIMD::Funcs
 		return emulate_simd_basic([](i64x4_arg a_, i64x4_arg b_) { return EmuSIMD::Funcs::andnot_i64x4(a_, b_); }, not_lhs_, rhs_);
 #endif
 	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 shift_left_i64x8(EmuSIMD::i64x8_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 64)
+		{
+			return setzero_i64x8();
+		}
+		else
+		{
+#if EMU_SIMD_USE_512_REGISTERS
+			return _mm512_slli_epi64(lhs_, NumShifts_);
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			return emulate_simd_basic([](i64x4_arg a_) { return shift_left_i64x4<NumShifts_>(a_); }, lhs_);
+#endif
+		}
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 shift_right_arithmetic_i64x8(EmuSIMD::i64x8_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 64)
+		{
+			return setzero_i64x8();
+		}
+		else
+		{
+#if EMU_SIMD_USE_512_REGISTERS
+			return _mm512_srai_epi64(lhs_, NumShifts_);
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			return emulate_simd_basic([](i64x4_arg a_) { return shift_right_arithmetic_i64x4<NumShifts_>(a_); }, lhs_);
+#endif
+		}
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 shift_right_logical_i64x8(EmuSIMD::i64x8_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 64)
+		{
+			return setzero_i64x8();
+		}
+		else
+		{
+#if EMU_SIMD_USE_512_REGISTERS
+			return _mm512_srli_epi64(lhs_, NumShifts_);
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			return emulate_simd_basic([](i64x4_arg a_) { return shift_right_logical_i64x4<NumShifts_>(a_); }, lhs_);
+#endif
+		}
+	}
 #pragma endregion
 
 #pragma region BLENDS

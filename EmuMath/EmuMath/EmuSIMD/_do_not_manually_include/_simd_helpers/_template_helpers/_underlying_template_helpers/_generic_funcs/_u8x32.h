@@ -534,6 +534,53 @@ namespace EmuSIMD::Funcs
 		return emulate_simd_basic([](u8x16_arg a_, u8x16_arg b_) { return EmuSIMD::Funcs::andnot_u8x16(a_, b_); }, not_lhs_, rhs_);
 #endif
 	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 shift_left_u8x32(EmuSIMD::u8x32_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 8)
+		{
+			return setzero_u8x32();
+		}
+		else
+		{
+#if EMU_SIMD_USE_256_REGISTERS
+			constexpr std::uint8_t remaining_bits = std::uint8_t(0xFF << NumShifts_);
+			EmuSIMD::u8x32 remaining_bits_mask = set1_u8x32(remaining_bits);
+			return and_u8x32(remaining_bits_mask, _mm256_slli_epi32(lhs_, NumShifts_));
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			return emulate_simd_basic([](u8x16_arg a_) { return shift_left_u8x16<NumShifts_>(a_); }, lhs_);
+#endif
+		}
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 shift_right_arithmetic_u8x32(EmuSIMD::u8x32_arg lhs_)
+	{
+		// No sign bit, so same as logical shift
+		return shift_right_logical_u8x32<NumShifts_>(lhs_);
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 shift_right_logical_u8x32(EmuSIMD::u8x32_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 8)
+		{
+			return setzero_u8x32();
+		}
+		else
+		{
+#if EMU_SIMD_USE_256_REGISTERS
+			constexpr std::int8_t remaining_bits = std::uint8_t(0xFF >> NumShifts_);
+			EmuSIMD::u8x32 remaining_bits_mask = set1_u8x32(remaining_bits);
+			return and_u8x32(remaining_bits_mask, _mm256_slli_epi32(lhs_, NumShifts_));
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			return emulate_simd_basic([](u8x16_arg a_) { return shift_right_logical_u8x16<NumShifts_>(a_); }, lhs_);
+#endif
+		}
+	}
 #pragma endregion
 
 #pragma region MINMAX_FUNCS

@@ -525,6 +525,38 @@ namespace EmuSIMD::Funcs
 			std::make_index_sequence<64>()
 		);
 	}
+
+	template<blend_mask_type BlendMask_, std::size_t NumIndices_, bool Reverse_ = false>
+	struct bool_sequence_from_index_mask_maker
+	{
+	private:
+		template<std::size_t...Indices_>
+		[[nodiscard]] static constexpr auto _make_bool_seq(std::index_sequence<Indices_...> index_sequence_)
+		{
+			return EmuCore::TMP::bool_sequence
+			<
+				static_cast<bool>((BlendMask_ >> Indices_) & 1)...
+			>();
+		}
+
+		[[nodiscard]] static constexpr auto _make_index_seq()
+		{
+			// Ironically, reversed index sequence will create an unreversed bool sequence as we're basing interactions on the x86 SIMD interface. Thanks, endianness!
+			if constexpr (Reverse_)
+			{
+				return std::make_index_sequence<NumIndices_>();
+			}
+			else
+			{
+				return EmuCore::TMP::make_reverse_index_sequence<NumIndices_>();
+			}
+		}
+
+	public:
+		using type = decltype(_make_bool_seq(_make_index_seq()));
+	};
+	template<blend_mask_type BlendMask_, std::size_t NumIndices_, bool Reverse_ = false>
+	using make_bool_sequence_from_index_mask = typename bool_sequence_from_index_mask_maker<BlendMask_, NumIndices_, Reverse_>::type;
 }
 
 #endif

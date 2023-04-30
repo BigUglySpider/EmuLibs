@@ -495,6 +495,49 @@ namespace EmuSIMD::Funcs
 		return emulate_simd_basic([](u16x8_arg a_, u16x8_arg b_) { return EmuSIMD::Funcs::andnot_u16x8(a_, b_); }, not_lhs_, rhs_);
 #endif
 	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 shift_left_u16x16(EmuSIMD::u16x16_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 16)
+		{
+			return setzero_u16x16();
+		}
+		else
+		{
+#if EMU_SIMD_USE_256_REGISTERS
+			return _mm256_slli_epi16(lhs_, NumShifts_);
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			return emulate_simd_basic([](u16x8_arg a_) { return shift_left_u16x8<NumShifts_>(a_); }, lhs_);
+#endif
+		}
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 shift_right_arithmetic_u16x16(EmuSIMD::u16x16_arg lhs_)
+	{
+		// No sign bit, so same as logical shift
+		return shift_right_logical_u16x16<NumShifts_>(lhs_);
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 shift_right_logical_u16x16(EmuSIMD::u16x16_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 16)
+		{
+			return setzero_u16x16();
+		}
+		else
+		{
+#if EMU_SIMD_USE_256_REGISTERS
+			return _mm256_srli_epi16(lhs_, NumShifts_);
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			return emulate_simd_basic([](u16x8_arg a_) { return shift_right_logical_u16x8<NumShifts_>(a_); }, lhs_);
+#endif
+		}
+	}
 #pragma endregion
 
 #pragma region BLENDS

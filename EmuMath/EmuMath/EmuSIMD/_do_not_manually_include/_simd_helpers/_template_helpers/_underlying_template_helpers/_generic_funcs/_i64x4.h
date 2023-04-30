@@ -446,6 +446,67 @@ namespace EmuSIMD::Funcs
 		return emulate_simd_basic([](i64x2_arg a_, i64x2_arg b_) { return EmuSIMD::Funcs::andnot_i64x2(a_, b_); }, not_lhs_, rhs_);
 #endif
 	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 shift_left_i64x4(EmuSIMD::i64x4_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 64)
+		{
+			return setzero_i64x4();
+		}
+		else
+		{
+#if EMU_SIMD_USE_256_REGISTERS
+			return _mm256_slli_epi64(lhs_, NumShifts_);
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			return emulate_simd_basic([](i64x2_arg a_) { return shift_left_i64x2<NumShifts_>(a_); }, lhs_);
+#endif
+		}
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 shift_right_arithmetic_i64x4(EmuSIMD::i64x4_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 64)
+		{
+			return setzero_i64x4();
+		}
+		else
+		{
+#if EMU_SIMD_USE_256_REGISTERS
+	#if EMU_SIMD_USE_512_REGISTERS // 64-bit srai only available with AVX-512
+			return _mm256_srai_epi64(lhs_, NumShifts_);
+	#else
+			constexpr std::int64_t sign_bit = std::int64_t(0b1000000000000000000000000000000000000000000000000000000000000000);
+			i64x4 signs_mask = set1_i64x4(sign_bit);
+			signs_mask = and_i64x4(signs_mask, lhs_);
+			return or_i64x4(signs_mask, shift_right_logical_i64x4<NumShifts_>(lhs_));
+	#endif
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			return emulate_simd_basic([](i64x2_arg a_) { return shift_right_arithmetic_i64x2<NumShifts_>(a_); }, lhs_);
+#endif
+		}
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 shift_right_logical_i64x4(EmuSIMD::i64x4_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 64)
+		{
+			return setzero_i64x4();
+		}
+		else
+		{
+#if EMU_SIMD_USE_256_REGISTERS
+			return _mm256_srli_epi64(lhs_, NumShifts_);
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			return emulate_simd_basic([](i64x2_arg a_) { return shift_right_logical_i64x2<NumShifts_>(a_); }, lhs_);
+#endif
+		}
+	}
 #pragma endregion
 	
 #pragma region BLENDS

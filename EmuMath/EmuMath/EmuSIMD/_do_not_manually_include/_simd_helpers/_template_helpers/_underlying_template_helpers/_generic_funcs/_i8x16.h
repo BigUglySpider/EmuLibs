@@ -768,7 +768,6 @@ namespace EmuSIMD::Funcs
 #endif
 	}
 
-
 	template<std::int32_t NumShifts_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 shift_left_i8x16(EmuSIMD::i8x16_arg lhs_)
 	{
@@ -779,7 +778,7 @@ namespace EmuSIMD::Funcs
 		else
 		{
 #if EMU_SIMD_USE_128_REGISTERS
-			constexpr std::int8_t remaining_bits = 0xFF << NumShifts_;
+			constexpr std::int8_t remaining_bits = std::int8_t(0xFF << NumShifts_);
 			EmuSIMD::i8x16 remaining_bits_mask = set1_i8x16(remaining_bits);
 			return and_i8x16(remaining_bits_mask, _mm_slli_epi32(lhs_, NumShifts_));
 #else
@@ -824,7 +823,7 @@ namespace EmuSIMD::Funcs
 		else
 		{
 #if EMU_SIMD_USE_128_REGISTERS
-			constexpr std::int8_t remaining_bits = 0xFF >> NumShifts_;
+			constexpr std::int8_t remaining_bits = std::int8_t(0xFF >> NumShifts_);
 			EmuSIMD::i8x16 remaining_bits_mask = set1_i8x16(remaining_bits);
 			return and_i8x16(remaining_bits_mask, _mm_srli_epi32(lhs_, NumShifts_));
 #else
