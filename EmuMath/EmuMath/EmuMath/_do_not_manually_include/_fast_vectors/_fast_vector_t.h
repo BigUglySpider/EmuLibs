@@ -1691,43 +1691,10 @@ namespace EmuMath
 		}
 
 		/// <summary>
-		/// <para> Logically left-shifts all registers encapsulated by this Vector using the passed argument as the shifts for each register. </para>
-		/// </summary>
-		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
-		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		[[nodiscard]] constexpr inline this_type ShiftLeft(shift_register_type num_shifts_) const
-		{
-			if constexpr (contains_multiple_registers)
-			{
-				return this_type(_do_array_shift_left(data, num_shifts_, register_index_sequence()));
-			}
-			else
-			{
-				return this_type(EmuSIMD::shift_left<per_element_width>(data, num_shifts_));
-			}
-		}
-
-		/// <summary>
-		/// <para> Logically left-shifts all elements within this Vector using the passed scalar value as the number of shifts for each element. </para>
-		/// <para> 
-		///		This will create an intermediate for SIMD register interactions; 
-		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
-		///		make_all_same_register function.
-		/// </para>
-		/// <para> If num_shifts_ is a compile-time constant, it is recommended to use the form of this function which takes a NumShifts_ template argument instead. </para>
-		/// </summary>
-		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
-		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		[[nodiscard]] constexpr inline this_type ShiftLeft(std::size_t num_shifts_) const
-		{
-			return ShiftLeft(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
-		}
-
-		/// <summary>
 		/// <para> Logically left-shifts all elements within this Vector using the passed template scalar value as the number of shifts for each element. </para>
 		/// </summary>
 		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		template<std::size_t NumShifts_>
+		template<std::int32_t NumShifts_>
 		constexpr inline this_type ShiftLeft() const
 		{
 			if constexpr (contains_multiple_registers)
@@ -1741,43 +1708,10 @@ namespace EmuMath
 		}
 
 		/// <summary>
-		/// <para> Logically right-shifts all registers encapsulated by this Vector using the passed argument as the shifts for each register. </para>
-		/// </summary>
-		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
-		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		[[nodiscard]] constexpr inline this_type ShiftRight(shift_register_type num_shifts_) const
-		{
-			if constexpr (contains_multiple_registers)
-			{
-				return this_type(_do_array_shift_right_logical(data, num_shifts_, register_index_sequence()));
-			}
-			else
-			{
-				return this_type(EmuSIMD::shift_right_logical<per_element_width>(data, num_shifts_));
-			}
-		}
-
-		/// <summary>
-		/// <para> Logically right-shifts all elements within this Vector using the passed scalar value as the number of shifts for each element. </para>
-		/// <para> 
-		///		This will create an intermediate for SIMD register interactions; 
-		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
-		///		make_all_same_register function.
-		/// </para>
-		/// <para> If num_shifts_ is a compile-time constant, it is recommended to use the form of this function which takes a NumShifts_ template argument instead. </para>
-		/// </summary>
-		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
-		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		[[nodiscard]] constexpr inline this_type ShiftRight(std::size_t num_shifts_) const
-		{
-			return ShiftRight(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
-		}
-
-		/// <summary>
 		/// <para> Logically right-shifts all elements within this Vector using the passed template scalar value as the number of shifts for each element. </para>
 		/// </summary>
 		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		template<std::size_t NumShifts_>
+		template<std::int32_t NumShifts_>
 		constexpr inline this_type ShiftRight() const
 		{
 			if constexpr (contains_multiple_registers)
@@ -1791,46 +1725,11 @@ namespace EmuMath
 		}
 
 		/// <summary>
-		/// <para> Arithmetically right-shifts all registers encapsulated by this Vector using the passed argument as the shifts for each register. </para>
-		/// <para> Arithmetic shifts differentiate from logical shifts in that they preserve the sign bit. </para>
-		/// </summary>
-		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
-		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		[[nodiscard]] constexpr inline this_type ShiftRightArithmetic(shift_register_type num_shifts_) const
-		{
-			if constexpr (contains_multiple_registers)
-			{
-				return this_type(_do_array_shift_right_arithmetic(data, num_shifts_, register_index_sequence()));
-			}
-			else
-			{
-				return this_type(EmuSIMD::shift_right_arithmetic<per_element_width>(data, num_shifts_));
-			}
-		}
-
-		/// <summary>
-		/// <para> Arithmetically right-shifts all elements within this Vector using the passed scalar value as the number of shifts for each element. </para>
-		/// <para> Arithmetic shifts differentiate from logical shifts in that they preserve the sign bit. </para>
-		/// <para> 
-		///		This will create an intermediate for SIMD register interactions; 
-		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
-		///		make_all_same_register function.
-		/// </para>
-		/// <para> If num_shifts_ is a compile-time constant, it is recommended to use the form of this function which takes a NumShifts_ template argument instead. </para>
-		/// </summary>
-		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
-		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		[[nodiscard]] constexpr inline this_type ShiftRightArithmetic(std::size_t num_shifts_) const
-		{
-			return ShiftRightArithmetic(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
-		}
-
-		/// <summary>
 		/// <para> Arithmetically right-shifts all elements within this Vector using the passed template scalar value as the number of shifts for each element. </para>
 		/// <para> Arithmetic shifts differentiate from logical shifts in that they preserve the sign bit. </para>
 		/// </summary>
 		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		template<std::size_t NumShifts_>
+		template<std::int32_t NumShifts_>
 		constexpr inline this_type ShiftRightArithmetic() const
 		{
 			if constexpr (contains_multiple_registers)
