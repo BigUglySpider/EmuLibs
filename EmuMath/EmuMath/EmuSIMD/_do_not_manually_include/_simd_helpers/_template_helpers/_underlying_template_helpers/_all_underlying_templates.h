@@ -6,7 +6,6 @@
 #include "_simd_helpers_underlying_basic_arithmetic.h"
 #include "_simd_helpers_underlying_bitwise.h"
 #include "_simd_helpers_underlying_blend.h"
-#include "_simd_helpers_underlying_blend_mask.h"
 #include "_simd_helpers_underlying_cast.h"
 #include "_simd_helpers_underlying_cmp.h"
 #include "_simd_helpers_underlying_cvt.h"

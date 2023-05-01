@@ -269,9 +269,6 @@
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_blend.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_blend_mask.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_blend.h">
       <Filter>Header Files</Filter>
     </ClInclude>

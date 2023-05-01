@@ -2,8 +2,6 @@
 #define EMU_SIMD_HELPERS_UNDERLYING_BLEND_H_INC_ 1
 
 #include "_common_underlying_simd_template_helper_includes.h"
-#include "_simd_helpers_underlying_blend_mask.h"
-#include "_simd_helpers_underlying_shuffle.h"
 #include "../../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD::_underlying_simd_helpers
