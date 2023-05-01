@@ -235,129 +235,447 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
-			using mask_generator = _underlying_simd_helpers::_blend_mask<register_type_uq, IndexUsesB_...>;
-			if constexpr (_underlying_simd_helpers::_is_valid_blend_mask<mask_generator>::value)
+			constexpr std::size_t num_blend_args = sizeof...(IndexUsesB_);
+			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				if constexpr (_underlying_simd_helpers::_blend_mask_is_simd_register<mask_generator>::value)
+				if constexpr (num_blend_args == 4)
 				{
-					// Defer to blendv for executing a register mask
-					if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::f32x4, EmuSIMD::f32x8, EmuSIMD::f32x16, EmuSIMD::f64x2, EmuSIMD::f64x4, EmuSIMD::f64x8>::value)
-					{
-						// Nothing extra needed
-						return _blendv(a_, b_, mask_generator::get());
-					}
-					else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::i128_generic, EmuSIMD::i256_generic, EmuSIMD::i512_generic>::value)
-					{
-						constexpr std::size_t register_width_ = EmuSIMD::TMP::simd_register_width_v<register_type_uq>;
-						constexpr std::size_t num_index_args_ = sizeof...(IndexUsesB_);
-						constexpr std::size_t per_element_width_ = register_width_ / num_index_args_;
-						if constexpr (EmuSIMD::TMP::_valid_simd_int_element_width(per_element_width_))
-						{
-							return _blendv<per_element_width_>(a_, b_, mask_generator::get());
-						}
-						else
-						{
-							static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to execute SIMD blend with index arguments which result in a vectorwise blend mask for a blendv operation, however the index argument count cannot be successfully used to determine a per-element width (in bits) for the register.");
-						}
-					}
-					else
-					{
-						static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to execute SIMD blend with index arguments which result in a vectorwise blend mask for a blendv operation, however the passed SIMD register is not supported for EmuMath's blendv functionality.");
-					}
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_f32x4<blend_mask>(a_, b_);
 				}
 				else
 				{
-					// We have a non-register mask to use
-					using namespace EmuSIMD::Funcs;
-					constexpr auto blend_mask = mask_generator::get();
-					if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
-					{
-						return blend_f32x4<blend_mask>(a_, b_);
-					}
-					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
-					{
-						return blend_f32x8<blend_mask>(a_, b_);
-					}
-					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
-					{
-						return blend_f32x16<blend_mask>(a_, b_);
-					}
-					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
-					{
-						return blend_f64x2<blend_mask>(a_, b_);
-					}
-					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
-					{
-						return blend_f64x4<blend_mask>(a_, b_);
-					}
-					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
-					{
-						return blend_f64x8<blend_mask>(a_, b_);
-					}
-					else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::i128_generic, EmuSIMD::i256_generic, EmuSIMD::i512_generic>::value)
-					{
-						constexpr std::size_t register_width_ = EmuSIMD::TMP::simd_register_width_v<register_type_uq>;
-						constexpr std::size_t num_index_args_ = sizeof...(IndexUsesB_);
-						constexpr std::size_t per_element_width_ = register_width_ / num_index_args_;
-
-						if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<per_element_width_>() && (per_element_width_ != 8))
-						{
-							// 8-bit is handled as vectorwise blend, so these cover the entire valid range in just an if...else
-							if constexpr (per_element_width_ == 16)
-							{
-								// We know we have one of the 3 integral registers, so simple else...elif...else covers all scenarios
-								if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
-								{
-									return _mm_blend_epi16(a_, b_, blend_mask);
-								}
-								else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
-								{
-									return _mm256_blend_epi16(a_, b_, blend_mask);
-								}
-								else
-								{
-									return _mm512_mask_blend_epi16(blend_mask, a_, b_);
-								}
-							}
-							else
-							{
-								// Blending 64-bit boundaries is emulated through a 32-bit blend; arguments are duplicated before moving to the next
-								// --- e.g. 64-bit blend<false, true> translates to 32-bit blend<false, false, true, true>
-								if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
-								{
-									return _mm_blend_epi32(a_, b_, blend_mask);
-								}
-								else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
-								{
-									return _mm256_blend_epi32(a_, b_, blend_mask);
-								}
-								else
-								{
-									return _mm512_mask_blend_epi32(blend_mask, a_, b_);
-								}
-							}
-						}
-						else
-						{
-							if constexpr (per_element_width_ == 8)
-							{
-								static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to execute a SIMD blend, but the provided arguments and register resulted in an attempt at blending an integral register in 8-bit fields without deferring to blendv. This behaviour is prohibited.");
-							}
-							else
-							{
-								static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to execute SIMD blend with integral registers, however the index argument count cannot be successfully used to determine a per-element width (in bits) for the register.");
-							}
-						}
-					}
-					else
-					{
-						static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to execute a SIMD blend via EmuSIMD helpers using a SIMD register that is not supported for this operation.");
-					}
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a f32x4 blend operation; expected 4.");
 				}
 			}
-			else
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to execute a SIMD blend, but the provided IndexUsesB_ arguments were not valid for creating a mask for the provided SIMD register type.");
+				if constexpr (num_blend_args == 8)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_f32x8<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a f32x8 blend operation; expected 8.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
+			{
+				if constexpr (num_blend_args == 16)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_f32x16<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a f32x16 blend operation; expected 16.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
+			{
+				if constexpr (num_blend_args == 2)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_f64x2<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a f64x2 blend operation; expected 2.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
+			{
+				if constexpr (num_blend_args == 4)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_f64x4<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a f64x4 blend operation; expected 4.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
+			{
+				if constexpr (num_blend_args == 8)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_f64x8<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a f64x8 blend operation; expected 8.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
+			{
+				if constexpr (num_blend_args == 2)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i64x2<blend_mask>(a_, b_);
+				}
+				else if constexpr (num_blend_args == 4)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i32x4<blend_mask>(a_, b_);
+				}
+				else if constexpr (num_blend_args == 8)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i16x8<blend_mask>(a_, b_);
+				}
+				else if constexpr (num_blend_args == 16)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i8x16<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a blend operation on a generic 128-bit integral SIMD register; expected one of: 16 [8-bit], 8 [16-bit], 4 [32-bit], 2 [64-bit].");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+			{
+				if constexpr (num_blend_args == 4)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i64x4<blend_mask>(a_, b_);
+				}
+				else if constexpr (num_blend_args == 8)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i32x8<blend_mask>(a_, b_);
+				}
+				else if constexpr (num_blend_args == 16)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i16x16<blend_mask>(a_, b_);
+				}
+				else if constexpr (num_blend_args == 32)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i8x32<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a blend operation on a generic 128-bit integral SIMD register; expected one of: 32 [8-bit], 16 [16-bit], 8 [32-bit], 4 [64-bit].");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
+			{
+				if constexpr (num_blend_args == 8)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i64x8<blend_mask>(a_, b_);
+				}
+				else if constexpr (num_blend_args == 16)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i32x16<blend_mask>(a_, b_);
+				}
+				else if constexpr (num_blend_args == 32)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i16x32<blend_mask>(a_, b_);
+				}
+				else if constexpr (num_blend_args == 64)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i8x64<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a blend operation on a generic 128-bit integral SIMD register; expected one of: 64 [8-bit], 32 [16-bit], 16 [32-bit], 8 [64-bit].");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+			{
+				if constexpr (num_blend_args == 16)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i8x16<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a i8x16 blend operation; expected 16.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+			{
+				if constexpr (num_blend_args == 8)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i16x8<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a i16x8 blend operation; expected 8.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+			{
+				if constexpr (num_blend_args == 4)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i32x4<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a i32x4 blend operation; expected 4.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+			{
+				if constexpr (num_blend_args == 2)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i64x2<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a i64x2 blend operation; expected 2.");
+				}
+			}			
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+			{
+				if constexpr (num_blend_args == 32)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i8x32<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a i8x32 blend operation; expected 32.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+			{
+				if constexpr (num_blend_args == 16)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i16x16<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a i16x16 blend operation; expected 16.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+			{
+				if constexpr (num_blend_args == 8)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i32x8<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a i32x8 blend operation; expected 8.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+			{
+				if constexpr (num_blend_args == 4)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i64x4<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a i64x4 blend operation; expected 4.");
+				}
+			}			
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+			{
+				if constexpr (num_blend_args == 64)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i8x64<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a i8x64 blend operation; expected 64.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+			{
+				if constexpr (num_blend_args == 32)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i16x32<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a i16x32 blend operation; expected 32.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+			{
+				if constexpr (num_blend_args == 16)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i32x16<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a i32x16 blend operation; expected 16.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+			{
+				if constexpr (num_blend_args == 8)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_i64x8<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a i64x8 blend operation; expected 8.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+			{
+				if constexpr (num_blend_args == 16)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_u8x16<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a u8x16 blend operation; expected 16.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+			{
+				if constexpr (num_blend_args == 8)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_u16x8<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a u16x8 blend operation; expected 8.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+			{
+				if constexpr (num_blend_args == 4)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_u32x4<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a u32x4 blend operation; expected 4.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+			{
+				if constexpr (num_blend_args == 2)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_u64x2<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a u64x2 blend operation; expected 2.");
+				}
+			}			
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+			{
+				if constexpr (num_blend_args == 32)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_u8x32<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a u8x32 blend operation; expected 32.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+			{
+				if constexpr (num_blend_args == 16)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_u16x16<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a u16x16 blend operation; expected 16.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+			{
+				if constexpr (num_blend_args == 8)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_u32x8<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a u32x8 blend operation; expected 8.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+			{
+				if constexpr (num_blend_args == 4)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_u64x4<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a u64x4 blend operation; expected 4.");
+				}
+			}			
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+			{
+				if constexpr (num_blend_args == 64)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_u8x64<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a u8x64 blend operation; expected 64.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+			{
+				if constexpr (num_blend_args == 32)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_u16x32<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a u16x32 blend operation; expected 32.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+			{
+				if constexpr (num_blend_args == 16)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_u32x16<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a u32x16 blend operation; expected 16.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+			{
+				if constexpr (num_blend_args == 8)
+				{
+					constexpr auto blend_mask = EmuSIMD::Funcs::make_reverse_blend_mask<IndexUsesB_...>();
+					return EmuSIMD::Funcs::blend_u64x8<blend_mask>(a_, b_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_blend_args>(), "Invalid number of boolean arguments passed to execute a u64x8 blend operation; expected 8.");
+				}
 			}
 		}
 		else

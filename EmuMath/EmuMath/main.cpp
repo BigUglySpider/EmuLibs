@@ -359,6 +359,17 @@ constexpr inline decltype(auto) setr_test_helper(Func_&& func_, std::index_seque
 int main()
 {
 	{
+		using test_reg = EmuSIMD::f32x4;
+		test_reg a = EmuSIMD::set1<test_reg>(1);
+		test_reg b = EmuSIMD::set1<test_reg>(2);
+		test_reg from_func = EmuSIMD::Funcs::blend_f32x4<EmuSIMD::Funcs::make_blend_mask<1, 0, 1, 0>()>(a, b);
+		test_reg from_temp = EmuSIMD::blend<1, 0, 1, 0>(a, b);
+		EmuSIMD::append_simd_vector_to_stream(std::cout, from_func) << '\n';
+		EmuSIMD::append_simd_vector_to_stream(std::cout, from_temp) << '\n';
+		universal_pause();
+	}
+
+	{
 		constexpr std::size_t num_elements = 4;
 		using scalar_type = float;
 		using emulated_f32x4 = EmuSIMD::_underlying_impl::single_lane_simd_emulator<num_elements, scalar_type>;

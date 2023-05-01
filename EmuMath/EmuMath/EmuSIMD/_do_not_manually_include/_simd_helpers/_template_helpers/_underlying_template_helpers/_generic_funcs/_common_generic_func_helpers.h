@@ -378,6 +378,19 @@ namespace EmuSIMD::Funcs
 				return (... | _shift_blend_mask_bit<Bits_, end_shift - Indices_>());
 			}
 		}
+
+		template<bool...Bits_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline blend_mask_type _make_reverse_blend_mask(EmuCore::TMP::bool_sequence<Bits_...> bits_, std::index_sequence<Indices_...> indices_)
+		{
+			constexpr std::size_t num_bits = sizeof...(Bits_);
+			constexpr std::size_t num_indices = sizeof...(Indices_);
+			static_assert(num_bits == num_indices, "Error with EmuSIMD::Funcs::_underlying_funcs::_make_reverse_blend_mask: The number of boolean bits passed is not equal to the number of indices in the passed index sequence.");
+
+			if constexpr (num_bits == sizeof...(Indices_))
+			{
+				return (... | _shift_blend_mask_bit<Bits_, Indices_>());
+			}
+		}
 	}
 
 	template<blend_mask_type BlendMask, bool Reverse_, typename TargetType_, std::size_t...Indices_, class SettingFunc_>
@@ -516,6 +529,64 @@ namespace EmuSIMD::Funcs
 	[[nodiscard]] constexpr inline blend_mask_type make_blend_mask()
 	{
 		return EmuSIMD::Funcs::_underlying_funcs::_make_blend_mask
+		(
+			EmuCore::TMP::bool_sequence
+			<
+				I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_, I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_,
+				I32_, I33_, I34_, I35_, I36_, I37_, I38_, I39_, I40_, I41_, I42_, I43_, I44_, I45_, I46_, I47_, I48_, I49_, I50_, I51_, I52_, I53_, I54_, I55_, I56_, I57_, I58_, I59_, I60_, I61_, I62_, I63_
+			>(),
+			std::make_index_sequence<64>()
+		);
+	}
+
+	template<bool I0_, bool I1_>
+	[[nodiscard]] constexpr inline blend_mask_type make_reverse_blend_mask()
+	{
+		return EmuSIMD::Funcs::_underlying_funcs::_make_reverse_blend_mask(EmuCore::TMP::bool_sequence<I0_, I1_>(), std::make_index_sequence<2>());
+	}
+
+	template<bool I0_, bool I1_, bool I2_, bool I3_>
+	[[nodiscard]] constexpr inline blend_mask_type make_reverse_blend_mask()
+	{
+		return EmuSIMD::Funcs::_underlying_funcs::_make_reverse_blend_mask(EmuCore::TMP::bool_sequence<I0_, I1_, I2_, I3_>(), std::make_index_sequence<4>());
+	}
+
+	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_>
+	[[nodiscard]] constexpr inline blend_mask_type make_reverse_blend_mask()
+	{
+		return EmuSIMD::Funcs::_underlying_funcs::_make_reverse_blend_mask(EmuCore::TMP::bool_sequence<I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>(), std::make_index_sequence<8>());
+	}
+
+	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_, bool I8_, bool I9_, bool I10_, bool I11_, bool I12_, bool I13_, bool I14_, bool I15_>
+	[[nodiscard]] constexpr inline blend_mask_type make_reverse_blend_mask()
+	{
+		return EmuSIMD::Funcs::_underlying_funcs::_make_reverse_blend_mask(EmuCore::TMP::bool_sequence<I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>(), std::make_index_sequence<16>());
+	}
+
+	template
+	<
+		bool I0_,  bool I1_,  bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_,  bool I8_,  bool I9_,  bool I10_, bool I11_ ,bool I12_, bool I13_, bool I14_, bool I15_,
+		bool I16_, bool I17_, bool I18_, bool I19_, bool I20_, bool I21_, bool I22_, bool I23_, bool I24_, bool I25_, bool I26_, bool I27_, bool I28_, bool I29_, bool I30_, bool I31_
+	>
+	[[nodiscard]] constexpr inline blend_mask_type make_reverse_blend_mask()
+	{
+		return EmuSIMD::Funcs::_underlying_funcs::_make_reverse_blend_mask
+		(
+			EmuCore::TMP::bool_sequence<I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_, I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_>(),
+			std::make_index_sequence<32>()
+		);
+	}
+
+	template
+	<
+		bool I0_,  bool I1_,  bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_,  bool I8_,  bool I9_,  bool I10_, bool I11_ ,bool I12_, bool I13_, bool I14_, bool I15_,
+		bool I16_, bool I17_, bool I18_, bool I19_, bool I20_, bool I21_, bool I22_, bool I23_, bool I24_, bool I25_, bool I26_, bool I27_, bool I28_, bool I29_, bool I30_, bool I31_,
+		bool I32_, bool I33_, bool I34_, bool I35_, bool I36_, bool I37_, bool I38_, bool I39_, bool I40_, bool I41_, bool I42_, bool I43_, bool I44_, bool I45_, bool I46_, bool I47_,
+		bool I48_, bool I49_, bool I50_, bool I51_, bool I52_, bool I53_, bool I54_, bool I55_, bool I56_, bool I57_, bool I58_, bool I59_, bool I60_, bool I61_, bool I62_, bool I63_
+	>
+	[[nodiscard]] constexpr inline blend_mask_type make_reverse_blend_mask()
+	{
+		return EmuSIMD::Funcs::_underlying_funcs::_make_reverse_blend_mask
 		(
 			EmuCore::TMP::bool_sequence
 			<
