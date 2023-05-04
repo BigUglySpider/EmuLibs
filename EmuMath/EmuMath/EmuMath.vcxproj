@@ -513,18 +513,6 @@
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_stream.h" />
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_get.h" />
     <ClInclude Include="EmuCore\CommonTypes\DeferrableReferenceWrapper.h" />
-    <ClInclude Include="EmuThreads\Functors\default_thread_allocator.h" />
-    <ClInclude Include="EmuThreads\Functors\default_work_allocator.h" />
-    <ClInclude Include="EmuThreads\Functors\ParallelLoopFunctors\default_parallel_loop_custom_incrementer.h" />
-    <ClInclude Include="EmuThreads\Functors\ParallelLoopFunctors\default_parallel_loop_incrementer.h" />
-    <ClInclude Include="EmuThreads\Functors\ParallelLoopFunctors\default_parallel_loop_iteration_allocator.h" />
-    <ClInclude Include="EmuThreads\Functors\prioritised_work_allocator.h" />
-    <ClInclude Include="EmuThreads\ParallelFor.h" />
-    <ClInclude Include="EmuThreads\ThreadPool.h" />
-    <ClInclude Include="EmuThreads\ThreadSafeHelpers.h" />
-    <ClInclude Include="EmuThreads\TMP\BindTMP.h" />
-    <ClInclude Include="EmuThreads\TMP\CommonThreadingAliases.h" />
-    <ClInclude Include="EmuThreads\TMP\ThreadPoolTMP.h" />
     <ClInclude Include="Tests.hpp" />
   </ItemGroup>
   <ItemGroup>

@@ -294,22 +294,22 @@ namespace EmuSIMD
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				EmuSIMD::f32x8 result_ = _underlying_simd_helpers::_cast<EmuSIMD::f32x8>
+				EmuSIMD::f32x8 result_ = EmuSIMD::cast<EmuSIMD::f32x8>
 				(
 					_underlying_simd_helpers::_execute_shuffle<0>
 					(
-						_underlying_simd_helpers::_cast<EmuSIMD::f32x4>(horizontal_sum(register_))
+						EmuSIMD::cast<EmuSIMD::f32x4>(horizontal_sum(register_))
 					)
 				);
 				return _mm256_permute2f128_ps(result_, result_, 0);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				EmuSIMD::f64x4 result_ = _underlying_simd_helpers::_cast<EmuSIMD::f64x4>
+				EmuSIMD::f64x4 result_ = EmuSIMD::cast<EmuSIMD::f64x4>
 				(
 					_underlying_simd_helpers::_execute_shuffle<0>
 					(
-						_underlying_simd_helpers::_cast<EmuSIMD::f64x2>(horizontal_sum(register_))
+						EmuSIMD::cast<EmuSIMD::f64x2>(horizontal_sum(register_))
 					)
 				);
 				return _mm256_permute2f128_pd(result_, result_, 0);

@@ -108,6 +108,11 @@ namespace EmuSIMD::Funcs
 	{
 		return _mm256_castsi128_si256(a_);
 	}
+	
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_i32x4_i32x8(i32x4_arg a_)
+	{
+		return _mm256_castsi128_si256(a_);
+	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_i32x8_i32x8(i32x4_arg a_)
 	{

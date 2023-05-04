@@ -35,7 +35,7 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_f64x8_i32x8(f64x8_arg a_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_i8x16_i32x8(i8x16_arg a_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_i16x8_i32x8(i16x8_arg a_);
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_i32x8_i32x8(i32x4_arg a_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_i32x4_i32x8(i32x4_arg a_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_i64x2_i32x8(i64x2_arg a_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_i8x32_i32x8(i8x32_arg a_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_i16x16_i32x8(i16x16_arg a_);

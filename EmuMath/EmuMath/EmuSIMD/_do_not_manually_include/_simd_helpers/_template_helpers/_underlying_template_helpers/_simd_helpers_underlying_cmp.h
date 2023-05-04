@@ -22,7 +22,8 @@ namespace EmuSIMD::_underlying_simd_helpers
 				(
 					PerElementWidth_ == 8 ? 0xFF : 
 						PerElementWidth_ == 16 ? 0xFFFF : 
-							PerElementWidth_ == 32 ? 0xFFFFFFFF : 0xFFFFFFFFFFFFFFFF
+							PerElementWidth_ == 32 ? 0xFFFFFFFF :
+								0xFFFFFFFFFFFFFFFF
 				);
 				constexpr bits_type masked_bits_ = static_cast<bits_type>(Bits_ & bit_mask_);
 
