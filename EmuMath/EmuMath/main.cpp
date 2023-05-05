@@ -359,6 +359,18 @@ constexpr inline decltype(auto) setr_test_helper(Func_&& func_, std::index_seque
 int main()
 {
 	{
+		std::uint16_t test = 0x000F;
+		std::byte& msb = EmuCore::ArithmeticHelpers::get_most_significant_byte<std::byte&>(test);
+		std::cout << test << " | msb: " << std::bitset<8>((int)msb) << '\n';
+		msb |= std::byte(1);
+		std::cout << test << " | msb: " << std::bitset<8>((int)msb) << '\n';
+		msb |= std::byte(0b10000000);
+		std::cout << test << " | msb: " << std::bitset<8>((int)msb) << '\n';
+		
+		universal_pause();
+	}
+
+	{
 		using test_reg = EmuSIMD::f32x4;
 		test_reg a = EmuSIMD::set1<test_reg>(1);
 		test_reg b = EmuSIMD::set1<test_reg>(2);

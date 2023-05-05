@@ -70,16 +70,16 @@ namespace EmuSIMD::Funcs
 		constexpr std::int8_t element_mask = static_cast<std::int8_t>(0xFF);
 		return _mm512_set_epi8
 		(
-			static_cast<std::int8_t>(bit_mask_  & 0x0000000000000001) * element_mask,
-			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000002) >> 1) * element_mask,
-			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000004) >> 2) * element_mask,
-			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000008) >> 3) * element_mask,
-			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000010) >> 4) * element_mask,
-			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000020) >> 5) * element_mask,
-			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000040) >> 6) * element_mask,
-			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000080) >> 7) * element_mask,
-			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000100) >> 8) * element_mask,
-			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000200) >> 9) * element_mask,
+			static_cast<std::int8_t>(bit_mask_  & 0x0000000000000001)        * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000002) >> 1)  * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000004) >> 2)  * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000008) >> 3)  * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000010) >> 4)  * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000020) >> 5)  * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000040) >> 6)  * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000080) >> 7)  * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000100) >> 8)  * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000200) >> 9)  * element_mask,
 			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000400) >> 10) * element_mask,
 			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000800) >> 11) * element_mask,
 			static_cast<std::int8_t>((bit_mask_ & 0x0000000000001000) >> 12) * element_mask,
@@ -133,7 +133,7 @@ namespace EmuSIMD::Funcs
 			static_cast<std::int8_t>((bit_mask_ & 0x1000000000000000) >> 60) * element_mask,
 			static_cast<std::int8_t>((bit_mask_ & 0x2000000000000000) >> 61) * element_mask,
 			static_cast<std::int8_t>((bit_mask_ & 0x4000000000000000) >> 62) * element_mask,
-			static_cast<std::int8_t>((bit_mask_ & 0x8000000000000000) >> 63)* element_mask
+			static_cast<std::int8_t>((bit_mask_ & 0x8000000000000000) >> 63) * element_mask
 		);
 	}
 #pragma endregion
@@ -147,6 +147,11 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC std::int8_t get_first_i8x64(i8x64_arg a_)
 	{
 		return get_first_i8x16(cast_i8x64_i8x16(a_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC std::uint64_t movemask_i8x64(i8x64_arg a_)
+	{
+		return static_cast<std::uint64_t>(_mm512_movepi8_mask(a_));
 	}
 #pragma endregion
 

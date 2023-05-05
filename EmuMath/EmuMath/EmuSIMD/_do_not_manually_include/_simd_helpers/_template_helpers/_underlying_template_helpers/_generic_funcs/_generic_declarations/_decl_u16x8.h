@@ -18,6 +18,7 @@ namespace EmuSIMD::Funcs
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_u16x8(std::uint16_t* p_out_, u16x8_arg a_);
 	EMU_SIMD_COMMON_FUNC_SPEC std::uint16_t get_first_u16x8(u16x8_arg a_);
+	EMU_SIMD_COMMON_FUNC_SPEC std::uint8_t movemask_u16x8(u16x8_arg a_);
 #pragma endregion
 
 #pragma region CASTS

@@ -628,6 +628,56 @@ namespace EmuSIMD::Funcs
 	};
 	template<blend_mask_type BlendMask_, std::size_t NumIndices_, bool Reverse_ = false>
 	using make_bool_sequence_from_index_mask = typename bool_sequence_from_index_mask_maker<BlendMask_, NumIndices_, Reverse_>::type;
+
+	namespace _underlying_funcs
+	{
+		template<std::size_t MsbIndex_, typename OutT_, typename InT_, std::size_t...OutIndices_>
+		[[nodiscard]] constexpr inline auto _convert_movemask_width_less_elements(const InT_& in_, std::index_sequence<OutIndices_...>) noexcept
+		{
+			constexpr std::size_t input_bits_per_output_bit = MsbIndex_ + 1;
+			return static_cast<OutT_>
+			((
+				... |
+				((in_ >> ((input_bits_per_output_bit * OutIndices_) + MsbIndex_) & 1) << OutIndices_)
+			));
+		}
+	}
+
+	template<std::size_t FromElements_, std::size_t ToElements_, typename OutT_, typename InT_>
+	[[nodiscard]] constexpr inline auto convert_movemask_width(const InT_& in_) noexcept
+		-> typename std::remove_cvref<OutT_>::type
+	{
+		if constexpr (FromElements_ == ToElements_)
+		{
+			return static_cast<typename std::remove_cvref<OutT_>::type>(in_);
+		}
+		else
+		{
+			if constexpr (EmuCore::TMP::is_one_of<ToElements_, 2, 4, 8, 16, 32, 64>())
+			{
+				if constexpr (EmuCore::TMP::is_one_of<FromElements_, 2, 4, 8, 16, 32, 64>())
+				{
+					if constexpr (ToElements_ < FromElements_)
+					{
+						constexpr std::size_t msb_index = (FromElements_ / ToElements_) - 1;
+						return _underlying_funcs::_convert_movemask_width_less_elements<msb_index, OutT_>(in_, std::make_index_sequence<ToElements_>());
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, ToElements_>(), "Invalid `ToElements_`/`FromElements_` counts provided to EmuSIMD::Funcs::convert_movemask_width: `ToElements_` cannot be greater than `FromElements_`.");
+					}
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, FromElements_>(), "Invalid `FromElements_` count provided to `EmuSIMD::Funcs::convert_movemask_width`. Valid values are: 2, 4, 8, 16, 32, 64.");
+				}
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<std::size_t, ToElements_>(), "Invalid `ToElements_` count provided to `EmuSIMD::Funcs::convert_movemask_width`. Valid values are: 2, 4, 8, 16, 32, 64.");
+			}
+		}
+	}
 }
 
 #endif

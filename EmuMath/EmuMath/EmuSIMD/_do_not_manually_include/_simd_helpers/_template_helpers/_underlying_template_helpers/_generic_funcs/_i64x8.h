@@ -66,6 +66,11 @@ namespace EmuSIMD::Funcs
 	{
 		return get_first_i64x2(cast_i64x8_i64x2(a_));
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC std::uint8_t movemask_i64x8(i64x8_arg a_)
+	{
+		return static_cast<std::uint8_t>(_mm512_movepi64_mask(a_));
+	}
 #pragma endregion
 
 #pragma region CASTS

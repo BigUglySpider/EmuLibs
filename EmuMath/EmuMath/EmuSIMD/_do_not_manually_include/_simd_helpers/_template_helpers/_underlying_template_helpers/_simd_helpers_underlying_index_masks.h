@@ -22,7 +22,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	{
 		[[nodiscard]] static inline EmuSIMD::i128_generic get()
 		{
-			return _mm_setzero_si128();
+			return EmuSIMD::Funcs::setzero_i32x4();
 		}
 	};
 	template<>
@@ -30,7 +30,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	{
 		[[nodiscard]] static inline EmuSIMD::i128_generic get()
 		{
-			return _mm_set1_epi64x(0xFFFFFFFFFFFFFFFF);
+			return EmuSIMD::Funcs::set1_u32x4(0xFFFFFFFF);
 		}
 	};
 

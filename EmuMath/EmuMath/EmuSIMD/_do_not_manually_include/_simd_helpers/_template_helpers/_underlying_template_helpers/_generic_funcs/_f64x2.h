@@ -57,6 +57,11 @@ namespace EmuSIMD::Funcs
 	{
 		return _mm_cvtsd_f64(a_);
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC std::uint8_t movemask_f64x2(f64x2_arg a_)
+	{
+		return static_cast<std::uint8_t>(_mm_movemask_pd(a_));
+	}
 #pragma endregion
 
 #pragma region CASTS

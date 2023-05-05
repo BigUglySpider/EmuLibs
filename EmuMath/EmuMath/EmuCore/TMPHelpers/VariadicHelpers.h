@@ -9,6 +9,31 @@
 namespace EmuCore::TMP
 {
 #pragma region TEMPLATE_HELPERS
+	template<typename Lhs_, typename...Rhs_>
+	[[nodiscard]] constexpr inline bool is_one_of(const Lhs_& lhs_, Rhs_&&...rhs_)
+	{
+		return (... || (lhs_ == rhs_));
+	}
+
+	template<bool CastRhs_, typename Lhs_, typename...Rhs_>
+	[[nodiscard]] constexpr inline bool is_one_of(const Lhs_& lhs_, Rhs_&&...rhs_)
+	{
+		if constexpr (CastRhs_)
+		{
+			return (... || (lhs_ == static_cast<typename std::remove_cvref<Lhs_>::type>(rhs_)));
+		}
+		else
+		{
+			return (... || (lhs_ == rhs_));
+		}
+	}
+
+	template<auto Lhs_, auto...Rhs_>
+	[[nodiscard]] constexpr inline bool is_one_of()
+	{
+		return (... || (Lhs_ == static_cast<decltype(Lhs_)>(Rhs_)));
+	}
+
 	template<bool...Bools_>
 	using bool_sequence = std::integer_sequence<bool, Bools_...>;
 

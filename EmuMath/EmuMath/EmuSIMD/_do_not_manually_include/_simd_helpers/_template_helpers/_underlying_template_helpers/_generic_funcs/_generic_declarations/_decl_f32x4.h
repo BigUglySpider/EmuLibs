@@ -17,6 +17,7 @@ namespace EmuSIMD::Funcs
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_f32x4(float* p_out_, f32x4_arg a_);
 	EMU_SIMD_COMMON_FUNC_SPEC float get_first_f32x4(f32x4_arg a_);
+	EMU_SIMD_COMMON_FUNC_SPEC std::uint8_t movemask_f32x4(f32x4_arg a_);
 #pragma endregion
 
 #pragma region CASTS

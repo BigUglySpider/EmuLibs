@@ -76,6 +76,11 @@ namespace EmuSIMD::Funcs
 	{
 		return get_first_i16x8(cast_i16x16_i16x8(a_));
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC std::uint16_t movemask_i16x16(i16x16_arg a_)
+	{
+		return EmuSIMD::Funcs::convert_movemask_width<32, 16, std::uint16_t>(_mm256_movemask_epi8(a_));
+	}
 #pragma endregion
 
 #pragma region CASTS

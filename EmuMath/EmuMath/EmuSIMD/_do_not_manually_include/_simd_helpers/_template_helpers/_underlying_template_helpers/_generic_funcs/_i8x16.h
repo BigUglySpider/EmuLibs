@@ -77,6 +77,11 @@ namespace EmuSIMD::Funcs
 		std::int32_t first_32_bits = _mm_cvtsi128_si32(a_);
 		return *reinterpret_cast<std::int8_t*>(&first_32_bits);
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC std::uint16_t movemask_i8x16(i8x16_arg a_)
+	{
+		return static_cast<std::uint16_t>(_mm_movemask_epi8(a_));
+	}
 #pragma endregion
 
 #pragma region CASTS
