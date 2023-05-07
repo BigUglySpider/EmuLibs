@@ -422,8 +422,8 @@ namespace EmuMath
 #pragma region CONSTRUCTORS
 	public:
 		constexpr inline FastMatrix() noexcept = default;
-		constexpr inline FastMatrix(this_type&&) noexcept = default;
-		constexpr inline FastMatrix(const this_type&) noexcept = default;
+		constexpr inline FastMatrix(EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>&&) noexcept = default;
+		constexpr inline FastMatrix(const EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>&) noexcept = default;
 
 		explicit constexpr inline FastMatrix(data_type&& data_to_move_) noexcept
 			: major_chunks(std::move(data_to_move_))

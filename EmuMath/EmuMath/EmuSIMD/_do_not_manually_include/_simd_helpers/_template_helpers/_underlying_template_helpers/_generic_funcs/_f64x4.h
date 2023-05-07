@@ -40,12 +40,60 @@ namespace EmuSIMD::Funcs
 		(
 			_mm256_set_epi64x
 			(
-				(bit_mask_ & 0x01) * element_mask,
+				(bit_mask_  & 0x01)       * element_mask,
 				((bit_mask_ & 0x02) >> 1) * element_mask,
 				((bit_mask_ & 0x04) >> 2) * element_mask,
 				((bit_mask_ & 0x08) >> 3) * element_mask
 			)
 		);
+	}
+
+	template<std::uint8_t BitMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 setmasked_f64x4()
+	{
+		if constexpr(BitMask_ != 0)
+		{
+			return cast_u64x4_f64x4
+			(
+				set_u64x4
+				(
+					std::integral_constant<std::uint64_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<0, std::uint64_t>(BitMask_)>::value,
+					std::integral_constant<std::uint64_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<1, std::uint64_t>(BitMask_)>::value,
+					std::integral_constant<std::uint64_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<2, std::uint64_t>(BitMask_)>::value,
+					std::integral_constant<std::uint64_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<3, std::uint64_t>(BitMask_)>::value
+				)
+			);
+		}
+		else
+		{
+			return setzero_f64x4();
+		}
+	}
+
+	template<bool I0_, bool I1_, bool I2_, bool I3_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 set_index_mask_f64x4()
+	{
+		if constexpr (I0_ || I1_ || I2_ || I3_)
+		{
+			return setmasked_f64x4<EmuSIMD::Funcs::make_index_set_mask<I0_, I1_, I2_, I3_>()>();
+		}
+		else
+		{
+			return setzero_f64x4();
+		}
+	}
+
+	template<bool Active_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 set_index_mask_f64x4()
+	{
+		if constexpr (Active_)
+		{
+			return setmasked_f64x4<EmuSIMD::Funcs::make_all_indices_set_mask<4, Active_>()>();
+		}
+		else
+		{
+			return setzero_f64x4();
+		}
 	}
 #pragma endregion
 

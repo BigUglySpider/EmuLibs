@@ -44,15 +44,64 @@ namespace EmuSIMD::Funcs
 		constexpr std::uint64_t element_mask = static_cast<std::uint64_t>(0xFFFFFFFFFFFFFFFF);
 		return _mm512_set_epi64
 		(
-			(bit_mask_ & 0x01) * element_mask,
-			((bit_mask_ & 0x02) >> 1) * element_mask,
-			((bit_mask_ & 0x04) >> 2) * element_mask,
-			((bit_mask_ & 0x08) >> 3) * element_mask,
-			((bit_mask_ & 0x10) >> 4) * element_mask,
-			((bit_mask_ & 0x20) >> 5) * element_mask,
-			((bit_mask_ & 0x40) >> 6) * element_mask,
-			((bit_mask_ & 0x80) >> 7) * element_mask
+			static_cast<std::uint64_t>(bit_mask_ & 0x01) * element_mask,
+			static_cast<std::uint64_t>((bit_mask_ & 0x02) >> 1) * element_mask,
+			static_cast<std::uint64_t>((bit_mask_ & 0x04) >> 2) * element_mask,
+			static_cast<std::uint64_t>((bit_mask_ & 0x08) >> 3) * element_mask,
+			static_cast<std::uint64_t>((bit_mask_ & 0x10) >> 4) * element_mask,
+			static_cast<std::uint64_t>((bit_mask_ & 0x20) >> 5) * element_mask,
+			static_cast<std::uint64_t>((bit_mask_ & 0x40) >> 6) * element_mask,
+			static_cast<std::uint64_t>((bit_mask_ & 0x80) >> 7) * element_mask
 		);
+	}
+
+	template<std::uint8_t BitMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x8 setmasked_u64x8()
+	{
+		if constexpr(BitMask_ != 0)
+		{
+			return set_u64x8
+			(
+				std::integral_constant<std::uint64_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<0,  std::uint64_t>(BitMask_)>::value,
+				std::integral_constant<std::uint64_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<1,  std::uint64_t>(BitMask_)>::value,
+				std::integral_constant<std::uint64_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<2,  std::uint64_t>(BitMask_)>::value,
+				std::integral_constant<std::uint64_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<3,  std::uint64_t>(BitMask_)>::value,
+				std::integral_constant<std::uint64_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<4,  std::uint64_t>(BitMask_)>::value,
+				std::integral_constant<std::uint64_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<5,  std::uint64_t>(BitMask_)>::value,
+				std::integral_constant<std::uint64_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<6,  std::uint64_t>(BitMask_)>::value,
+				std::integral_constant<std::uint64_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<7,  std::uint64_t>(BitMask_)>::value
+			);
+		}
+		else
+		{
+			return setzero_u64x8();
+		}
+	}
+
+	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x8 set_index_mask_u64x8()
+	{
+		if constexpr(I0_ || I1_ || I2_ || I3_ || I4_ || I5_ || I6_ || I7_)
+		{
+			return setmasked_u64x8<EmuSIMD::Funcs::make_index_set_mask<I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>()>();
+		}
+		else
+		{
+			return setzero_u64x8();
+		}
+	}
+
+	template<bool Active_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x8 set_index_mask_u64x8()
+	{
+		if constexpr (Active_)
+		{
+			return setmasked_u64x8<EmuSIMD::Funcs::make_all_indices_set_mask<8, Active_>()>();
+		}
+		else
+		{
+			return setzero_u64x8();
+		}
 	}
 #pragma endregion
 

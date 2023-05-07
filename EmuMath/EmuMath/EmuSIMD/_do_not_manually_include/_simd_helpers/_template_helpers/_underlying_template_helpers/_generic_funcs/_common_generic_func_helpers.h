@@ -678,6 +678,76 @@ namespace EmuSIMD::Funcs
 			}
 		}
 	}
+
+	namespace _underlying_funcs
+	{
+		template<bool...IndexArgs_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline decltype(auto) _make_index_set_mask(EmuCore::TMP::bool_sequence<IndexArgs_...> index_args_, std::index_sequence<Indices_...> indices_) noexcept
+		{
+			constexpr std::size_t num_args = sizeof...(IndexArgs_);
+			if constexpr (EmuCore::TMP::is_one_of<num_args, 2, 4, 8>())
+			{
+				return std::uint8_t(((std::uint8_t(IndexArgs_) << Indices_) | ...));
+			}
+			else if constexpr (EmuCore::TMP::is_one_of<num_args, 16>())
+			{
+				return std::uint16_t(((std::uint16_t(IndexArgs_) << Indices_) | ...));
+			}
+			else if constexpr (EmuCore::TMP::is_one_of<num_args, 32>())
+			{
+				return std::uint32_t(((std::uint32_t(IndexArgs_) << Indices_) | ...));
+			}
+			else if constexpr (EmuCore::TMP::is_one_of<num_args, 64>())
+			{
+				return std::uint64_t(((std::uint64_t(IndexArgs_) << Indices_) | ...));
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<std::size_t, num_args>(), "Invalid number of arguments passed to make an index set mask: Valid values are: 2, 4, 8, 16, 32, 64");
+			}
+		}
+	}
+
+	template<bool...IndexArgs_>
+	[[nodiscard]] constexpr inline decltype(auto) make_index_set_mask() noexcept
+	{
+		constexpr std::size_t num_args = sizeof...(IndexArgs_);
+		static_assert(EmuCore::TMP::is_one_of<num_args, 2, 4, 8, 16, 32, 64>(), "Invalid number of arguments passed to make an index set mask: Valid values are: 2, 4, 8, 16, 32, 64");
+		return _underlying_funcs::_make_index_set_mask(EmuCore::TMP::bool_sequence<IndexArgs_...>(), std::make_index_sequence<num_args>());
+	}
+
+	template<std::size_t IndexCount_, bool Active_>
+	[[nodiscard]] constexpr inline decltype(auto) make_all_indices_set_mask() noexcept
+	{
+		if constexpr (IndexCount_ == 2)
+		{
+			return std::uint8_t(0x03 * Active_);
+		}
+		else if constexpr (IndexCount_ == 4)
+		{
+			return std::uint8_t(0x0F * Active_);
+		}
+		else if constexpr (IndexCount_ == 8)
+		{
+			return std::uint8_t(0xFF * Active_);
+		}
+		else if constexpr (IndexCount_ == 16)
+		{
+			return std::uint16_t(0xFFFF * Active_);
+		}
+		else if constexpr (IndexCount_ == 32)
+		{
+			return std::uint32_t(0xFFFFFFFF * Active_);
+		}
+		else if constexpr (IndexCount_ == 64)
+		{
+			return std::uint64_t(0xFFFFFFFFFFFFFFFF * Active_);
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<std::size_t, IndexCount_>(), "Invalid IndexCount_ passed to make an all-indices set mask: Valid values are: 2, 4, 8, 16, 32, 64");
+		}
+	}
 }
 
 #endif

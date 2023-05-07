@@ -38,11 +38,56 @@ namespace EmuSIMD::Funcs
 		constexpr std::uint32_t element_mask = static_cast<std::uint32_t>(0xFFFFFFFF);
 		return _mm_set_epi32
 		(
-			(bit_mask_ & 0x01) * element_mask,
-			((bit_mask_ & 0x02) >> 1) * element_mask,
-			((bit_mask_ & 0x04) >> 2) * element_mask,
-			((bit_mask_ & 0x08) >> 3) * element_mask
+			static_cast<std::uint32_t>(bit_mask_  & 0x01)       * element_mask,
+			static_cast<std::uint32_t>((bit_mask_ & 0x02) >> 1) * element_mask,
+			static_cast<std::uint32_t>((bit_mask_ & 0x04) >> 2) * element_mask,
+			static_cast<std::uint32_t>((bit_mask_ & 0x08) >> 3) * element_mask
 		);
+	}
+
+	template<std::uint8_t BitMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 setmasked_u32x4()
+	{
+		if constexpr(BitMask_ != 0)
+		{
+			return set_u32x4
+			(
+				std::integral_constant<std::uint32_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<0, std::uint32_t>(BitMask_)>::value,
+				std::integral_constant<std::uint32_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<1, std::uint32_t>(BitMask_)>::value,
+				std::integral_constant<std::uint32_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<2, std::uint32_t>(BitMask_)>::value,
+				std::integral_constant<std::uint32_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<3, std::uint32_t>(BitMask_)>::value
+			);
+		}
+		else
+		{
+			return setzero_u32x4();
+		}
+	}
+
+	template<bool I0_, bool I1_, bool I2_, bool I3_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 set_index_mask_u32x4()
+	{
+		if constexpr(I0_ || I1_ || I2_ || I3_)
+		{
+			return setmasked_u32x4<EmuSIMD::Funcs::make_index_set_mask<I0_, I1_, I2_, I3_>()>();
+		}
+		else
+		{
+			return setzero_u32x4();
+		}
+	}
+
+	template<bool Active_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 set_index_mask_u32x4()
+	{
+		if constexpr (Active_)
+		{
+			return setmasked_u32x4<EmuSIMD::Funcs::make_all_indices_set_mask<4, Active_>()>();
+		}
+		else
+		{
+			return setzero_u32x4();
+		}
 	}
 #pragma endregion
 

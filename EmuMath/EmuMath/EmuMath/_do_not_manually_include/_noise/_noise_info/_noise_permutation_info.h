@@ -98,14 +98,14 @@ namespace EmuMath::Info
 				}
 				else
 				{
-					std::size_t next_ = EmuCore::ArithmeticHelpers::next_unsigned_power_of_2<std::size_t>(target_num_permutations);
+					std::size_t next_ = EmuCore::ArithmeticHelpers::next_power_of_2(target_num_permutations);
 					if (next_ > target_num_permutations)
 					{
 						return next_;
 					}
 					else
 					{
-						return EmuCore::ArithmeticHelpers::previous_unsigned_power_of_2<std::size_t>(target_num_permutations);
+						return EmuCore::ArithmeticHelpers::previous_power_of_2(target_num_permutations);
 					}
 				}
 			}

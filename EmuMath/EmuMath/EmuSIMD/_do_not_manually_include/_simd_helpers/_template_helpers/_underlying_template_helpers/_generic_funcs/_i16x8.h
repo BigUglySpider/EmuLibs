@@ -38,7 +38,7 @@ namespace EmuSIMD::Funcs
 		constexpr std::int16_t element_mask = static_cast<std::int16_t>(0xFFFF);
 		return _mm_set_epi16
 		(
-			(bit_mask_ & 0x01) * element_mask,
+			(bit_mask_  & 0x01)       * element_mask,
 			((bit_mask_ & 0x02) >> 1) * element_mask,
 			((bit_mask_ & 0x04) >> 2) * element_mask,
 			((bit_mask_ & 0x08) >> 3) * element_mask,
@@ -47,6 +47,55 @@ namespace EmuSIMD::Funcs
 			((bit_mask_ & 0x40) >> 6) * element_mask,
 			((bit_mask_ & 0x80) >> 7) * element_mask
 		);
+	}
+
+	template<std::uint8_t BitMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 setmasked_i16x8()
+	{
+		if constexpr(BitMask_ != 0)
+		{
+			return set_i16x8
+			(
+				std::integral_constant<std::int16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<0, std::int16_t>(BitMask_)>::value,
+				std::integral_constant<std::int16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<1, std::int16_t>(BitMask_)>::value,
+				std::integral_constant<std::int16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<2, std::int16_t>(BitMask_)>::value,
+				std::integral_constant<std::int16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<3, std::int16_t>(BitMask_)>::value,
+				std::integral_constant<std::int16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<4, std::int16_t>(BitMask_)>::value,
+				std::integral_constant<std::int16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<5, std::int16_t>(BitMask_)>::value,
+				std::integral_constant<std::int16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<6, std::int16_t>(BitMask_)>::value,
+				std::integral_constant<std::int16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<7, std::int16_t>(BitMask_)>::value
+			);
+		}
+		else
+		{
+			return setzero_i16x8();
+		}
+	}
+
+	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 set_index_mask_i16x8()
+	{
+		if constexpr(I0_ || I1_ || I2_ || I3_ || I4_ || I5_ || I6_ || I7_)
+		{
+			return setmasked_i16x8<EmuSIMD::Funcs::make_index_set_mask<I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_>()>();
+		}
+		else
+		{
+			return setzero_i16x8();
+		}
+	}
+
+	template<bool Active_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 set_index_mask_i16x8()
+	{
+		if constexpr (Active_)
+		{
+			return setmasked_i16x8<EmuSIMD::Funcs::make_all_indices_set_mask<8, Active_>()>();
+		}
+		else
+		{
+			return setzero_i16x8();
+		}
 	}
 #pragma endregion
 

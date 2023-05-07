@@ -265,6 +265,32 @@ namespace EmuCore::TMP
 
 	template<auto...Values_>
 	static constexpr inline auto first_variadic_value_v = first_variadic_value<Values_...>::value;
+
+	/// <summary>
+	/// <para> Helper for variadic scenarios (such as when a series of indices is provided) where variadic behaviour is required but only the provided argument is required. </para>
+	/// <para> Forwards the provided `func_arg_`, and does nothing with the template argument `ToDiscard_`. </para>
+	/// <para> Example usage is constructing an array that starts as all the same value with a size that is determined from a variadic index count. </para>
+	/// </summary>
+	/// <param name="func_arg_">Argument to forward.</param>
+	/// <returns>Result of `std::forward`ing the input `func_arg_`.</returns>
+	template<auto ToDiscard_, class FuncArg_>
+	constexpr inline decltype(auto) discard_template_arg_forward_func_arg(FuncArg_&& func_arg_)
+	{
+		return std::forward<FuncArg_>(func_arg_);
+	}
+
+	/// <summary>
+	/// <para> Helper for variadic scenarios (such as when a series of indices is provided) where variadic behaviour is required but only the provided argument is required. </para>
+	/// <para> Forwards the provided `func_arg_`, and does nothing with the template argument `ToDiscard_`. </para>
+	/// <para> Example usage is constructing an array that starts as all the same value with a size that is determined from the number of types within a passed tuple of variadic size. </para>
+	/// </summary>
+	/// <param name="func_arg_">Argument to forward.</param>
+	/// <returns>Result of `std::forward`ing the input `func_arg_`.</returns>
+	template<class ToDiscard_, class FuncArg_>
+	constexpr inline decltype(auto) discard_template_arg_forward_func_arg(FuncArg_&& func_arg_)
+	{
+		return std::forward<FuncArg_>(func_arg_);
+	}
 #pragma endregion
 
 #pragma region VARIADIC_BOOLS

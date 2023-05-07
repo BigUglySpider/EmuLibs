@@ -359,6 +359,14 @@ constexpr inline decltype(auto) setr_test_helper(Func_&& func_, std::index_seque
 int main()
 {
 	{
+		std::uint8_t flags = ((1 << 3) | (0 << 2) | (1 << 1) | (0 << 0));
+		using mask_gen = EmuSIMD::index_mask<EmuSIMD::f32x4, 1, 0, 1, 0>;
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::setmasked_f32x4(flags)) << '\n';
+		EmuSIMD::append_simd_vector_to_stream(std::cout, mask_gen::get()) << '\n';
+		universal_pause();
+	}
+
+	{
 		std::uint16_t test = 0x000F;
 		std::byte& msb = EmuCore::ArithmeticHelpers::get_most_significant_byte<std::byte&>(test);
 		std::cout << test << " | msb: " << std::bitset<8>((int)msb) << '\n';
@@ -1496,7 +1504,7 @@ int main()
 	std::cout << (cmptestc != cmptestd) << "\n";
 	std::cout << cmptestc.CmpNear(cmptestd) << "\n";
 
-	/*
+	//*
 	{
 		// ##### SCALAR vs SIMD NOISE #####
 		constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN; 

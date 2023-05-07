@@ -50,39 +50,127 @@ namespace EmuSIMD::Funcs
 		constexpr std::uint16_t element_mask = static_cast<std::uint16_t>(0xFFFF);
 		return _mm512_set_epi16
 		(
-			(bit_mask_ & 0x00000001) * element_mask,
-			((bit_mask_ & 0x00000002) >> 1) * element_mask,
-			((bit_mask_ & 0x00000004) >> 2) * element_mask,
-			((bit_mask_ & 0x00000008) >> 3) * element_mask,
-			((bit_mask_ & 0x00000010) >> 4) * element_mask,
-			((bit_mask_ & 0x00000020) >> 5) * element_mask,
-			((bit_mask_ & 0x00000040) >> 6) * element_mask,
-			((bit_mask_ & 0x00000080) >> 7) * element_mask,
-			((bit_mask_ & 0x00000100) >> 8) * element_mask,
-			((bit_mask_ & 0x00000200) >> 9) * element_mask,
-			((bit_mask_ & 0x00000400) >> 10) * element_mask,
-			((bit_mask_ & 0x00000800) >> 11) * element_mask,
-			((bit_mask_ & 0x00001000) >> 12) * element_mask,
-			((bit_mask_ & 0x00002000) >> 13) * element_mask,
-			((bit_mask_ & 0x00004000) >> 14) * element_mask,
-			((bit_mask_ & 0x00008000) >> 15) * element_mask,
-			((bit_mask_ & 0x00010000) >> 16) * element_mask,
-			((bit_mask_ & 0x00020000) >> 17) * element_mask,
-			((bit_mask_ & 0x00040000) >> 18) * element_mask,
-			((bit_mask_ & 0x00080000) >> 19) * element_mask,
-			((bit_mask_ & 0x00100000) >> 20) * element_mask,
-			((bit_mask_ & 0x00200000) >> 21) * element_mask,
-			((bit_mask_ & 0x00400000) >> 22) * element_mask,
-			((bit_mask_ & 0x00800000) >> 23) * element_mask,
-			((bit_mask_ & 0x01000000) >> 24) * element_mask,
-			((bit_mask_ & 0x02000000) >> 25) * element_mask,
-			((bit_mask_ & 0x04000000) >> 26) * element_mask,
-			((bit_mask_ & 0x08000000) >> 27) * element_mask,
-			((bit_mask_ & 0x10000000) >> 28) * element_mask,
-			((bit_mask_ & 0x20000000) >> 29) * element_mask,
-			((bit_mask_ & 0x40000000) >> 30) * element_mask,
-			((bit_mask_ & 0x80000000) >> 31) * element_mask
+			static_cast<std::uint16_t>(bit_mask_  & 0x00000001)        * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00000002) >> 1)  * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00000004) >> 2)  * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00000008) >> 3)  * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00000010) >> 4)  * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00000020) >> 5)  * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00000040) >> 6)  * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00000080) >> 7)  * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00000100) >> 8)  * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00000200) >> 9)  * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00000400) >> 10) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00000800) >> 11) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00001000) >> 12) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00002000) >> 13) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00004000) >> 14) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00008000) >> 15) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00010000) >> 16) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00020000) >> 17) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00040000) >> 18) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00080000) >> 19) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00100000) >> 20) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00200000) >> 21) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00400000) >> 22) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x00800000) >> 23) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x01000000) >> 24) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x02000000) >> 25) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x04000000) >> 26) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x08000000) >> 27) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x10000000) >> 28) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x20000000) >> 29) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x40000000) >> 30) * element_mask,
+			static_cast<std::uint16_t>((bit_mask_ & 0x80000000) >> 31) * element_mask
 		);
+	}
+
+	template<std::uint32_t BitMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 setmasked_u16x32()
+	{
+		if constexpr(BitMask_ != 0)
+		{
+			return set_u16x32
+			(
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<0,  std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<1,  std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<2,  std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<3,  std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<4,  std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<5,  std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<6,  std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<7,  std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<8,  std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<9,  std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<10, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<11, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<12, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<13, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<14, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<15, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<16, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<17, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<18, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<19, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<20, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<21, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<22, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<23, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<24, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<25, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<26, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<27, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<28, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<29, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<30, std::uint16_t>(BitMask_)>::value,
+				std::integral_constant<std::uint16_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<31, std::uint16_t>(BitMask_)>::value
+			);
+		}
+		else
+		{
+			return setzero_u16x32();
+		}
+	}
+
+	template
+	<
+		bool I0_,  bool I1_,  bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_,  bool I8_,  bool I9_,  bool I10_, bool I11_, bool I12_, bool I13_, bool I14_, bool I15_,
+		bool I16_, bool I17_, bool I18_, bool I19_, bool I20_, bool I21_, bool I22_, bool I23_, bool I24_, bool I25_, bool I26_, bool I27_, bool I28_, bool I29_, bool I30_, bool I31_
+	>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 set_index_mask_u16x32()
+	{
+		if constexpr
+		(
+			I0_  || I1_  || I2_  || I3_  || I4_  || I5_  || I6_  || I7_  || I8_  || I9_  || I10_ || I11_ || I12_ || I13_ || I14_ || I15_ ||
+			I16_ || I17_ || I18_ || I19_ || I20_ || I21_ || I22_ || I23_ || I24_ || I25_ || I26_ || I27_ || I28_ || I29_ || I30_ || I31_
+		)
+		{
+			return setmasked_u16x32
+			<
+				EmuSIMD::Funcs::make_index_set_mask
+				<
+					I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_,
+					I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_
+				>()
+			>();
+		}
+		else
+		{
+			return setzero_u16x32();
+		}
+	}
+
+	template<bool Active_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x32 set_index_mask_u16x32()
+	{
+		if constexpr (Active_)
+		{
+			return setmasked_u16x32<EmuSIMD::Funcs::make_all_indices_set_mask<32, Active_>()>();
+		}
+		else
+		{
+			return setzero_u16x32();
+		}
 	}
 #pragma endregion
 

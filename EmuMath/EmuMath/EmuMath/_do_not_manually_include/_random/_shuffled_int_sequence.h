@@ -322,7 +322,7 @@ namespace EmuMath
 		{
 			if (!ContainsPowerOf2())
 			{
-				std::size_t power_ = EmuCore::ArithmeticHelpers::highest_set_uint_bit<std::size_t>(size());
+				std::size_t power_ = EmuCore::ArithmeticHelpers::highest_set_bit<std::size_t>(size());
 				if (power_ == 0)
 				{
 					power_ = 1;
@@ -338,7 +338,7 @@ namespace EmuMath
 		{
 			if (!ContainsPowerOf2())
 			{
-				std::size_t power_ = EmuCore::ArithmeticHelpers::next_unsigned_power_of_2<std::size_t>(size());
+				std::size_t power_ = EmuCore::ArithmeticHelpers::next_power_of_2<std::size_t>(size());
 				if (power_ > size())
 				{
 					items.resize(power_);

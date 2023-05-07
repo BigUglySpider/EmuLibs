@@ -136,6 +136,132 @@ namespace EmuSIMD::Funcs
 			static_cast<std::int8_t>((bit_mask_ & 0x8000000000000000) >> 63) * element_mask
 		);
 	}
+
+	template<std::uint64_t BitMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 setmasked_i8x64()
+	{
+		if constexpr(BitMask_ != 0)
+		{
+			return set_i8x64
+			(
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<0,  std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<1,  std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<2,  std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<3,  std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<4,  std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<5,  std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<6,  std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<7,  std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<8,  std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<9,  std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<10, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<11, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<12, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<13, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<14, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<15, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<16, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<17, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<18, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<19, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<20, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<21, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<22, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<23, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<24, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<25, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<26, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<27, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<28, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<29, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<30, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<31, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<32, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<33, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<34, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<35, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<36, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<37, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<38, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<39, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<40, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<41, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<42, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<43, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<44, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<45, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<46, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<47, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<48, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<49, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<50, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<51, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<52, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<53, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<54, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<55, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<56, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<57, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<58, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<59, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<60, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<61, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<62, std::int8_t>(BitMask_)>::value,
+				std::integral_constant<std::int8_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<63, std::int8_t>(BitMask_)>::value
+			);
+		}
+		else
+		{
+			return setzero_i8x64();
+		}
+	}
+
+	template
+	<
+		bool I0_,  bool I1_,  bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_,  bool I8_,  bool I9_,  bool I10_, bool I11_, bool I12_, bool I13_, bool I14_, bool I15_,
+		bool I16_, bool I17_, bool I18_, bool I19_, bool I20_, bool I21_, bool I22_, bool I23_, bool I24_, bool I25_, bool I26_, bool I27_, bool I28_, bool I29_, bool I30_, bool I31_,
+		bool I32_, bool I33_, bool I34_, bool I35_, bool I36_, bool I37_, bool I38_, bool I39_, bool I40_, bool I41_, bool I42_, bool I43_, bool I44_, bool I45_, bool I46_, bool I47_,
+		bool I48_, bool I49_, bool I50_, bool I51_, bool I52_, bool I53_, bool I54_, bool I55_, bool I56_, bool I57_, bool I58_, bool I59_, bool I60_, bool I61_, bool I62_, bool I63_
+	>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 set_index_mask_i8x64()
+	{
+		if constexpr
+		(
+			I0_  || I1_  || I2_  || I3_  || I4_  || I5_  || I6_  || I7_  || I8_  || I9_  || I10_ || I11_ || I12_ || I13_ || I14_ || I15_ ||
+			I16_ || I17_ || I18_ || I19_ || I20_ || I21_ || I22_ || I23_ || I24_ || I25_ || I26_ || I27_ || I28_ || I29_ || I30_ || I31_ ||
+			I32_ || I33_ || I34_ || I35_ || I36_ || I37_ || I38_ || I39_ || I40_ || I41_ || I42_ || I43_ || I44_ || I45_ || I46_ || I47_ ||
+			I48_ || I49_ || I50_ || I51_ || I52_ || I53_ || I54_ || I55_ || I56_ || I57_ || I58_ || I59_ || I60_ || I61_ || I62_ || I63_
+		)
+		{
+			return setmasked_i8x64
+			<
+				EmuSIMD::Funcs::make_index_set_mask
+				<
+					I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_,
+					I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_,
+					I32_, I33_, I34_, I35_, I36_, I37_, I38_, I39_, I40_, I41_, I42_, I43_, I44_, I45_, I46_, I47_,
+					I48_, I49_, I50_, I51_, I52_, I53_, I54_, I55_, I56_, I57_, I58_, I59_, I60_, I61_, I62_, I63_
+				>()
+			>();
+		}
+		else
+		{
+			return setzero_i8x64();
+		}
+	}
+
+	template<bool Active_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 set_index_mask_i8x64()
+	{
+		if constexpr (Active_)
+		{
+			return setmasked_i8x64<EmuSIMD::Funcs::make_all_indices_set_mask<64, Active_>()>();
+		}
+		else
+		{
+			return setzero_i8x64();
+		}
+	}
 #pragma endregion
 
 #pragma region STORES
