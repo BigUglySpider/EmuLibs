@@ -1203,282 +1203,374 @@ namespace EmuSIMD::_underlying_simd_helpers
 	};
 
 	template<bool FirstActive_, std::size_t PerElementWidthIfIntegral_>
-	struct _alternating_index_mask<EmuSIMD::f32x4, FirstActive_, PerElementWidthIfIntegral_>
+	struct _alternating_index_mask<EmuSIMD::f32x4, FirstActive_, PerElementWidthIfIntegral_> :
+		public _per_index_mask<EmuSIMD::f32x4, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
 	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask<EmuSIMD::f32x4, even, odd, even, odd>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::f32x4 get()
-		{
-			return _mask_generator::get();
-		}
 	};
 
 	template<bool FirstActive_, std::size_t PerElementWidthIfIntegral_>
-	struct _alternating_index_mask<EmuSIMD::f32x8, FirstActive_, PerElementWidthIfIntegral_>
+	struct _alternating_index_mask<EmuSIMD::f32x8, FirstActive_, PerElementWidthIfIntegral_> :
+		public _per_index_mask<EmuSIMD::f32x8, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
 	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask<EmuSIMD::f32x8, even, odd, even, odd, even, odd, even, odd>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::f32x8 get()
-		{
-			return _mask_generator::get();
-		}
+	};
+	
+	template<bool FirstActive_, std::size_t PerElementWidthIfIntegral_>
+	struct _alternating_index_mask<EmuSIMD::f32x16, FirstActive_, PerElementWidthIfIntegral_> :
+		public _per_index_mask
+		<
+			EmuSIMD::f32x16,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
+	{
+	};
+	
+	template<bool FirstActive_, std::size_t PerElementWidthIfIntegral_>
+	struct _alternating_index_mask<EmuSIMD::f64x2, FirstActive_, PerElementWidthIfIntegral_> :
+		public _per_index_mask<EmuSIMD::f64x4, FirstActive_, !FirstActive_>
+	{
 	};
 
 	template<bool FirstActive_, std::size_t PerElementWidthIfIntegral_>
-	struct _alternating_index_mask<EmuSIMD::f32x16, FirstActive_, PerElementWidthIfIntegral_>
+	struct _alternating_index_mask<EmuSIMD::f64x4, FirstActive_, PerElementWidthIfIntegral_> :
+		public _per_index_mask<EmuSIMD::f64x4, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
 	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask<EmuSIMD::f32x16, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::f32x16 get()
-		{
-			return _mask_generator::get();
-		}
 	};
 
 	template<bool FirstActive_, std::size_t PerElementWidthIfIntegral_>
-	struct _alternating_index_mask<EmuSIMD::f64x2, FirstActive_, PerElementWidthIfIntegral_>
+	struct _alternating_index_mask<EmuSIMD::f64x8, FirstActive_, PerElementWidthIfIntegral_> :
+		public _per_index_mask<EmuSIMD::f64x8, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
 	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask<EmuSIMD::f64x2, even, odd>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::f64x2 get()
-		{
-			return _mask_generator::get();
-		}
 	};
 
-	template<bool FirstActive_, std::size_t PerElementWidthIfIntegral_>
-	struct _alternating_index_mask<EmuSIMD::f64x4, FirstActive_, PerElementWidthIfIntegral_>
-	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask<EmuSIMD::f64x4, even, odd, even, odd>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::f64x4 get()
-		{
-			return _mask_generator::get();
-		}
-	};
-
-	template<bool FirstActive_, std::size_t PerElementWidthIfIntegral_>
-	struct _alternating_index_mask<EmuSIMD::f64x8, FirstActive_, PerElementWidthIfIntegral_>
-	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask<EmuSIMD::f64x8, even, odd, even, odd, even, odd, even, odd>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::f64x8 get()
-		{
-			return _mask_generator::get();
-		}
-	};
-
+#if EMU_SIMD_USE_GENERIC_INT_REGISTERS
 	template<bool FirstActive_>
-	struct _alternating_index_mask<EmuSIMD::i128_generic, FirstActive_, 8>
+	struct _alternating_index_mask<EmuSIMD::i128_generic, FirstActive_, 8> :
+		public _per_index_mask
+		<
+			EmuSIMD::i128_generic,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
 	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask<EmuSIMD::i128_generic, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::i128_generic get()
-		{
-			return _mask_generator::get();
-		}
 	};
 	template<bool FirstActive_>
-	struct _alternating_index_mask<EmuSIMD::i128_generic, FirstActive_, 16>
+	struct _alternating_index_mask<EmuSIMD::i128_generic, FirstActive_, 16> :
+		public _per_index_mask<EmuSIMD::i128_generic, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
 	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask<EmuSIMD::i128_generic, even, odd, even, odd, even, odd, even, odd>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::i128_generic get()
-		{
-			return _mask_generator::get();
-		}
 	};
 	template<bool FirstActive_>
-	struct _alternating_index_mask<EmuSIMD::i128_generic, FirstActive_, 32>
+	struct _alternating_index_mask<EmuSIMD::i128_generic, FirstActive_, 32> :
+		public _per_index_mask<EmuSIMD::i128_generic, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
 	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask<EmuSIMD::i128_generic, even, odd, even, odd>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::i128_generic get()
-		{
-			return _mask_generator::get();
-		}
 	};
 	template<bool FirstActive_>
-	struct _alternating_index_mask<EmuSIMD::i128_generic, FirstActive_, 64>
+	struct _alternating_index_mask<EmuSIMD::i128_generic, FirstActive_, 64> :
+		public _per_index_mask<EmuSIMD::i128_generic, FirstActive_, !FirstActive_>
 	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask<EmuSIMD::i128_generic, even, odd>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::i128_generic get()
-		{
-			return _mask_generator::get();
-		}
 	};
-
+	
 	template<bool FirstActive_>
-	struct _alternating_index_mask<EmuSIMD::i256_generic, FirstActive_, 8>
-	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask
+	struct _alternating_index_mask<EmuSIMD::i256_generic, FirstActive_, 8> :
+		public _per_index_mask
 		<
 			EmuSIMD::i256_generic,
-			even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd,
-			even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd
-		>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::i256_generic get()
-		{
-			return _mask_generator::get();
-		}
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
+	{
 	};
 	template<bool FirstActive_>
-	struct _alternating_index_mask<EmuSIMD::i256_generic, FirstActive_, 16>
+	struct _alternating_index_mask<EmuSIMD::i256_generic, FirstActive_, 16> :
+		public _per_index_mask
+		<
+			EmuSIMD::i256_generic,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
 	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask<EmuSIMD::i256_generic, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::i256_generic get()
-		{
-			return _mask_generator::get();
-		}
 	};
 	template<bool FirstActive_>
-	struct _alternating_index_mask<EmuSIMD::i256_generic, FirstActive_, 32>
+	struct _alternating_index_mask<EmuSIMD::i256_generic, FirstActive_, 32> :
+		public _per_index_mask<EmuSIMD::i256_generic, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
 	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask<EmuSIMD::i256_generic, even, odd, even, odd, even, odd, even, odd>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::i256_generic get()
-		{
-			return _mask_generator::get();
-		}
 	};
 	template<bool FirstActive_>
-	struct _alternating_index_mask<EmuSIMD::i256_generic, FirstActive_, 64>
+	struct _alternating_index_mask<EmuSIMD::i256_generic, FirstActive_, 64> :
+		public _per_index_mask<EmuSIMD::i256_generic, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
 	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask<EmuSIMD::i256_generic, even, odd, even, odd>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::i256_generic get()
-		{
-			return _mask_generator::get();
-		}
 	};
-
+	
 	template<bool FirstActive_>
-	struct _alternating_index_mask<EmuSIMD::i512_generic, FirstActive_, 8>
-	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask
+	struct _alternating_index_mask<EmuSIMD::i512_generic, FirstActive_, 8> :
+		public _per_index_mask
 		<
 			EmuSIMD::i512_generic,
-			even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd,
-			even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd,
-			even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd,
-			even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd
-		>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::i512_generic get()
-		{
-			return _mask_generator::get();
-		}
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
+	{
 	};
 	template<bool FirstActive_>
-	struct _alternating_index_mask<EmuSIMD::i512_generic, FirstActive_, 16>
-	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask
+	struct _alternating_index_mask<EmuSIMD::i512_generic, FirstActive_, 16> :
+		public _per_index_mask
 		<
 			EmuSIMD::i512_generic,
-			even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd,
-			even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd
-		>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::i512_generic get()
-		{
-			return _mask_generator::get();
-		}
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
+	{
 	};
 	template<bool FirstActive_>
-	struct _alternating_index_mask<EmuSIMD::i512_generic, FirstActive_, 32>
+	struct _alternating_index_mask<EmuSIMD::i512_generic, FirstActive_, 32> :
+		public _per_index_mask
+		<
+			EmuSIMD::i512_generic,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
 	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask<EmuSIMD::i512_generic, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::i512_generic get()
-		{
-			return _mask_generator::get();
-		}
 	};
 	template<bool FirstActive_>
-	struct _alternating_index_mask<EmuSIMD::i512_generic, FirstActive_, 64>
+	struct _alternating_index_mask<EmuSIMD::i512_generic, FirstActive_, 64> :
+		public _per_index_mask<EmuSIMD::i512_generic, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
 	{
-	private:
-		static constexpr bool even = FirstActive_;
-		static constexpr bool odd = !even;
-		using _mask_generator = _per_index_mask<EmuSIMD::i512_generic, even, odd, even, odd, even, odd, even, odd>;
-
-	public:
-		[[nodiscard]] static inline EmuSIMD::i512_generic get()
-		{
-			return _mask_generator::get();
-		}
 	};
+#else
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::i8x16, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask
+		<
+			EmuSIMD::i8x16,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::i16x8, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask<EmuSIMD::i16x8, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::i32x4, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask<EmuSIMD::i32x4, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::i64x2, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask<EmuSIMD::i64x2, FirstActive_, !FirstActive_>
+	{
+	};
+	
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::i8x32, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask
+		<
+			EmuSIMD::i8x32,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::i16x16, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask
+		<
+			EmuSIMD::i16x16,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::i32x8, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask<EmuSIMD::i32x8, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::i64x4, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask<EmuSIMD::i64x4, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
+	{
+	};
+	
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::i8x64, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask
+		<
+			EmuSIMD::i8x64,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::i16x32, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask
+		<
+			EmuSIMD::i16x32,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::i32x16, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask
+		<
+			EmuSIMD::i32x16,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::i64x8, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask<EmuSIMD::i64x8, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::u8x16, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask
+		<
+			EmuSIMD::u8x16,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::u16x8, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask<EmuSIMD::u16x8, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::u32x4, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask<EmuSIMD::u32x4, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::u64x2, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask<EmuSIMD::u64x2, FirstActive_, !FirstActive_>
+	{
+	};
+	
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::u8x32, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask
+		<
+			EmuSIMD::u8x32,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::u16x16, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask
+		<
+			EmuSIMD::u16x16,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::u32x8, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask<EmuSIMD::u32x8, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::u64x4, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask<EmuSIMD::u64x4, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
+	{
+	};
+	
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::u8x64, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask
+		<
+			EmuSIMD::u8x64,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::u16x32, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask
+		<
+			EmuSIMD::u16x32,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::u32x16, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask
+		<
+			EmuSIMD::u32x16,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_,
+			FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_
+		>
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfGenericInt_>
+	struct _alternating_index_mask<EmuSIMD::u64x8, FirstActive_, PerElementWidthIfGenericInt_> :
+		public _per_index_mask<EmuSIMD::u64x8, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_, FirstActive_, !FirstActive_>
+	{
+	};
+#endif
 #pragma endregion
 	
 #pragma region VALIDITY_TMP
