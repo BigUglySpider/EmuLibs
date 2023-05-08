@@ -385,10 +385,10 @@ int main()
 			std::cout << '\n';
 
 			std::cout << "---\n";
-			auto c_reg = EmuSIMD::Funcs::set_f32x4(10.0f, 20.0f, 30.0f, 40.0f);
-			auto d_reg = EmuSIMD::Funcs::set_f32x4(50.0f, 60.0f, 70.0f, 80.0f);
-			auto c_emu = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, float>(40.0f, 30.0f, 20.0f, 10.0f);
-			auto d_emu = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, float>(80.0f, 70.0f, 60.0f, 50.0f);
+			auto c_reg = EmuSIMD::Funcs::set_f32x4(10.0f, 1.0f, 300.0f, 40.0f);
+			auto d_reg = EmuSIMD::Funcs::set_f32x4(50.0f, 60.0f, 700.0f, 80.0f);
+			auto c_emu = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, float>(40.0f, 300.0f, 1.0f, 10.0f);
+			auto d_emu = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, float>(80.0f, 700.0f, 60.0f, 50.0f);
 			EmuSIMD::Funcs::store_f32x4(dump_f32x16, c_reg);
 			PrintIndexable<4>(dump_f32x16);
 			std::cout << " | ";
@@ -415,6 +415,26 @@ int main()
 			std::cout << "movelh\n";
 			e_reg = EmuSIMD::Funcs::movelh_f32x4(c_reg, d_reg);
 			e_emu = EmuSIMD::_underlying_impl::emulated_movelh(c_emu, d_emu, std::make_index_sequence<4>());
+			EmuSIMD::Funcs::store_f32x4(dump_f32x16, e_reg);
+			PrintIndexable<4>(dump_f32x16);
+			std::cout << '\n';
+			EmuSIMD::_underlying_impl::emulate_simd_store(e_emu, dump_f32x16);
+			PrintIndexable<4>(dump_f32x16);
+			std::cout << '\n';
+
+			std::cout << "horizontal max\n";
+			e_reg = EmuSIMD::Funcs::horizontal_max_f32x4(c_reg);
+			e_emu = EmuSIMD::_underlying_impl::emulate_horizontal_min_or_max<true>(c_emu, EmuCore::TMP::make_index_sequence_excluding_0<4>());
+			EmuSIMD::Funcs::store_f32x4(dump_f32x16, e_reg);
+			PrintIndexable<4>(dump_f32x16);
+			std::cout << '\n';
+			EmuSIMD::_underlying_impl::emulate_simd_store(e_emu, dump_f32x16);
+			PrintIndexable<4>(dump_f32x16);
+			std::cout << '\n';
+
+			std::cout << "horizontal min\n";
+			e_reg = EmuSIMD::Funcs::horizontal_min_f32x4(c_reg);
+			e_emu = EmuSIMD::_underlying_impl::emulate_horizontal_min_or_max<false>(c_emu, EmuCore::TMP::make_index_sequence_excluding_0<4>());
 			EmuSIMD::Funcs::store_f32x4(dump_f32x16, e_reg);
 			PrintIndexable<4>(dump_f32x16);
 			std::cout << '\n';

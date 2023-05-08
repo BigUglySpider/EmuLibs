@@ -377,9 +377,32 @@ namespace EmuCore::TMP
 
 	template<typename T_, T_ Offset_, T_ Size_>
 	using make_offset_integer_sequence = typename offset_integer_sequence_maker<T_, Offset_, Size_>::type;
-
 	template<std::size_t Offset_, std::size_t Size_>
 	using make_offset_index_sequence = typename offset_integer_sequence_maker<std::size_t, Offset_, Size_>::type;
+
+	template<typename T_, std::size_t Size_>
+	struct zero_excluding_integer_sequence_maker
+	{
+	private:
+		static constexpr auto _get()
+		{
+			if constexpr (Size_ <= 1)
+			{
+				return std::integer_sequence<T_>();
+			}
+			else
+			{
+				return make_offset_index_sequence<1, Size_ - 1>();
+			}
+		}
+
+	public:
+		using type = decltype(_get());
+	};
+	template<typename T_, std::size_t Size_>
+	using make_integer_sequence_excluding_0 = typename zero_excluding_integer_sequence_maker<T_, Size_>::type;
+	template<std::size_t Size_>
+	using make_index_sequence_excluding_0 = typename zero_excluding_integer_sequence_maker<std::size_t, Size_>::type;
 
 	/// <summary>
 	///	<para> Type used to splice two integer sequences into a single one. Indices in the left-hand sequence will all appear first, then those in the right-hand sequence. </para>

@@ -873,11 +873,18 @@ namespace EmuSIMD::Funcs
 #pragma region MINMAX_FUNCS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 min_f32x4(EmuSIMD::f32x4_arg a_, EmuSIMD::f32x4_arg b_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_min_ps(a_, b_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_min<float>(), a_, b_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 horizontal_min_f32x4(EmuSIMD::f32x4_arg a_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		EmuSIMD::f32x4 min = movehl_f32x4(a_, a_);
 		min = min_f32x4(min, a_);
 		min = min_f32x4
@@ -886,15 +893,25 @@ namespace EmuSIMD::Funcs
 			min
 		);
 		return permute_f32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(min);
+#else
+		return _underlying_impl::emulate_horizontal_min_or_max<false>(a_, EmuCore::TMP::make_index_sequence_excluding_0<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 max_f32x4(EmuSIMD::f32x4_arg a_, EmuSIMD::f32x4_arg b_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_max_ps(a_, b_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_max<float>(), a_, b_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 horizontal_max_f32x4(EmuSIMD::f32x4_arg a_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		EmuSIMD::f32x4 max = movehl_f32x4(a_, a_);
 		max = max_f32x4(max, a_);
 		max = max_f32x4
@@ -903,6 +920,9 @@ namespace EmuSIMD::Funcs
 			max
 		);
 		return permute_f32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(max);
+#else
+		return _underlying_impl::emulate_horizontal_min_or_max<true>(a_, EmuCore::TMP::make_index_sequence_excluding_0<4>());
+#endif
 	}
 #pragma endregion
 

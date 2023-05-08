@@ -1154,6 +1154,25 @@ namespace EmuSIMD
 			return single_lane_simd_emulator<NumElements_, T_>(_select_emulated_movelh_value<Indices_>(a_, b_)...);
 		}
 #pragma endregion
+
+#pragma region EMULATED_MIN_MAX
+		template<bool IsMax_, std::size_t NumElements_, typename T_, std::size_t...IndicesExcept0_>
+		[[nodiscard]] constexpr inline auto emulate_horizontal_min_or_max(const single_lane_simd_emulator<NumElements_, T_>& a_, std::index_sequence<IndicesExcept0_...> indices_except_0_)
+			-> single_lane_simd_emulator<NumElements_, T_>
+		{
+			T_ result = retrieve_emulated_single_lane_simd_element<T_, 0, false>(a_);
+			auto update_result = [&result](const T_& val_)
+			{
+				using _cmp_func = typename std::conditional<IsMax_, std::greater_equal<T_>, std::less_equal<T_>>::type;
+				if (_cmp_func()(val_, result))
+				{
+					result = val_;
+				}
+			};
+			(update_result(retrieve_emulated_single_lane_simd_element<T_, IndicesExcept0_, false>(a_)), ...);
+			return set1_single_lane_simd_emulator<NumElements_, T_>(result);
+		}
+#pragma endregion
 	}
 
 #pragma region REGISTER_ALIASES
