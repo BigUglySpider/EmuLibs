@@ -1056,6 +1056,49 @@ namespace EmuSIMD
 			}
 		}
 #pragma endregion
+
+#pragma region CMPS
+		template<std::size_t NumElements_, typename T_, class Cmp_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto emulate_single_lane_cmp
+		(
+			const Cmp_& cmp_,
+			const single_lane_simd_emulator<NumElements_, T_>& lhs_,
+			const single_lane_simd_emulator<NumElements_, T_>& rhs_,
+			std::index_sequence<Indices_...> indices_
+		)
+		{
+			if constexpr (EmuConcepts::Integer<T_>)
+			{
+				constexpr auto all_bits_one = EmuCore::ArithmeticHelpers::set_all_bits_one<T_>();
+				return set_single_lane_simd_emulator<NumElements_, T_>
+				(
+					(
+						cmp_
+						(
+							retrieve_emulated_single_lane_simd_element<T_, Indices_, false>(lhs_),
+							retrieve_emulated_single_lane_simd_element<T_, Indices_, false>(rhs_)
+						) * all_bits_one
+					)...
+				);
+			}
+			else
+			{
+				using _uint_type = EmuCore::TMP::uint_of_size_t<sizeof(T_)>;
+				constexpr auto all_bits_one = EmuCore::ArithmeticHelpers::set_all_bits_one<_uint_type>();
+				return set_single_lane_simd_emulator<NumElements_, T_>
+				(
+					std::bit_cast<T_>
+					(
+						cmp_
+						(
+							retrieve_emulated_single_lane_simd_element<T_, Indices_, false>(lhs_),
+							retrieve_emulated_single_lane_simd_element<T_, Indices_, false>(rhs_)
+						) * all_bits_one
+					)...
+				);
+			}
+		}
+#pragma endregion
 	}
 
 #pragma region REGISTER_ALIASES

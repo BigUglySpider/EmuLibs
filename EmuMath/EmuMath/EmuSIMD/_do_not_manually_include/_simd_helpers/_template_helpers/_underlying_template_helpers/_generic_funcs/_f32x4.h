@@ -704,32 +704,56 @@ namespace EmuSIMD::Funcs
 #pragma region COMPARISONS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cmpeq_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cmpeq_ps(lhs_, rhs_);
+#else
+		return _underlying_impl::emulate_single_lane_cmp(std::equal_to(), lhs_, rhs_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cmpneq_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cmpneq_ps(lhs_, rhs_);
+#else
+		return _underlying_impl::emulate_single_lane_cmp(std::not_equal_to(), lhs_, rhs_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cmpgt_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cmpgt_ps(lhs_, rhs_);
+#else
+		return _underlying_impl::emulate_single_lane_cmp(std::greater(), lhs_, rhs_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cmplt_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cmplt_ps(lhs_, rhs_);
+#else
+		return _underlying_impl::emulate_single_lane_cmp(std::less(), lhs_, rhs_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cmpge_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cmpge_ps(lhs_, rhs_);
+#else
+		return _underlying_impl::emulate_single_lane_cmp(std::greater_equal(), lhs_, rhs_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cmple_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cmple_ps(lhs_, rhs_);
+#else
+		return _underlying_impl::emulate_single_lane_cmp(std::less_equal(), lhs_, rhs_, std::make_index_sequence<4>());
+#endif
 	}
 #pragma endregion
 
