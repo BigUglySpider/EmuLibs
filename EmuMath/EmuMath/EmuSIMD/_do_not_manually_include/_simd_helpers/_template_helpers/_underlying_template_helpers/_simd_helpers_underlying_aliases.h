@@ -1110,6 +1110,50 @@ namespace EmuSIMD
 			}
 		};
 #pragma endregion
+
+#pragma region EMULATED_SHUFFLES
+		template<std::size_t Index_, std::size_t NumElements_, typename T_>
+		[[nodiscard]] constexpr inline decltype(auto) _select_emulated_movehl_value(const single_lane_simd_emulator<NumElements_, T_>& a_, const single_lane_simd_emulator<NumElements_, T_>& b_)
+		{
+			constexpr std::size_t half_elements = NumElements_ / 2;
+			if constexpr (Index_ < half_elements)
+			{
+				constexpr std::size_t offset_index = Index_ + half_elements; // Offset the index so that we select the hi-half of b
+				return retrieve_emulated_single_lane_simd_element<T_, offset_index, false>(b_);
+			}
+			else
+			{
+				return retrieve_emulated_single_lane_simd_element<T_, Index_, false>(a_); // Already hi indices, so no need for an offset
+			}
+		}
+
+		template<std::size_t NumElements_, typename T_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto emulated_movehl(const single_lane_simd_emulator<NumElements_, T_>& a_, const single_lane_simd_emulator<NumElements_, T_>& b_, std::index_sequence<Indices_...> indices_)
+		{
+			return single_lane_simd_emulator<NumElements_, T_>(_select_emulated_movehl_value<Indices_>(a_, b_)...);
+		}
+
+		template<std::size_t Index_, std::size_t NumElements_, typename T_>
+		[[nodiscard]] constexpr inline decltype(auto) _select_emulated_movelh_value(const single_lane_simd_emulator<NumElements_, T_>& a_, const single_lane_simd_emulator<NumElements_, T_>& b_)
+		{
+			constexpr std::size_t half_elements = NumElements_ / 2;
+			if constexpr (Index_ < half_elements)
+			{
+				return retrieve_emulated_single_lane_simd_element<T_, Index_, false>(a_); // Already lo indices, so no need for an offset
+			}
+			else
+			{
+				constexpr std::size_t offset_index = Index_ - half_elements; // Offset the index so that we select the lo-half of b
+				return retrieve_emulated_single_lane_simd_element<T_, offset_index, false>(b_);
+			}
+		}
+
+		template<std::size_t NumElements_, typename T_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto emulated_movelh(const single_lane_simd_emulator<NumElements_, T_>& a_, const single_lane_simd_emulator<NumElements_, T_>& b_, std::index_sequence<Indices_...> indices_)
+		{
+			return single_lane_simd_emulator<NumElements_, T_>(_select_emulated_movelh_value<Indices_>(a_, b_)...);
+		}
+#pragma endregion
 	}
 
 #pragma region REGISTER_ALIASES

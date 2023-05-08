@@ -384,18 +384,45 @@ int main()
 			PrintIndexable<4>(dump_f32x16);
 			std::cout << '\n';
 
-			auto c_reg = EmuSIMD::Funcs::set1_f32x4(10.0f);
-			auto d_reg = EmuSIMD::Funcs::set1_f32x4(20.0f);
-			auto c_emu = EmuSIMD::_underlying_impl::set1_single_lane_simd_emulator<4, float>(10.0f);
-			auto d_emu = EmuSIMD::_underlying_impl::set1_single_lane_simd_emulator<4, float>(20.0f);
-			auto e_reg = EmuSIMD::Funcs::blendv_f32x4(c_reg, d_reg, a_reg);
-			auto e_emu = EmuSIMD::_underlying_impl::emulate_simd_basic(EmuSIMD::_underlying_impl::blendv_emulator_func<float>(), c_emu, d_emu, a_emu, std::make_index_sequence<4>());
+			std::cout << "---\n";
+			auto c_reg = EmuSIMD::Funcs::set_f32x4(10.0f, 20.0f, 30.0f, 40.0f);
+			auto d_reg = EmuSIMD::Funcs::set_f32x4(50.0f, 60.0f, 70.0f, 80.0f);
+			auto c_emu = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, float>(40.0f, 30.0f, 20.0f, 10.0f);
+			auto d_emu = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, float>(80.0f, 70.0f, 60.0f, 50.0f);
+			EmuSIMD::Funcs::store_f32x4(dump_f32x16, c_reg);
+			PrintIndexable<4>(dump_f32x16);
+			std::cout << " | ";
+			EmuSIMD::Funcs::store_f32x4(dump_f32x16, d_reg);
+			PrintIndexable<4>(dump_f32x16);
+			std::cout << '\n';
+			EmuSIMD::_underlying_impl::emulate_simd_store(c_emu, dump_f32x16);
+			PrintIndexable<4>(dump_f32x16);
+			std::cout << " | ";
+			EmuSIMD::_underlying_impl::emulate_simd_store(d_emu, dump_f32x16);
+			PrintIndexable<4>(dump_f32x16);
+			std::cout << '\n';
+
+			std::cout << "movehl\n";
+			auto e_reg = EmuSIMD::Funcs::movehl_f32x4(c_reg, d_reg);
+			auto e_emu = EmuSIMD::_underlying_impl::emulated_movehl(c_emu, d_emu, std::make_index_sequence<4>());
 			EmuSIMD::Funcs::store_f32x4(dump_f32x16, e_reg);
 			PrintIndexable<4>(dump_f32x16);
 			std::cout << '\n';
 			EmuSIMD::_underlying_impl::emulate_simd_store(e_emu, dump_f32x16);
 			PrintIndexable<4>(dump_f32x16);
 			std::cout << '\n';
+
+			std::cout << "movelh\n";
+			e_reg = EmuSIMD::Funcs::movelh_f32x4(c_reg, d_reg);
+			e_emu = EmuSIMD::_underlying_impl::emulated_movelh(c_emu, d_emu, std::make_index_sequence<4>());
+			EmuSIMD::Funcs::store_f32x4(dump_f32x16, e_reg);
+			PrintIndexable<4>(dump_f32x16);
+			std::cout << '\n';
+			EmuSIMD::_underlying_impl::emulate_simd_store(e_emu, dump_f32x16);
+			PrintIndexable<4>(dump_f32x16);
+			std::cout << '\n';
+
+			universal_pause();
 		}
 
 		{

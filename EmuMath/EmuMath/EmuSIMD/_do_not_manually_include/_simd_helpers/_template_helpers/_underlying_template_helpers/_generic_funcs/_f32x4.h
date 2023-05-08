@@ -773,12 +773,20 @@ namespace EmuSIMD::Funcs
 #pragma region MOVES
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 movehl_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_movehl_ps(lhs_, rhs_);
+#else
+		return _underlying_impl::emulated_movehl<4>(lhs_, rhs_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 movelh_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_movelh_ps(lhs_, rhs_);
+#else
+		return _underlying_impl::emulated_movelh<4>(lhs_, rhs_);
+#endif
 	}
 #pragma endregion
 
