@@ -12,15 +12,6 @@ namespace EmuSIMD
 	{
 		using permuter = _underlying_simd_helpers::_permuter<typename std::remove_cvref<Register_>::type, Indices_...>;
 		return permuter::execute(std::forward<Register_>(ab_));
-
-	}
-	template<std::size_t...Indices_, EmuConcepts::KnownSIMD Register_>
-	[[nodiscard]] inline auto permute(Register_&& ab_)
-		-> typename std::remove_cvref<Register_>::type
-	{
-		using permuter = _underlying_simd_helpers::_permuter<typename std::remove_cvref<Register_>::type, Indices_...>;
-		return permuter::execute(std::forward<Register_>(ab_));
-
 	}
 
 	template<std::size_t...Indices_, EmuConcepts::KnownSIMD RegisterA_, EmuConcepts::UnqualifiedMatch<RegisterA_> RegisterB_>
@@ -36,27 +27,31 @@ namespace EmuSIMD
 	/// <para> Performs a full-width shuffle of the passed SIMD register's indices. </para>
 	/// <para> For 128-bit registers, this is the same as a normal shuffle. </para>
 	/// </summary>
-	/// <param name="ab_">128-bit register to shuffle.</param>
-	/// <returns>Result of shuffling the passed Register with the provided indices.</returns>
-	template<std::size_t...Indices_, EmuConcepts::KnownSIMD Register_>
-	requires (EmuSIMD::TMP::simd_register_width_v<Register_> == 128)
-	[[nodiscard]] constexpr inline Register_ shuffle_full_width(Register_ ab_)
+	/// <param name="a_">128-bit register to shuffle for the lo bytes of the output register.</param>
+	/// <param name="b_">128-bit register to shuffle for the hi bytes of the output register.</param>
+	/// <returns>Result of shuffling the passed Registers with the provided indices.</returns>
+	template<std::size_t...Indices_, EmuConcepts::KnownSIMD RegisterA_, EmuConcepts::UnqualifiedMatch<RegisterA_> RegisterB_>
+	requires (EmuSIMD::TMP::simd_register_width_v<RegisterA_> == 128)
+	[[nodiscard]] constexpr inline auto shuffle_full_width(RegisterA_&& a_, RegisterB_&& b_)
+		-> typename std::remove_cvref<RegisterA_>::type
 	{
-		return shuffle<Indices_...>(ab_);
+		using shuffler = _underlying_simd_helpers::_shuffler<typename std::remove_cvref<RegisterA_>::type, typename std::remove_cvref<RegisterB_>::type, Indices_...>;
+		return shuffler::execute(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
 	}
 
 	/// <summary>
 	/// <para> Performs a full-width shuffle of the passed SIMD register's indices. </para>
 	/// <para> For 128-bit registers, this is the same as a normal shuffle. </para>
 	/// </summary>
-	/// <param name="a_">128-bit register to shuffle for the lo bytes of the output register.</param>
-	/// <param name="b_">128-bit register to shuffle for the hi bytes of the output register.</param>
-	/// <returns>Result of shuffling the passed Registers with the provided indices.</returns>
+	/// <param name="ab_">128-bit register to shuffle.</param>
+	/// <returns>Result of shuffling the passed Register with the provided indices.</returns>
 	template<std::size_t...Indices_, EmuConcepts::KnownSIMD Register_>
 	requires (EmuSIMD::TMP::simd_register_width_v<Register_> == 128)
-	[[nodiscard]] constexpr inline Register_ shuffle_full_width(Register_ a_, Register_ b_)
+	[[nodiscard]] constexpr inline auto shuffle_full_width(Register_&& ab_)
+		-> typename std::remove_cvref<Register_>::type
 	{
-		return shuffle<Indices_...>(a_, b_);
+		using permuter = _underlying_simd_helpers::_permuter<typename std::remove_cvref<Register_>::type, Indices_...>;
+		return permuter::execute(std::forward<Register_>(ab_));
 	}
 
 	/// <summary>
@@ -65,11 +60,12 @@ namespace EmuSIMD
 	/// <param name="a_">256-bit register to shuffle for the lo 128-bit lane of the output register.</param>
 	/// <param name="b_">256-bit register to shuffle for the hi 128-bit lane of the output register.</param>
 	/// <returns>Result of full-width-shuffling the passed Registers with the provided indices.</returns>
-	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, EmuConcepts::KnownSIMD Register_>
-	requires (EmuSIMD::TMP::simd_register_width_v<Register_> == 256 && EmuSIMD::TMP::register_element_count_v<Register_> == 4)
-	[[nodiscard]] constexpr inline Register_ shuffle_full_width(Register_ a_, Register_ b_)
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, EmuConcepts::KnownSIMD RegisterA_, EmuConcepts::UnqualifiedMatch<RegisterA_> RegisterB_>
+	requires (EmuSIMD::TMP::simd_register_width_v<RegisterA_> == 256 && EmuSIMD::TMP::register_element_count_v<RegisterA_, 64> == 4)
+	[[nodiscard]] constexpr inline auto shuffle_full_width(RegisterA_&& a_, RegisterB_&& b_)
+		-> typename std::remove_cvref<RegisterA_>::type
 	{
-		using _register_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+		using _register_uq = typename EmuCore::TMP::remove_ref_cv<RegisterA_>::type;
 		using _generic_register_type = EmuSIMD::f64x4;
 		using _generic_lane_register = typename EmuSIMD::TMP::half_width<_generic_register_type>::type;
 		_generic_register_type out;
@@ -79,8 +75,8 @@ namespace EmuSIMD
 		if constexpr (lowest_index > max_lo_index)
 		{
 			// All hi indices, we can just shuffle hi lane
-			auto hi_a = EmuSIMD::extract_lane<1, _generic_lane_register>(a_);
-			auto hi_b = EmuSIMD::extract_lane<1, _generic_lane_register>(b_);
+			auto hi_a = EmuSIMD::extract_lane<1, _generic_lane_register>(std::forward<RegisterA_>(a_));
+			auto hi_b = EmuSIMD::extract_lane<1, _generic_lane_register>(std::forward<RegisterB_>(b_));
 			hi_b = EmuSIMD::shuffle<I2_ - 2, I3_ - 2>(hi_b);
 
 			out = EmuSIMD::cast<_generic_register_type>(EmuSIMD::shuffle<I0_ - 2, I1_ - 2>(hi_a));
@@ -92,8 +88,8 @@ namespace EmuSIMD
 			if constexpr (highest_index <= max_lo_index)
 			{
 				// All lo indices, we can just shuffle lo lane
-				auto lo_a = EmuSIMD::cast<_generic_lane_register>(a_);
-				auto lo_b = EmuSIMD::cast<_generic_lane_register>(b_);
+				auto lo_a = EmuSIMD::cast<_generic_lane_register>(std::forward<RegisterA_>(a_));
+				auto lo_b = EmuSIMD::cast<_generic_lane_register>(std::forward<RegisterB_>(b_));
 
 				out = EmuSIMD::cast<_generic_register_type>(EmuSIMD::shuffle<I0_, I1_>(lo_a));
 				lo_b = EmuSIMD::shuffle<I2_, I3_>(lo_b);
@@ -107,13 +103,13 @@ namespace EmuSIMD
 				_generic_lane_register lane_0, lane_1;
 				if constexpr (i0_lane == i1_lane)
 				{
-					lane_0 = EmuSIMD::extract_lane<i0_lane, _generic_lane_register>(a_);
+					lane_0 = EmuSIMD::extract_lane<i0_lane, _generic_lane_register>(std::forward<RegisterA_>(a_));
 					lane_1 = lane_0;
 				}
 				else
 				{
-					lane_0 = EmuSIMD::extract_lane<i0_lane, _generic_lane_register>(a_);
-					lane_1 = EmuSIMD::extract_lane<i1_lane, _generic_lane_register>(a_);
+					lane_0 = EmuSIMD::extract_lane<i0_lane, _generic_lane_register>(std::forward<RegisterA_>(a_));
+					lane_1 = EmuSIMD::extract_lane<i1_lane, _generic_lane_register>(std::forward<RegisterA_>(a_));
 				}
 				out = EmuSIMD::cast<_generic_register_type>(EmuSIMD::shuffle<I0_ % 2, I1_ % 2>(lane_0, lane_1));
 
@@ -122,13 +118,13 @@ namespace EmuSIMD
 				constexpr int i3_lane = (I3_ <= max_lo_index) ? 0 : 1;
 				if constexpr (i2_lane == i3_lane)
 				{
-					lane_0 = EmuSIMD::extract_lane<i2_lane, _generic_lane_register>(b_);
+					lane_0 = EmuSIMD::extract_lane<i2_lane, _generic_lane_register>(std::forward<RegisterB_>(b_));
 					lane_1 = lane_0;
 				}
 				else
 				{
-					lane_0 = EmuSIMD::extract_lane<i2_lane, _generic_lane_register>(b_);
-					lane_1 = EmuSIMD::extract_lane<i3_lane, _generic_lane_register>(b_);
+					lane_0 = EmuSIMD::extract_lane<i2_lane, _generic_lane_register>(std::forward<RegisterB_>(b_));
+					lane_1 = EmuSIMD::extract_lane<i3_lane, _generic_lane_register>(std::forward<RegisterB_>(b_));
 				}
 
 				auto tmp_shuffle = EmuSIMD::cast<_generic_lane_register>(EmuSIMD::shuffle<I2_ % 2, I3_ % 2>(lane_0, lane_1));
@@ -142,7 +138,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			return EmuSIMD::cast<Register_>(out);
+			return EmuSIMD::cast<typename std::remove_cvref<RegisterA_>::type>(out);
 		}
 	}
 
@@ -153,9 +149,11 @@ namespace EmuSIMD
 	/// <returns>Result of full-width-shuffling the passed Register with the provided indices.</returns>
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, EmuConcepts::KnownSIMD Register_>
 	requires (EmuSIMD::TMP::simd_register_width_v<Register_> == 256 && EmuSIMD::TMP::register_element_count_v<Register_> == 4)
-	[[nodiscard]] constexpr inline Register_ shuffle_full_width(Register_ ab_)
+	[[nodiscard]] constexpr inline auto shuffle_full_width(Register_&& ab_)
+		-> typename std::remove_cvref<Register_>::type
 	{
-		return shuffle_full_width<I0_, I1_, I2_, I3_>(ab_, ab_);
+		const auto& ab_ref = std::forward<Register_>(ab_);
+		return shuffle_full_width<I0_, I1_, I2_, I3_>(ab_ref, ab_ref);
 	}
 #pragma endregion
 }

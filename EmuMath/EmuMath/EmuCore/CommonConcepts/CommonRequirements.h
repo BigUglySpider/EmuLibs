@@ -34,11 +34,7 @@ namespace EmuCore::Concepts
 	template<class T_, class Target_>
 	concept UnqualifiedMatch =
 	(
-		std::is_same_v
-		<
-			typename std::remove_cvref<T_>::type,
-			typename std::remove_cvref<Target_>::type
-		>
+		std::is_same_v<typename std::remove_cvref<T_>::type, typename std::remove_cvref<Target_>::type>
 	);
 }
 
