@@ -33,6 +33,11 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 load_i8x16(const std::int8_t* p_to_load_)
 	{
+		return _mm_loadu_si128(reinterpret_cast<const __m128i*>(p_to_load_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 aligned_load_i8x16(const std::int8_t* p_to_load_)
+	{
 		return _mm_load_si128(reinterpret_cast<const __m128i*>(p_to_load_));
 	}
 
@@ -125,6 +130,11 @@ namespace EmuSIMD::Funcs
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_i8x16(std::int8_t* p_out_, i8x16_arg a_)
+	{
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(p_out_), a_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC void aligned_store_i8x16(std::int8_t* p_out_, i8x16_arg a_)
 	{
 		_mm_store_si128(reinterpret_cast<__m128i*>(p_out_), a_);
 	}

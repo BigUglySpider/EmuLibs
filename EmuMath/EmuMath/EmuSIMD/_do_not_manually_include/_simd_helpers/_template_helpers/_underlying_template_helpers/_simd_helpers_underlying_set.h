@@ -2078,6 +2078,155 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	}
 
+	template<class Register_, typename In_>
+	[[nodiscard]] inline Register_ _aligned_load(const In_* p_to_load_)
+	{
+		using register_type_uq = EmuCore::TMP::remove_ref_cv_t<Register_>;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
+			{
+				return EmuSIMD::Funcs::aligned_load_f32x4(reinterpret_cast<const float*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
+			{
+				return EmuSIMD::Funcs::aligned_load_f32x8(reinterpret_cast<const float*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
+			{
+				return EmuSIMD::Funcs::aligned_load_f32x16(reinterpret_cast<const float*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
+			{
+				return EmuSIMD::Funcs::aligned_load_f64x2(reinterpret_cast<const double*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
+			{
+				return EmuSIMD::Funcs::aligned_load_f64x4(reinterpret_cast<const double*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
+			{
+				return EmuSIMD::Funcs::aligned_load_f64x8(reinterpret_cast<const double*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i8x16(reinterpret_cast<const std::int8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i8x32(reinterpret_cast<const std::int8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i8x64(reinterpret_cast<const std::int8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i8x16(reinterpret_cast<const std::int8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i8x32(reinterpret_cast<const std::int8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i8x64(reinterpret_cast<const std::int8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i16x8(reinterpret_cast<const std::int16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i16x16(reinterpret_cast<const std::int16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i16x32(reinterpret_cast<const std::int16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i32x4(reinterpret_cast<const std::int32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i32x8(reinterpret_cast<const std::int32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i32x16(reinterpret_cast<const std::int32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i64x2(reinterpret_cast<const std::int64_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i64x4(reinterpret_cast<const std::int64_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i64x8(reinterpret_cast<const std::int64_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u8x16(reinterpret_cast<const std::uint8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u8x32(reinterpret_cast<const std::uint8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u8x64(reinterpret_cast<const std::uint8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u16x8(reinterpret_cast<const std::uint16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u16x16(reinterpret_cast<const std::uint16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u16x32(reinterpret_cast<const std::uint16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u32x4(reinterpret_cast<const std::uint32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u32x8(reinterpret_cast<const std::uint32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u32x16(reinterpret_cast<const std::uint32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u64x2(reinterpret_cast<const std::uint64_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u64x4(reinterpret_cast<const std::uint64_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u64x8(reinterpret_cast<const std::uint64_t*>(p_to_load_));
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to aligned-load a SIMD register from memory via EmuSIMD helpers, but the provided SIMD register type is not supported for this operation.");
+			}
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to aligned-load a SIMD register from memory via EmuSIMD helpers, but the provided Register_ type was not recognised as a supported SIMD register.");
+		}
+	}
+
 	template<class Register_, std::size_t PerElementWidthIfGenericInt_, bool Reverse_, bool...SignAtIndex_>
 	[[nodiscard]] inline Register_ _make_sign_mask()
 	{

@@ -52,6 +52,11 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 load_u8x64(const std::uint8_t* p_to_load_)
 	{
+		return _mm512_loadu_si512(p_to_load_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 aligned_load_u8x64(const std::uint8_t* p_to_load_)
+	{
 		return _mm512_load_si512(p_to_load_);
 	}
 
@@ -262,12 +267,22 @@ namespace EmuSIMD::Funcs
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_u8x64(std::uint8_t* p_out_, u8x64_arg a_)
 	{
+		_mm512_storeu_si512(reinterpret_cast<__m256i*>(p_out_), a_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC void aligned_store_u8x64(std::uint8_t* p_out_, u8x64_arg a_)
+	{
 		_mm512_store_si512(reinterpret_cast<__m256i*>(p_out_), a_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC std::uint8_t get_first_u8x64(u8x64_arg a_)
 	{
 		return get_first_u8x16(cast_u8x64_u8x16(a_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC std::uint64_t movemask_u8x64(u8x64_arg a_)
+	{
+		return static_cast<std::uint64_t>(_mm512_movepi8_mask(a_));
 	}
 #pragma endregion
 

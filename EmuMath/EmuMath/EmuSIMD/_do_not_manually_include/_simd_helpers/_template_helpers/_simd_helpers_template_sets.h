@@ -180,6 +180,21 @@ namespace EmuSIMD
 		}
 	}
 
+	template<EmuConcepts::KnownSIMD SIMDRegister_, typename In_>
+	[[nodiscard]] inline auto aligned_load(const In_* p_to_load_)
+		-> typename std::remove_cvref<SIMDRegister_>::type
+	{
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<SIMDRegister_>::type;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _underlying_simd_helpers::_aligned_load<SIMDRegister_>(p_to_load_);
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<SIMDRegister_>(), "Attempted to perform EmuSIMD::aligned_load with an unsupported type as the passed SIMDRegister_.");
+		}
+	}
+
 	template<std::size_t Index_, std::size_t PerElementWidthIfGenericInt_, EmuConcepts::KnownSIMD SIMDRegister_>
 	[[nodiscard]] inline auto set_all_to_index(SIMDRegister_&& in_) noexcept
 		-> typename std::remove_cvref<SIMDRegister_>::type

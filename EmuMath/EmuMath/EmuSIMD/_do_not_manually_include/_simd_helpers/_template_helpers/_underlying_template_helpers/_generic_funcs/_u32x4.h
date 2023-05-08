@@ -25,6 +25,11 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 load_u32x4(const std::uint32_t* p_to_load_)
 	{
+		return _mm_loadu_si128(reinterpret_cast<const __m128i*>(p_to_load_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 aligned_load_u32x4(const std::uint32_t* p_to_load_)
+	{
 		return _mm_load_si128(reinterpret_cast<const __m128i*>(p_to_load_));
 	}
 
@@ -94,12 +99,22 @@ namespace EmuSIMD::Funcs
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_u32x4(std::uint32_t* p_out_, u32x4_arg a_)
 	{
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(p_out_), a_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC void aligned_store_u32x4(std::uint32_t* p_out_, u32x4_arg a_)
+	{
 		_mm_store_si128(reinterpret_cast<__m128i*>(p_out_), a_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC std::uint32_t get_first_u32x4(u32x4_arg a_)
 	{
 		return static_cast<std::uint32_t>(_mm_cvtsi128_si32(a_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC std::uint8_t movemask_u32x4(u32x4_arg a_)
+	{
+		return movemask_f32x4(cast_u32x4_f32x4(a_));
 	}
 #pragma endregion
 

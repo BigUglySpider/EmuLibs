@@ -25,6 +25,11 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 load_u16x8(const std::uint16_t* p_to_load_)
 	{
+		return _mm_loadu_si128(reinterpret_cast<const __m128i*>(p_to_load_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 aligned_load_u16x8(const std::uint16_t* p_to_load_)
+	{
 		return _mm_load_si128(reinterpret_cast<const __m128i*>(p_to_load_));
 	}
 
@@ -102,6 +107,11 @@ namespace EmuSIMD::Funcs
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_u16x8(std::uint16_t* p_out_, u16x8_arg a_)
 	{
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(p_out_), a_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC void aligned_store_u16x8(std::uint16_t* p_out_, u16x8_arg a_)
+	{
 		_mm_store_si128(reinterpret_cast<__m128i*>(p_out_), a_);
 	}
 
@@ -109,6 +119,11 @@ namespace EmuSIMD::Funcs
 	{
 		std::int32_t first_32_bits = _mm_cvtsi128_si32(a_);
 		return *reinterpret_cast<std::uint16_t*>(&first_32_bits);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC std::uint8_t movemask_u16x8(u16x8_arg a_)
+	{
+		return EmuSIMD::Funcs::convert_movemask_width<16, 8, std::uint8_t>(_mm_movemask_epi8(a_));
 	}
 #pragma endregion
 

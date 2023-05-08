@@ -10,12 +10,14 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 setr_f32x4(float e0, float e1, float e2, float e3);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 set1_f32x4(float all_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 load_f32x4(const float* p_to_load_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 aligned_load_f32x4(const float* p_to_load_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 setzero_f32x4();
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 setmasked_f32x4(std::uint8_t bit_mask_);
 #pragma endregion
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_f32x4(float* p_out_, f32x4_arg a_);
+	EMU_SIMD_COMMON_FUNC_SPEC void aligned_store_f32x4(float* p_out_, f32x4_arg a_);
 	EMU_SIMD_COMMON_FUNC_SPEC float get_first_f32x4(f32x4_arg a_);
 	EMU_SIMD_COMMON_FUNC_SPEC std::uint8_t movemask_f32x4(f32x4_arg a_);
 #pragma endregion

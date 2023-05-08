@@ -30,7 +30,20 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<SIMDRegister_>(), "Attempted to extract a SIMD register index via EmuSIMD::get_index, but the provided register_ is not recognised as a SIMD register.");
+			static_assert(EmuCore::TMP::get_false<SIMDRegister_>(), "Attempted to store a SIMD register in memory via EmuSIMD::store, but the provided register_ is not recognised as a SIMD register.");
+		}
+	}
+
+	template<EmuConcepts::Writable Out_, EmuConcepts::KnownSIMD SIMDRegister_>
+	inline void aligned_store(SIMDRegister_&& simd_register_, Out_* p_out_)
+	{
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<SIMDRegister_>)
+		{
+			return _underlying_simd_helpers::_aligned_store_register(std::forward<SIMDRegister_>(simd_register_), p_out_);
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<SIMDRegister_>(), "Attempted to aligned-store a SIMD register in memory via EmuSIMD::aligned_store, but the provided register_ is not recognised as a SIMD register.");
 		}
 	}
 

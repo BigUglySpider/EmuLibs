@@ -19,12 +19,14 @@ namespace EmuSIMD::Funcs
 	);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 set1_i16x16(std::int16_t all_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 load_i16x16(const std::int16_t* p_to_load_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 aligned_load_i16x16(const std::int16_t* p_to_load_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 setzero_i16x16();
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 setmasked_i16x16(std::uint16_t bit_mask_);
 #pragma endregion
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_i16x16(std::int16_t* p_out_, i16x16_arg a_);
+	EMU_SIMD_COMMON_FUNC_SPEC void aligned_store_i16x16(std::int16_t* p_out_, i16x16_arg a_);
 	EMU_SIMD_COMMON_FUNC_SPEC std::int16_t get_first_i16x16(i16x16_arg a_);
 	EMU_SIMD_COMMON_FUNC_SPEC std::uint16_t movemask_i16x16(i16x16_arg a_);
 #pragma endregion

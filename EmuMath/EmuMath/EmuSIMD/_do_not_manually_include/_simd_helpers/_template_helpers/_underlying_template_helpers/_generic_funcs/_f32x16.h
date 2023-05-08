@@ -33,6 +33,11 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 load_f32x16(const float* p_to_load_)
 	{
+		return _mm512_loadu_ps(p_to_load_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 aligned_load_f32x16(const float* p_to_load_)
+	{
 		return _mm512_load_ps(p_to_load_);
 	}
 
@@ -131,6 +136,11 @@ namespace EmuSIMD::Funcs
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_f32x16(float* p_out_, f32x16_arg a_)
+	{
+		_mm512_storeu_ps(p_out_, a_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC void aligned_store_f32x16(float* p_out_, f32x16_arg a_)
 	{
 		_mm512_store_ps(p_out_, a_);
 	}

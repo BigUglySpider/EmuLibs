@@ -11,12 +11,14 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x8 setr_u64x8(std::uint64_t e0, std::uint64_t e1, std::uint64_t e2, std::uint64_t e3, std::uint64_t e4, std::uint64_t e5, std::uint64_t e6, std::uint64_t e7);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x8 set1_u64x8(std::uint64_t all_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x8 load_u64x8(const std::uint64_t* p_to_load_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x8 aligned_load_u64x8(const std::uint64_t* p_to_load_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x8 setzero_u64x8();
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x8 setmasked_u64x8(std::uint8_t bit_mask_);
 #pragma endregion
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_u64x8(std::uint64_t* p_out_, u64x8_arg a_);
+	EMU_SIMD_COMMON_FUNC_SPEC void aligned_store_u64x8(std::uint64_t* p_out_, u64x8_arg a_);
 	EMU_SIMD_COMMON_FUNC_SPEC std::uint64_t get_first_u64x8(u64x8_arg a_);
 	EMU_SIMD_COMMON_FUNC_SPEC std::uint8_t movemask_u64x8(u64x8_arg a_);
 #pragma endregion

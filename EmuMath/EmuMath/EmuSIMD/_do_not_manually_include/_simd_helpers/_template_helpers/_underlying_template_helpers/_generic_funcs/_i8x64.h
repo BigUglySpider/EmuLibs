@@ -57,6 +57,11 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 load_i8x64(const std::int8_t* p_to_load_)
 	{
+		return _mm512_loadu_si512(p_to_load_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 aligned_load_i8x64(const std::int8_t* p_to_load_)
+	{
 		return _mm512_load_si512(p_to_load_);
 	}
 
@@ -266,6 +271,11 @@ namespace EmuSIMD::Funcs
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_i8x64(std::int8_t* p_out_, i8x64_arg a_)
+	{
+		_mm512_storeu_si512(reinterpret_cast<__m256i*>(p_out_), a_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC void aligned_store_i8x64(std::int8_t* p_out_, i8x64_arg a_)
 	{
 		_mm512_store_si512(reinterpret_cast<__m256i*>(p_out_), a_);
 	}

@@ -33,6 +33,11 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x16 load_u32x16(const std::uint32_t* p_to_load_)
 	{
+		return _mm512_loadu_si512(p_to_load_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x16 aligned_load_u32x16(const std::uint32_t* p_to_load_)
+	{
 		return _mm512_load_si512(p_to_load_);
 	}
 
@@ -126,12 +131,22 @@ namespace EmuSIMD::Funcs
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_u32x16(std::uint32_t* p_out_, u32x16_arg a_)
 	{
+		_mm512_storeu_si512(reinterpret_cast<__m256i*>(p_out_), a_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC void aligned_store_u32x16(std::uint32_t* p_out_, u32x16_arg a_)
+	{
 		_mm512_store_si512(reinterpret_cast<__m256i*>(p_out_), a_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC std::uint32_t get_first_u32x16(u32x16_arg a_)
 	{
 		return get_first_u32x4(cast_u32x16_u32x4(a_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC std::uint16_t movemask_u32x16(u32x16_arg a_)
+	{
+		return static_cast<std::uint16_t>(_mm512_movepi32_mask(a_));
 	}
 #pragma endregion
 

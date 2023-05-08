@@ -39,6 +39,15 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 load_f32x4(const float* p_to_load_)
 	{
 #if EMU_SIMD_USE_128_REGISTERS
+		return _mm_loadu_ps(p_to_load_);
+#else
+		return _underlying_impl::load_single_lane_simd_emulator<4, float>(p_to_load_);
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 aligned_load_f32x4(const float* p_to_load_)
+	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_load_ps(p_to_load_);
 #else
 		return _underlying_impl::load_single_lane_simd_emulator<4, float>(p_to_load_);
@@ -128,6 +137,15 @@ namespace EmuSIMD::Funcs
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_f32x4(float* p_out_, f32x4_arg a_)
+	{
+#if EMU_SIMD_USE_128_REGISTERS
+		_mm_storeu_ps(p_out_, a_);
+#else
+		_underlying_impl::emulate_simd_store(a_, p_out_);
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC void aligned_store_f32x4(float* p_out_, f32x4_arg a_)
 	{
 #if EMU_SIMD_USE_128_REGISTERS
 		_mm_store_ps(p_out_, a_);

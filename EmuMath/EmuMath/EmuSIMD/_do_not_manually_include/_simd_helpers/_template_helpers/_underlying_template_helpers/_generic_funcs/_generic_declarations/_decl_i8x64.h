@@ -32,12 +32,14 @@ namespace EmuSIMD::Funcs
 	);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 set1_i8x64(std::int8_t all_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 load_i8x64(const std::int8_t* p_to_load_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 aligned_load_i8x64(const std::int8_t* p_to_load_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 setzero_i8x64();
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 setmasked_i8x64(std::uint64_t bit_mask_);
 #pragma endregion
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_i8x64(std::int8_t* p_out_, i8x64_arg a_);
+	EMU_SIMD_COMMON_FUNC_SPEC void aligned_store_i8x64(std::int8_t* p_out_, i8x64_arg a_);
 	EMU_SIMD_COMMON_FUNC_SPEC std::int8_t get_first_i8x64(i8x64_arg a_);
 	EMU_SIMD_COMMON_FUNC_SPEC std::uint64_t movemask_i8x64(i8x64_arg a_);
 #pragma endregion
