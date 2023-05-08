@@ -648,6 +648,55 @@ namespace EmuCore::ArithmeticHelpers
 			}
 		}
 	}
+
+	/// <summary>
+	/// <para> Creates an instance of the specified type with its most-significant bit set to 1 (and all other bits 0). </para>
+	/// <para> Naturally, this is unsafe to use with more complex types that should not be all-0 (excluding an msb of 1) in memory. </para>
+	/// </summary>
+	/// <returns>Specified type created with its most-significant bit set to 1, and all other bits set to 0.</returns>
+	template<typename T_>
+	[[nodiscard]] constexpr inline auto set_most_significant_bit() noexcept
+		-> typename std::remove_cvref<T_>::type
+	{
+		constexpr std::size_t num_bytes = sizeof(typename std::remove_cvref<T_>::type);
+		if constexpr (std::is_integral_v<typename std::remove_cvref<T_>::type>)
+		{
+			if constexpr (num_bytes == 1)
+			{
+				return typename std::remove_cvref<T_>::type(0x80);
+			}
+			else if constexpr (num_bytes == 2)
+			{
+				return typename std::remove_cvref<T_>::type(0x8000);
+			}
+			else if constexpr (num_bytes == 4)
+			{
+				return typename std::remove_cvref<T_>::type(0x80000000);
+			}
+			else if constexpr (num_bytes == 4)
+			{
+				return typename std::remove_cvref<T_>::type(0x8000000000000000);
+			}
+		}
+		else if constexpr (std::is_floating_point_v<typename std::remove_cvref<T_>::type>)
+		{
+			return typename std::remove_cvref<T_>::type(-0.0);
+		}
+		else if constexpr (num_bytes == 1 || num_bytes == 2 || num_bytes == 4 || num_bytes == 8)
+		{
+			return std::bit_cast<typename std::remove_cvref<T_>::type>
+			(
+				set_most_significant_bit<EmuCore::TMP::uint_of_size_t<num_bytes>>()
+			);
+		}
+		else
+		{
+			auto output_bytes = std::array<unsigned char, num_bytes>();
+			constexpr std::size_t most_significant_index = is_little_endian() ? (num_bytes - 1) : 0;
+			output_bytes[most_significant_index] = 0x80;
+			return std::bit_cast<typename std::remove_cvref<T_>::type>(output_bytes);
+		}
+	}
 }
 
 #endif

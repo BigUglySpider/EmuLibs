@@ -793,39 +793,65 @@ namespace EmuSIMD
 
 #pragma region EMULATED_BASIC_GENERIC_OPS
 		template<class Func_, std::size_t NumElements_, EmuConcepts::Arithmetic T_, std::size_t...OutIndices_>
-		constexpr inline single_lane_simd_emulator<NumElements_, T_> emulate_simd_basic(const Func_& func_, const single_lane_simd_emulator<NumElements_, T_>& simd_emulator_, std::index_sequence<OutIndices_...> out_indices_)
+		constexpr inline single_lane_simd_emulator<NumElements_, T_> emulate_simd_basic(Func_&& func_, const single_lane_simd_emulator<NumElements_, T_>& simd_emulator_, std::index_sequence<OutIndices_...> out_indices_)
 		{
 			static_assert(sizeof...(OutIndices_) == NumElements_, "INTERNAL EMUSIMD ERROR: `emulate_simd_basic` called with a number of indices not equal to the number of elements in the output emulated register.");
-			return single_lane_simd_emulator<NumElements_, T_>
-			(
-				func_(retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_))...
-			);
+			if constexpr(std::is_lvalue_reference_v<Func_>)
+			{
+				return single_lane_simd_emulator<NumElements_, T_>
+				(
+					func_(retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_))...
+				);
+			}
+			else
+			{
+				auto& func_ref = EmuCore::TMP::lval_ref_cast<Func_>(std::forward<Func_>(func_));
+				return single_lane_simd_emulator<NumElements_, T_>
+				(
+					func_ref(retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_))...
+				);
+			}
 		}
 
 		template<class Func_, std::size_t NumElements_, EmuConcepts::Arithmetic T_, std::size_t...OutIndices_>
 		constexpr inline single_lane_simd_emulator<NumElements_, T_> emulate_simd_basic
 		(
-			const Func_& func_,
+			Func_&& func_,
 			const single_lane_simd_emulator<NumElements_, T_>& simd_emulator_a_,
 			const single_lane_simd_emulator<NumElements_, T_>& simd_emulator_b_,
 			std::index_sequence<OutIndices_...> out_indices_
 		)
 		{
 			static_assert(sizeof...(OutIndices_) == NumElements_, "INTERNAL EMUSIMD ERROR: `emulate_simd_basic` called with a number of indices not equal to the number of elements in the output emulated register.");
-			return single_lane_simd_emulator<NumElements_, T_>
-			(
-				func_
+			if constexpr(std::is_lvalue_reference_v<Func_>)
+			{
+				return single_lane_simd_emulator<NumElements_, T_>
 				(
-					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_a_),
-					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_b_)
-				)...
-			);
+					func_
+					(
+						retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_a_),
+						retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_b_)
+					)...
+				);
+			}
+			else
+			{
+				auto& func_ref = EmuCore::TMP::lval_ref_cast<Func_>(std::forward<Func_>(func_));
+				return single_lane_simd_emulator<NumElements_, T_>
+				(
+					func_ref
+					(
+						retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_a_),
+						retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_b_)
+					)...
+				);
+			}
 		}
 
 		template<class Func_, std::size_t NumElements_, EmuConcepts::Arithmetic T_, std::size_t...OutIndices_>
 		constexpr inline single_lane_simd_emulator<NumElements_, T_> emulate_simd_basic
 		(
-			const Func_& func_,
+			Func_&& func_,
 			const single_lane_simd_emulator<NumElements_, T_>& simd_emulator_a_,
 			const single_lane_simd_emulator<NumElements_, T_>& simd_emulator_b_,
 			const single_lane_simd_emulator<NumElements_, T_>& simd_emulator_c_,
@@ -833,15 +859,31 @@ namespace EmuSIMD
 		)
 		{
 			static_assert(sizeof...(OutIndices_) == NumElements_, "INTERNAL EMUSIMD ERROR: `emulate_simd_basic` called with a number of indices not equal to the number of elements in the output emulated register.");
-			return single_lane_simd_emulator<NumElements_, T_>
-			(
-				func_
+			if constexpr(std::is_lvalue_reference_v<Func_>)
+			{
+				return single_lane_simd_emulator<NumElements_, T_>
 				(
-					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_a_),
-					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_b_),
-					retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_c_)
-				)...
-			);
+					func_
+					(
+						retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_a_),
+						retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_b_),
+						retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_c_)
+					)...
+				);
+			}
+			else
+			{
+				auto& func_ref = EmuCore::TMP::lval_ref_cast<Func_>(std::forward<Func_>(func_));
+				return single_lane_simd_emulator<NumElements_, T_>
+				(
+					func_ref
+					(
+						retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_a_),
+						retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_b_),
+						retrieve_emulated_single_lane_simd_element<T_, OutIndices_, false>(simd_emulator_c_)
+					)...
+				);
+			}
 		}
 
 		template<class LaneFunc_, std::size_t EmulatedWidth_, class LaneT_>
@@ -1107,6 +1149,82 @@ namespace EmuSIMD
 			[[nodiscard]] constexpr inline decltype(auto) operator()(const T_& a_, const T_& b_, const T_& mask_) const
 			{
 				return EmuCore::ArithmeticHelpers::get_most_significant_bit<bool>(mask_) ? b_ : a_;
+			}
+		};
+
+		template<typename T_, bool AddFirst_, class Adder_, class Subtractor_>
+		struct alternating_add_subtract_func
+		{
+		private:
+			using _counter_type = typename std::conditional
+			<
+				(EmuConcepts::Integer<T_>),
+				T_,
+				EmuCore::TMP::int_of_size_t<sizeof(T_)>
+			>::type;
+
+			[[nodiscard]] static constexpr inline _counter_type _counter_starting_val() noexcept
+			{
+				if constexpr ((EmuConcepts::UnsignedArithmetic<T_>))
+				{
+					return _counter_type(0);
+				}
+				else
+				{
+					if constexpr (AddFirst_)
+					{
+						return _counter_type(1);
+					}
+					else
+					{
+						return _counter_type(-1);
+					}
+				}
+			}
+
+			_counter_type _counter;
+
+		public:
+			constexpr inline alternating_add_subtract_func() : _counter(_counter_starting_val())
+			{
+			}
+
+			[[nodiscard]] constexpr inline decltype(auto) operator()(const T_& a_, const T_& b_)
+			{
+				if constexpr ((EmuConcepts::UnsignedArithmetic<T_>))
+				{
+					if ((_counter ^= 1))
+					{
+						// Even invocation [0, 2, 4, etc...]
+						if constexpr (AddFirst_)
+						{
+							return Subtractor_()(a_, b_);
+						}
+						else
+						{
+							return Adder_()(a_, b_);
+						}
+					}
+					else
+					{
+						// Odd invocation [1, 3, 5, etc...]
+						if constexpr (AddFirst_)
+						{
+							return Adder_()(a_, b_);
+						}
+						else
+						{
+							return Subtractor_()(a_, b_);
+						}
+					}
+				}
+				else
+				{
+					// Counter is used as a +/-1 multiplier here, flip its signedness to multiply `b_` value to switch between add/subtract using just adder
+					// --- This approach avoids any branching unlike the unsigned variant
+					constexpr _counter_type sign_mask = EmuCore::ArithmeticHelpers::set_all_bits_one<_counter_type>() & ~_counter_type(1);
+					return Adder_()(a_, b_ * (_counter ^= sign_mask));
+				}
 			}
 		};
 #pragma endregion

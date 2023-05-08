@@ -361,10 +361,14 @@ int main()
 	{
 		constexpr std::array<std::uint32_t, 16> elems_u32{ 0x80000000, 0x00000000, 0xFFFFFFFF, 0x00000001, 0x0FFFFFFF, 0x4FFFFFFF, 0x81234567, 0xF0000000, 0x00000000, 0x00000000, 0xF0000000, 0x80000000, 0xFFFFFFFF, 0x0000000F, 0x0F0F0F0F, 0xF0F0F0F0 };
 		constexpr auto elems_f32 = std::bit_cast<std::array<float, 16>>(elems_u32);
+		std::uint32_t dump_u32x16[16];
 		float dump_f32x16[16];
 
 
 		{
+			auto some_func = [](auto&& val) { return float(val); };
+			constexpr auto bloob = EmuCore::TMP::RuntimeTupleTable<std::tuple<float, int, float>, decltype(some_func)>();
+
 			std::cout << "### 128-bit ###\n";
 			auto a_reg = EmuSIMD::Funcs::load_f32x4(elems_f32.data());
 			auto a_emu = EmuSIMD::_underlying_impl::load_single_lane_simd_emulator<4, float>(elems_f32.data());
@@ -385,10 +389,10 @@ int main()
 			std::cout << '\n';
 
 			std::cout << "---\n";
-			auto c_reg = EmuSIMD::Funcs::set_f32x4(10.0f, 1.0f, 300.0f, 40.0f);
-			auto d_reg = EmuSIMD::Funcs::set_f32x4(50.0f, 60.0f, 700.0f, 80.0f);
-			auto c_emu = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, float>(40.0f, 300.0f, 1.0f, 10.0f);
-			auto d_emu = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, float>(80.0f, 700.0f, 60.0f, 50.0f);
+			auto c_reg = EmuSIMD::Funcs::set_f32x4(50.0f, 60.0f, 700.0f, 80.0f);
+			auto d_reg = EmuSIMD::Funcs::set_f32x4(10.0f, 1.0f, 300.0f, 40.0f);
+			auto c_emu = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, float>(80.0f, 700.0f, 60.0f, 50.0f);
+			auto d_emu = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, float>(40.0f, 300.0f, 1.0f, 10.0f);
 			EmuSIMD::Funcs::store_f32x4(dump_f32x16, c_reg);
 			PrintIndexable<4>(dump_f32x16);
 			std::cout << " | ";
@@ -440,6 +444,23 @@ int main()
 			std::cout << '\n';
 			EmuSIMD::_underlying_impl::emulate_simd_store(e_emu, dump_f32x16);
 			PrintIndexable<4>(dump_f32x16);
+			std::cout << '\n';
+
+			std::cout << "addsub\n";
+			e_reg = EmuSIMD::Funcs::addsub_f32x4(c_reg, d_reg);
+			e_emu = EmuSIMD::_underlying_impl::emulate_simd_basic(EmuSIMD::_underlying_impl::alternating_add_subtract_func<float, false, EmuCore::do_add<float>, EmuCore::do_subtract<float>>(), c_emu, d_emu, std::make_index_sequence<4>());
+			EmuSIMD::Funcs::store_f32x4(dump_f32x16, e_reg);
+			PrintIndexable<4>(dump_f32x16);
+			std::cout << '\n';
+			EmuSIMD::_underlying_impl::emulate_simd_store(e_emu, dump_f32x16);
+			PrintIndexable<4>(dump_f32x16);
+			std::cout << '\n';
+
+			auto c_emu_u32 = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, std::uint32_t>(80u, 700u, 60u, 50u);
+			auto d_emu_u32 = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, std::uint32_t>(40u, 300u, 1u, 10u);
+			auto e_emu_u32 = EmuSIMD::_underlying_impl::emulate_simd_basic(EmuSIMD::_underlying_impl::alternating_add_subtract_func<std::uint32_t, false, EmuCore::do_add<std::uint32_t>, EmuCore::do_subtract<std::uint32_t>>(), c_emu_u32, d_emu_u32, std::make_index_sequence<4>());
+			EmuSIMD::_underlying_impl::emulate_simd_store(e_emu_u32, dump_u32x16);
+			PrintIndexable<4>(dump_u32x16);
 			std::cout << '\n';
 
 			universal_pause();
