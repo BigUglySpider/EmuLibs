@@ -890,40 +890,52 @@ namespace EmuSIMD
 		template<std::size_t OutElements_, EmuConcepts::Arithmetic OutT_, std::size_t InElements_, EmuConcepts::Arithmetic InT_>
 		[[nodiscard]] constexpr inline single_lane_simd_emulator<OutElements_, OutT_> emulate_simd_cast_same_width(const single_lane_simd_emulator<InElements_, InT_>& in_)
 		{
-			auto out_emulator = single_lane_simd_emulator<OutElements_, OutT_>();
-			memcpy(out_emulator._data.data(), in_._data.data(), sizeof(InT_) * InElements_);
-			return out_emulator;
+			if constexpr (OutElements_ == InElements_ && std::is_same_v<OutT_, InT_>)
+			{
+				// Same type so just return immediately
+				return in_;
+			}
+			else
+			{
+				auto out_emulator = single_lane_simd_emulator<OutElements_, OutT_>();
+				memcpy(out_emulator._data.data(), in_._data.data(), sizeof(InT_) * InElements_);
+				return out_emulator;
+			}
+		}
+
+		template<EmuConcepts::Arithmetic OutLaneT_, std::size_t EmulatedWidth_, EmuConcepts::Arithmetic InLaneT_>
+		[[nodiscard]] constexpr inline dual_lane_simd_emulator<EmulatedWidth_, OutLaneT_> emulate_simd_cast_same_width(const dual_lane_simd_emulator<EmulatedWidth_, InLaneT_>& in_)
+		{
+			if constexpr (std::is_same_v<OutLaneT_, InLaneT_>)
+			{
+				// Same type so just return immediately
+				return in_;
+			}
+			else
+			{
+				return dual_lane_simd_emulator<EmulatedWidth_, OutLaneT_>
+				(
+					EmuSIMD::cast<OutLaneT_>(in_._lane_0),
+					EmuSIMD::cast<OutLaneT_>(in_._lane_1)
+				);
+			}
 		}
 
 		template<class Out_, std::size_t InElements_, EmuConcepts::Arithmetic InT_>
 		[[nodiscard]] constexpr inline Out_ emulate_simd_cast_greater_width(const single_lane_simd_emulator<InElements_, InT_>& in_)
 		{
-			constexpr std::size_t copy_bytes = 128 / 8;
 			if constexpr (is_simd_emulator<Out_>::value)
 			{
 				// 128-bit emulator -> 256-bit or 512-bit emulator
-				// Guaranteed to be emulators all the way up as the lowest-width register is being emulated (due to single_lane_simd_emulator being in use)
-				// --- As such, we know we can safely use `_lane_X` and `_data` syntax
-				Out_ out_emulator = Out_();
-				if constexpr (Out_::emulated_width == 256)
-				{
-					memcpy(out_emulator._lane_0._data.data(), in_._data.data(), copy_bytes);
-					return out_emulator;
-				}
-				else if constexpr(Out_::emulated_width == 512)
-				{
-					memcpy(out_emulator._lane_0._lane_0._data.data(), in_._data.data(), copy_bytes);
-					return out_emulator;
-				}
-				else
-				{
-					static_assert(EmuCore::TMP::get_false<Out_>(), "EmuSIMD: Could not cast an emulated SIMD register to one of a greater width as the emulated width was neither 256- nor 512-bit.");
-				}
+				// --- This will only be used for the lo-lane (and perhaps even only the lo-half of that), so just cast this to lo-lane and default hi-lane
+				return Out_(EmuSIMD::cast<typename Out_::lane_type>(in_));
 			}
 			else
 			{
 				// 128-bit emulator -> 256-bit or 512-bit register
 				// --- Just copy the emulated register's 128-bits to the lo end of the output register and return that
+				// --- This should never really be possible
+				constexpr std::size_t copy_bytes = 128 / 8;
 				Out_ out_register = Out_();
 				memcpy(&out_register, in_._data.data(), copy_bytes);
 				return out_register;
@@ -940,25 +952,14 @@ namespace EmuSIMD
 			if constexpr (is_simd_emulator<Out_>::value)
 			{
 				// 256-bit emulator -> 512-bit emulator
-				Out_ out_emulator = Out_();
-				if constexpr (is_simd_emulator<_lane_type>::value)
-				{
-					// Emulators all the way down, so copy to-and-from the data chunks specifically
-					memcpy(out_emulator._lane_0._lane_0._data.data(), in_._lane_0._data.data(), bytes_per_128_chunk);
-					memcpy(out_emulator._lane_0._lane_1._data.data(), in_._lane_1._data.data(), bytes_per_128_chunk);
-				}
-				else
-				{
-					// 128-bit chunks are actual registers
-					memcpy(&(out_emulator._lane_0._lane_0), &(in_._lane_0), bytes_per_128_chunk);
-					memcpy(&(out_emulator._lane_0._lane_1), &(in_._lane_1), bytes_per_128_chunk);
-				}
-				return out_emulator;
+				// --- Cast input emulator to the lo-lane and default the hi-lane
+				return Out_(EmuSIMD::cast<typename Out_::lane_type>(in_));
 			}
 			else
 			{
 				// 256-bit emulator -> 512-bit register
 				// --- Just copy the emulated register's 256-bits to the lo end of the output register and return that
+				// --- This should never really be possible
 				Out_ out_register = Out_();
 				if constexpr (is_simd_emulator<_lane_type>::value)
 				{
@@ -979,136 +980,78 @@ namespace EmuSIMD
 		template<class Out_, std::size_t EmulatedWidth_, class LaneT_>
 		[[nodiscard]] constexpr inline Out_ emulate_simd_cast_lesser_width(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& in_)
 		{
-			// We will always need lane_0 and will analyse its type on every path, so may as well prepare it here
-			auto& lane_0 = in_._lane_0;
-			using _lane_type = typename std::remove_cvref<decltype(lane_0)>::type;
+			// When becoming a lesser width, we're guaranteed to only need the lo-lane, so just defer to the cast template for that
+			return EmuSIMD::cast<Out_>(in_._lane_0);
+		}
+#pragma endregion
 
-			if constexpr (EmulatedWidth_ == 256)
+#pragma region EMULATED_CONVERSIONS
+		template<std::size_t Index_, std::size_t InvalidBegin_, bool CanMove_, class DefaultT_, class T_>
+		[[nodiscard]] constexpr inline decltype(auto) _retrieve_data_or_default(T_* p_data_)
+		{
+			if constexpr (Index_ < InvalidBegin_)
 			{
-				// Guaranteed casting 256-bit -> 128-bit
-				if constexpr (std::is_same_v<Out_, _lane_type>)
+				if constexpr (CanMove_)
 				{
-					// Output is the same as a lane within the emulator, so just return a copy of the lo lane
-					return Out_(lane_0);
+					return std::move(*(p_data_ + Index_));
 				}
 				else
 				{
-					// Need to copy the bytes to the new type to safely "reinterpret" (due to type aliasing rules)
-					constexpr std::size_t bytes_to_copy = 128 / 8;
-					Out_ cast_result = Out_();
-					if constexpr (is_simd_emulator<Out_>::value)
-					{
-						// Casting to 128-bit emulator
-						memcpy(&cast_result._data.data(), lane_0._data.data(), bytes_to_copy);
-					}
-					else
-					{
-						// Casting to 128-bit register
-						memcpy(&cast_result, lane_0._data.data(), bytes_to_copy);
-					}
-					return cast_result;
+					return *(p_data_ + Index_);
 				}
 			}
 			else
 			{
-				// 512-bit -> either 256-bit or 128-bit, need to test more
-				if constexpr (std::is_same_v<Out_, _lane_type>)
+				return DefaultT_();
+			}
+		}
+
+		template<class Out_, std::size_t OutPerElementWidth_, typename OutT_, EmuConcepts::Arithmetic InT_, std::size_t InSize_, std::size_t...OutIndices_>
+		[[nodiscard]] constexpr inline auto emulate_cvt(const single_lane_simd_emulator<InSize_, InT_>& in_emulator_, std::index_sequence<OutIndices_...> out_indices_)
+			-> typename std::remove_cvref<Out_>::type
+		{
+			return EmuSIMD::setr<typename std::remove_cvref<Out_>::type, OutPerElementWidth_>
+			(
+				retrieve_emulated_single_lane_simd_element<OutT_, OutIndices_, true>(in_emulator_)...
+			);
+		}
+
+		template<class Out_, std::size_t OutPerElementWidth_, bool OutSigned_, typename OutT_, std::size_t InElementCount_, bool InSigned_, typename InT_, class LaneT_, std::size_t EmulatedWidth_, std::size_t...OutIndices_>
+		[[nodiscard]] constexpr inline auto emulate_cvt(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& in_emulator_, std::index_sequence<OutIndices_...> out_indices_)
+			-> typename std::remove_cvref<Out_>::type
+		{
+			if constexpr (std::is_same_v<typename std::remove_cvref<Out_>::type, LaneT_>)
+			{
+				// Guaranteed that we're converting to half-width of this emulator, so just return the lo half directly
+				return in_emulator_._lane_0;
+			}
+			else if constexpr (std::is_same_v<OutT_, InT_>)
+			{
+				// Can just do a simple cast since memory representation is guaranteed to be the same
+				return EmuSIMD::cast<typename std::remove_cvref<Out_>::type>(in_emulator_);
+			}
+			else
+			{
+				constexpr std::size_t output_count = sizeof...(OutIndices_);
+				constexpr std::size_t in_half_count = InElementCount_ / 2;
+				if constexpr (in_half_count >= output_count)
 				{
-					// Output is the same as a lane within the emulator, so just return a copy of the lo lane
-					return Out_(lane_0);
+					// Can perform entire conversion with just the lo-lane, so defer to that
+					constexpr std::size_t per_element_width = EmulatedWidth_ / InElementCount_;
+					return EmuSIMD::convert<typename std::remove_cvref<Out_>::type, per_element_width, InSigned_, OutPerElementWidth_, OutSigned_>
+					(
+						in_emulator_._lane_0
+					);
 				}
 				else
 				{
-					if constexpr (is_simd_emulator<Out_>::value)
-					{
-						// 512-bit -> 256-bit or 128-bit emulator
-						if constexpr (is_single_lane_simd_emulator<Out_>::value)
-						{
-							// 512-bit -> 128-bit emulator
-							// --- As output is an emulator, guaranteed we only have emulators until the end due to the guarnateed hierarchy
-							auto& lane_0_lo = lane_0._lane_0;
-							using _lane_lo_type = typename std::remove_cvref<decltype(lane_0_lo)>::type;
-							if constexpr (std::is_same_v<Out_, _lane_lo_type>)
-							{
-								// Result is same type as the lo 128-bit lane of the lo 256-bit lane, so just return a direct copy
-								return Out_(lane_0_lo);
-							}
-							else
-							{
-								// Need to copy the bytes to the new type to safely "reinterpret" (due to type aliasing rules)
-								constexpr std::size_t bytes_to_copy = 128 / 8;
-								Out_ cast_result = Out_();
-								memcpy(cast_result._data.data(), lane_0_lo._data.data(), bytes_to_copy);
-								return cast_result;
-							}
-						}
-						else
-						{
-							// 512-bit -> 256-bit emulator, copying individual 128-bit lanes
-							// --- Need to determine if a 128-bit lane is emulated in the output
-							constexpr std::size_t bytes_to_copy_per_lane = 128 / 8;
-							using _out_lo_lane_type = typename std::remove_cvref<decltype(std::declval<Out_>()._lane_0)>::type;
-							Out_ cast_result = Out_();
-							if constexpr (is_simd_emulator<_out_lo_lane_type>::value)
-							{
-								// Outputting a 256-bit lane as two 128-bit emulated lanes
-								memcpy(cast_result._lane_0._data.data(), lane_0._lane_0._data.data(), bytes_to_copy_per_lane);
-								memcpy(cast_result._lane_1._data.data(), lane_0._lane_1._data.data(), bytes_to_copy_per_lane);
-							}
-							else
-							{
-								// Outputting a 256-bit lane as two 128-bit register lanes
-								memcpy(&(cast_result._lane_0), &(lane_0._lane_0), bytes_to_copy_per_lane);
-								memcpy(&(cast_result._lane_1), &(lane_0._lane_1), bytes_to_copy_per_lane);
-							}
-							return cast_result;
-						}
-					}
-					else
-					{
-						// 512-bit -> 256-bit or 128-bit register
-						constexpr std::size_t min_bytes_for_256bit = 256 / 8;
-						if constexpr (sizeof(Out_) < min_bytes_for_256bit)
-						{
-							// 512-bit -> 128-bit register
-							if constexpr (is_simd_emulator<_lane_type>::value)
-							{
-								// lane_0 is an emulated 256-bit register, so we're outputting its lo lane
-								auto& lane_0_lo = lane_0._lane_0;
-								using _lane_lo_type = typename std::remove_cvref<decltype(lane_0_lo)>::type;
-								if constexpr (std::is_same_v<_lane_lo_type, Out_>)
-								{
-									// lane_0's lo lane is the same as the output register, so just output a copy of that
-									return Out_(lane_0_lo);
-								}
-								else
-								{
-									// lane_0's lo lane is a different type to the output
-									constexpr std::size_t bytes_to_copy = 128 / 8;
-									Out_ cast_result = Out_();
-									memcpy(&cast_result, &lane_0_lo, bytes_to_copy);
-									return cast_result;
-								}
-							}
-							else
-							{
-								// lane_0 is a 256-bit register so we can't work with emulated lanes
-								// --- This can be optimised but not presently due to EmuSIMD structure, unless we want to make this function a *lot* larger
-								constexpr std::size_t bytes_to_copy = 128 / 8;
-								Out_ cast_result = Out_();
-								memcpy(&cast_result, lane_0, bytes_to_copy);
-								return cast_result;
-							}
-						}
-						else
-						{
-							// 512-bit -> 256-bit register
-							constexpr std::size_t bytes_to_copy = 256 / 8;
-							Out_ cast_result = Out_();
-							memcpy(&cast_result, &lane_0, bytes_to_copy);
-							return cast_result;
-						}
-					}
+					// Outputting 128-bit emulator
+					InT_ data_dump[InElementCount_];
+					emulate_simd_store(in_emulator_, data_dump);
+					return EmuSIMD::setr<typename std::remove_cvref<Out_>::type, OutPerElementWidth_>
+					(
+						_retrieve_data_or_default<OutIndices_, InElementCount_, true, OutT_>(data_dump)...
+					);
 				}
 			}
 		}

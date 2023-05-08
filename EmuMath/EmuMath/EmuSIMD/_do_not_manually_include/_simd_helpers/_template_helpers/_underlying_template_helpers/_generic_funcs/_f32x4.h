@@ -449,17 +449,21 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_f32x8_f32x4(f32x8_arg a_)
 	{
-		return _mm256_castps256_ps128(a_);
+		return cast_f32x8_f32x4(a_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_f32x16_f32x4(f32x16_arg a_)
 	{
-		return _mm512_castps512_ps128(a_);
+		return cast_f32x16_f32x4(a_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_f64x2_f32x4(f64x2_arg a_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtpd_ps(a_);
+#else
+		// TODO
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_f64x4_f32x4(f64x4_arg a_)
