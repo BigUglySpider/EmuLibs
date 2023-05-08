@@ -51,10 +51,10 @@ namespace EmuSIMD::_underlying_simd_helpers
 	struct _make_movemask<EmuSIMD::f64x2, I0_, I1_>
 	{
 		static constexpr std::uint8_t value = _construct_movemask_value<std::uint8_t>
-			(
-				EmuCore::TMP::bool_sequence<I0_, I1_>(),
-				std::make_index_sequence<2>()
-			);
+		(
+			EmuCore::TMP::bool_sequence<I0_, I1_>(),
+			std::make_index_sequence<2>()
+		);
 	};
 
 	template<bool I0_, bool I1_, bool I2_, bool I3_>

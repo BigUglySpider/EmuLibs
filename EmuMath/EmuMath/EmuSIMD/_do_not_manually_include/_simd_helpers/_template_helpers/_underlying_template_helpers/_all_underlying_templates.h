@@ -16,5 +16,6 @@
 #include "_simd_helpers_underlying_shuffle.h"
 #include "_simd_helpers_underlying_stream.h"
 #include "_simd_helpers_underlying_tmp.h"
+#include "_underlying_specialisations/_simd_helpers_all_underlying_specialisations.h"
 
 #endif

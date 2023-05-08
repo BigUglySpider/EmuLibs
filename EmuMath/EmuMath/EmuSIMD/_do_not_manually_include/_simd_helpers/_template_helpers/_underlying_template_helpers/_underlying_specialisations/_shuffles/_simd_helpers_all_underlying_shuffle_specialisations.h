@@ -1,0 +1,6 @@
+#ifndef EMU_SIMD_HELPERS_ALL_UNDERLYING_SHUFFLE_SPECIALISATIONS_H_INC_
+#define EMU_SIMD_HELPERS_ALL_UNDERLYING_SHUFFLE_SPECIALISATIONS_H_INC_ 1
+
+#include "_simd_helpers_underlying_128_shuffle_specialisations.h"
+
+#endif

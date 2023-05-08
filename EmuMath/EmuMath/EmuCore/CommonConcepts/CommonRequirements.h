@@ -27,6 +27,19 @@ namespace EmuCore::Concepts
 		std::is_pointer_v<T_> &&
 		!std::is_const_v<typename std::remove_pointer<T_>::type>
 	);
+
+	/// <summary>
+	/// <para> Simple concept to constrain a pair of types to be of a mutual type but not necessarily of the same cvref qualification. </para>
+	/// </summary>
+	template<class T_, class Target_>
+	concept UnqualifiedMatch =
+	(
+		std::is_same_v
+		<
+			typename std::remove_cvref<T_>::type,
+			typename std::remove_cvref<Target_>::type
+		>
+	);
 }
 
 namespace EmuConcepts

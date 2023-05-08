@@ -6,15 +6,29 @@
 
 namespace EmuSIMD
 {
-	template<std::size_t...Indices_, class Register_>
-	[[nodiscard]] inline Register_ shuffle(Register_ ab_)
+	template<std::size_t...Indices_, EmuConcepts::KnownSIMD Register_>
+	[[nodiscard]] inline auto shuffle(Register_&& ab_)
+		-> typename std::remove_cvref<Register_>::type
 	{
-		return _underlying_simd_helpers::_execute_shuffle<Indices_...>(ab_);
+		using permuter = _underlying_simd_helpers::_permuter<typename std::remove_cvref<Register_>::type, Indices_...>;
+		return permuter::execute(std::forward<Register_>(ab_));
+
 	}
-	template<std::size_t...Indices_, class Register_>
-	[[nodiscard]] inline Register_ shuffle(Register_ a_, Register_ b_)
+	template<std::size_t...Indices_, EmuConcepts::KnownSIMD Register_>
+	[[nodiscard]] inline auto permute(Register_&& ab_)
+		-> typename std::remove_cvref<Register_>::type
 	{
-		return _underlying_simd_helpers::_execute_shuffle<Indices_...>(a_, b_);
+		using permuter = _underlying_simd_helpers::_permuter<typename std::remove_cvref<Register_>::type, Indices_...>;
+		return permuter::execute(std::forward<Register_>(ab_));
+
+	}
+
+	template<std::size_t...Indices_, EmuConcepts::KnownSIMD RegisterA_, EmuConcepts::UnqualifiedMatch<RegisterA_> RegisterB_>
+	[[nodiscard]] inline auto shuffle(RegisterA_&& a_, RegisterB_&& b_)
+		-> typename std::remove_cvref<RegisterA_>::type
+	{
+		using shuffler = _underlying_simd_helpers::_shuffler<typename std::remove_cvref<RegisterA_>::type, typename std::remove_cvref<RegisterB_>::type, Indices_...>;
+		return shuffler::execute(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
 	}
 
 #pragma region FULL_WIDTH_SHUFFLES

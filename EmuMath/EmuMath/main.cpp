@@ -359,6 +359,16 @@ constexpr inline decltype(auto) setr_test_helper(Func_&& func_, std::index_seque
 int main()
 {
 	{
+		EmuSIMD::f32x4 a = EmuSIMD::Funcs::setr_f32x4(1, 2, 3, 4);
+		EmuSIMD::f32x4 b = EmuSIMD::Funcs::setr_f32x4(5, 6, 7, 8);
+		EmuSIMD::f32x4 c = EmuSIMD::shuffle<2, 3, 2, 3>(a, b);
+
+		EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, c) << '\n';
+
+		universal_pause();
+	}
+
+	{
 		std::uint8_t flags = ((1 << 3) | (0 << 2) | (1 << 1) | (0 << 0));
 		using mask_gen = EmuSIMD::index_mask<EmuSIMD::f32x4, 1, 0, 1, 0>;
 		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::setmasked_f32x4(flags)) << '\n';
