@@ -1348,29 +1348,33 @@ namespace EmuMath
 		/// <param name="epsilon_">Optional epsilon value to use for floating-point near-equal comparisons. Will default to a suitable epsilon for calculations if omitted.</param>
 		/// <returns>3D EmuMath Vector of Euler angles X, Y, Z represented by this Quaternion.</returns>
 		template<bool OutRads_, typename OutT_ = preferred_floating_point, typename Epsilon_>
+		requires(EmuMath::Helpers::quaternion_can_convert_to_euler<OutRads_, OutT_, T_, Epsilon_, false>())
 		[[nodiscard]] constexpr inline auto ToEuler(Epsilon_&& epsilon_) const
-			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_convert_to_euler<OutRads_, OutT_, T_, Epsilon_, false>(), EmuMath::Vector<3, OutT_>>
+			-> EmuMath::Vector<3, OutT_>
 		{
 			return EmuMath::Helpers::quaternion_to_euler<OutRads_, OutT_>(*this, std::forward<Epsilon_>(epsilon_));
 		}
 
 		template<bool OutRads_, typename OutT_ = preferred_floating_point>
+		requires(EmuMath::Helpers::quaternion_can_convert_to_euler<OutRads_, OutT_, T_, false>())
 		[[nodiscard]] constexpr inline auto ToEuler() const
-			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_convert_to_euler<OutRads_, OutT_, T_, false>(), EmuMath::Vector<3, OutT_>>
+			-> EmuMath::Vector<3, OutT_>
 		{
 			return EmuMath::Helpers::quaternion_to_euler<OutRads_, OutT_>(*this);
 		}
 
 		template<typename OutT_ = preferred_floating_point, typename Epsilon_>
+		requires(EmuMath::Helpers::quaternion_can_convert_to_euler<true, OutT_, T_, Epsilon_, false>())
 		[[nodiscard]] constexpr inline auto ToEuler(Epsilon_&& epsilon_) const
-			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_convert_to_euler<true, OutT_, T_, Epsilon_, false>(), EmuMath::Vector<3, OutT_>>
+			-> EmuMath::Vector<3, OutT_>
 		{
 			return EmuMath::Helpers::quaternion_to_euler<true, OutT_>(*this, std::forward<Epsilon_>(epsilon_));
 		}
 
 		template<typename OutT_ = preferred_floating_point>
+		requires(EmuMath::Helpers::quaternion_can_convert_to_euler<true, OutT_, T_, false>())
 		[[nodiscard]] constexpr inline auto ToEuler() const
-			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_convert_to_euler<true, OutT_, T_, false>(), EmuMath::Vector<3, OutT_>>
+			-> EmuMath::Vector<3, OutT_>
 		{
 			return EmuMath::Helpers::quaternion_to_euler<true, OutT_>(*this);
 		}
@@ -1391,29 +1395,33 @@ namespace EmuMath
 		/// <param name="epsilon_">Optional epsilon value to use for floating-point near-equal comparisons. Will default to a suitable epsilon for calculations if omitted.</param>
 		/// <returns>3D EmuMath Vector of Euler angles X, Y, Z represented by this Quaternion.</returns>
 		template<bool OutRads_, typename OutT_ = preferred_floating_point, typename Epsilon_>
+		requires(EmuMath::Helpers::quaternion_can_convert_to_euler_fused<OutRads_, OutT_, T_, Epsilon_, false>())
 		[[nodiscard]] constexpr inline auto ToEulerFused(Epsilon_&& epsilon_) const
-			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_convert_to_euler_fused<OutRads_, OutT_, T_, Epsilon_, false>(), EmuMath::Vector<3, OutT_>>
+			-> EmuMath::Vector<3, OutT_>
 		{
 			return EmuMath::Helpers::quaternion_to_euler_fused<OutRads_, OutT_>(*this, std::forward<Epsilon_>(epsilon_));
 		}
 
 		template<bool OutRads_, typename OutT_ = preferred_floating_point>
+		requires(EmuMath::Helpers::quaternion_can_convert_to_euler_fused<OutRads_, OutT_, T_, false>())
 		[[nodiscard]] constexpr inline auto ToEulerFused() const
-			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_convert_to_euler_fused<OutRads_, OutT_, T_, false>(), EmuMath::Vector<3, OutT_>>
+			-> EmuMath::Vector<3, OutT_>
 		{
 			return EmuMath::Helpers::quaternion_to_euler_fused<OutRads_, OutT_>(*this);
 		}
 
 		template<typename OutT_ = preferred_floating_point, typename Epsilon_>
+		requires(EmuMath::Helpers::quaternion_can_convert_to_euler_fused<true, OutT_, T_, Epsilon_, false>())
 		[[nodiscard]] constexpr inline auto ToEulerFused(Epsilon_&& epsilon_) const
-			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_convert_to_euler_fused<true, OutT_, T_, Epsilon_, false>(), EmuMath::Vector<3, OutT_>>
+			-> EmuMath::Vector<3, OutT_>
 		{
 			return EmuMath::Helpers::quaternion_to_euler_fused<true, OutT_>(*this, std::forward<Epsilon_>(epsilon_));
 		}
 
 		template<typename OutT_ = preferred_floating_point>
+		requires(EmuMath::Helpers::quaternion_can_convert_to_euler_fused<true, OutT_, T_, false>())
 		[[nodiscard]] constexpr inline auto ToEulerFused() const
-			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_convert_to_euler_fused<true, OutT_, T_, false>(), EmuMath::Vector<3, OutT_>>
+			-> EmuMath::Vector<3, OutT_>
 		{
 			return EmuMath::Helpers::quaternion_to_euler_fused<true, OutT_>(*this);
 		}
@@ -1431,15 +1439,17 @@ namespace EmuMath
 		/// <param name="epsilon_">Optional epsilon value to use for floating-point near-equal comparisons. Will default to a suitable epsilon for calculations if omitted.</param>
 		/// <returns>3D EmuMath Vector of Euler angles X, Y, Z represented by this Quaternion.</returns>
 		template<bool OutRads_, typename OutT_ = preferred_floating_point, typename Epsilon_>
+		requires(EmuMath::Helpers::quaternion_can_convert_to_euler_constexpr<OutRads_, OutT_, T_, Epsilon_, false>())
 		[[nodiscard]] constexpr inline auto ToEulerConstexpr(Epsilon_&& epsilon_) const
-			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_convert_to_euler_constexpr<OutRads_, OutT_, T_, Epsilon_, false>(), EmuMath::Vector<3, OutT_>>
+			-> EmuMath::Vector<3, OutT_>
 		{
 			return EmuMath::Helpers::quaternion_to_euler_constexpr<OutRads_, OutT_>(*this, std::forward<Epsilon_>(epsilon_));
 		}
 
 		template<bool OutRads_, typename OutT_ = preferred_floating_point>
+		requires(EmuMath::Helpers::quaternion_can_convert_to_euler_constexpr<OutRads_, OutT_, T_, false>())
 		[[nodiscard]] constexpr inline auto ToEulerConstexpr() const
-			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_convert_to_euler_constexpr<OutRads_, OutT_, T_, false>(), EmuMath::Vector<3, OutT_>>
+			-> EmuMath::Vector<3, OutT_>
 		{
 			return EmuMath::Helpers::quaternion_to_euler_constexpr<OutRads_, OutT_>(*this);
 		}
@@ -1452,8 +1462,9 @@ namespace EmuMath
 		}
 
 		template<typename OutT_ = preferred_floating_point>
+		requires(EmuMath::Helpers::quaternion_can_convert_to_euler_constexpr<true, OutT_, T_, false>())
 		[[nodiscard]] constexpr inline auto ToEulerConstexpr() const
-			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_convert_to_euler_constexpr<true, OutT_, T_, false>(), EmuMath::Vector<3, OutT_>>
+			-> EmuMath::Vector<3, OutT_>
 		{
 			return EmuMath::Helpers::quaternion_to_euler_constexpr<true, OutT_>(*this);
 		}
