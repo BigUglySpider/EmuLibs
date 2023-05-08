@@ -1099,6 +1099,17 @@ namespace EmuSIMD
 			}
 		}
 #pragma endregion
+
+#pragma region FUNCTORS
+		template<typename T_>
+		struct blendv_emulator_func
+		{
+			[[nodiscard]] constexpr inline decltype(auto) operator()(const T_& a_, const T_& b_, const T_& mask_) const
+			{
+				return EmuCore::ArithmeticHelpers::get_most_significant_bit<bool>(mask_) ? b_ : a_;
+			}
+		};
+#pragma endregion
 	}
 
 #pragma region REGISTER_ALIASES

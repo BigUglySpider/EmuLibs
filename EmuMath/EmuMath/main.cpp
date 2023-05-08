@@ -383,6 +383,19 @@ int main()
 			EmuSIMD::_underlying_impl::emulate_simd_store(b_emu, dump_f32x16);
 			PrintIndexable<4>(dump_f32x16);
 			std::cout << '\n';
+
+			auto c_reg = EmuSIMD::Funcs::set1_f32x4(10.0f);
+			auto d_reg = EmuSIMD::Funcs::set1_f32x4(20.0f);
+			auto c_emu = EmuSIMD::_underlying_impl::set1_single_lane_simd_emulator<4, float>(10.0f);
+			auto d_emu = EmuSIMD::_underlying_impl::set1_single_lane_simd_emulator<4, float>(20.0f);
+			auto e_reg = EmuSIMD::Funcs::blendv_f32x4(c_reg, d_reg, a_reg);
+			auto e_emu = EmuSIMD::_underlying_impl::emulate_simd_basic(EmuSIMD::_underlying_impl::blendv_emulator_func<float>(), c_emu, d_emu, a_emu, std::make_index_sequence<4>());
+			EmuSIMD::Funcs::store_f32x4(dump_f32x16, e_reg);
+			PrintIndexable<4>(dump_f32x16);
+			std::cout << '\n';
+			EmuSIMD::_underlying_impl::emulate_simd_store(e_emu, dump_f32x16);
+			PrintIndexable<4>(dump_f32x16);
+			std::cout << '\n';
 		}
 
 		{

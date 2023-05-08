@@ -760,7 +760,13 @@ namespace EmuSIMD::Funcs
 #pragma region BLENDS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 blendv_f32x4(EmuSIMD::f32x4_arg a_, EmuSIMD::f32x4_arg b_, EmuSIMD::f32x4_arg shuffle_mask_vec_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_blendv_ps(a_, b_, shuffle_mask_vec_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(_underlying_impl::blendv_emulator_func<float>(), a_, b_, shuffle_mask_vec_, index_sequence());
+#endif
 	}
 #pragma endregion
 
