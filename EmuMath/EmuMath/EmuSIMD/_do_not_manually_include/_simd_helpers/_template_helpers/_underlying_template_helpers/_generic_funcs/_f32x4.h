@@ -462,138 +462,242 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtpd_ps(a_);
 #else
-		// TODO
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
 #endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_f64x4_f32x4(f64x4_arg a_)
 	{
+#if EMU_SIMD_USE_256_REGISTERS
 		return _mm256_cvtpd_ps(a_);
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 4, true, double>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_f64x8_f32x4(f64x8_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm256_cvtpd_ps(_mm512_castpd512_pd256(a_));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 8, true, double>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_i8x16_f32x4(i8x16_arg a_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtepi32_ps(_mm_cvtepi8_epi32(a_));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_i16x8_f32x4(i16x8_arg a_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtepi32_ps(_mm_cvtepi16_epi32(a_));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_i32x4_f32x4(i32x4_arg a_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtepi32_ps(a_);
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_i64x2_f32x4(i64x2_arg a_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtepi64_ps(a_);
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_i8x32_f32x4(i8x32_arg a_)
 	{
+#if EMU_SIMD_USE_256_REGISTERS
 		return _mm_cvtepi32_ps(_mm_cvtepi8_epi32(_mm256_castsi256_si128(a_)));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 32, true, std::int8_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_i16x16_f32x4(i16x16_arg a_)
 	{
+#if EMU_SIMD_USE_256_REGISTERS
 		return _mm_cvtepi32_ps(_mm_cvtepi16_epi32(_mm256_castsi256_si128(a_)));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 16, true, std::int16_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_i32x8_f32x4(i32x8_arg a_)
 	{
+#if EMU_SIMD_USE_256_REGISTERS
 		return _mm_cvtepi32_ps(_mm256_castsi256_si128(a_));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 8, true, std::int32_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_i64x4_f32x4(i64x4_arg a_)
 	{
+#if EMU_SIMD_USE_256_REGISTERS
 		return _mm256_cvtepi64_ps(a_);
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 4, true, std::int64_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_i8x64_f32x4(i8x64_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm_cvtepi32_ps(_mm_cvtepi8_epi32(_mm512_castsi512_si128(a_)));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 64, true, std::int8_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_i16x32_f32x4(i16x32_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm_cvtepi32_ps(_mm_cvtepi16_epi32(_mm512_castsi512_si128(a_)));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 32, true, std::int16_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_i32x16_f32x4(i32x16_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm_cvtepi32_ps(_mm512_castsi512_si128(a_));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 16, true, std::int32_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_i64x8_f32x4(i64x8_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm256_cvtepi64_ps(_mm512_castsi512_si256(a_));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 8, true, std::int64_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_u8x16_f32x4(u8x16_arg a_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtepi32_ps(_mm_cvtepu8_epi32(a_));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_u16x8_f32x4(u16x8_arg a_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtepi32_ps(_mm_cvtepu16_epi32(a_));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_u32x4_f32x4(u32x4_arg a_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtepu32_ps(a_);
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_u64x2_f32x4(u64x2_arg a_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtepu64_ps(a_);
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_u8x32_f32x4(u8x32_arg a_)
 	{
+#if EMU_SIMD_USE_256_REGISTERS
 		return _mm_cvtepi32_ps(_mm_cvtepu8_epi32(_mm256_castsi256_si128(a_)));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 32, false, std::uint8_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_u16x16_f32x4(u16x16_arg a_)
 	{
+#if EMU_SIMD_USE_256_REGISTERS
 		return _mm_cvtepi32_ps(_mm_cvtepu16_epi32(_mm256_castsi256_si128(a_)));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 16, false, std::uint16_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_u32x8_f32x4(u32x8_arg a_)
 	{
+#if EMU_SIMD_USE_256_REGISTERS
 		return _mm_cvtepu32_ps(_mm256_castsi256_si128(a_));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 8, false, std::uint32_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_u64x4_f32x4(u64x4_arg a_)
 	{
+#if EMU_SIMD_USE_256_REGISTERS
 		return _mm256_cvtepu64_ps(a_);
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 4, false, std::uint64_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_u8x64_f32x4(u8x64_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm_cvtepi32_ps(_mm_cvtepu8_epi32(_mm512_castsi512_si128(a_)));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 64, false, std::uint8_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_u16x32_f32x4(u16x32_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm_cvtepi32_ps(_mm_cvtepu16_epi32(_mm512_castsi512_si128(a_)));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 32, false, std::uint16_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_u32x16_f32x4(u32x16_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm_cvtepu32_ps(_mm512_castsi512_si128(a_));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 16, false, std::uint32_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cvt_u64x8_f32x4(u64x8_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm256_cvtepu64_ps(_mm512_castsi512_si256(a_));
+#else
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 8, false, std::uint64_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 #pragma endregion
 

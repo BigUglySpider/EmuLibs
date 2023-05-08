@@ -344,7 +344,7 @@ namespace EmuSIMD
 			{
 				if constexpr (AllowTheoreticalIndices_)
 				{
-					return typename std::remove_cvref<OutT_>::type(0);
+					return typename std::remove_cvref<OutT_>::type();
 				}
 				else
 				{
@@ -1006,7 +1006,7 @@ namespace EmuSIMD
 			}
 		}
 
-		template<class Out_, std::size_t OutPerElementWidth_, typename OutT_, EmuConcepts::Arithmetic InT_, std::size_t InSize_, std::size_t...OutIndices_>
+		template<class Out_, typename OutT_, std::size_t OutPerElementWidth_, EmuConcepts::Arithmetic InT_, std::size_t InSize_, std::size_t...OutIndices_>
 		[[nodiscard]] constexpr inline auto emulate_cvt(const single_lane_simd_emulator<InSize_, InT_>& in_emulator_, std::index_sequence<OutIndices_...> out_indices_)
 			-> typename std::remove_cvref<Out_>::type
 		{
@@ -1016,7 +1016,7 @@ namespace EmuSIMD
 			);
 		}
 
-		template<class Out_, std::size_t OutPerElementWidth_, bool OutSigned_, typename OutT_, std::size_t InElementCount_, bool InSigned_, typename InT_, class LaneT_, std::size_t EmulatedWidth_, std::size_t...OutIndices_>
+		template<class Out_, typename OutT_, std::size_t OutPerElementWidth_, bool OutSigned_, std::size_t InElementCount_, bool InSigned_, typename InT_, class LaneT_, std::size_t EmulatedWidth_, std::size_t...OutIndices_>
 		[[nodiscard]] constexpr inline auto emulate_cvt(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& in_emulator_, std::index_sequence<OutIndices_...> out_indices_)
 			-> typename std::remove_cvref<Out_>::type
 		{
