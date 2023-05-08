@@ -1083,7 +1083,7 @@ namespace EmuSIMD
 	using f32x8 = _underlying_impl::dual_lane_simd_emulator<256, f32x4>;
 #endif
 
-#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS
 	/// <summary> Alias to a 512-bit register of 16 32-bit floating-point values. </summary>
 	using f32x16 = __m512;
 #else
@@ -1107,7 +1107,7 @@ namespace EmuSIMD
 	using f64x4 = _underlying_impl::dual_lane_simd_emulator<256, f64x2>;
 #endif
 
-#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS
 	/// <summary> Alias to a 512-bit register of 8 64-bit floating-point values. </summary>
 	using f64x8 = __m512d;
 #else
@@ -1131,7 +1131,7 @@ namespace EmuSIMD
 	using i8x32 = _underlying_impl::dual_lane_simd_emulator<256, i8x16>;
 #endif
 
-#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS
 	/// <summary> Alias to a 512-bit register of 64 8-bit signed integer values. This may be a generic 512-bit integral register, such as if using x86 intrinsics. </summary>
 	using i8x64 = __m512i;
 #else
@@ -1155,7 +1155,7 @@ namespace EmuSIMD
 	using i16x16 = _underlying_impl::dual_lane_simd_emulator<256, i16x8>;
 #endif
 
-#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS
 	/// <summary> Alias to a 512-bit register of 32 16-bit signed integer values. This may be a generic 512-bit integral register, such as if using x86 intrinsics. </summary>
 	using i16x32 = __m512i;
 #else
@@ -1179,7 +1179,7 @@ namespace EmuSIMD
 	using i32x8 = _underlying_impl::dual_lane_simd_emulator<256, i32x4>;
 #endif
 
-#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS
 	/// <summary> Alias to a 512-bit register of 16 32-bit signed integer values. This may be a generic 512-bit integral register, such as if using x86 intrinsics. </summary>
 	using i32x16 = __m512i;
 #else
@@ -1203,7 +1203,7 @@ namespace EmuSIMD
 	using i64x4 = _underlying_impl::dual_lane_simd_emulator<256, i64x2>;
 #endif
 
-#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS
 	/// <summary> Alias to a 512-bit register of 8 64-bit signed integer values. This may be a generic 512-bit integral register, such as if using x86 intrinsics. </summary>
 	using i64x8 = __m512i;
 #else
@@ -1227,7 +1227,7 @@ namespace EmuSIMD
 	using u8x32 = _underlying_impl::dual_lane_simd_emulator<256, u8x16>;
 #endif
 
-#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS
 	/// <summary> Alias to a 512-bit register of 64 8-bit unsigned integer values. This may be a generic 512-bit integral register, such as if using x86 intrinsics. </summary>
 	using u8x64 = __m512i;
 #else
@@ -1251,7 +1251,7 @@ namespace EmuSIMD
 	using u16x16 = _underlying_impl::dual_lane_simd_emulator<256, u16x8>;
 #endif
 
-#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS
 	/// <summary> Alias to a 512-bit register of 32 16-bit unsigned integer values. This may be a generic 512-bit integral register, such as if using x86 intrinsics. </summary>
 	using u16x32 = __m512i;
 #else
@@ -1275,7 +1275,7 @@ namespace EmuSIMD
 	using u32x8 = _underlying_impl::dual_lane_simd_emulator<256, u32x4>;
 #endif
 
-#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS
 	/// <summary> Alias to a 512-bit register of 16 32-bit unsigned integer values. This may be a generic 512-bit integral register, such as if using x86 intrinsics. </summary>
 	using u32x16 = __m512i;
 #else
@@ -1299,7 +1299,7 @@ namespace EmuSIMD
 	using u64x4 = _underlying_impl::dual_lane_simd_emulator<256, u64x2>;
 #endif
 
-#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE (well, remove the !)
+#if EMU_SIMD_USE_512_REGISTERS
 	/// <summary> Alias to a 512-bit register of 8 64-bit unsigned integer values. This may be a generic 512-bit integral register, such as if using x86 intrinsics. </summary>
 	using u64x8 = __m512i;
 #else
@@ -1324,7 +1324,7 @@ namespace EmuSIMD
 #endif
 
 	/// <summary> Alias to a generic 512-bit integral register, which is per-element-width-and-signedness-agnostic. If there is no generic register, this will be `void`. </summary>
-#if EMU_SIMD_USE_512_REGISTERS // TODO: TEMPORARY, REMOVE WHEN REWORK FOR EMULATION IS DONE
+#if EMU_SIMD_USE_512_REGISTERS
 	using i512_generic = __m512i;
 #else
 	/// <summary> Alias to a generic 512-bit integral register, which is per-element-width-and-signedness-agnostic. If there is no generic register, this will be `void`. </summary>

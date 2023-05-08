@@ -2708,11 +2708,6 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	}
 
-	// #########################################################################
-	// # TODO: ALL REMAINING CASTS: UNSIGNED INTS                              #
-	// # TODO: ALSO CALLING THESE FUNCTIONS FROM _simd_helpers_template_cast.h #
-	// #########################################################################
-
 	template<class ToRegister_>
 	[[nodiscard]] inline auto _cast_u8x16(EmuSIMD::u8x16_arg from_)
 		-> typename std::remove_cvref<ToRegister_>::type
