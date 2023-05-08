@@ -156,12 +156,20 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC float get_first_f32x4(f32x4_arg a_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtss_f32(a_);
+#else
+		return _underlying_impl::retrieve_emulated_single_lane_simd_element<float, 0, false>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC std::uint8_t movemask_f32x4(f32x4_arg a_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return static_cast<std::uint8_t>(_mm_movemask_ps(a_));
+#else
+		return _underlying_impl::emulate_simd_movemask<std::uint8_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 #pragma endregion
 

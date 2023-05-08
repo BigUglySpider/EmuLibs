@@ -7,6 +7,212 @@
 
 namespace EmuSIMD::_underlying_simd_helpers
 {
+	template<std::size_t PerElementWidthIfGenericInt_, EmuConcepts::KnownSIMD Register_>
+	[[nodiscard]] inline decltype(auto) _movemask(Register_&& register_)
+	{
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
+			{
+				return EmuSIMD::Funcs::movemask_f32x4(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
+			{
+				return EmuSIMD::Funcs::movemask_f64x2(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
+			{
+				return EmuSIMD::Funcs::movemask_f32x8(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
+			{
+				return EmuSIMD::Funcs::movemask_f64x4(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
+			{
+				return EmuSIMD::Funcs::movemask_f32x16(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
+			{
+				return EmuSIMD::Funcs::movemask_f64x8(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
+			{
+				if constexpr (PerElementWidthIfGenericInt_ == 8)
+				{
+					return EmuSIMD::Funcs::movemask_i8x16(std::forward<Register_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 16)
+				{
+					return EmuSIMD::Funcs::movemask_i16x8(std::forward<Register_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 32)
+				{
+					return EmuSIMD::Funcs::movemask_i32x4(std::forward<Register_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 64)
+				{
+					return EmuSIMD::Funcs::movemask_i64x2(std::forward<Register_>(register_));
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to retrieve a movemask from a generic 128-bit integral SIMD register via an EmuSIMD helper, but the provided per-element width is invalid.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+			{
+				if constexpr (PerElementWidthIfGenericInt_ == 8)
+				{
+					return EmuSIMD::Funcs::movemask_i8x32(std::forward<Register_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 16)
+				{
+					return EmuSIMD::Funcs::movemask_i16x16(std::forward<Register_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 32)
+				{
+					return EmuSIMD::Funcs::movemask_i32x8(std::forward<Register_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 64)
+				{
+					return EmuSIMD::Funcs::movemask_i64x4(std::forward<Register_>(register_));
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to retrieve a movemask from a generic 256-bit integral SIMD register via an EmuSIMD helper, but the provided per-element width is invalid.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
+			{
+				if constexpr (PerElementWidthIfGenericInt_ == 8)
+				{
+					return EmuSIMD::Funcs::movemask_i8x64(std::forward<Register_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 16)
+				{
+					return EmuSIMD::Funcs::movemask_i16x32(std::forward<Register_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 32)
+				{
+					return EmuSIMD::Funcs::movemask_i32x16(std::forward<Register_>(register_));
+				}
+				else if constexpr (PerElementWidthIfGenericInt_ == 64)
+				{
+					return EmuSIMD::Funcs::movemask_i64x8(std::forward<Register_>(register_));
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to retrieve a movemask from a generic 512-bit integral SIMD register via an EmuSIMD helper, but the provided per-element width is invalid.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+			{
+				return EmuSIMD::Funcs::movemask_i8x16(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+			{
+				return EmuSIMD::Funcs::movemask_i8x32(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+			{
+				return EmuSIMD::Funcs::movemask_i8x64(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+			{
+				return EmuSIMD::Funcs::movemask_i16x8(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+			{
+				return EmuSIMD::Funcs::movemask_i16x16(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+			{
+				return EmuSIMD::Funcs::movemask_i16x32(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+			{
+				return EmuSIMD::Funcs::movemask_i32x4(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+			{
+				return EmuSIMD::Funcs::movemask_i32x8(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+			{
+				return EmuSIMD::Funcs::movemask_i32x16(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+			{
+				return EmuSIMD::Funcs::movemask_i64x2(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+			{
+				return EmuSIMD::Funcs::movemask_i64x4(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+			{
+				return EmuSIMD::Funcs::movemask_i64x8(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+			{
+				return EmuSIMD::Funcs::movemask_u8x16(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+			{
+				return EmuSIMD::Funcs::movemask_u8x32(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+			{
+				return EmuSIMD::Funcs::movemask_u8x64(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+			{
+				return EmuSIMD::Funcs::movemask_u16x8(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+			{
+				return EmuSIMD::Funcs::movemask_u16x16(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+			{
+				return EmuSIMD::Funcs::movemask_u16x32(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+			{
+				return EmuSIMD::Funcs::movemask_u32x4(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+			{
+				return EmuSIMD::Funcs::movemask_u32x8(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+			{
+				return EmuSIMD::Funcs::movemask_u32x16(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+			{
+				return EmuSIMD::Funcs::movemask_u64x2(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+			{
+				return EmuSIMD::Funcs::movemask_u64x4(std::forward<Register_>(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+			{
+				return EmuSIMD::Funcs::movemask_u64x8(std::forward<Register_>(register_));
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to retrieve a movemask from a SIMD register via an EmuSIMD helper, but the provided register_ could not be recognised.");
+			}
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to retrieve a movemask from a SIMD register via an EmuSIMD helper, but the provided register_ was not a supported SIMD register.");
+		}
+	}
+
 	template<std::size_t Index_, typename OutT_, std::size_t PerElementWidthIfGenericInt_ = 32, class SIMDRegister_>
 	[[nodiscard]] inline auto _get_register_index(SIMDRegister_&& register_)
 		-> typename std::remove_cvref<OutT_>::type

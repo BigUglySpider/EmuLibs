@@ -12,6 +12,9 @@
 
 namespace EmuSIMD
 {
+	template<std::size_t PerElementWidthIfGenericInt_ = 32, EmuConcepts::KnownSIMD Register_>
+	[[nodiscard]] inline decltype(auto) movemask(Register_&& simd_register_);
+
 	/// <summary>
 	/// <para> Retrieves a specified index from a the passed SIMD register, cast as the provided Out_ type. </para>
 	/// <para> If the requested register is integral, PerElementWidthIfGenericInt_ will be used to determine how many bits each element should be interpreted as. </para>

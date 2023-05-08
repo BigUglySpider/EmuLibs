@@ -359,6 +359,59 @@ constexpr inline decltype(auto) setr_test_helper(Func_&& func_, std::index_seque
 int main()
 {
 	{
+		constexpr std::array<std::uint32_t, 16> elems_u32{ 0x80000000, 0x40000000, 0xFFFFFFFF, 0x00000001, 0x0FFFFFFF, 0x4FFFFFFF, 0x81234567, 0xF0000000, 0x00000000, 0x00000000, 0xF0000000, 0x80000000, 0xFFFFFFFF, 0x0000000F, 0x0F0F0F0F, 0xF0F0F0F0 };
+		constexpr auto elems_f32 = std::bit_cast<std::array<float, 16>>(elems_u32);
+		float dump_f32x16[16];
+
+
+		{
+			std::cout << "### 128-bit ###\n";
+			auto a_reg = EmuSIMD::Funcs::load_f32x4(elems_f32.data());
+			auto a_emu = EmuSIMD::_underlying_impl::load_single_lane_simd_emulator<4, float>(elems_f32.data());
+			EmuSIMD::Funcs::store_f32x4(dump_f32x16, a_reg);
+			PrintIndexable<8>(dump_f32x16);
+			std::cout << " | " << std::bitset<8>(EmuSIMD::Funcs::movemask_f32x4(a_reg)) << '\n';
+			EmuSIMD::_underlying_impl::emulate_simd_store(a_emu, dump_f32x16);
+			PrintIndexable<8>(dump_f32x16);
+			std::cout << " | " << std::bitset<8>(EmuSIMD::_underlying_impl::emulate_simd_movemask<std::uint8_t>(a_emu, std::make_index_sequence<4>())) << '\n';
+		}
+
+		{
+			std::cout << "### 256-bit ###\n";
+			auto a_reg = EmuSIMD::Funcs::load_f32x8(elems_f32.data());
+			auto a_emu = EmuSIMD::_underlying_impl::load_dual_lane_simd_emulator<256, EmuSIMD::f32x4>(elems_f32.data());
+			auto a_emu_emu = EmuSIMD::_underlying_impl::load_dual_lane_simd_emulator<256, EmuSIMD::_underlying_impl::single_lane_simd_emulator<4, float>>(elems_f32.data());
+			EmuSIMD::Funcs::store_f32x8(dump_f32x16, a_reg);
+			PrintIndexable<8>(dump_f32x16);
+			std::cout << " | " << std::bitset<8>(EmuSIMD::Funcs::movemask_f32x8(a_reg)) << '\n';
+			EmuSIMD::_underlying_impl::emulate_simd_store(a_emu, dump_f32x16);
+			PrintIndexable<8>(dump_f32x16);
+			std::cout << " | " << std::bitset<8>(EmuSIMD::_underlying_impl::emulate_simd_movemask<std::uint8_t, 8>(a_emu)) << '\n';
+			EmuSIMD::_underlying_impl::emulate_simd_store(a_emu_emu, dump_f32x16);
+			PrintIndexable<8>(dump_f32x16);
+			std::cout << " | " << std::bitset<8>(EmuSIMD::_underlying_impl::emulate_simd_movemask<std::uint8_t, 8>(a_emu_emu)) << '\n';
+		}
+
+		{
+			std::cout << "### 512-bit ###\n";
+			auto a_emu_reg = EmuSIMD::_underlying_impl::load_dual_lane_simd_emulator<512, EmuSIMD::f32x8>(elems_f32.data());
+			auto a_emu_emu_reg = EmuSIMD::_underlying_impl::load_dual_lane_simd_emulator<512, EmuSIMD::_underlying_impl::dual_lane_simd_emulator<256, EmuSIMD::f32x4>>(elems_f32.data());
+			auto a_emu_emu_emu = EmuSIMD::_underlying_impl::load_dual_lane_simd_emulator<512, EmuSIMD::_underlying_impl::dual_lane_simd_emulator<256, EmuSIMD::_underlying_impl::single_lane_simd_emulator<4, float>>>(elems_f32.data());
+			EmuSIMD::_underlying_impl::emulate_simd_store(a_emu_reg, dump_f32x16);
+			PrintIndexable<16>(dump_f32x16);
+			std::cout << " | " << std::bitset<16>(EmuSIMD::_underlying_impl::emulate_simd_movemask<std::uint16_t, 16>(a_emu_reg)) << '\n';
+			EmuSIMD::_underlying_impl::emulate_simd_store(a_emu_emu_reg, dump_f32x16);
+			PrintIndexable<16>(dump_f32x16);
+			std::cout << " | " << std::bitset<16>(EmuSIMD::_underlying_impl::emulate_simd_movemask<std::uint16_t, 16>(a_emu_emu_reg)) << '\n';
+			EmuSIMD::_underlying_impl::emulate_simd_store(a_emu_emu_emu, dump_f32x16);
+			PrintIndexable<16>(dump_f32x16);
+			std::cout << " | " << std::bitset<16>(EmuSIMD::_underlying_impl::emulate_simd_movemask<std::uint16_t, 16>(a_emu_emu_emu)) << '\n';
+		}
+
+		universal_pause();
+	}
+
+	{
 		EmuSIMD::f32x4 a = EmuSIMD::Funcs::setr_f32x4(1, 2, 3, 4);
 		EmuSIMD::f32x4 b = EmuSIMD::Funcs::setr_f32x4(5, 6, 7, 8);
 		EmuSIMD::f32x4 c = EmuSIMD::shuffle<2, 3, 2, 3>(a, b);

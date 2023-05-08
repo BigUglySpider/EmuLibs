@@ -2,6 +2,7 @@
 #define EMU_SIMD_UNDERLYING_ALIASES_H_INC_ 1
 
 #include "_generic_funcs/_forward_declarations/_all_forward_declarations.h"
+#include "../../../../../EmuCore/ArithmeticHelpers/BitHelpers.h"
 #include "../../../../../EmuCore/CommonConcepts/Arithmetic.h"
 #include "../../../../../EmuCore/CommonPreprocessor/Compiler.h"
 #include "../../../../../EmuCore/TMPHelpers/Tuples.h"
@@ -678,6 +679,54 @@ namespace EmuSIMD
 #pragma endregion
 
 #pragma region EMULATED_STORES
+		template<EmuConcepts::Arithmetic OutMask_, std::size_t NumElements_, EmuConcepts::Arithmetic T_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto emulate_simd_movemask(const single_lane_simd_emulator<NumElements_, T_>& simd_emulator_, std::index_sequence<Indices_...> indices_) noexcept
+			-> typename std::remove_cvref<OutMask_>::type
+		{
+			return 
+			(
+				(
+					EmuCore::ArithmeticHelpers::get_most_significant_bit<OutMask_>
+					(
+						retrieve_emulated_single_lane_simd_element<T_, Indices_, false>(simd_emulator_)
+					) << Indices_
+				) | ...
+			);
+		}
+
+		template<EmuConcepts::Arithmetic OutMask_, std::size_t NumIndices_, std::size_t EmulatedWidth_, class LaneT_>
+		[[nodiscard]] constexpr inline auto emulate_simd_movemask(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& simd_emulator_) noexcept
+			-> typename std::remove_cvref<OutMask_>::type
+		{
+			constexpr std::size_t half_count = NumIndices_ / 2;
+			if constexpr (is_single_lane_simd_emulator<LaneT_>::value)
+			{
+				using _half_index_sequence = std::make_index_sequence<half_count>;
+				return
+				(
+					(emulate_simd_movemask<OutMask_>(simd_emulator_._lane_1, _half_index_sequence()) << half_count) |
+					emulate_simd_movemask<OutMask_>(simd_emulator_._lane_0, _half_index_sequence())
+				);
+			}
+			else if constexpr (is_dual_lane_simd_emulator<LaneT_>::value)
+			{
+				return
+				(
+					(emulate_simd_movemask<OutMask_, half_count>(simd_emulator_._lane_1) << half_count) |
+					emulate_simd_movemask<OutMask_, half_count>(simd_emulator_._lane_0)
+				);
+			}
+			else
+			{
+				constexpr std::size_t per_element_width = EmulatedWidth_ / NumIndices_;
+				return
+				(
+					(static_cast<OutMask_>(EmuSIMD::movemask<per_element_width>(simd_emulator_._lane_1)) << half_count) |
+					static_cast<OutMask_>(EmuSIMD::movemask<per_element_width>(simd_emulator_._lane_0))
+				);
+			}
+		}
+
 		template<std::size_t NumElements_, EmuConcepts::Arithmetic T_>
 		constexpr inline void emulate_simd_store(const single_lane_simd_emulator<NumElements_, T_>& simd_emulator_, void* p_out_)
 		{

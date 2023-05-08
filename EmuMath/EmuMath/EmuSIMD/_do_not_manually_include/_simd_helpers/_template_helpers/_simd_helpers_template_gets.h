@@ -7,6 +7,12 @@
 
 namespace EmuSIMD
 {
+	template<std::size_t PerElementWidthIfGenericInt_, EmuConcepts::KnownSIMD Register_>
+	[[nodiscard]] inline decltype(auto) movemask(Register_&& simd_register_)
+	{
+		return _underlying_simd_helpers::_movemask<PerElementWidthIfGenericInt_>(std::forward<Register_>(simd_register_));
+	}
+
 	template<std::size_t Index_, class Out_, std::size_t PerElementWidthIfGenericInt_, EmuConcepts::KnownSIMD SIMDRegister_>
 	[[nodiscard]] inline auto get_index(SIMDRegister_&& simd_register_) noexcept
 		-> Out_
