@@ -1014,87 +1014,178 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 fmadd_f32x4(EmuSIMD::f32x4_arg a_, EmuSIMD::f32x4_arg b_, EmuSIMD::f32x4_arg c_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_fmadd_ps(a_, b_, c_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_fmadd<float>(), a_, b_, c_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 fmsub_f32x4(EmuSIMD::f32x4_arg a_, EmuSIMD::f32x4_arg b_, EmuSIMD::f32x4_arg c_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_fmsub_ps(a_, b_, c_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_fmsub<float>(), a_, b_, c_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 fnmadd_f32x4(EmuSIMD::f32x4_arg a_, EmuSIMD::f32x4_arg b_, EmuSIMD::f32x4_arg c_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_fnmadd_ps(a_, b_, c_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		auto func = [](const float& a, const float& b, const float& c) { return EmuCore::do_fmadd<float>()(-a, b, c); };
+		return emulate_simd_basic(func, a_, b_, c_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 fnmsub_f32x4(EmuSIMD::f32x4_arg a_, EmuSIMD::f32x4_arg b_, EmuSIMD::f32x4_arg c_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_fnmsub_ps(a_, b_, c_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		auto func = [](const float& a, const float& b, const float& c) { return EmuCore::do_fmsub<float>()(-a, b, c); };
+		return emulate_simd_basic(func, a_, b_, c_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 fmaddsub_f32x4(EmuSIMD::f32x4_arg a_, EmuSIMD::f32x4_arg b_, EmuSIMD::f32x4_arg c_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_fmaddsub_ps(a_, b_, c_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(_underlying_impl::alternating_add_subtract_func<float, false, EmuCore::do_fmadd<float>, EmuCore::do_fmsub<float>>(), a_, b_, c_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 fmsubadd_f32x4(EmuSIMD::f32x4_arg a_, EmuSIMD::f32x4_arg b_, EmuSIMD::f32x4_arg c_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_fmsubadd_ps(a_, b_, c_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(_underlying_impl::alternating_add_subtract_func<float, true, EmuCore::do_fmadd<float>, EmuCore::do_fmsub<float>>(), a_, b_, c_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 subadd_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return fmsubadd_f32x4(set1_f32x4(1.0f), lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(_underlying_impl::alternating_add_subtract_func<float, true, EmuCore::do_add<float>, EmuCore::do_subtract<float>>(), lhs_, rhs_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 floor_f32x4(EmuSIMD::f32x4_arg to_floor_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_floor_ps(to_floor_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_floor<float>(), to_floor_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 ceil_f32x4(EmuSIMD::f32x4_arg to_ceil_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_ceil_ps(to_ceil_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_ceil>(), to_ceil_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 trunc_f32x4(EmuSIMD::f32x4_arg to_trunc_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_round_ps(to_trunc_, EMU_SIMD_FLAG_TRUNC);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_trunc<float>(), to_trunc_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 mod_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		EmuSIMD::f32x4 res = div_f32x4(lhs_, rhs_);
 		res = trunc_f32x4(res);
 		return fmadd_f32x4(res, rhs_, lhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_mod<float, float>(), lhs_, rhs_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 abs_f32x4(EmuSIMD::f32x4_arg in_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return andnot_f32x4(set1_f32x4(-0.0f), in_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_abs<float>(), in_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 sqrt_f32x4(EmuSIMD::f32x4_arg in_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_sqrt_ps(in_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_sqrt<float>(), in_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 rsqrt_f32x4(EmuSIMD::f32x4_arg in_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_rsqrt_ps(in_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic([](const float& in) { return 1.0f / EmuCore::do_sqrt<float>()(in); }, in_, index_sequence());
+#endif
 	}
 #pragma endregion
 
 #pragma region NEAR_COMPARISONS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cmpnear_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_, EmuSIMD::f32x4_arg epsilon)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return cmple_f32x4(abs_f32x4(sub_f32x4(lhs_, rhs_)), epsilon);
+#else
+		return _underlying_impl::emulate_single_lane_cmp(EmuCore::do_cmp_near_equal<float>(), lhs_, rhs_, epsilon, std::make_index_sequence<4>());
+#endif
 	}
 #pragma endregion
 
 #pragma region TRIG
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cos_f32x4(EmuSIMD::f32x4_arg in_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		#if EMU_CORE_IS_INTEL_COMPILER && EMU_CORE_X86_X64 // Only tends to score better on Intel platforms
 		return _mm_cos_ps(in_);
 		#else
@@ -1171,10 +1262,16 @@ namespace EmuSIMD::Funcs
 
 		return fmadd_f32x4(r1x, r2x, fmadd_f32x4(r1y, r2y, mul_f32x4(r1z, r2z)));
 		#endif
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic([](EmuCore::do_cos<float>(), in_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 sin_f32x4(EmuSIMD::f32x4_arg in_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		#if EMU_CORE_IS_INTEL_COMPILER && EMU_CORE_X86_X64 // Only tends to score better on Intel platforms
 		return _mm_sin_ps(in_);
 		#else
@@ -1251,10 +1348,16 @@ namespace EmuSIMD::Funcs
 
 		return fmadd_f32x4(r1x, r2x, fmadd_f32x4(r1y, r2y, mul_f32x4(r1z, r2z)));
 		#endif
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic([](EmuCore::do_sin<float>(), in_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 tan_f32x4(EmuSIMD::f32x4_arg in_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		#if 0 && (EMU_CORE_IS_INTEL_COMPILER || EMU_CORE_IS_MSVC) && EMU_CORE_X86_X64 // Better on both Intel and AMD x86/x64 builds, so use where available
 		return _mm_tan_ps(in_);
 		#else
@@ -1371,10 +1474,16 @@ namespace EmuSIMD::Funcs
 
 		return div_f32x4(r2x_sin, r2x_cos);
 		#endif
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic([](EmuCore::do_tan<float>(), in_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 acos_f32x4(EmuSIMD::f32x4_arg in_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		#if EMU_CORE_IS_INTEL_COMPILER && EMU_CORE_X86_X64 // Only tends to score better on Intel platforms
 		return _mm_acos_ps(in_);
 		#else
@@ -1396,10 +1505,16 @@ namespace EmuSIMD::Funcs
 
 		return fmadd_f32x4(negation_mult, set1_f32x4(3.14159265358979f), result);
 		#endif
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic([](EmuCore::do_acos<float>(), in_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 asin_f32x4(EmuSIMD::f32x4_arg in_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		#if EMU_CORE_IS_INTEL_COMPILER && EMU_CORE_X86_X64 // Only tends to score better on Intel platforms
 		return _mm_asin_ps(in_);
 		#else
@@ -1422,10 +1537,16 @@ namespace EmuSIMD::Funcs
 		tmp = mul_f32x4(negation_mult, result);
 		return sub_f32x4(result, tmp);
 		#endif
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic([](EmuCore::do_asin<float>(), in_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 atan2_f32x4(EmuSIMD::f32x4_arg y_, EmuSIMD::f32x4_arg x_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		#if EMU_CORE_IS_INTEL_COMPILER && EMU_CORE_X86_X64 // Only tends to score better on Intel platforms
 		return _mm_atan2_ps(y_, x_);
 		#else		
@@ -1468,10 +1589,16 @@ namespace EmuSIMD::Funcs
 
 		return temp2;
 		#endif
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic([](EmuCore::do_atan2<float>(), y_, x_, index_sequence());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 atan_f32x4(EmuSIMD::f32x4_arg in_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		#if EMU_CORE_IS_INTEL_COMPILER && EMU_CORE_X86_X64 // Only tends to score better on Intel platforms
 		return _mm_atan_ps(in_);
 		#else
@@ -1508,6 +1635,11 @@ namespace EmuSIMD::Funcs
 
 		return temp2;
 		#endif
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic([](EmuCore::do_atan<float>(), in_, index_sequence());
+#endif
 	}
 #pragma endregion
 }

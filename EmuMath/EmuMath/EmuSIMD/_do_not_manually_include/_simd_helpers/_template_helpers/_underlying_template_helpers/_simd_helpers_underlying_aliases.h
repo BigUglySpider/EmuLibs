@@ -1140,6 +1140,50 @@ namespace EmuSIMD
 				);
 			}
 		}
+
+		template<std::size_t NumElements_, typename T_, class Cmp_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto emulate_single_lane_cmp
+		(
+			const Cmp_& cmp_,
+			const single_lane_simd_emulator<NumElements_, T_>& lhs_,
+			const single_lane_simd_emulator<NumElements_, T_>& rhs_,
+			const single_lane_simd_emulator<NumElements_, T_>& extra_,
+			std::index_sequence<Indices_...> indices_
+		)
+		{
+			if constexpr (EmuConcepts::Integer<T_>)
+			{
+				constexpr auto all_bits_one = EmuCore::ArithmeticHelpers::set_all_bits_one<T_>();
+				return set_single_lane_simd_emulator<NumElements_, T_>
+				(
+					(
+						cmp_
+						(
+							retrieve_emulated_single_lane_simd_element<T_, Indices_, false>(lhs_),
+							retrieve_emulated_single_lane_simd_element<T_, Indices_, false>(rhs_),
+							retrieve_emulated_single_lane_simd_element<T_, Indices_, false>(extra_)
+						) * all_bits_one
+					)...
+				);
+			}
+			else
+			{
+				using _uint_type = EmuCore::TMP::uint_of_size_t<sizeof(T_)>;
+				constexpr auto all_bits_one = EmuCore::ArithmeticHelpers::set_all_bits_one<_uint_type>();
+				return set_single_lane_simd_emulator<NumElements_, T_>
+				(
+					std::bit_cast<T_>
+					(
+						cmp_
+						(
+							retrieve_emulated_single_lane_simd_element<T_, Indices_, false>(lhs_),
+							retrieve_emulated_single_lane_simd_element<T_, Indices_, false>(rhs_),
+							retrieve_emulated_single_lane_simd_element<T_, Indices_, false>(extra_)
+						) * all_bits_one
+					)...
+				);
+			}
+		}
 #pragma endregion
 
 #pragma region FUNCTORS
@@ -1189,6 +1233,9 @@ namespace EmuSIMD
 			{
 			}
 
+			// ADD/SUB
+			// a + b
+			// a - b
 			[[nodiscard]] constexpr inline decltype(auto) operator()(const T_& a_, const T_& b_)
 			{
 				if constexpr ((EmuConcepts::UnsignedArithmetic<T_>))
@@ -1224,6 +1271,47 @@ namespace EmuSIMD
 					// --- This approach avoids any branching unlike the unsigned variant
 					constexpr _counter_type sign_mask = EmuCore::ArithmeticHelpers::set_all_bits_one<_counter_type>() & ~_counter_type(1);
 					return Adder_()(a_, b_ * (_counter ^= sign_mask));
+				}
+			}
+
+			// FMADD/FMSUB
+			// --- (a * b) + c
+			// --- (a * b) - c
+			[[nodiscard]] constexpr inline decltype(auto) operator()(const T_& a_, const T_& b_, const T_& c_)
+			{
+				if constexpr ((EmuConcepts::UnsignedArithmetic<T_>))
+				{
+					if ((_counter ^= 1))
+					{
+						// Even invocation [0, 2, 4, etc...]
+						if constexpr (AddFirst_)
+						{
+							return Subtractor_()(a_, b_, c_);
+						}
+						else
+						{
+							return Adder_()(a_, b_, c_);
+						}
+					}
+					else
+					{
+						// Odd invocation [1, 3, 5, etc...]
+						if constexpr (AddFirst_)
+						{
+							return Adder_()(a_, b_, c_);
+						}
+						else
+						{
+							return Subtractor_()(a_, b_, c_);
+						}
+					}
+				}
+				else
+				{
+					// Counter is used as a +/-1 multiplier here, flip its signedness to multiply `b_` value to switch between add/subtract using just adder
+					// --- This approach avoids any branching unlike the unsigned variant
+					constexpr _counter_type sign_mask = EmuCore::ArithmeticHelpers::set_all_bits_one<_counter_type>() & ~_counter_type(1);
+					return Adder_()(a_, b_, c_ * (_counter ^= sign_mask));
 				}
 			}
 		};
