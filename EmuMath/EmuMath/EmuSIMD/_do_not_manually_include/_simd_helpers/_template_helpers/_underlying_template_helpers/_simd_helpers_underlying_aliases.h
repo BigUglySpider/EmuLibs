@@ -67,7 +67,7 @@
 /// <para> Boolean preprocessor flag indicating if 512-bit registers use reference arguments. </para>
 /// <para> This affects the`_arg` variants of all 512-bit register aliases. </para>
 /// </summary>
-#define EMU_SIMD_512_ARG_REFS (EMU_SIMD_USE_512_REGISTERS)
+#define EMU_SIMD_512_ARG_REFS !(EMU_SIMD_USE_512_REGISTERS)
 
 #if EMU_SIMD_128_ARG_REFS
 /// <summary> Helper macro for creating the 128-bit register arg types. `basic_type` is the base register alias (e.g. for `f32x4_arg`, `basic_type` is `f32x4`). </summary>
@@ -652,6 +652,30 @@ namespace EmuSIMD
 			}
 		}
 
+		template<std::size_t EmulatedWidth_, class LaneT_, std::size_t NumElements_, EmuConcepts::Arithmetic LaneMaskT_, EmuConcepts::Arithmetic BitMaskT_, class LaneSetmaskedFunc_>
+		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> setmasked_dual_lane_simd_emulator(const BitMaskT_& bit_mask_, const LaneSetmaskedFunc_& lane_setmasked_func_)
+		{
+			constexpr std::size_t half_elements = NumElements_ / 2;
+			return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+			(
+				lane_setmasked_func_(static_cast<LaneMaskT_>(bit_mask_ >> half_elements)),
+				lane_setmasked_func_(static_cast<LaneMaskT_>(bit_mask_))
+			);
+		}
+
+		template<auto BitMask_, std::size_t EmulatedWidth_, class LaneT_, std::size_t NumElements_, EmuConcepts::Arithmetic LaneMaskT_, EmuConcepts::Arithmetic BitMaskT_, class LaneSetmaskedFunc_>
+		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> setmasked_dual_lane_simd_emulator(const LaneSetmaskedFunc_& lane_setmasked_template_func_)
+		{
+			constexpr std::size_t half_elements = NumElements_ / 2;
+			constexpr auto lo_mask = static_cast<LaneMaskT_>(BitMask_ >> half_elements);
+			constexpr auto hi_mask = static_cast<LaneMaskT_>(BitMask_);
+			return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+			(
+				lane_setmasked_template_func_.template operator()<lo_mask>(),
+				lane_setmasked_template_func_.template operator()<hi_mask>()
+			);
+		}
+
 		template<std::size_t NumElements_, EmuConcepts::Arithmetic T_>
 		constexpr inline single_lane_simd_emulator<NumElements_, T_> load_single_lane_simd_emulator(const void* p_to_load_)
 		{
@@ -965,7 +989,7 @@ namespace EmuSIMD
 			}
 		}
 
-		template<EmuConcepts::Arithmetic OutLaneT_, std::size_t EmulatedWidth_, EmuConcepts::Arithmetic InLaneT_>
+		template<class OutLaneT_, std::size_t EmulatedWidth_, class InLaneT_>
 		[[nodiscard]] constexpr inline dual_lane_simd_emulator<EmulatedWidth_, OutLaneT_> emulate_simd_cast_same_width(const dual_lane_simd_emulator<EmulatedWidth_, InLaneT_>& in_)
 		{
 			if constexpr (std::is_same_v<OutLaneT_, InLaneT_>)
@@ -1036,6 +1060,31 @@ namespace EmuSIMD
 					memcpy(reinterpret_cast<std::byte*>(&out_register) + bytes_per_128_chunk, &(in_._lane_1), bytes_per_128_chunk);
 				}
 				return out_register;
+			}
+		}
+
+		template<class Out_, EmuConcepts::KnownSIMD Register_>
+		requires(!is_simd_emulator<Register_>::value)
+		[[nodiscard]] constexpr inline Out_ emulate_simd_cast_greater_width(Register_&& in_register_)
+		{
+			// Cannot be a single-lane emulator
+			if constexpr(is_dual_lane_simd_emulator<Out_>::value)
+			{
+				constexpr std::size_t emulated_width = Out_::emulated_width;
+				using out_lane_type = typename Out_::lane_type;
+
+				if constexpr (std::is_same_v<out_lane_type, typename std::remove_cvref<Register_>::type>)
+				{
+					return Out_(std::forward<Register_>(in_register_));
+				}
+				else
+				{
+					return Out_(EmuSIMD::cast<out_lane_type>(std::forward<Register_>(in_register_)));
+				}
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<Out_>(), "INTERNAL EMUSIMD ERROR: Invalid SIMD cast emulation operation: The input and the output are both actual SIMD registers and not emulators. These cases must be implemented as intrinsics or inline-assembly instead.");
 			}
 		}
 
