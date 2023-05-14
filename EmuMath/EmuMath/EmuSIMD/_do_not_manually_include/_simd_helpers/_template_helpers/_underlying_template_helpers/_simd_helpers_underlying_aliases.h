@@ -1149,7 +1149,7 @@ namespace EmuSIMD
 			const single_lane_simd_emulator<NumElements_, T_>& rhs_,
 			const single_lane_simd_emulator<NumElements_, T_>& extra_,
 			std::index_sequence<Indices_...> indices_
-		)
+		) -> single_lane_simd_emulator<NumElements_, T_>
 		{
 			if constexpr (EmuConcepts::Integer<T_>)
 			{
@@ -1184,13 +1184,49 @@ namespace EmuSIMD
 				);
 			}
 		}
+
+		template<auto BlendMask_, EmuConcepts::Arithmetic T_, std::size_t NumElements_, std::size_t...Indices_>
+		requires(sizeof...(Indices_) == NumElements_)
+		[[nodiscard]] constexpr inline auto emulate_single_lane_blend_with_mask
+		(
+			const single_lane_simd_emulator<NumElements_, T_>& a_,
+			const single_lane_simd_emulator<NumElements_, T_>& b_,
+			std::index_sequence<Indices_...> indices_
+		) -> single_lane_simd_emulator<NumElements_, T_>
+		{
+			return set_single_lane_simd_emulator<NumElements_, T_>
+			(
+				retrieve_emulated_single_lane_simd_element<T_, Indices_, false>
+				(
+					((BlendMask_ >> Indices_) & 1) ? b_ : a_
+				)...
+			);
+		}
+
+		template<auto BlendMask_, class LaneT_, std::size_t EmulatedWidth_, std::size_t...HalfSizeIndices_>
+		[[nodiscard]] constexpr inline auto emulate_dual_lane_blend_with_mask
+		(
+			const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& a_,
+			const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& b_,
+			std::index_sequence<HalfSizeIndices_...> half_size_indices_
+		) -> dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+		{
+			constexpr std::size_t half_elements = sizeof...(HalfSizeIndices_);
+			constexpr std::size_t num_elements = half_elements * 2;
+			constexpr auto offset_blend_mask = BlendMask_ >> half_elements;
+			return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+			(
+				EmuSIMD::blend<(static_cast<bool>((BlendMask_ >> HalfSizeIndices_) & 1))...>(a_._lane_0, b_._lane_0),
+				EmuSIMD::blend<(static_cast<bool>((offset_blend_mask >> HalfSizeIndices_) & 1))...>(a_._lane_1, b_._lane_1)
+			);
+		}
 #pragma endregion
 
 #pragma region FUNCTORS
 		template<typename T_>
 		struct blendv_emulator_func
 		{
-			[[nodiscard]] constexpr inline decltype(auto) operator()(const T_& a_, const T_& b_, const T_& mask_) const
+			[[nodiscard]] constexpr inline const T_& operator()(const T_& a_, const T_& b_, const T_& mask_) const
 			{
 				return EmuCore::ArithmeticHelpers::get_most_significant_bit<bool>(mask_) ? b_ : a_;
 			}

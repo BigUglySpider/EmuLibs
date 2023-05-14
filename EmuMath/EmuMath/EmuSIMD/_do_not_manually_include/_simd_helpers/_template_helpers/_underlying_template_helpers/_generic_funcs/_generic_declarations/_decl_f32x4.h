@@ -193,7 +193,11 @@ namespace EmuSIMD::Funcs
 	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 blend_f32x4(EmuSIMD::f32x4_arg a_, EmuSIMD::f32x4_arg b_)
 	{
+#if EMU_SIMD_USE_128_REGISTERS
 		return _mm_blend_ps(a_, b_, BlendMask);
+#else
+		return EmuSIMD::_underlying_impl::emulate_single_lane_blend_with_mask<BlendMask>(a_, b_, std::make_index_sequence<4>());
+#endif
 	}
 #pragma endregion
 

@@ -481,30 +481,60 @@ namespace EmuSIMD::Funcs
 		);
 	}
 
+	/// <summary>
+	/// <para> Creates a blend masked to be used by a register of 2 elements. </para>
+	/// <para> If an index is true, the operation blend(a, b) will use the respective index of b in the blend; otherwise it will use the index of a. </para>
+	/// <para> Indices are taken in reverse order (e.g. the "leftmost" element is the "rightmost" argument to this template). </para>
+	/// </summary>
+	/// <returns>Blend mask for 2-element SIMD blend operations.</returns>
 	template<bool I0_, bool I1_>
 	[[nodiscard]] constexpr inline blend_mask_type make_blend_mask()
 	{
 		return EmuSIMD::Funcs::_underlying_funcs::_make_blend_mask(EmuCore::TMP::bool_sequence<I0_, I1_>(), std::make_index_sequence<2>());
 	}
 
+	/// <summary>
+	/// <para> Creates a blend masked to be used by a register of 4 elements. </para>
+	/// <para> If an index is true, the operation blend(a, b) will use the respective index of b in the blend; otherwise it will use the index of a. </para>
+	/// <para> Indices are taken in reverse order (e.g. the "leftmost" element is the "rightmost" argument to this template). </para>
+	/// </summary>
+	/// <returns>Blend mask for 4-element SIMD blend operations.</returns>
 	template<bool I0_, bool I1_, bool I2_, bool I3_>
 	[[nodiscard]] constexpr inline blend_mask_type make_blend_mask()
 	{
 		return EmuSIMD::Funcs::_underlying_funcs::_make_blend_mask(EmuCore::TMP::bool_sequence<I0_, I1_, I2_, I3_>(), std::make_index_sequence<4>());
 	}
 
+	/// <summary>
+	/// <para> Creates a blend masked to be used by a register of 8 elements. </para>
+	/// <para> If an index is true, the operation blend(a, b) will use the respective index of b in the blend; otherwise it will use the index of a. </para>
+	/// <para> Indices are taken in reverse order (e.g. the "leftmost" element is the "rightmost" argument to this template). </para>
+	/// </summary>
+	/// <returns>Blend mask for 8-element SIMD blend operations.</returns>
 	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_>
 	[[nodiscard]] constexpr inline blend_mask_type make_blend_mask()
 	{
 		return EmuSIMD::Funcs::_underlying_funcs::_make_blend_mask(EmuCore::TMP::bool_sequence<I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>(), std::make_index_sequence<8>());
 	}
 
+	/// <summary>
+	/// <para> Creates a blend masked to be used by a register of 16 elements. </para>
+	/// <para> If an index is true, the operation blend(a, b) will use the respective index of b in the blend; otherwise it will use the index of a. </para>
+	/// <para> Indices are taken in reverse order (e.g. the "leftmost" element is the "rightmost" argument to this template). </para>
+	/// </summary>
+	/// <returns>Blend mask for 16-element SIMD blend operations.</returns>
 	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_, bool I8_, bool I9_, bool I10_, bool I11_, bool I12_, bool I13_, bool I14_, bool I15_>
 	[[nodiscard]] constexpr inline blend_mask_type make_blend_mask()
 	{
 		return EmuSIMD::Funcs::_underlying_funcs::_make_blend_mask(EmuCore::TMP::bool_sequence<I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>(), std::make_index_sequence<16>());
 	}
 
+	/// <summary>
+	/// <para> Creates a blend masked to be used by a register of 32 elements. </para>
+	/// <para> If an index is true, the operation blend(a, b) will use the respective index of b in the blend; otherwise it will use the index of a. </para>
+	/// <para> Indices are taken in reverse order (e.g. the "leftmost" element is the "rightmost" argument to this template). </para>
+	/// </summary>
+	/// <returns>Blend mask for 32-element SIMD blend operations.</returns>
 	template
 	<
 		bool I0_,  bool I1_,  bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_,  bool I8_,  bool I9_,  bool I10_, bool I11_ ,bool I12_, bool I13_, bool I14_, bool I15_,
@@ -519,6 +549,12 @@ namespace EmuSIMD::Funcs
 		);
 	}
 
+	/// <summary>
+	/// <para> Creates a blend masked to be used by a register of 64 elements. </para>
+	/// <para> If an index is true, the operation blend(a, b) will use the respective index of b in the blend; otherwise it will use the index of a. </para>
+	/// <para> Indices are taken in reverse order (e.g. the "leftmost" element is the "rightmost" argument to this template). </para>
+	/// </summary>
+	/// <returns>Blend mask for 64-element SIMD blend operations.</returns>
 	template
 	<
 		bool I0_,  bool I1_,  bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_,  bool I8_,  bool I9_,  bool I10_, bool I11_ ,bool I12_, bool I13_, bool I14_, bool I15_,

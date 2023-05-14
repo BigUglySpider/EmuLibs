@@ -359,143 +359,60 @@ constexpr inline decltype(auto) setr_test_helper(Func_&& func_, std::index_seque
 int main()
 {
 	{
-		constexpr std::array<std::uint32_t, 16> elems_u32{ 0x80000000, 0x00000000, 0xFFFFFFFF, 0x00000001, 0x0FFFFFFF, 0x4FFFFFFF, 0x81234567, 0xF0000000, 0x00000000, 0x00000000, 0xF0000000, 0x80000000, 0xFFFFFFFF, 0x0000000F, 0x0F0F0F0F, 0xF0F0F0F0 };
-		constexpr auto elems_f32 = std::bit_cast<std::array<float, 16>>(elems_u32);
+		constexpr auto elems_u32 = std::array<std::uint32_t, 16>({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 });
+		constexpr auto elems_f32 = std::array<float, 16>({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16});
 		std::uint32_t dump_u32x16[16];
 		float dump_f32x16[16];
 
-
 		{
-			auto some_func = [](auto&& val) { return float(val); };
-			constexpr auto bloob = EmuCore::TMP::RuntimeTupleTable<std::tuple<float, int, float>, decltype(some_func)>();
-
-			std::cout << "### 128-bit ###\n";
+			std::cout << "128-bit\n";
+			constexpr auto blend_mask = EmuSIMD::Funcs::make_blend_mask<0, 1, 0, 1>();
 			auto a_reg = EmuSIMD::Funcs::load_f32x4(elems_f32.data());
+			auto b_reg = EmuSIMD::Funcs::setzero_f32x4();
 			auto a_emu = EmuSIMD::_underlying_impl::load_single_lane_simd_emulator<4, float>(elems_f32.data());
-			EmuSIMD::Funcs::store_f32x4(dump_f32x16, a_reg);
-			PrintIndexable<4>(dump_f32x16);
-			std::cout << " | " << std::bitset<8>(EmuSIMD::Funcs::movemask_f32x4(a_reg)) << '\n';
-			EmuSIMD::_underlying_impl::emulate_simd_store(a_emu, dump_f32x16);
-			PrintIndexable<4>(dump_f32x16);
-			std::cout << " | " << std::bitset<8>(EmuSIMD::_underlying_impl::emulate_simd_movemask<std::uint8_t>(a_emu, std::make_index_sequence<4>())) << '\n';
+			auto b_emu = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, float>();
 
-			auto b_reg = EmuSIMD::Funcs::cmpeq_f32x4(a_reg, EmuSIMD::Funcs::setzero_f32x4());
-			auto b_emu = EmuSIMD::_underlying_impl::emulate_single_lane_cmp(std::equal_to(), a_emu, EmuSIMD::_underlying_impl::set1_single_lane_simd_emulator<4, float>(0.0f), std::make_index_sequence<4>());
-			EmuSIMD::Funcs::store_f32x4(dump_f32x16, b_reg);
-			PrintIndexable<4>(dump_f32x16);
-			std::cout << '\n';
-			EmuSIMD::_underlying_impl::emulate_simd_store(b_emu, dump_f32x16);
-			PrintIndexable<4>(dump_f32x16);
-			std::cout << '\n';
+			auto c_reg = EmuSIMD::Funcs::blend_f32x4<blend_mask>(a_reg, b_reg);
+			auto c_emu = EmuSIMD::_underlying_impl::emulate_single_lane_blend_with_mask<blend_mask>(a_emu, b_emu, std::make_index_sequence<4>());
 
-			std::cout << "---\n";
-			auto c_reg = EmuSIMD::Funcs::set_f32x4(50.0f, 60.0f, 700.0f, 80.0f);
-			auto d_reg = EmuSIMD::Funcs::set_f32x4(10.0f, 1.0f, 300.0f, 40.0f);
-			auto c_emu = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, float>(80.0f, 700.0f, 60.0f, 50.0f);
-			auto d_emu = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, float>(40.0f, 300.0f, 1.0f, 10.0f);
 			EmuSIMD::Funcs::store_f32x4(dump_f32x16, c_reg);
-			PrintIndexable<4>(dump_f32x16);
-			std::cout << " | ";
-			EmuSIMD::Funcs::store_f32x4(dump_f32x16, d_reg);
 			PrintIndexable<4>(dump_f32x16);
 			std::cout << '\n';
 			EmuSIMD::_underlying_impl::emulate_simd_store(c_emu, dump_f32x16);
 			PrintIndexable<4>(dump_f32x16);
-			std::cout << " | ";
-			EmuSIMD::_underlying_impl::emulate_simd_store(d_emu, dump_f32x16);
-			PrintIndexable<4>(dump_f32x16);
 			std::cout << '\n';
-
-			std::cout << "movehl\n";
-			auto e_reg = EmuSIMD::Funcs::movehl_f32x4(c_reg, d_reg);
-			auto e_emu = EmuSIMD::_underlying_impl::emulated_movehl(c_emu, d_emu, std::make_index_sequence<4>());
-			EmuSIMD::Funcs::store_f32x4(dump_f32x16, e_reg);
-			PrintIndexable<4>(dump_f32x16);
-			std::cout << '\n';
-			EmuSIMD::_underlying_impl::emulate_simd_store(e_emu, dump_f32x16);
-			PrintIndexable<4>(dump_f32x16);
-			std::cout << '\n';
-
-			std::cout << "movelh\n";
-			e_reg = EmuSIMD::Funcs::movelh_f32x4(c_reg, d_reg);
-			e_emu = EmuSIMD::_underlying_impl::emulated_movelh(c_emu, d_emu, std::make_index_sequence<4>());
-			EmuSIMD::Funcs::store_f32x4(dump_f32x16, e_reg);
-			PrintIndexable<4>(dump_f32x16);
-			std::cout << '\n';
-			EmuSIMD::_underlying_impl::emulate_simd_store(e_emu, dump_f32x16);
-			PrintIndexable<4>(dump_f32x16);
-			std::cout << '\n';
-
-			std::cout << "horizontal max\n";
-			e_reg = EmuSIMD::Funcs::horizontal_max_f32x4(c_reg);
-			e_emu = EmuSIMD::_underlying_impl::emulate_horizontal_min_or_max<true>(c_emu, EmuCore::TMP::make_index_sequence_excluding_0<4>());
-			EmuSIMD::Funcs::store_f32x4(dump_f32x16, e_reg);
-			PrintIndexable<4>(dump_f32x16);
-			std::cout << '\n';
-			EmuSIMD::_underlying_impl::emulate_simd_store(e_emu, dump_f32x16);
-			PrintIndexable<4>(dump_f32x16);
-			std::cout << '\n';
-
-			std::cout << "horizontal min\n";
-			e_reg = EmuSIMD::Funcs::horizontal_min_f32x4(c_reg);
-			e_emu = EmuSIMD::_underlying_impl::emulate_horizontal_min_or_max<false>(c_emu, EmuCore::TMP::make_index_sequence_excluding_0<4>());
-			EmuSIMD::Funcs::store_f32x4(dump_f32x16, e_reg);
-			PrintIndexable<4>(dump_f32x16);
-			std::cout << '\n';
-			EmuSIMD::_underlying_impl::emulate_simd_store(e_emu, dump_f32x16);
-			PrintIndexable<4>(dump_f32x16);
-			std::cout << '\n';
-
-			std::cout << "addsub\n";
-			e_reg = EmuSIMD::Funcs::addsub_f32x4(c_reg, d_reg);
-			e_emu = EmuSIMD::_underlying_impl::emulate_simd_basic(EmuSIMD::_underlying_impl::alternating_add_subtract_func<float, false, EmuCore::do_add<float>, EmuCore::do_subtract<float>>(), c_emu, d_emu, std::make_index_sequence<4>());
-			EmuSIMD::Funcs::store_f32x4(dump_f32x16, e_reg);
-			PrintIndexable<4>(dump_f32x16);
-			std::cout << '\n';
-			EmuSIMD::_underlying_impl::emulate_simd_store(e_emu, dump_f32x16);
-			PrintIndexable<4>(dump_f32x16);
-			std::cout << '\n';
-
-			auto c_emu_u32 = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, std::uint32_t>(80u, 700u, 60u, 50u);
-			auto d_emu_u32 = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, std::uint32_t>(40u, 300u, 1u, 10u);
-			auto e_emu_u32 = EmuSIMD::_underlying_impl::emulate_simd_basic(EmuSIMD::_underlying_impl::alternating_add_subtract_func<std::uint32_t, false, EmuCore::do_add<std::uint32_t>, EmuCore::do_subtract<std::uint32_t>>(), c_emu_u32, d_emu_u32, std::make_index_sequence<4>());
-			EmuSIMD::_underlying_impl::emulate_simd_store(e_emu_u32, dump_u32x16);
-			PrintIndexable<4>(dump_u32x16);
-			std::cout << '\n';
-
-			universal_pause();
 		}
 
 		{
-			std::cout << "### 256-bit ###\n";
+			std::cout << "256-bit\n";
+			constexpr auto blend_mask = EmuSIMD::Funcs::make_blend_mask<0, 1, 0, 1, 1, 1, 0, 0>();
 			auto a_reg = EmuSIMD::Funcs::load_f32x8(elems_f32.data());
+			auto b_reg = EmuSIMD::Funcs::setzero_f32x8();
 			auto a_emu = EmuSIMD::_underlying_impl::load_dual_lane_simd_emulator<256, EmuSIMD::f32x4>(elems_f32.data());
-			auto a_emu_emu = EmuSIMD::_underlying_impl::load_dual_lane_simd_emulator<256, EmuSIMD::_underlying_impl::single_lane_simd_emulator<4, float>>(elems_f32.data());
-			EmuSIMD::Funcs::store_f32x8(dump_f32x16, a_reg);
+			auto b_emu = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<256, EmuSIMD::f32x4>();
+
+			auto c_reg = EmuSIMD::Funcs::blend_f32x8<blend_mask>(a_reg, b_reg);
+			auto c_emu = EmuSIMD::_underlying_impl::emulate_dual_lane_blend_with_mask<blend_mask>(a_emu, b_emu, std::make_index_sequence<4>());
+
+			EmuSIMD::Funcs::store_f32x8(dump_f32x16, c_reg);
 			PrintIndexable<8>(dump_f32x16);
-			std::cout << " | " << std::bitset<8>(EmuSIMD::Funcs::movemask_f32x8(a_reg)) << '\n';
-			EmuSIMD::_underlying_impl::emulate_simd_store(a_emu, dump_f32x16);
+			std::cout << '\n';
+			EmuSIMD::_underlying_impl::emulate_simd_store(c_emu, dump_f32x16);
 			PrintIndexable<8>(dump_f32x16);
-			std::cout << " | " << std::bitset<8>(EmuSIMD::_underlying_impl::emulate_simd_movemask<std::uint8_t, 8>(a_emu)) << '\n';
-			EmuSIMD::_underlying_impl::emulate_simd_store(a_emu_emu, dump_f32x16);
-			PrintIndexable<8>(dump_f32x16);
-			std::cout << " | " << std::bitset<8>(EmuSIMD::_underlying_impl::emulate_simd_movemask<std::uint8_t, 8>(a_emu_emu)) << '\n';
+			std::cout << '\n';
 		}
 
 		{
-			std::cout << "### 512-bit ###\n";
-			auto a_emu_reg = EmuSIMD::_underlying_impl::load_dual_lane_simd_emulator<512, EmuSIMD::f32x8>(elems_f32.data());
-			auto a_emu_emu_reg = EmuSIMD::_underlying_impl::load_dual_lane_simd_emulator<512, EmuSIMD::_underlying_impl::dual_lane_simd_emulator<256, EmuSIMD::f32x4>>(elems_f32.data());
-			auto a_emu_emu_emu = EmuSIMD::_underlying_impl::load_dual_lane_simd_emulator<512, EmuSIMD::_underlying_impl::dual_lane_simd_emulator<256, EmuSIMD::_underlying_impl::single_lane_simd_emulator<4, float>>>(elems_f32.data());
-			EmuSIMD::_underlying_impl::emulate_simd_store(a_emu_reg, dump_f32x16);
+			std::cout << "512-bit\n";
+			constexpr auto blend_mask = EmuSIMD::Funcs::make_blend_mask<0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0>();
+			auto a_emu = EmuSIMD::_underlying_impl::load_dual_lane_simd_emulator<512, EmuSIMD::f32x8>(elems_f32.data());
+			auto b_emu = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<512, EmuSIMD::f32x8>();
+
+			auto c_emu = EmuSIMD::_underlying_impl::emulate_dual_lane_blend_with_mask<blend_mask>(a_emu, b_emu, std::make_index_sequence<8>());
+
+			EmuSIMD::_underlying_impl::emulate_simd_store(c_emu, dump_f32x16);
 			PrintIndexable<16>(dump_f32x16);
-			std::cout << " | " << std::bitset<16>(EmuSIMD::_underlying_impl::emulate_simd_movemask<std::uint16_t, 16>(a_emu_reg)) << '\n';
-			EmuSIMD::_underlying_impl::emulate_simd_store(a_emu_emu_reg, dump_f32x16);
-			PrintIndexable<16>(dump_f32x16);
-			std::cout << " | " << std::bitset<16>(EmuSIMD::_underlying_impl::emulate_simd_movemask<std::uint16_t, 16>(a_emu_emu_reg)) << '\n';
-			EmuSIMD::_underlying_impl::emulate_simd_store(a_emu_emu_emu, dump_f32x16);
-			PrintIndexable<16>(dump_f32x16);
-			std::cout << " | " << std::bitset<16>(EmuSIMD::_underlying_impl::emulate_simd_movemask<std::uint16_t, 16>(a_emu_emu_emu)) << '\n';
+			std::cout << '\n';
 		}
 
 		universal_pause();
