@@ -12,6 +12,26 @@
 #include <bit>
 #include <immintrin.h>
 
+// Flag used to identify a cmpeq comparison (==)
+#define EMU_SIMD_CMP_EQ_FLAG _CMP_EQ_OS
+// Flag used to identify a cmpneq comparison (!=)
+#define EMU_SIMD_CMP_NEQ_FLAG _CMP_NEQ_OS
+// Flag used to identify a cmpgt comparison (>)
+#define EMU_SIMD_CMP_GT_FLAG _CMP_GT_OS
+// Flag used to identify a cmplt comparison (<)
+#define EMU_SIMD_CMP_LT_FLAG _CMP_LT_OS
+// Flag used to identify a cmpge comparison (>=)
+#define EMU_SIMD_CMP_GE_FLAG _CMP_GE_OS
+// Flag used to identify a cmple comparison (<-)
+#define EMU_SIMD_CMP_LE_FLAG _CMP_LE_OS
+
+// Flag used to identify a floor round (toward negative infinity)
+#define EMU_SIMD_FLAG_FLOOR	_MM_FROUND_FLOOR
+// Flag used to identify a ceil round (toward positive infinity)
+#define EMU_SIMD_FLAG_CEIL	_MM_FROUND_CEIL
+// Flag used to identify a trunc round (toward 0)
+#define EMU_SIMD_FLAG_TRUNC	_MM_FROUND_TRUNC
+
 // Should make these defines actually determined based on architecture/compiler rather than hard-coded
 
 /// <summary>
@@ -1184,45 +1204,126 @@ namespace EmuSIMD
 				);
 			}
 		}
+#pragma endregion
 
-		template<auto BlendMask_, EmuConcepts::Arithmetic T_, std::size_t NumElements_, std::size_t...Indices_>
-		requires(sizeof...(Indices_) == NumElements_)
-		[[nodiscard]] constexpr inline auto emulate_single_lane_blend_with_mask
-		(
-			const single_lane_simd_emulator<NumElements_, T_>& a_,
-			const single_lane_simd_emulator<NumElements_, T_>& b_,
-			std::index_sequence<Indices_...> indices_
-		) -> single_lane_simd_emulator<NumElements_, T_>
+#pragma region EXTRACTION
+		template<class Out_, std::size_t LaneWidth_, std::size_t LaneIndex_, std::size_t InNumElements_, EmuConcepts::Arithmetic InT_>
+		[[nodiscard]] constexpr inline auto emulate_extraction(const single_lane_simd_emulator<InNumElements_, InT_>& in_)
+			-> Out_
 		{
-			return set_single_lane_simd_emulator<NumElements_, T_>
-			(
-				retrieve_emulated_single_lane_simd_element<T_, Indices_, false>
-				(
-					((BlendMask_ >> Indices_) & 1) ? b_ : a_
-				)...
-			);
+			if constexpr (LaneWidth_ == 128)
+			{
+				if constexpr (LaneIndex_ == 0)
+				{
+					return EmuSIMD::cast<Out_>(in_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, LaneIndex_>(), "Invalid SIMD lane extraction emulation: Attempting to retrieve a lane index that cannot exist within the input emulator. As the output lane is the same width as the input register, only index 0 is valid.");
+				}
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<std::size_t, LaneWidth_>(), "Invalid SIMD lane extraction emulation: Attempting to retrieve a lane larger than 128-bits from an emulator that can only be 128-bits wide. This is an illegal operation.");
+			}
 		}
 
-		template<auto BlendMask_, class LaneT_, std::size_t EmulatedWidth_, std::size_t...HalfSizeIndices_>
-		[[nodiscard]] constexpr inline auto emulate_dual_lane_blend_with_mask
-		(
-			const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& a_,
-			const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& b_,
-			std::index_sequence<HalfSizeIndices_...> half_size_indices_
-		) -> dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+		template<class Out_, std::size_t LaneWidth_, std::size_t LaneIndex_, std::size_t EmulatedWidth_, class LaneT_>
+		[[nodiscard]] constexpr inline auto emulate_extraction(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& in_)
+			-> Out_
 		{
-			constexpr std::size_t half_elements = sizeof...(HalfSizeIndices_);
-			constexpr std::size_t num_elements = half_elements * 2;
-			constexpr auto offset_blend_mask = BlendMask_ >> half_elements;
-			return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
-			(
-				EmuSIMD::blend<(static_cast<bool>((BlendMask_ >> HalfSizeIndices_) & 1))...>(a_._lane_0, b_._lane_0),
-				EmuSIMD::blend<(static_cast<bool>((offset_blend_mask >> HalfSizeIndices_) & 1))...>(a_._lane_1, b_._lane_1)
-			);
+			static_assert(EmuCore::TMP::is_one_of<LaneWidth_, 128, 256, 512>(), "Invalid SIMD lane extraction emulation: Incorrect output Lane Width. Valid values are 128, 256, 512.");
+			if constexpr (LaneWidth_ == EmulatedWidth_)
+			{
+				if constexpr (LaneIndex_ == 0)
+				{
+					return EmuSIMD::cast<Out_>(in_);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, LaneIndex_>(), "Invalid SIMD lane extraction emulation: Attempting to retrieve a lane index that cannot exist within the input emulator. As the output lane is the same width as the input register, only index 0 is valid.");
+				}
+			}
+			else if constexpr (LaneWidth_ < EmulatedWidth_)
+			{
+				if constexpr (LaneWidth_ == (EmulatedWidth_ / 2))
+				{
+					if constexpr (LaneIndex_ == 0)
+					{
+						return EmuSIMD::cast<Out_>(in_._lane_0);
+					}
+					else if constexpr(LaneIndex_ == 1)
+					{
+						return EmuSIMD::cast<Out_>(in_._lane_1);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, LaneIndex_>(), "Invalid SIMD lane extraction emulation: Attempting to retrieve a lane index that cannot exist within the emulator. As the output lane is half the width of the input register, only indices 0 and 1 are valid.");
+					}
+				}
+				else if constexpr(LaneWidth_ == (EmulatedWidth_ / 4))
+				{
+					if constexpr (LaneIndex_ == 0 || LaneIndex_ == 1)
+					{
+						return EmuSIMD::extract_lane<LaneIndex_, Out_>(in_._lane_0);
+					}
+					else if constexpr (LaneIndex_ == 2 || LaneIndex_ == 3)
+					{
+						return EmuSIMD::extract_lane<LaneIndex_ - 2, Out_>(in_._lane_1);
+					}
+					else
+					{
+						static_assert(EmuCore::TMP::get_false<std::size_t, LaneIndex_>(), "Invalid SIMD lane extraction emulation: Attempting to retrieve a lane index that cannot exist within the emulator. As the output lane is quarter the width of the input register, only indices 0, 1, 2, and 3 are valid.");
+					}
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<std::size_t, LaneIndex_>(), "Invalid SIMD lane extraction emulation: Attempting to retrieve a lane from a multi-lane SIMD register of a width that is neither half nor quarter the width of the input emulator.");
+				}
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<std::size_t, LaneWidth_>(), "Invalid SIMD lane extraction emulation: Attempting to retrieve a lane larger than the overall width of a multi-lane emulator. This is an illegal operation.");
+			}
 		}
 #pragma endregion
 
 #pragma region FUNCTORS
+		template<int RoundingFlag_, typename T_>
+		struct round_with_flag_emulator_func
+		{
+			[[nodiscard]] constexpr inline decltype(auto) operator()(const T_& in_) const
+			{
+				if constexpr (EmuConcepts::Integer<T_>)
+				{
+					return in_;
+				}
+				else
+				{
+					if constexpr (RoundingFlag_ == EMU_SIMD_FLAG_FLOOR)
+					{
+						return EmuCore::do_floor<T_>()(in_);
+					}
+					else if constexpr (RoundingFlag_ == EMU_SIMD_FLAG_CEIL)
+					{
+						return EmuCore::do_ceil<T_>()(in_);
+					}
+					else if constexpr (RoundingFlag_ == EMU_SIMD_FLAG_TRUNC)
+					{
+						return EmuCore::do_trunc<T_>()(in_);
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<RoundingFlag_>(),
+							"Invalid RoundingFlag_ provided for an emulated EmuSIMD round function: The flag is not a recognised roudning flag defined by EmuSIMD. This is implementation-defined behaviour, which is not supported by EmuSIMD's suite of guarantees, and thus will not be emulated. Only use rounding flags prefixed with EMU_SIMD_FLAG_ to guarantee EmuSIMD support."
+						);
+					}
+				}
+			}
+		};
+
 		template<typename T_>
 		struct blendv_emulator_func
 		{
@@ -1353,7 +1454,98 @@ namespace EmuSIMD
 		};
 #pragma endregion
 
+#pragma region EMULATED_BLENDS
+		template<auto BlendMask_, EmuConcepts::Arithmetic T_, std::size_t NumElements_, std::size_t...Indices_>
+		requires(sizeof...(Indices_) == NumElements_)
+		[[nodiscard]] constexpr inline auto emulate_single_lane_blend_with_mask
+		(
+			const single_lane_simd_emulator<NumElements_, T_>& a_,
+			const single_lane_simd_emulator<NumElements_, T_>& b_,
+			std::index_sequence<Indices_...> indices_
+		) -> single_lane_simd_emulator<NumElements_, T_>
+		{
+			return set_single_lane_simd_emulator<NumElements_, T_>
+			(
+				retrieve_emulated_single_lane_simd_element<T_, Indices_, false>
+				(
+					((BlendMask_ >> Indices_) & 1) ? b_ : a_
+				)...
+			);
+		}
+
+		template<auto BlendMask_, class LaneT_, std::size_t EmulatedWidth_, std::size_t...HalfSizeIndices_>
+		[[nodiscard]] constexpr inline auto emulate_dual_lane_blend_with_mask
+		(
+			const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& a_,
+			const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& b_,
+			std::index_sequence<HalfSizeIndices_...> half_size_indices_
+		) -> dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+		{
+			constexpr std::size_t half_elements = sizeof...(HalfSizeIndices_);
+			constexpr std::size_t num_elements = half_elements * 2;
+			constexpr auto offset_blend_mask = BlendMask_ >> half_elements;
+			return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+			(
+				EmuSIMD::blend<(static_cast<bool>((BlendMask_ >> HalfSizeIndices_) & 1))...>(a_._lane_0, b_._lane_0),
+				EmuSIMD::blend<(static_cast<bool>((offset_blend_mask >> HalfSizeIndices_) & 1))...>(a_._lane_1, b_._lane_1)
+			);
+		}
+#pragma endregion
+
 #pragma region EMULATED_SHUFFLES
+		template<std::size_t Index_, auto ShuffleMask_, std::size_t SingleArgWidth_, std::size_t NumElements_, typename T_>
+		[[nodiscard]] constexpr inline decltype(auto) _get_element_for_single_lane_shuffle
+		(
+			const single_lane_simd_emulator<NumElements_, T_>& a_,
+			const single_lane_simd_emulator<NumElements_, T_>& b_
+		)
+		{
+			constexpr std::size_t half_elements = NumElements_ / 2;
+			constexpr std::size_t current_arg_shift_count = Index_ * SingleArgWidth_;
+			constexpr std::size_t element_arg_mask = (1 << SingleArgWidth_) - 1;
+			constexpr auto current_element_arg = (ShuffleMask_ >> current_arg_shift_count) & element_arg_mask;
+			if constexpr (Index_ < half_elements)
+			{
+				return retrieve_emulated_single_lane_simd_element<T_, current_element_arg, false>(a_);
+			}
+			else
+			{
+				return retrieve_emulated_single_lane_simd_element<T_, current_element_arg, false>(b_);
+			}
+		}
+
+		template<auto ShuffleMask_, std::size_t SingleArgWidth_, std::size_t NumElements_, typename T_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto _emulate_single_lane_shuffle
+		(
+			const single_lane_simd_emulator<NumElements_, T_>& a_,
+			const single_lane_simd_emulator<NumElements_, T_>& b_,
+			std::index_sequence<Indices_...> indices_
+		) -> single_lane_simd_emulator<NumElements_, T_>
+		{
+			return single_lane_simd_emulator<NumElements_, T_>
+			(
+				_get_element_for_single_lane_shuffle<Indices_, ShuffleMask_, SingleArgWidth_>
+				(
+					a_,
+					b_
+				)...
+			);
+		}
+
+		template<auto ShuffleMask_, std::size_t SingleArgWidth_, std::size_t NumElements_, typename T_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto _emulate_single_lane_permute(const single_lane_simd_emulator<NumElements_, T_>& ab_, std::index_sequence<Indices_...> indices_)
+			-> single_lane_simd_emulator<NumElements_, T_>
+		{
+			return single_lane_simd_emulator<NumElements_, T_>
+			(
+				_get_element_for_single_lane_shuffle<Indices_, ShuffleMask_, SingleArgWidth_>
+				(
+					ab_,
+					ab_
+				)...
+			);
+		}
+
 		template<std::size_t Index_, std::size_t NumElements_, typename T_>
 		[[nodiscard]] constexpr inline decltype(auto) _select_emulated_movehl_value(const single_lane_simd_emulator<NumElements_, T_>& a_, const single_lane_simd_emulator<NumElements_, T_>& b_)
 		{

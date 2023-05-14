@@ -363,17 +363,17 @@ int main()
 		constexpr auto elems_f32 = std::array<float, 16>({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16});
 		std::uint32_t dump_u32x16[16];
 		float dump_f32x16[16];
-
+		
+		constexpr auto shuffle_mask = EmuSIMD::Funcs::make_shuffle_mask_32<2, 1, 3, 0>();
 		{
 			std::cout << "128-bit\n";
-			constexpr auto blend_mask = EmuSIMD::Funcs::make_blend_mask<0, 1, 0, 1>();
 			auto a_reg = EmuSIMD::Funcs::load_f32x4(elems_f32.data());
 			auto b_reg = EmuSIMD::Funcs::setzero_f32x4();
 			auto a_emu = EmuSIMD::_underlying_impl::load_single_lane_simd_emulator<4, float>(elems_f32.data());
 			auto b_emu = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, float>();
 
-			auto c_reg = EmuSIMD::Funcs::blend_f32x4<blend_mask>(a_reg, b_reg);
-			auto c_emu = EmuSIMD::_underlying_impl::emulate_single_lane_blend_with_mask<blend_mask>(a_emu, b_emu, std::make_index_sequence<4>());
+			auto c_reg = EmuSIMD::Funcs::shuffle_f32x4<shuffle_mask>(a_reg, b_reg);
+			auto c_emu = EmuSIMD::_underlying_impl::_emulate_single_lane_shuffle<shuffle_mask, 2>(a_emu, b_emu, std::make_index_sequence<4>());
 
 			EmuSIMD::Funcs::store_f32x4(dump_f32x16, c_reg);
 			PrintIndexable<4>(dump_f32x16);
@@ -385,33 +385,19 @@ int main()
 
 		{
 			std::cout << "256-bit\n";
-			constexpr auto blend_mask = EmuSIMD::Funcs::make_blend_mask<0, 1, 0, 1, 1, 1, 0, 0>();
 			auto a_reg = EmuSIMD::Funcs::load_f32x8(elems_f32.data());
 			auto b_reg = EmuSIMD::Funcs::setzero_f32x8();
 			auto a_emu = EmuSIMD::_underlying_impl::load_dual_lane_simd_emulator<256, EmuSIMD::f32x4>(elems_f32.data());
 			auto b_emu = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<256, EmuSIMD::f32x4>();
-
-			auto c_reg = EmuSIMD::Funcs::blend_f32x8<blend_mask>(a_reg, b_reg);
-			auto c_emu = EmuSIMD::_underlying_impl::emulate_dual_lane_blend_with_mask<blend_mask>(a_emu, b_emu, std::make_index_sequence<4>());
-
+			
+			auto c_reg = EmuSIMD::Funcs::shuffle_f32x8<shuffle_mask>(a_reg, b_reg);
+			auto c_emu = EmuSIMD::_underlying_impl::emulate_simd_basic([](const auto& a, const auto& b) { return EmuSIMD::Funcs::shuffle_f32x4<shuffle_mask>(a, b); }, a_emu, b_emu);
+			
 			EmuSIMD::Funcs::store_f32x8(dump_f32x16, c_reg);
 			PrintIndexable<8>(dump_f32x16);
 			std::cout << '\n';
 			EmuSIMD::_underlying_impl::emulate_simd_store(c_emu, dump_f32x16);
 			PrintIndexable<8>(dump_f32x16);
-			std::cout << '\n';
-		}
-
-		{
-			std::cout << "512-bit\n";
-			constexpr auto blend_mask = EmuSIMD::Funcs::make_blend_mask<0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0>();
-			auto a_emu = EmuSIMD::_underlying_impl::load_dual_lane_simd_emulator<512, EmuSIMD::f32x8>(elems_f32.data());
-			auto b_emu = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<512, EmuSIMD::f32x8>();
-
-			auto c_emu = EmuSIMD::_underlying_impl::emulate_dual_lane_blend_with_mask<blend_mask>(a_emu, b_emu, std::make_index_sequence<8>());
-
-			EmuSIMD::_underlying_impl::emulate_simd_store(c_emu, dump_f32x16);
-			PrintIndexable<16>(dump_f32x16);
 			std::cout << '\n';
 		}
 

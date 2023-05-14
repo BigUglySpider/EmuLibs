@@ -1265,7 +1265,7 @@ namespace EmuSIMD::Funcs
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
 		using index_sequence = std::make_index_sequence<4>;
-		return emulate_simd_basic([](EmuCore::do_cos<float>(), in_, index_sequence());
+		return emulate_simd_basic(EmuCore::do_cos<float>(), in_, index_sequence());
 #endif
 	}
 
@@ -1351,7 +1351,7 @@ namespace EmuSIMD::Funcs
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
 		using index_sequence = std::make_index_sequence<4>;
-		return emulate_simd_basic([](EmuCore::do_sin<float>(), in_, index_sequence());
+		return emulate_simd_basic(EmuCore::do_sin<float>(), in_, index_sequence());
 #endif
 	}
 
@@ -1477,7 +1477,7 @@ namespace EmuSIMD::Funcs
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
 		using index_sequence = std::make_index_sequence<4>;
-		return emulate_simd_basic([](EmuCore::do_tan<float>(), in_, index_sequence());
+		return emulate_simd_basic(EmuCore::do_tan<float>(), in_, index_sequence());
 #endif
 	}
 
@@ -1508,7 +1508,7 @@ namespace EmuSIMD::Funcs
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
 		using index_sequence = std::make_index_sequence<4>;
-		return emulate_simd_basic([](EmuCore::do_acos<float>(), in_, index_sequence());
+		return emulate_simd_basic(EmuCore::do_acos<float>(), in_, index_sequence());
 #endif
 	}
 
@@ -1540,7 +1540,7 @@ namespace EmuSIMD::Funcs
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
 		using index_sequence = std::make_index_sequence<4>;
-		return emulate_simd_basic([](EmuCore::do_asin<float>(), in_, index_sequence());
+		return emulate_simd_basic(EmuCore::do_asin<float>(), in_, index_sequence());
 #endif
 	}
 
@@ -1592,7 +1592,7 @@ namespace EmuSIMD::Funcs
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
 		using index_sequence = std::make_index_sequence<4>;
-		return emulate_simd_basic([](EmuCore::do_atan2<float>(), y_, x_, index_sequence());
+		return emulate_simd_basic(EmuCore::do_atan2<float>(), y_, x_, index_sequence());
 #endif
 	}
 
@@ -1638,7 +1638,7 @@ namespace EmuSIMD::Funcs
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
 		using index_sequence = std::make_index_sequence<4>;
-		return emulate_simd_basic([](EmuCore::do_atan<float>(), in_, index_sequence());
+		return emulate_simd_basic(EmuCore::do_atan<float>(), in_, index_sequence());
 #endif
 	}
 #pragma endregion
