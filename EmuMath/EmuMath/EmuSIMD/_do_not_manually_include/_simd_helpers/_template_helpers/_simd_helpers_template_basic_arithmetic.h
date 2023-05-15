@@ -2,6 +2,7 @@
 #define EMU_SIMD_HELPERS_TEMPLATE_BASIC_ARITHMETIC_H_INC_ 1
 
 #include "_underlying_template_helpers/_all_underlying_templates.h"
+#include "_underlying_template_helpers/_generic_funcs/_forward_declarations/_forward_template_basic_arithmetic.h"
 #include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD
@@ -17,7 +18,7 @@ namespace EmuSIMD
 	/// <param name="lhs_">Register of values appearing on the left-hand side of addition.</param>
 	/// <param name="rhs_">Register of values appearing on the right-hand side of addition.</param>
 	/// <returns>Result of adding the two passed SIMD registers with their relevant _add_ operation (e.g. _mm_add_ps with EmuSIMD::f32x4 registers).</returns>
-	template<std::size_t PerElementWidthIfIntegral_ = 32, class Register_>
+	template<std::size_t PerElementWidthIfIntegral_, class Register_>
 	[[nodiscard]] inline Register_ add(Register_ lhs_, Register_ rhs_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -49,7 +50,7 @@ namespace EmuSIMD
 	/// <param name="lhs_">Register of values appearing on the left-hand side of subtraction.</param>
 	/// <param name="rhs_">Register of values appearing on the right-hand side of subtraction.</param>
 	/// <returns>Result of subtracting the two passed SIMD registers with their relevant _sub_ operation (e.g. _mm_sub_ps with EmuSIMD::f32x4 registers).</returns>
-	template<std::size_t PerElementWidthIfIntegral_ = 32, class Register_>
+	template<std::size_t PerElementWidthIfIntegral_, class Register_>
 	[[nodiscard]] inline Register_ sub(Register_ lhs_, Register_ rhs_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -89,7 +90,7 @@ namespace EmuSIMD
 	///		Result of multiplying the two passed SIMD registers with their relevant _mul_ operation (e.g. _mm_mul_ps with EmuSIMD::f32x4 registers), where
 	///		all operations and resulting elements are of the same width of the input elements.
 	/// </returns>
-	template<std::size_t PerElementWidthIfIntegral_ = 32, class Register_>
+	template<std::size_t PerElementWidthIfIntegral_, class Register_>
 	[[nodiscard]] inline Register_ mul_all(Register_ lhs_, Register_ rhs_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -124,7 +125,7 @@ namespace EmuSIMD
 	/// <param name="lhs_">Register of values appearing on the left-hand side of division.</param>
 	/// <param name="rhs_">Register of values appearing on the right-hand side of division.</param>
 	/// <returns>Result of division with the two passed SIMD registers with their relevant _div_ operation (e.g. _mm_div_ps with EmuSIMD::f32x4 registers).</returns>
-	template<std::size_t PerElementWidthIfIntegral_ = 32, bool SignedIfIntegral_ = true, class Register_>
+	template<std::size_t PerElementWidthIfIntegral_, bool SignedIfIntegral_, class Register_>
 	[[nodiscard]] inline Register_ div(Register_ lhs_, Register_ rhs_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -159,7 +160,7 @@ namespace EmuSIMD
 	/// <param name="lhs_">Register of values appearing on the left-hand side of modulo division.</param>
 	/// <param name="rhs_">Register of values appearing on the right-hand side of modulo division.</param>
 	/// <returns>Result of modulo division with the two passed SIMD registers with their relevant mod operation (e.g. _mm_fmod_ps with EmuSIMD::f32x4 registers).</returns>
-	template<std::size_t PerElementWidthIfIntegral_ = 32, bool SignedIfIntegral_ = true, class Register_>
+	template<std::size_t PerElementWidthIfIntegral_, bool SignedIfIntegral_, class Register_>
 	[[nodiscard]] inline Register_ mod(Register_ lhs_, Register_ rhs_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -192,7 +193,7 @@ namespace EmuSIMD
 	/// <typeparam name="Register_">Register type to perform a negation via.</typeparam>
 	/// <param name="register_">SIMD register to negate.</param>
 	/// <returns>Negated form of the passed SIMD register.</returns>
-	template<std::size_t PerElementWidthIfIntegral_ = 32, class Register_>
+	template<std::size_t PerElementWidthIfIntegral_, class Register_>
 	[[nodiscard]] inline Register_ negate(Register_ register_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -220,7 +221,7 @@ namespace EmuSIMD
 	/// <param name="to_mult_rhs_">Register appearing on the right-hand side of multiplication.</param>
 	/// <param name="to_add_after_mult_">Register to add to the intermediate value resulting from the initial multiplication before a floating-point round.</param>
 	/// <returns>Result of a fused multiply-add operation with the provided operands, or an emulation of such if the registers are integral.</returns>
-	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
+	template<std::size_t PerElementWidthIfInt_, class Register_>
 	[[nodiscard]] inline Register_ fmadd(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_add_after_mult_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -259,7 +260,7 @@ namespace EmuSIMD
 	/// <param name="to_mult_rhs_">Register appearing on the right-hand side of multiplication.</param>
 	/// <param name="to_add_after_mult_">Register to subtract from the intermediate value resulting from the initial multiplication before a floating-point round.</param>
 	/// <returns>Result of a fused multiply-subtract operation with the provided operands, or an emulation of such if the registers are integral.</returns>
-	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
+	template<std::size_t PerElementWidthIfInt_, class Register_>
 	[[nodiscard]] inline Register_ fmsub(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_add_after_mult_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -301,7 +302,7 @@ namespace EmuSIMD
 	///		Register to sequentially add to/subtract from the intermediate value resulting from the initial multiplication before a floating-point round.
 	/// </param>
 	/// <returns>Result of a fused multiply-add/subtract operation with the provided operands, or an emulation of such if the registers are integral.</returns>
-	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
+	template<std::size_t PerElementWidthIfInt_, class Register_>
 	[[nodiscard]] inline Register_ fmaddsub(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_add_sub_after_mult_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -343,7 +344,7 @@ namespace EmuSIMD
 	///		Register to sequentially subtract from/add to the intermediate value resulting from the initial multiplication before a floating-point round.
 	/// </param>
 	/// <returns>Result of a fused multiply-subtract/add operation with the provided operands, or an emulation of such if the registers are integral.</returns>
-	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
+	template<std::size_t PerElementWidthIfInt_, class Register_>
 	[[nodiscard]] inline Register_ fmsubadd(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_sub_add_after_mult_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -382,7 +383,7 @@ namespace EmuSIMD
 	/// <param name="lhs_">Register to add to/subtract from.</param>
 	/// <param name="rhs_">Register to sequentially add/subtract the values of.</param>
 	/// <returns>Result of sequential addition to/subtraction from the passed lhs_ register via the passed rhs_ register.</returns>
-	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
+	template<std::size_t PerElementWidthIfInt_, class Register_>
 	[[nodiscard]] inline Register_ addsub(Register_ lhs_, Register_ rhs_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -420,7 +421,7 @@ namespace EmuSIMD
 	/// <param name="lhs_">Register to subtract from/add to.</param>
 	/// <param name="rhs_">Register to sequentially subtract/add the values of.</param>
 	/// <returns>Result of sequential subtraction from/addition to the passed lhs_ register via the passed rhs_ register.</returns>
-	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
+	template<std::size_t PerElementWidthIfInt_, class Register_>
 	[[nodiscard]] inline Register_ subadd(Register_ lhs_, Register_ rhs_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -501,7 +502,7 @@ namespace EmuSIMD
 		}
 	}
 
-	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
 	[[nodiscard]] inline Register_ vector_min(Register_ a_, Register_ b_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -515,7 +516,7 @@ namespace EmuSIMD
 		}
 	}
 
-	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
 	[[nodiscard]] inline Register_ vector_max(Register_ a_, Register_ b_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -529,7 +530,7 @@ namespace EmuSIMD
 		}
 	}
 
-	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
 	[[nodiscard]] inline Register_ min(Register_ a_, Register_ b_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -543,7 +544,7 @@ namespace EmuSIMD
 		}
 	}
 
-	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
 	[[nodiscard]] inline Register_ max(Register_ a_, Register_ b_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -557,7 +558,37 @@ namespace EmuSIMD
 		}
 	}
 
-	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, EmuConcepts::KnownSIMD Register_>
+	[[nodiscard]] inline auto horizontal_min(Register_&& a_)
+		-> typename std::remove_cvref<Register_>::type
+	{
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _underlying_simd_helpers::_horizontal_min<PerElementWidthIfInt_, SignedIfInt_>(std::forward<Register_>(a_));
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::horizontal_min with an unsupported type as the passed Register_.");
+		}
+	}
+
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, EmuConcepts::KnownSIMD Register_>
+	[[nodiscard]] inline auto horizontal_max(Register_&& a_)
+		-> typename std::remove_cvref<Register_>::type
+	{
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _underlying_simd_helpers::_horizontal_max<PerElementWidthIfInt_, SignedIfInt_>(std::forward<Register_>(a_));
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::horizontal_max with an unsupported type as the passed Register_.");
+		}
+	}
+
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
 	[[nodiscard]] inline Register_ clamp_min(Register_ register_, Register_ min_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -571,7 +602,7 @@ namespace EmuSIMD
 		}
 	}
 
-	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
 	[[nodiscard]] inline Register_ clamp_max(Register_ register_, Register_ max_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -585,7 +616,7 @@ namespace EmuSIMD
 		}
 	}
 
-	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
 	[[nodiscard]] inline Register_ clamp(Register_ register_, Register_ min_, Register_ max_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -599,7 +630,7 @@ namespace EmuSIMD
 		}
 	}
 
-	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
 	[[nodiscard]] constexpr inline Register_ sqrt(Register_ in_)
 	{
 		using in_uq = EmuCore::TMP::remove_ref_cv_t<Register_>;
@@ -909,7 +940,7 @@ namespace EmuSIMD
 		}
 	}
 
-	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
 	[[nodiscard]] constexpr inline Register_ rsqrt(Register_ in_)
 	{
 		using in_uq = EmuCore::TMP::remove_ref_cv_t<Register_>;
@@ -1219,7 +1250,7 @@ namespace EmuSIMD
 		}
 	}
 
-	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
 	[[nodiscard]] constexpr inline Register_ abs(Register_ in_)
 	{
 		using in_uq = EmuCore::TMP::remove_ref_cv_t<Register_>;

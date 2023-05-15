@@ -122,7 +122,9 @@ namespace EmuSIMD::Funcs
 
 #pragma region MINMAX_FUNCS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 min_i16x8(EmuSIMD::i16x8_arg a_, EmuSIMD::i16x8_arg b_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 horizontal_min_i16x8(EmuSIMD::i16x8_arg a_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 max_i16x8(EmuSIMD::i16x8_arg a_, EmuSIMD::i16x8_arg b_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 horizontal_max_i16x8(EmuSIMD::i16x8_arg a_);
 #pragma endregion
 
 #pragma region BASIC_ARITHMETIC

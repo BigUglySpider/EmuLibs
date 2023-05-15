@@ -462,7 +462,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtpd_ps(a_);
 #else
-		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 2, true, double>(a_, std::make_index_sequence<4>());
 #endif
 	}
 
@@ -489,7 +489,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtepi32_ps(_mm_cvtepi8_epi32(a_));
 #else
-		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 16, true, std::int8_t>(a_, std::make_index_sequence<4>());
 #endif
 	}
 
@@ -498,7 +498,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtepi32_ps(_mm_cvtepi16_epi32(a_));
 #else
-		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 8, true, std::int16_t>(a_, std::make_index_sequence<4>());
 #endif
 	}
 
@@ -507,7 +507,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtepi32_ps(a_);
 #else
-		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 4, true, std::int32_t>(a_, std::make_index_sequence<4>());
 #endif
 	}
 
@@ -516,7 +516,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtepi64_ps(a_);
 #else
-		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 2, true, std::int64_t>(a_, std::make_index_sequence<4>());
 #endif
 	}
 
@@ -597,7 +597,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtepi32_ps(_mm_cvtepu8_epi32(a_));
 #else
-		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 16, false, std::uint8_t>(a_, std::make_index_sequence<4>());
 #endif
 	}
 
@@ -606,7 +606,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtepi32_ps(_mm_cvtepu16_epi32(a_));
 #else
-		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 8, false, std::uint16_t>(a_, std::make_index_sequence<4>());
 #endif
 	}
 
@@ -615,7 +615,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtepu32_ps(a_);
 #else
-		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 4, false, std::uint32_t>(a_, std::make_index_sequence<4>());
 #endif
 	}
 
@@ -624,7 +624,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_128_REGISTERS
 		return _mm_cvtepu64_ps(a_);
 #else
-		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32>(a_, std::make_index_sequence<4>());
+		return _underlying_impl::emulate_cvt<EmuSIMD::f32x4, float, 32, true, 2, false, std::uint64_t>(a_, std::make_index_sequence<4>());
 #endif
 	}
 

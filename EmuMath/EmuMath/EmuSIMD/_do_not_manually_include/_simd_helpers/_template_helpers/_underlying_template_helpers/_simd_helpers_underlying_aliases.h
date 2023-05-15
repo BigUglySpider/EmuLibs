@@ -50,7 +50,7 @@
 /// <para> If this is true, `EMU_SIMD_USE_256_REGISTERS` and `EMU_SIMD_USE_128_REGISTERS` will also be true. </para>
 /// <para> When emulating, 512-bit registers will be emulated as two 256-bit registers (this will also work when 256-bit registers are emulated). </para>
 /// </summary>
-#define EMU_SIMD_USE_512_REGISTERS (true)
+#define EMU_SIMD_USE_512_REGISTERS (false)
 #define EMU_SIMD_USES_ANY_SIMD_REGISTERS (EMU_SIMD_USE_128_REGISTERS || EMU_SIMD_USE_256_REGISTERS || EMU_SIMD_USE_512_REGISTERS)
 
 /// <summary>
@@ -1117,8 +1117,8 @@ namespace EmuSIMD
 			}
 		}
 
-		template<class Out_, typename OutT_, std::size_t OutPerElementWidth_, EmuConcepts::Arithmetic InT_, std::size_t InSize_, std::size_t...OutIndices_>
-		[[nodiscard]] constexpr inline auto emulate_cvt(const single_lane_simd_emulator<InSize_, InT_>& in_emulator_, std::index_sequence<OutIndices_...> out_indices_)
+		template<class Out_, typename OutT_, std::size_t OutPerElementWidth_, bool OutSigned_, std::size_t InElementCount_, bool InSigned_, typename InT_, std::size_t InSize_, EmuConcepts::Arithmetic EmuT_, std::size_t...OutIndices_>
+		[[nodiscard]] constexpr inline auto emulate_cvt(const single_lane_simd_emulator<InSize_, EmuT_>& in_emulator_, std::index_sequence<OutIndices_...> out_indices_)
 			-> typename std::remove_cvref<Out_>::type
 		{
 			return EmuSIMD::setr<typename std::remove_cvref<Out_>::type, OutPerElementWidth_>
@@ -1165,6 +1165,19 @@ namespace EmuSIMD
 					);
 				}
 			}
+		}
+
+		template<class Out_, typename OutT_, std::size_t OutPerElementWidth_, bool OutSigned_, std::size_t InElementCount_, bool InSigned_, typename InT_, EmuConcepts::KnownSIMD In_, std::size_t...OutIndices_>
+		requires(!is_simd_emulator<In_>::value)
+		[[nodiscard]] constexpr inline auto emulate_cvt(In_&& in_register_, std::index_sequence<OutIndices_...> out_indices_)
+			-> typename std::remove_cvref<Out_>::type
+		{
+			InT_ input_data[InElementCount_];
+			EmuSIMD::store(std::forward<In_>(in_register_), input_data);
+			return EmuSIMD::setr<typename std::remove_cvref<Out_>::type, OutPerElementWidth_>
+			(
+				_retrieve_data_or_default<OutIndices_, InElementCount_, true, OutT_>(input_data)...
+			);
 		}
 #pragma endregion
 
@@ -1654,6 +1667,21 @@ namespace EmuSIMD
 			};
 			(update_result(retrieve_emulated_single_lane_simd_element<T_, IndicesExcept0_, false>(a_)), ...);
 			return set1_single_lane_simd_emulator<NumElements_, T_>(result);
+		}
+
+		template<bool IsMax_, std::size_t PerElementWidth_, bool IsSigned_, std::size_t EmulatedWidth_, class LaneT_>
+		[[nodiscard]] constexpr inline auto emulate_horizontal_min_or_max(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& a_)
+		{
+			if constexpr (IsMax_)
+			{
+				auto vertical_max = EmuSIMD::max<PerElementWidth_, IsSigned_>(a_._lane_0, a_._lane_1);
+				return EmuSIMD::horizontal_max<PerElementWidth_, IsSigned_>(vertical_max);
+			}
+			else
+			{
+				auto vertical_min = EmuSIMD::min<PerElementWidth_, IsSigned_>(a_._lane_0, a_._lane_1);
+				return EmuSIMD::horizontal_min<PerElementWidth_, IsSigned_>(vertical_min);
+			}
 		}
 #pragma endregion
 	}
