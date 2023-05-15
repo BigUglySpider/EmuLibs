@@ -197,7 +197,7 @@ namespace EmuSIMD::Funcs
 		return _mm512_shuffle_ps(lhs_, rhs_, ShuffleMask);
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
-		emulate_simd_basic([](EmuSIMD::f32x8_arg lhs, EmuSIMD::f32x8_arg rhs) { return shuffle_f32x8<ShuffleMask>(lhs, rhs); }, lhs_, rhs_);
+		return emulate_simd_basic([](EmuSIMD::f32x8_arg lhs, EmuSIMD::f32x8_arg rhs) { return shuffle_f32x8<ShuffleMask>(lhs, rhs); }, lhs_, rhs_);
 #endif
 	}
 
@@ -208,7 +208,7 @@ namespace EmuSIMD::Funcs
 		return _mm512_permute_ps(in_, ShuffleMask);
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
-		emulate_simd_basic([](EmuSIMD::f32x8_arg ab) { return permute_f32x8<ShuffleMask>(ab); }, in_);
+		return emulate_simd_basic([](EmuSIMD::f32x8_arg ab) { return permute_f32x8<ShuffleMask>(ab); }, in_);
 #endif
 	}
 #pragma endregion
