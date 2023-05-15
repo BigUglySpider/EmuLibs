@@ -503,34 +503,6 @@ namespace EmuSIMD
 	}
 
 	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
-	[[nodiscard]] inline Register_ vector_min(Register_ a_, Register_ b_)
-	{
-		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
-		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
-		{
-			return _underlying_simd_helpers::_min<PerElementWidthIfInt_, SignedIfInt_>(a_, b_);
-		}
-		else
-		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::vector_min with an unsupported type as the passed Register_.");
-		}
-	}
-
-	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
-	[[nodiscard]] inline Register_ vector_max(Register_ a_, Register_ b_)
-	{
-		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
-		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
-		{
-			return _underlying_simd_helpers::_max<PerElementWidthIfInt_, SignedIfInt_>(a_, b_);
-		}
-		else
-		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::vector_max with an unsupported type as the passed Register_.");
-		}
-	}
-
-	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
 	[[nodiscard]] inline Register_ min(Register_ a_, Register_ b_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;

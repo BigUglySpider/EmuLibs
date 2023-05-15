@@ -224,12 +224,6 @@ namespace EmuSIMD
 	[[nodiscard]] inline Register_ trunc(Register_ register_);
 
 	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
-	[[nodiscard]] inline Register_ vector_min(Register_ a_, Register_ b_);
-
-	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
-	[[nodiscard]] inline Register_ vector_max(Register_ a_, Register_ b_);
-
-	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
 	[[nodiscard]] inline Register_ min(Register_ a_, Register_ b_);
 
 	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
