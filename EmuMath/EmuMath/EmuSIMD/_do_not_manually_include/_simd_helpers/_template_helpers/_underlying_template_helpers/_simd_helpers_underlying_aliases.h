@@ -50,7 +50,7 @@
 /// <para> If this is true, `EMU_SIMD_USE_256_REGISTERS` and `EMU_SIMD_USE_128_REGISTERS` will also be true. </para>
 /// <para> When emulating, 512-bit registers will be emulated as two 256-bit registers (this will also work when 256-bit registers are emulated). </para>
 /// </summary>
-#define EMU_SIMD_USE_512_REGISTERS (true)
+#define EMU_SIMD_USE_512_REGISTERS (false)
 #define EMU_SIMD_USES_ANY_SIMD_REGISTERS (EMU_SIMD_USE_128_REGISTERS || EMU_SIMD_USE_256_REGISTERS || EMU_SIMD_USE_512_REGISTERS)
 
 /// <summary>
@@ -1625,8 +1625,20 @@ namespace EmuSIMD
 
 		template<std::size_t NumElements_, typename T_, std::size_t...Indices_>
 		[[nodiscard]] constexpr inline auto emulated_movehl(const single_lane_simd_emulator<NumElements_, T_>& a_, const single_lane_simd_emulator<NumElements_, T_>& b_, std::index_sequence<Indices_...> indices_)
+			-> single_lane_simd_emulator<NumElements_, T_>
 		{
 			return single_lane_simd_emulator<NumElements_, T_>(_select_emulated_movehl_value<Indices_>(a_, b_)...);
+		}
+
+		template<std::size_t EmulatedWidth_, class LaneT_>
+		[[nodiscard]] constexpr inline auto emulated_movehl(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& a_, const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& b_)
+			-> dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+		{
+			return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+			(
+				b_._lane_1,
+				a_._lane_1
+			);
 		}
 
 		template<std::size_t Index_, std::size_t NumElements_, typename T_>
@@ -1648,6 +1660,17 @@ namespace EmuSIMD
 		[[nodiscard]] constexpr inline auto emulated_movelh(const single_lane_simd_emulator<NumElements_, T_>& a_, const single_lane_simd_emulator<NumElements_, T_>& b_, std::index_sequence<Indices_...> indices_)
 		{
 			return single_lane_simd_emulator<NumElements_, T_>(_select_emulated_movelh_value<Indices_>(a_, b_)...);
+		}
+
+		template<std::size_t EmulatedWidth_, class LaneT_>
+		[[nodiscard]] constexpr inline auto emulated_movelh(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& a_, const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& b_)
+			-> dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+		{
+			return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
+			(
+				a_._lane_0,
+				b_._lane_0
+			);
 		}
 #pragma endregion
 

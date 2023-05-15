@@ -801,14 +801,22 @@ namespace EmuSIMD::Funcs
 #pragma region MOVES
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 movehl_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		constexpr auto permute_mask = EmuSIMD::Funcs::make_shuffle_mask_32<3, 2, 3, 2>(); // Mask for { b[hi] a[hi] }
 		return _mm512_shuffle_f32x4(rhs_, lhs_, permute_mask);
+#else
+		return EmuSIMD::_underlying_impl::emulated_movehl(lhs_, rhs_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 movelh_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		constexpr auto permute_mask = EmuSIMD::Funcs::make_shuffle_mask_32<1, 0, 1, 0>(); // Mask for { a[lo] b[lo] }
 		return _mm512_shuffle_f32x4(lhs_, rhs_, permute_mask);
+#else
+		return EmuSIMD::_underlying_impl::emulated_movelh(lhs_, rhs_);
+#endif
 	}
 #pragma endregion
 
