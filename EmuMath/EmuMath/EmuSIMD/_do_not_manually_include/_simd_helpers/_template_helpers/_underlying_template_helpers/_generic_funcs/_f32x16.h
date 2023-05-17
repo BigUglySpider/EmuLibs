@@ -188,11 +188,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC float get_first_f32x16(f32x16_arg a_)
 	{
-#if EMU_SIMD_USE_512_REGISTERS
 		return get_first_f32x4(cast_f32x16_f32x4(a_));
-#else
-		return get_first_f32x8(a_._lane_0);
-#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC std::uint16_t movemask_f32x16(f32x16_arg a_)

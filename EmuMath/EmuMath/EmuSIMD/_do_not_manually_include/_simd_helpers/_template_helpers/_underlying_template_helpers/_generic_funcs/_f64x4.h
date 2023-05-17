@@ -279,7 +279,11 @@ namespace EmuSIMD::Funcs
 #pragma region CONVERSIONS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cvt_f32x4_f64x4(f32x4_arg a_)
 	{
+#if EMU_SIMD_USE_256_REGISTERS
 		return _mm256_cvtps_pd(a_);
+#else
+		return f64x4(cvt_f32x4_f64x2(a_), cvt_f32x4_f64x2(movehl_f32x4(a_)));
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cvt_f32x8_f64x4(f32x8_arg a_)
