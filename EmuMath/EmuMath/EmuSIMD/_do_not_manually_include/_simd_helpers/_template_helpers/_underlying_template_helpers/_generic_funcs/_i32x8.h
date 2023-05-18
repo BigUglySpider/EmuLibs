@@ -644,11 +644,6 @@ namespace EmuSIMD::Funcs
 		return _mm256_sub_epi32(lhs_, rhs_);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 mul_i32x8(EmuSIMD::i32x8_arg lhs_, EmuSIMD::i32x8_arg rhs_)
-	{
-		return _mm256_mul_epi32(lhs_, rhs_);
-	}
-
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 div_i32x8(EmuSIMD::i32x8_arg lhs_, EmuSIMD::i32x8_arg rhs_)
 	{
 #if EMU_CORE_X86_X64_SVML

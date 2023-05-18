@@ -132,7 +132,6 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 add_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 sub_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 negate_f32x8(EmuSIMD::f32x8_arg to_negate_);
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 mul_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 div_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 addsub_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 fmadd_f32x8(EmuSIMD::f32x8_arg a_, EmuSIMD::f32x8_arg b_, EmuSIMD::f32x8_arg c_);

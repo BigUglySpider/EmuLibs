@@ -271,27 +271,27 @@ namespace EmuSIMD::_underlying_simd_helpers
 			using namespace EmuSIMD::Funcs;
 			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				return mul_f32x4(lhs_, rhs_);
+				return mul_all_f32x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				return mul_f32x8(lhs_, rhs_);
+				return mul_all_f32x8(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return mul_f32x16(lhs_, rhs_);
+				return mul_all_f32x16(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
-				return mul_f64x2(lhs_, rhs_);
+				return mul_all_f64x2(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				return mul_f64x4(lhs_, rhs_);
+				return mul_all_f64x4(lhs_, rhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return mul_f64x8(lhs_, rhs_);
+				return mul_all_f64x8(lhs_, rhs_);
 			}
 			else
 			{

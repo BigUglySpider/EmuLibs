@@ -610,11 +610,6 @@ namespace EmuSIMD::Funcs
 		return _mm256_sub_pd(lhs_, rhs_);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 mul_f64x4(EmuSIMD::f64x4_arg lhs_, EmuSIMD::f64x4_arg rhs_)
-	{
-		return _mm256_mul_pd(lhs_, rhs_);
-	}
-
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 div_f64x4(EmuSIMD::f64x4_arg lhs_, EmuSIMD::f64x4_arg rhs_)
 	{
 		return _mm256_div_pd(lhs_, rhs_);
@@ -719,7 +714,7 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f64x4 one_c4z = setr_f64x4(1.0, -1.0, 1.0, -1.0);
 
 		// Prepare for power series
-		EmuSIMD::f64x4 r1x = mul_f64x4(set1_f64x4(0.159154943091), in_); // r1.x = c1.w * in_;
+		EmuSIMD::f64x4 r1x = mul_all_f64x4(set1_f64x4(0.159154943091), in_); // r1.x = c1.w * in_;
 
 		EmuSIMD::f64x4 r1y = trunc_f64x4(r1x); // r1.y = frac(r1.x)
 		r1y = sub_f64x4(r1x, r1y);
@@ -736,14 +731,14 @@ namespace EmuSIMD::Funcs
 		r2z = and_f64x4(r2z, const0);
 
 		EmuSIMD::f64x4 const1 = permute_f64x4<make_shuffle_mask_64<1, 1, 1, 1>()>(one_c4z);
-		r2y = fmadd_f64x4(r2x, const1, fmadd_f64x4(r2y, const0, mul_f64x4(r2z, const1))); // dot(r2, c4.zwz)
+		r2y = fmadd_f64x4(r2x, const1, fmadd_f64x4(r2y, const0, mul_all_f64x4(r2z, const1))); // dot(r2, c4.zwz)
 
 		EmuSIMD::f64x4 r0x = negate_f64x4(r1y);
 		EmuSIMD::f64x4 r0y = sub_f64x4(set1_f64x4(0.5), r1y);
 		EmuSIMD::f64x4 r0z = sub_f64x4(const0, r1y);
-		r0x = mul_f64x4(r0x, r0x);
-		r0y = mul_f64x4(r0y, r0y);
-		r0z = mul_f64x4(r0z, r0z);
+		r0x = mul_all_f64x4(r0x, r0x);
+		r0y = mul_all_f64x4(r0y, r0y);
+		r0z = mul_all_f64x4(r0z, r0z);
 
 		// Begin power series
 		// --- Power 1
@@ -783,7 +778,7 @@ namespace EmuSIMD::Funcs
 		r2y = negate_f64x4(r2y);
 		r2z = negate_f64x4(r2z);
 
-		return fmadd_f64x4(r1x, r2x, fmadd_f64x4(r1y, r2y, mul_f64x4(r1z, r2z)));
+		return fmadd_f64x4(r1x, r2x, fmadd_f64x4(r1y, r2y, mul_all_f64x4(r1z, r2z)));
 #endif
 	}
 
@@ -815,14 +810,14 @@ namespace EmuSIMD::Funcs
 		r2z = and_f64x4(r2z, const0);
 
 		EmuSIMD::f64x4 const1 = permute_f64x4<make_shuffle_mask_64<1, 1, 1, 1>()>(one_c4z);
-		r2y = fmadd_f64x4(r2x, const1, fmadd_f64x4(r2y, const0, mul_f64x4(r2z, const1))); // dot(r2, c4.zwz)
+		r2y = fmadd_f64x4(r2x, const1, fmadd_f64x4(r2y, const0, mul_all_f64x4(r2z, const1))); // dot(r2, c4.zwz)
 
 		EmuSIMD::f64x4 r0x = negate_f64x4(r1y);
 		EmuSIMD::f64x4 r0y = sub_f64x4(set1_f64x4(0.5), r1y);
 		EmuSIMD::f64x4 r0z = sub_f64x4(const0, r1y);
-		r0x = mul_f64x4(r0x, r0x);
-		r0y = mul_f64x4(r0y, r0y);
-		r0z = mul_f64x4(r0z, r0z);
+		r0x = mul_all_f64x4(r0x, r0x);
+		r0y = mul_all_f64x4(r0y, r0y);
+		r0z = mul_all_f64x4(r0z, r0z);
 
 		// Begin power series
 		// --- Power 1
@@ -862,7 +857,7 @@ namespace EmuSIMD::Funcs
 		r2y = negate_f64x4(r2y);
 		r2z = negate_f64x4(r2z);
 
-		return fmadd_f64x4(r1x, r2x, fmadd_f64x4(r1y, r2y, mul_f64x4(r1z, r2z)));
+		return fmadd_f64x4(r1x, r2x, fmadd_f64x4(r1y, r2y, mul_all_f64x4(r1z, r2z)));
 #endif
 	}
 
@@ -879,7 +874,7 @@ namespace EmuSIMD::Funcs
 
 		// Prepare for power series
 		EmuSIMD::f64x4 const0 = set1_f64x4(0.25);
-		EmuSIMD::f64x4 r1x_cos = mul_f64x4(set1_f64x4(0.159154943091), in_);
+		EmuSIMD::f64x4 r1x_cos = mul_all_f64x4(set1_f64x4(0.159154943091), in_);
 		EmuSIMD::f64x4 r1x_sin = sub_f64x4(r1x_cos, const0); // r1.x = c1.w * in_ - c1.x
 
 		EmuSIMD::f64x4 r1y_sin = trunc_f64x4(r1x_sin); // r1.y = frac(r1.x)
@@ -906,22 +901,22 @@ namespace EmuSIMD::Funcs
 		r2z_cos = and_f64x4(r2z_cos, const0);
 
 		const1 = permute_f64x4<make_shuffle_mask_64<1, 1, 1, 1>()>(one_c4z);
-		r2y_sin = fmadd_f64x4(r2x_sin, const1, fmadd_f64x4(r2y_sin, const0, mul_f64x4(r2z_sin, const1))); // dot(r2, c4.zwz)
-		r2y_cos = fmadd_f64x4(r2x_cos, const1, fmadd_f64x4(r2y_cos, const0, mul_f64x4(r2z_cos, const1)));
+		r2y_sin = fmadd_f64x4(r2x_sin, const1, fmadd_f64x4(r2y_sin, const0, mul_all_f64x4(r2z_sin, const1))); // dot(r2, c4.zwz)
+		r2y_cos = fmadd_f64x4(r2x_cos, const1, fmadd_f64x4(r2y_cos, const0, mul_all_f64x4(r2z_cos, const1)));
 
 		const1 = set1_f64x4(0.5);
 		EmuSIMD::f64x4 r0x_sin = negate_f64x4(r1y_sin);
 		EmuSIMD::f64x4 r0y_sin = sub_f64x4(const1, r1y_sin);
 		EmuSIMD::f64x4 r0z_sin = sub_f64x4(const0, r1y_sin);
-		r0x_sin = mul_f64x4(r0x_sin, r0x_sin);
-		r0y_sin = mul_f64x4(r0y_sin, r0y_sin);
-		r0z_sin = mul_f64x4(r0z_sin, r0z_sin);
+		r0x_sin = mul_all_f64x4(r0x_sin, r0x_sin);
+		r0y_sin = mul_all_f64x4(r0y_sin, r0y_sin);
+		r0z_sin = mul_all_f64x4(r0z_sin, r0z_sin);
 		EmuSIMD::f64x4 r0x_cos = negate_f64x4(r1y_cos);
 		EmuSIMD::f64x4 r0y_cos = sub_f64x4(const1, r1y_cos);
 		EmuSIMD::f64x4 r0z_cos = sub_f64x4(const0, r1y_cos);
-		r0x_cos = mul_f64x4(r0x_cos, r0x_cos);
-		r0y_cos = mul_f64x4(r0y_cos, r0y_cos);
-		r0z_cos = mul_f64x4(r0z_cos, r0z_cos);
+		r0x_cos = mul_all_f64x4(r0x_cos, r0x_cos);
+		r0y_cos = mul_all_f64x4(r0y_cos, r0y_cos);
+		r0z_cos = mul_all_f64x4(r0z_cos, r0z_cos);
 
 		// Begin power series
 		// --- Power 1
@@ -980,11 +975,11 @@ namespace EmuSIMD::Funcs
 		r2x_sin = negate_f64x4(r2x_sin);
 		r2y_sin = negate_f64x4(r2y_sin);
 		r2z_sin = negate_f64x4(r2z_sin);
-		r2x_sin = fmadd_f64x4(r1x_sin, r2x_sin, fmadd_f64x4(r1y_sin, r2y_sin, mul_f64x4(r1z_sin, r2z_sin)));
+		r2x_sin = fmadd_f64x4(r1x_sin, r2x_sin, fmadd_f64x4(r1y_sin, r2y_sin, mul_all_f64x4(r1z_sin, r2z_sin)));
 		r2x_cos = negate_f64x4(r2x_cos);
 		r2y_cos = negate_f64x4(r2y_cos);
 		r2z_cos = negate_f64x4(r2z_cos);
-		r2x_cos = fmadd_f64x4(r1x_cos, r2x_cos, fmadd_f64x4(r1y_cos, r2y_cos, mul_f64x4(r1z_cos, r2z_cos)));
+		r2x_cos = fmadd_f64x4(r1x_cos, r2x_cos, fmadd_f64x4(r1y_cos, r2y_cos, mul_all_f64x4(r1z_cos, r2z_cos)));
 
 		return div_f64x4(r2x_sin, r2x_cos);
 #endif
@@ -1005,10 +1000,10 @@ namespace EmuSIMD::Funcs
 		result = fmadd_f64x4(result, in_abs, set1_f64x4(0.074261));
 		result = fmsub_f64x4(result, in_abs, set1_f64x4(0.2121144));
 		result = fmadd_f64x4(result, in_abs, set1_f64x4(1.5707288));
-		result = mul_f64x4(result, sqrt_f64x4(sub_f64x4(one, in_abs)));
+		result = mul_all_f64x4(result, sqrt_f64x4(sub_f64x4(one, in_abs)));
 
-		EmuSIMD::f64x4 tmp = mul_f64x4(set1_f64x4(2.0), negation_mult);
-		tmp = mul_f64x4(tmp, result);
+		EmuSIMD::f64x4 tmp = mul_all_f64x4(set1_f64x4(2.0), negation_mult);
+		tmp = mul_all_f64x4(tmp, result);
 		result = sub_f64x4(result, tmp);
 
 		return fmadd_f64x4(negation_mult, set1_f64x4(3.14159265358979), result);
@@ -1032,11 +1027,11 @@ namespace EmuSIMD::Funcs
 		result = fmadd_f64x4(result, in_abs, set1_f64x4(1.5707288));
 
 		EmuSIMD::f64x4 tmp = sub_f64x4(set1_f64x4(1.0), in_abs);
-		tmp = mul_f64x4(sqrt_f64x4(tmp), result);
+		tmp = mul_all_f64x4(sqrt_f64x4(tmp), result);
 		result = set1_f64x4(3.14159265358979 * 0.5);
 		result = sub_f64x4(result, tmp);
 
-		tmp = mul_f64x4(negation_mult, result);
+		tmp = mul_all_f64x4(negation_mult, result);
 		return sub_f64x4(result, tmp);
 #endif
 	}
@@ -1054,16 +1049,16 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f64x4 temp0 = max_f64x4(abs_x, abs_y);
 		EmuSIMD::f64x4 temp1 = min_f64x4(abs_x, abs_y);
 		EmuSIMD::f64x4 temp2 = div_f64x4(set1_f64x4(1.0), temp0);
-		temp2 = mul_f64x4(temp1, temp2);
+		temp2 = mul_all_f64x4(temp1, temp2);
 
-		EmuSIMD::f64x4 t4 = mul_f64x4(temp2, temp2);
+		EmuSIMD::f64x4 t4 = mul_all_f64x4(temp2, temp2);
 		temp0 = set1_f64x4(-0.013480470);
 		temp0 = fmadd_f64x4(temp0, t4, set1_f64x4(0.057477314));
 		temp0 = fmsub_f64x4(temp0, t4, set1_f64x4(0.121239071));
 		temp0 = fmadd_f64x4(temp0, t4, set1_f64x4(0.195635925));
 		temp0 = fmsub_f64x4(temp0, t4, set1_f64x4(0.332994597));
 		temp0 = fmadd_f64x4(temp0, t4, set1_f64x4(0.999995630));
-		temp2 = mul_f64x4(temp0, temp2);
+		temp2 = mul_all_f64x4(temp0, temp2);
 
 		//t3 = (abs(y) > abs(x)) ? float(1.570796327) - t3 : t3;
 		EmuSIMD::f64x4 cmp_mask = cmpgt_f64x4(abs_y, abs_x);
@@ -1101,16 +1096,16 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f64x4 temp0 = or_f64x4(and_f64x4(cmp_mask, one), andnot_f64x4(cmp_mask, abs_y));
 		EmuSIMD::f64x4 temp1 = or_f64x4(andnot_f64x4(cmp_mask, one), and_f64x4(cmp_mask, abs_y));
 		EmuSIMD::f64x4 temp2 = div_f64x4(one, temp0);
-		temp2 = mul_f64x4(temp1, temp2);
+		temp2 = mul_all_f64x4(temp1, temp2);
 
-		EmuSIMD::f64x4 t4 = mul_f64x4(temp2, temp2);
+		EmuSIMD::f64x4 t4 = mul_all_f64x4(temp2, temp2);
 		temp0 = set1_f64x4(-0.013480470);
 		temp0 = fmadd_f64x4(temp0, t4, set1_f64x4(0.057477314));
 		temp0 = fmsub_f64x4(temp0, t4, set1_f64x4(0.121239071));
 		temp0 = fmadd_f64x4(temp0, t4, set1_f64x4(0.195635925));
 		temp0 = fmsub_f64x4(temp0, t4, set1_f64x4(0.332994597));
 		temp0 = fmadd_f64x4(temp0, t4, set1_f64x4(0.999995630));
-		temp2 = mul_f64x4(temp0, temp2);
+		temp2 = mul_all_f64x4(temp0, temp2);
 
 		//t3 = (abs(y) > abs(x)) ? float(1.570796327) - t3 : t3;
 		cmp_mask = cmpgt_f64x4(abs_y, one);

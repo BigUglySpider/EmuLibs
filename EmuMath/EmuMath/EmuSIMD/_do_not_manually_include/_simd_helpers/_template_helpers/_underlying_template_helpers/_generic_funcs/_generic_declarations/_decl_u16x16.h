@@ -140,7 +140,6 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 negate_u16x16(EmuSIMD::u16x16_arg to_negate_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 add_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 sub_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_);
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 mul_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 div_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 addsub_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 subadd_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_);

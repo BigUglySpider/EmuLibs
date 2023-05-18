@@ -132,7 +132,6 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 negate_i64x4(EmuSIMD::i64x4_arg to_negate_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 add_i64x4(EmuSIMD::i64x4_arg lhs_, EmuSIMD::i64x4_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 sub_i64x4(EmuSIMD::i64x4_arg lhs_, EmuSIMD::i64x4_arg rhs_);
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 mul_i64x4(EmuSIMD::i64x4_arg lhs_, EmuSIMD::i64x4_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 div_i64x4(EmuSIMD::i64x4_arg lhs_, EmuSIMD::i64x4_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 addsub_i64x4(EmuSIMD::i64x4_arg lhs_, EmuSIMD::i64x4_arg rhs_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 subadd_i64x4(EmuSIMD::i64x4_arg lhs_, EmuSIMD::i64x4_arg rhs_);

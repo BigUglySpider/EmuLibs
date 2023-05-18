@@ -638,11 +638,6 @@ namespace EmuSIMD::Funcs
 		return _mm512_sub_epi64(lhs_, rhs_);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 mul_i64x8(EmuSIMD::i64x8_arg lhs_, EmuSIMD::i64x8_arg rhs_)
-	{
-		return _mm512_mullo_epi64(lhs_, rhs_);
-	}
-
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 div_i64x8(EmuSIMD::i64x8_arg lhs_, EmuSIMD::i64x8_arg rhs_)
 	{
 #if EMU_CORE_X86_X64_SVML

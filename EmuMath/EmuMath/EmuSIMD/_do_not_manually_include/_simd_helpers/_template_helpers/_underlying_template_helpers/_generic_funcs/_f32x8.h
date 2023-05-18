@@ -614,11 +614,6 @@ namespace EmuSIMD::Funcs
 		return sub_f32x8(setzero_f32x8(), to_negate_);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 mul_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_)
-	{
-		return _mm256_mul_ps(lhs_, rhs_);
-	}
-
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 div_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_)
 	{
 		return _mm256_div_ps(lhs_, rhs_);
@@ -732,7 +727,7 @@ namespace EmuSIMD::Funcs
 		);
 
 		// Prepare for power series
-		EmuSIMD::f32x8 r1x = mul_f32x8(set1_f32x8(0.159154943091f), in_); // r1.x = c1.w * in_;
+		EmuSIMD::f32x8 r1x = mul_all_f32x8(set1_f32x8(0.159154943091f), in_); // r1.x = c1.w * in_;
 
 		EmuSIMD::f32x8 r1y = trunc_f32x8(r1x); // r1.y = frac(r1.x)
 		r1y = sub_f32x8(r1x, r1y);
@@ -749,14 +744,14 @@ namespace EmuSIMD::Funcs
 		r2z = and_f32x8(r2z, const0);
 
 		EmuSIMD::f32x8 const1 = permute_f32x8<make_shuffle_mask_32<3, 3, 3, 3>()>(one_c2z_c3z_c4z);
-		r2y = fmadd_f32x8(r2x, const1, fmadd_f32x8(r2y, const0, mul_f32x8(r2z, const1))); // dot(r2, c4.zwz)
+		r2y = fmadd_f32x8(r2x, const1, fmadd_f32x8(r2y, const0, mul_all_f32x8(r2z, const1))); // dot(r2, c4.zwz)
 
 		EmuSIMD::f32x8 r0x = negate_f32x8(r1y);
 		EmuSIMD::f32x8 r0y = sub_f32x8(set1_f32x8(0.5f), r1y);
 		EmuSIMD::f32x8 r0z = sub_f32x8(const0, r1y);
-		r0x = mul_f32x8(r0x, r0x);
-		r0y = mul_f32x8(r0y, r0y);
-		r0z = mul_f32x8(r0z, r0z);
+		r0x = mul_all_f32x8(r0x, r0x);
+		r0y = mul_all_f32x8(r0y, r0y);
+		r0z = mul_all_f32x8(r0z, r0z);
 
 		// Begin power series
 		// --- Power 1
@@ -796,7 +791,7 @@ namespace EmuSIMD::Funcs
 		r2y = negate_f32x8(r2y);
 		r2z = negate_f32x8(r2z);
 
-		return fmadd_f32x8(r1x, r2x, fmadd_f32x8(r1y, r2y, mul_f32x8(r1z, r2z)));
+		return fmadd_f32x8(r1x, r2x, fmadd_f32x8(r1y, r2y, mul_all_f32x8(r1z, r2z)));
 		#endif
 	}
 
@@ -837,14 +832,14 @@ namespace EmuSIMD::Funcs
 		r2z = and_f32x8(r2z, const0);
 
 		EmuSIMD::f32x8 const1 = permute_f32x8<make_shuffle_mask_32<3, 3, 3, 3>()>(one_c2z_c3z_c4z);
-		r2y = fmadd_f32x8(r2x, const1, fmadd_f32x8(r2y, const0, mul_f32x8(r2z, const1))); // dot(r2, c4.zwz)
+		r2y = fmadd_f32x8(r2x, const1, fmadd_f32x8(r2y, const0, mul_all_f32x8(r2z, const1))); // dot(r2, c4.zwz)
 
 		EmuSIMD::f32x8 r0x = negate_f32x8(r1y);
 		EmuSIMD::f32x8 r0y = sub_f32x8(set1_f32x8(0.5f), r1y);
 		EmuSIMD::f32x8 r0z = sub_f32x8(const0, r1y);
-		r0x = mul_f32x8(r0x, r0x);
-		r0y = mul_f32x8(r0y, r0y);
-		r0z = mul_f32x8(r0z, r0z);
+		r0x = mul_all_f32x8(r0x, r0x);
+		r0y = mul_all_f32x8(r0y, r0y);
+		r0z = mul_all_f32x8(r0z, r0z);
 
 		// Begin power series
 		// --- Power 1
@@ -884,7 +879,7 @@ namespace EmuSIMD::Funcs
 		r2y = negate_f32x8(r2y);
 		r2z = negate_f32x8(r2z);
 
-		return fmadd_f32x8(r1x, r2x, fmadd_f32x8(r1y, r2y, mul_f32x8(r1z, r2z)));
+		return fmadd_f32x8(r1x, r2x, fmadd_f32x8(r1y, r2y, mul_all_f32x8(r1z, r2z)));
 		#endif
 	}
 
@@ -910,7 +905,7 @@ namespace EmuSIMD::Funcs
 
 		// Prepare for power series
 		EmuSIMD::f32x8 const0 = permute_f32x8<make_shuffle_mask_32<0, 0, 0, 0>()>(c1x_c2x_c3x_c4x);
-		EmuSIMD::f32x8 r1x_cos = mul_f32x8(set1_f32x8(0.159154943091f), in_);
+		EmuSIMD::f32x8 r1x_cos = mul_all_f32x8(set1_f32x8(0.159154943091f), in_);
 		EmuSIMD::f32x8 r1x_sin = sub_f32x8(r1x_cos, const0); // r1.x = c1.w * in_ - c1.x
 
 		EmuSIMD::f32x8 r1y_sin = trunc_f32x8(r1x_sin); // r1.y = frac(r1.x)
@@ -935,21 +930,21 @@ namespace EmuSIMD::Funcs
 		r2z_cos = and_f32x8(r2z_cos, const0);
 
 		EmuSIMD::f32x8 const1 = permute_f32x8<make_shuffle_mask_32<3, 3, 3, 3>()>(one_c2z_c3z_c4z);
-		r2y_sin = fmadd_f32x8(r2x_sin, const1, fmadd_f32x8(r2y_sin, const0, mul_f32x8(r2z_sin, const1))); // dot(r2, c4.zwz)
-		r2y_cos = fmadd_f32x8(r2x_cos, const1, fmadd_f32x8(r2y_cos, const0, mul_f32x8(r2z_cos, const1)));
+		r2y_sin = fmadd_f32x8(r2x_sin, const1, fmadd_f32x8(r2y_sin, const0, mul_all_f32x8(r2z_sin, const1))); // dot(r2, c4.zwz)
+		r2y_cos = fmadd_f32x8(r2x_cos, const1, fmadd_f32x8(r2y_cos, const0, mul_all_f32x8(r2z_cos, const1)));
 
 		EmuSIMD::f32x8 r0x_sin = negate_f32x8(r1y_sin);
 		EmuSIMD::f32x8 r0y_sin = sub_f32x8(set1_f32x8(0.5f), r1y_sin);
 		EmuSIMD::f32x8 r0z_sin = sub_f32x8(const0, r1y_sin);
-		r0x_sin = mul_f32x8(r0x_sin, r0x_sin);
-		r0y_sin = mul_f32x8(r0y_sin, r0y_sin);
-		r0z_sin = mul_f32x8(r0z_sin, r0z_sin);
+		r0x_sin = mul_all_f32x8(r0x_sin, r0x_sin);
+		r0y_sin = mul_all_f32x8(r0y_sin, r0y_sin);
+		r0z_sin = mul_all_f32x8(r0z_sin, r0z_sin);
 		EmuSIMD::f32x8 r0x_cos = negate_f32x8(r1y_cos);
 		EmuSIMD::f32x8 r0y_cos = sub_f32x8(set1_f32x8(0.5f), r1y_cos);
 		EmuSIMD::f32x8 r0z_cos = sub_f32x8(const0, r1y_cos);
-		r0x_cos = mul_f32x8(r0x_cos, r0x_cos);
-		r0y_cos = mul_f32x8(r0y_cos, r0y_cos);
-		r0z_cos = mul_f32x8(r0z_cos, r0z_cos);
+		r0x_cos = mul_all_f32x8(r0x_cos, r0x_cos);
+		r0y_cos = mul_all_f32x8(r0y_cos, r0y_cos);
+		r0z_cos = mul_all_f32x8(r0z_cos, r0z_cos);
 
 		// Begin power series
 		// --- Power 1
@@ -1006,11 +1001,11 @@ namespace EmuSIMD::Funcs
 		r2x_sin = negate_f32x8(r2x_sin);
 		r2y_sin = negate_f32x8(r2y_sin);
 		r2z_sin = negate_f32x8(r2z_sin);
-		r2x_sin = fmadd_f32x8(r1x_sin, r2x_sin, fmadd_f32x8(r1y_sin, r2y_sin, mul_f32x8(r1z_sin, r2z_sin)));
+		r2x_sin = fmadd_f32x8(r1x_sin, r2x_sin, fmadd_f32x8(r1y_sin, r2y_sin, mul_all_f32x8(r1z_sin, r2z_sin)));
 		r2x_cos = negate_f32x8(r2x_cos);
 		r2y_cos = negate_f32x8(r2y_cos);
 		r2z_cos = negate_f32x8(r2z_cos);
-		r2x_cos = fmadd_f32x8(r1x_cos, r2x_cos, fmadd_f32x8(r1y_cos, r2y_cos, mul_f32x8(r1z_cos, r2z_cos)));
+		r2x_cos = fmadd_f32x8(r1x_cos, r2x_cos, fmadd_f32x8(r1y_cos, r2y_cos, mul_all_f32x8(r1z_cos, r2z_cos)));
 
 		return div_f32x8(r2x_sin, r2x_cos);
 		#endif
@@ -1031,10 +1026,10 @@ namespace EmuSIMD::Funcs
 		result = fmadd_f32x8(result, in_abs, set1_f32x8(0.074261f));
 		result = fmsub_f32x8(result, in_abs, set1_f32x8(0.2121144f));
 		result = fmadd_f32x8(result, in_abs, set1_f32x8(1.5707288f));
-		result = mul_f32x8(result, sqrt_f32x8(sub_f32x8(one, in_abs)));
+		result = mul_all_f32x8(result, sqrt_f32x8(sub_f32x8(one, in_abs)));
 
-		EmuSIMD::f32x8 tmp = mul_f32x8(set1_f32x8(2.0f), negation_mult);
-		tmp = mul_f32x8(tmp, result);
+		EmuSIMD::f32x8 tmp = mul_all_f32x8(set1_f32x8(2.0f), negation_mult);
+		tmp = mul_all_f32x8(tmp, result);
 		result = sub_f32x8(result, tmp);
 
 		return fmadd_f32x8(negation_mult, set1_f32x8(3.14159265358979f), result);
@@ -1058,11 +1053,11 @@ namespace EmuSIMD::Funcs
 		result = fmadd_f32x8(result, in_abs, set1_f32x8(1.5707288f));
 
 		EmuSIMD::f32x8 tmp = sub_f32x8(set1_f32x8(1.0f), in_abs);
-		tmp = mul_f32x8(sqrt_f32x8(tmp), result);
+		tmp = mul_all_f32x8(sqrt_f32x8(tmp), result);
 		result = set1_f32x8(3.14159265358979f * 0.5f);
 		result = sub_f32x8(result, tmp);
 
-		tmp = mul_f32x8(negation_mult, result);
+		tmp = mul_all_f32x8(negation_mult, result);
 		return sub_f32x8(result, tmp);
 		#endif
 	}
@@ -1080,16 +1075,16 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f32x8 temp0 = max_f32x8(abs_x, abs_y);
 		EmuSIMD::f32x8 temp1 = min_f32x8(abs_x, abs_y);
 		EmuSIMD::f32x8 temp2 = div_f32x8(set1_f32x8(1.0f), temp0);
-		temp2 = mul_f32x8(temp1, temp2);
+		temp2 = mul_all_f32x8(temp1, temp2);
 
-		EmuSIMD::f32x8 t4 = mul_f32x8(temp2, temp2);
+		EmuSIMD::f32x8 t4 = mul_all_f32x8(temp2, temp2);
 		temp0 = set1_f32x8(-0.013480470f);
 		temp0 = fmadd_f32x8(temp0, t4, set1_f32x8(0.057477314f));
 		temp0 = fmsub_f32x8(temp0, t4, set1_f32x8(0.121239071f));
 		temp0 = fmadd_f32x8(temp0, t4, set1_f32x8(0.195635925f));
 		temp0 = fmsub_f32x8(temp0, t4, set1_f32x8(0.332994597f));
 		temp0 = fmadd_f32x8(temp0, t4, set1_f32x8(0.999995630f));
-		temp2 = mul_f32x8(temp0, temp2);
+		temp2 = mul_all_f32x8(temp0, temp2);
 
 		//t3 = (abs(y) > abs(x)) ? float(1.570796327) - t3 : t3;
 		EmuSIMD::f32x8 cmp_mask = cmpgt_f32x8(abs_y, abs_x);
@@ -1127,16 +1122,16 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f32x8 temp0 = or_f32x8(and_f32x8(cmp_mask, one), andnot_f32x8(cmp_mask, abs_y));
 		EmuSIMD::f32x8 temp1 = or_f32x8(andnot_f32x8(cmp_mask, one), and_f32x8(cmp_mask, abs_y));
 		EmuSIMD::f32x8 temp2 = div_f32x8(one, temp0);
-		temp2 = mul_f32x8(temp1, temp2);
+		temp2 = mul_all_f32x8(temp1, temp2);
 
-		EmuSIMD::f32x8 t4 = mul_f32x8(temp2, temp2);
+		EmuSIMD::f32x8 t4 = mul_all_f32x8(temp2, temp2);
 		temp0 = set1_f32x8(-0.013480470f);
 		temp0 = fmadd_f32x8(temp0, t4, set1_f32x8(0.057477314f));
 		temp0 = fmsub_f32x8(temp0, t4, set1_f32x8(0.121239071f));
 		temp0 = fmadd_f32x8(temp0, t4, set1_f32x8(0.195635925f));
 		temp0 = fmsub_f32x8(temp0, t4, set1_f32x8(0.332994597f));
 		temp0 = fmadd_f32x8(temp0, t4, set1_f32x8(0.999995630f));
-		temp2 = mul_f32x8(temp0, temp2);
+		temp2 = mul_all_f32x8(temp0, temp2);
 
 		//t3 = (abs(y) > abs(x)) ? float(1.570796327) - t3 : t3;
 		cmp_mask = cmpgt_f32x8(abs_y, one);
