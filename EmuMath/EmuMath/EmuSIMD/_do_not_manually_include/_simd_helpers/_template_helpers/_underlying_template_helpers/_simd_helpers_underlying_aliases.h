@@ -50,7 +50,7 @@
 /// <para> If this is true, `EMU_SIMD_USE_256_REGISTERS` and `EMU_SIMD_USE_128_REGISTERS` will also be true. </para>
 /// <para> When emulating, 512-bit registers will be emulated as two 256-bit registers (this will also work when 256-bit registers are emulated). </para>
 /// </summary>
-#define EMU_SIMD_USE_512_REGISTERS (true)
+#define EMU_SIMD_USE_512_REGISTERS (false)
 #define EMU_SIMD_USES_ANY_SIMD_REGISTERS (EMU_SIMD_USE_128_REGISTERS || EMU_SIMD_USE_256_REGISTERS || EMU_SIMD_USE_512_REGISTERS)
 
 /// <summary>
@@ -1694,16 +1694,19 @@ namespace EmuSIMD
 
 		template<bool IsMax_, std::size_t PerElementWidth_, bool IsSigned_, std::size_t EmulatedWidth_, class LaneT_>
 		[[nodiscard]] constexpr inline auto emulate_horizontal_min_or_max(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& a_)
+			-> dual_lane_simd_emulator<EmulatedWidth_, LaneT_>
 		{
 			if constexpr (IsMax_)
 			{
-				auto vertical_max = EmuSIMD::max<PerElementWidth_, IsSigned_>(a_._lane_0, a_._lane_1);
-				return EmuSIMD::horizontal_max<PerElementWidth_, IsSigned_>(vertical_max);
+				auto max_lane = EmuSIMD::max<PerElementWidth_, IsSigned_>(a_._lane_0, a_._lane_1);
+				max_lane = EmuSIMD::horizontal_max<PerElementWidth_, IsSigned_>(max_lane);
+				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>(max_lane, max_lane);
 			}
 			else
 			{
-				auto vertical_min = EmuSIMD::min<PerElementWidth_, IsSigned_>(a_._lane_0, a_._lane_1);
-				return EmuSIMD::horizontal_min<PerElementWidth_, IsSigned_>(vertical_min);
+				auto min_lane = EmuSIMD::min<PerElementWidth_, IsSigned_>(a_._lane_0, a_._lane_1);
+				min_lane = EmuSIMD::horizontal_min<PerElementWidth_, IsSigned_>(min_lane);
+				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>(min_lane, min_lane);
 			}
 		}
 #pragma endregion
