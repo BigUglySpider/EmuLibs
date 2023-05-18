@@ -764,9 +764,23 @@ namespace EmuSIMD::Funcs
 		return _mm512_min_epi8(a_, b_);
 	}
 
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 horizontal_min_i8x64(EmuSIMD::i8x64_arg a_)
+	{
+		i8x32 min_lane = min_i8x32(cast_i8x64_i8x32(a_), extract_i8x64_lane_i8x32<1>(a_));
+		min_lane = horizontal_min_i8x32(min_lane);
+		return _mm512_inserti32x8(cast_i8x32_i8x64(min_lane), min_lane, 1);
+	}
+
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 max_i8x64(EmuSIMD::i8x64_arg a_, EmuSIMD::i8x64_arg b_)
 	{
 		return _mm512_max_epi8(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 horizontal_max_i8x64(EmuSIMD::i8x64_arg a_)
+	{
+		i8x32 max_lane = max_i8x32(cast_i8x64_i8x32(a_), extract_i8x64_lane_i8x32<1>(a_));
+		max_lane = horizontal_max_i8x32(max_lane);
+		return _mm512_inserti32x8(cast_i8x32_i8x64(max_lane), max_lane, 1);
 	}
 #pragma endregion
 

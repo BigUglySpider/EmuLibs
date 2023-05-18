@@ -185,15 +185,17 @@ namespace EmuSIMD::Funcs
 	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 permute_i16x16(EmuSIMD::i16x16_arg a_)
 	{
-		static_assert(EmuCore::TMP::get_false<ShuffleMask_>(), "NO SUPPORT ERROR: EmuSIMD does not provide support for permuting i16x16 (256-bit registers containing 16 16-bit signed integer elements) [permute_i16x16].");
-		return EmuSIMD::i16x16{};
+		// Expects a mask for 8-bit shuffles with offset (0-based) odd indices, which will be created by default by EmuSIMD mask creation helpers
+		// --- This is specifically an x86 quirk, resulting from the need to emulate such a shuffle
+		return permute_i8x32<ShuffleMask_>(a_);
 	}
 
 	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 shuffle_i16x16(EmuSIMD::i16x16_arg a_, EmuSIMD::i16x16_arg b_)
 	{
-		static_assert(EmuCore::TMP::get_false<ShuffleMask_>(), "NO SUPPORT ERROR: EmuSIMD does not provide support for shuffling i16x16 (256-bit registers containing 16 16-bit signed integer elements) [shuffle_i16x16].");
-		return EmuSIMD::i16x16{};
+		// Expects a mask for 8-bit shuffles with offset (0-based) odd indices, which will be created by default by EmuSIMD mask creation helpers
+		// --- This is specifically an x86 quirk, resulting from the need to emulate such a shuffle
+		return shuffle_i8x32<ShuffleMask_>(a_, b_);
 	}
 #pragma endregion
 

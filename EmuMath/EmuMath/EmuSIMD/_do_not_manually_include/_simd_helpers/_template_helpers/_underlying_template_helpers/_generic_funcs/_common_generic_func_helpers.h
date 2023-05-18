@@ -258,13 +258,33 @@ namespace EmuSIMD::Funcs
 		shuffle_mask_type I8_,  shuffle_mask_type I9_,  shuffle_mask_type I10_, shuffle_mask_type I11_,
 		shuffle_mask_type I12_, shuffle_mask_type I13_, shuffle_mask_type I14_, shuffle_mask_type I15_
 	>
-		[[nodiscard]] constexpr inline shuffle_mask_type make_shuffle_mask_8()
+	[[nodiscard]] constexpr inline shuffle_mask_type make_shuffle_mask_8()
 	{
 		return _underlying_funcs::_create_generic_shuffle_mask<4>
 		(
 			std::integer_sequence<shuffle_mask_type, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>(),
 			std::make_index_sequence<16>()
 		);
+	}
+
+	template
+	<
+		shuffle_mask_type I0_, shuffle_mask_type I1_, shuffle_mask_type I2_, shuffle_mask_type I3_,
+		shuffle_mask_type I4_, shuffle_mask_type I5_, shuffle_mask_type I6_, shuffle_mask_type I7_
+	>
+	[[nodiscard]] constexpr inline shuffle_mask_type make_shuffle_mask_16()
+	{
+		return make_shuffle_mask_8
+		<
+			(I0_ * 2) + 1, (I0_ * 2),
+			(I1_ * 2) + 1, (I1_ * 2),
+			(I2_ * 2) + 1, (I2_ * 2),
+			(I3_ * 2) + 1, (I3_ * 2),
+			(I4_ * 2) + 1, (I4_ * 2),
+			(I5_ * 2) + 1, (I5_ * 2),
+			(I6_ * 2) + 1, (I6_ * 2),
+			(I7_ * 2) + 1, (I7_ * 2)
+		>();
 	}
 
 	template<shuffle_mask_type Index_>

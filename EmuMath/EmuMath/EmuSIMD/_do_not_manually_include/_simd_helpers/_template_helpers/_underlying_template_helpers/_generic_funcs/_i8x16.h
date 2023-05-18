@@ -923,8 +923,8 @@ namespace EmuSIMD::Funcs
 		// 4 elements left to determine min, so defer to 32-bit calculation
 		EmuSIMD::i32x4 last_4_min = cvt_i8x16_i32x4(min);
 		last_4_min = horizontal_min_i32x4(last_4_min);
-
-		return min;
+		min = cvt_i32x4_i8x16(last_4_min);
+		return permute_i8x16<make_shuffle_mask_8<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>()>(min);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 max_i8x16(EmuSIMD::i8x16_arg a_, EmuSIMD::i8x16_arg b_)
@@ -941,11 +941,8 @@ namespace EmuSIMD::Funcs
 		// 4 elements left to determine max, so defer to 32-bit calculation
 		EmuSIMD::i32x4 last_4_max = cvt_i8x16_i32x4(max);
 		last_4_max = horizontal_max_i32x4(last_4_max);
-
 		max = cvt_i32x4_i8x16(last_4_max);
-		max = permute_i8x16<make_reverse_shuffle_mask_8<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>()>(max);
-
-		return max;
+		return permute_i8x16<make_shuffle_mask_8<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>()>(max);
 	}
 #pragma endregion
 

@@ -757,9 +757,35 @@ namespace EmuSIMD::Funcs
 		return _mm_min_epu8(a_, b_);
 	}
 
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 horizontal_min_u8x16(EmuSIMD::u8x16_arg a_)
+	{
+		EmuSIMD::u8x16 min = movelh_u8x16(a_, a_);
+		min = min_u8x16(min, a_);
+		min = min_u8x16(min, permute_u8x16<make_shuffle_mask_8<0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7>()>(min));
+
+		// 4 elements left to determine min, so defer to 32-bit calculation
+		EmuSIMD::u32x4 last_4_min = cvt_u8x16_u32x4(min);
+		last_4_min = horizontal_min_u32x4(last_4_min);
+		min = cvt_u32x4_u8x16(last_4_min);
+		return permute_u8x16<make_shuffle_mask_8<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>()>(min);
+	}
+
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 max_u8x16(EmuSIMD::u8x16_arg a_, EmuSIMD::u8x16_arg b_)
 	{
 		return _mm_max_epu8(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 horizontal_max_u8x16(EmuSIMD::u8x16_arg a_)
+	{
+		EmuSIMD::u8x16 max = movelh_u8x16(a_, a_);
+		max = max_u8x16(max, a_);
+		max = max_u8x16(max, permute_u8x16<make_shuffle_mask_8<0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7>()>(max));
+
+		// 4 elements left to determine max, so defer to 32-bit calculation
+		EmuSIMD::u32x4 last_4_max = cvt_u8x16_u32x4(max);
+		last_4_max = horizontal_max_u32x4(last_4_max);
+		max = cvt_u32x4_u8x16(last_4_max);
+		return permute_u8x16<make_shuffle_mask_8<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>()>(max);
 	}
 #pragma endregion
 

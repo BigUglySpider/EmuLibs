@@ -614,9 +614,29 @@ namespace EmuSIMD::Funcs
 		return _mm_min_epi16(a_, b_);
 	}
 
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 horizontal_min_i16x8(EmuSIMD::i16x8_arg a_)
+	{
+		EmuSIMD::i16x8 min = movelh_i16x8(a_, a_);
+		min = min_i16x8(min, a_);
+		EmuSIMD::i32x4 last_4_min = cvt_i16x8_i32x4(min);
+		last_4_min = horizontal_min_i32x4(last_4_min);
+		min = cvt_i32x4_i16x8(last_4_min);
+		return permute_i16x8<make_shuffle_mask_16<0, 0, 0, 0, 0, 0, 0, 0>()>(min);
+	}
+
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 max_i16x8(EmuSIMD::i16x8_arg a_, EmuSIMD::i16x8_arg b_)
 	{
 		return _mm_max_epi16(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 horizontal_max_i16x8(EmuSIMD::i16x8_arg a_)
+	{
+		EmuSIMD::i16x8 max = movelh_i16x8(a_, a_);
+		max = max_i16x8(max, a_);
+		EmuSIMD::i32x4 last_4_max = cvt_i16x8_i32x4(max);
+		last_4_max = horizontal_max_i32x4(last_4_max);
+		max = cvt_i32x4_i16x8(last_4_max);
+		return permute_i16x8<make_shuffle_mask_16<0, 0, 0, 0, 0, 0, 0, 0>()>(max);
 	}
 #pragma endregion
 
