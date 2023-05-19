@@ -30,7 +30,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_set1_pd(all_);
 #else
-		return f64x8(set1_f64x4(all_), set1_f64x4(all_));
+		return EmuSIMD::_underlying_impl::set1_dual_lane_simd_emulator<512, f64x4, 64>(all_);
 #endif
 	}
 

@@ -189,17 +189,27 @@ namespace EmuSIMD::Funcs
 	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x32 permute_i16x32(EmuSIMD::i16x32_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		// Expects a mask for 8-bit shuffles with offset (0-based) odd indices, which will be created by default by EmuSIMD mask creation helpers
 		// --- This is specifically an x86 quirk, resulting from the need to emulate such a shuffle
 		return permute_i8x64<ShuffleMask_>(a_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](i16x16_arg a) { return EmuSIMD::Funcs::permute_i16x16<ShuffleMask>(a); }, a_);
+#endif
 	}
 
 	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x32 shuffle_i16x32(EmuSIMD::i16x32_arg a_, EmuSIMD::i16x32_arg b_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		// Expects a mask for 8-bit shuffles with offset (0-based) odd indices, which will be created by default by EmuSIMD mask creation helpers
 		// --- This is specifically an x86 quirk, resulting from the need to emulate such a shuffle
 		return shuffle_i8x64<ShuffleMask_>(a_, b_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](i16x16_arg a, i16x16_arg b) { return EmuSIMD::Funcs::shuffle_i16x16<ShuffleMask>(a, b); }, a_, b_);
+#endif
 	}
 #pragma endregion
 
@@ -207,6 +217,7 @@ namespace EmuSIMD::Funcs
 	template<EmuSIMD::Funcs::blend_mask_type BlendMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x32 blend_i16x32(EmuSIMD::i16x32_arg a_, EmuSIMD::i16x32_arg b_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		constexpr auto lo_blend_mask = BlendMask_;
 		constexpr auto hi_blend_mask = BlendMask_ >> 16;
 
@@ -219,6 +230,9 @@ namespace EmuSIMD::Funcs
 		hi = _mm256_blend_epi16(hi, half_b, hi_blend_mask);
 
 		return _mm512_inserti32x8(_mm512_castsi256_si512(lo), hi, 1);
+#else
+		return EmuSIMD::_underlying_impl::emulate_dual_lane_blend_with_mask<BlendMask>(a_, b_, std::make_index_sequence<16>());
+#endif
 	}
 #pragma endregion
 

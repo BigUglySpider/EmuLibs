@@ -94,7 +94,7 @@
 #endif
 
 /// <summary>
-/// <para> Boolean preprocessor flag indicating if 128-bit, 256-bit, and 512-bit integral registers are generic (i.e. the same regardless of element width), as per x86/x64 intrinsics. </para>
+/// <para> Boolean preprocessor flag indicating if 128-bit, 256-bit, and 512-bit integral registers are generic (i.e. the same regardless of element width and signedness), as per x86/x64 intrinsics. </para>
 /// <para> If true, tests such as `std::is_same_v&lt;i32x4, x16x8&gt;` will evaluate to true. </para>
 /// <para> If false, tests such as `std::is_same_v&lt;i32x4, x16x8&gt;` will evaluate to false. </para>
 /// </summary>
@@ -616,6 +616,13 @@ namespace EmuSIMD
 		constexpr inline single_lane_simd_emulator<NumElements_, T_> set1_single_lane_simd_emulator(const T_& set1_val_) noexcept
 		{
 			return single_lane_simd_emulator<NumElements_, T_>(set1_val_, std::make_index_sequence<NumElements_>());
+		}
+
+		template<std::size_t EmulatedWidth_, class LaneT_, std::size_t PerElementWidth_, EmuConcepts::Arithmetic T_>
+		constexpr inline dual_lane_simd_emulator<EmulatedWidth_, LaneT_> set1_dual_lane_simd_emulator(T_&& set1_val_) noexcept
+		{
+			LaneT_ both_lanes = EmuSIMD::set1<LaneT_, PerElementWidth_>(std::forward<T_>(set1_val_));
+			return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>(both_lanes, both_lanes);
 		}
 
 		template<std::size_t NumElements_, EmuConcepts::Arithmetic T_, EmuConcepts::Arithmetic BitMaskT_, EmuConcepts::Arithmetic WidthInt_, std::size_t...ReverseIndices_>
