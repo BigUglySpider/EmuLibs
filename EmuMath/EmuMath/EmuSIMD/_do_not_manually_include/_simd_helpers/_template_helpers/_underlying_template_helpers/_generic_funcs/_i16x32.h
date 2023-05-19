@@ -745,7 +745,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x32 cvt_u16x16_i16x32(u16x16_arg a_)
 	{
-		return cast_u16x16_i16x16(a_);
+		return cast_u16x16_i16x32(a_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x32 cvt_u32x8_i16x32(u32x8_arg a_)
