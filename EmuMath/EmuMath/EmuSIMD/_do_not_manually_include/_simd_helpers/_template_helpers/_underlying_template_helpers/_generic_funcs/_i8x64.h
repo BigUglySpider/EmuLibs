@@ -1160,20 +1160,25 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 addsub_i8x64(EmuSIMD::i8x64_arg lhs_, EmuSIMD::i8x64_arg rhs_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		constexpr std::int8_t byte_mask = static_cast<std::int8_t>(0xFF);
-		const EmuSIMD::i8x64 mask = _mm512_set_epi8
+		const EmuSIMD::i8x64 mask = set_i8x64
 		(
 			byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0,
 			byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0,
 			byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0,
 			byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0, byte_mask, 0
 		);
-		EmuSIMD::i8x64 out = _mm512_add_epi8(lhs_, _mm512_and_si512(mask, rhs_));
-		return _mm512_sub_epi8(lhs_, _mm512_andnot_si512(mask, rhs_));
+		EmuSIMD::i8x64 out = add_i8x64(lhs_, and_i8x64(mask, rhs_));
+		return sub_i8x64(lhs_, andnot_i8x64(mask, rhs_));
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg lhs, i8x32_arg rhs) { return addsub_i8x32(lhs, rhs); }, lhs_, rhs_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 subadd_i8x64(EmuSIMD::i8x64_arg lhs_, EmuSIMD::i8x64_arg rhs_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		constexpr std::int8_t byte_mask = static_cast<std::int8_t>(0xFF);
 		const EmuSIMD::i8x64 mask = _mm512_set_epi8
 		(
@@ -1184,36 +1189,63 @@ namespace EmuSIMD::Funcs
 		);
 		EmuSIMD::i8x64 out = _mm512_sub_epi8(lhs_, _mm512_and_si512(mask, rhs_));
 		return _mm512_add_epi8(lhs_, _mm512_andnot_si512(mask, rhs_));
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg lhs, i8x32_arg rhs) { return subadd_i8x32(lhs, rhs); }, lhs_, rhs_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 fmadd_i8x64(EmuSIMD::i8x64_arg a_, EmuSIMD::i8x64_arg b_, EmuSIMD::i8x64_arg c_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_add_epi8(mul_all_i8x64(a_, b_), c_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg a, i8x32_arg b, i8x32_arg c) { return fmadd_i8x32(a, b, c); }, a_, b_, c_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 fmsub_i8x64(EmuSIMD::i8x64_arg a_, EmuSIMD::i8x64_arg b_, EmuSIMD::i8x64_arg c_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_sub_epi8(mul_all_i8x64(a_, b_), c_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg a, i8x32_arg b, i8x32_arg c) { return fmsub_i8x32(a, b, c); }, a_, b_, c_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 fnmadd_i8x64(EmuSIMD::i8x64_arg a_, EmuSIMD::i8x64_arg b_, EmuSIMD::i8x64_arg c_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_add_epi8(mul_all_i8x64(negate_i8x64(a_), b_), c_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg a, i8x32_arg b, i8x32_arg c) { return fnmadd_i8x32(a, b, c); }, a_, b_, c_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 fnmsub_i8x64(EmuSIMD::i8x64_arg a_, EmuSIMD::i8x64_arg b_, EmuSIMD::i8x64_arg c_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_sub_epi8(mul_all_i8x64(negate_i8x64(a_), b_), c_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg a, i8x32_arg b, i8x32_arg c) { return fnmsub_i8x32(a, b, c); }, a_, b_, c_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 fmaddsub_i8x64(EmuSIMD::i8x64_arg a_, EmuSIMD::i8x64_arg b_, EmuSIMD::i8x64_arg c_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return addsub_i8x64(mul_all_i8x64(negate_i8x64(a_), b_), c_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg a, i8x32_arg b, i8x32_arg c) { return fmaddsub_i8x32(a, b, c); }, a_, b_, c_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 fmsubadd_i8x64(EmuSIMD::i8x64_arg a_, EmuSIMD::i8x64_arg b_, EmuSIMD::i8x64_arg c_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return subadd_i8x64(mul_all_i8x64(negate_i8x64(a_), b_), c_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg a, i8x32_arg b, i8x32_arg c) { return fmsubadd_i8x32(a, b, c); }, a_, b_, c_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 floor_i8x64(EmuSIMD::i8x64_arg to_floor_)
@@ -1233,6 +1265,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 mod_i8x64(EmuSIMD::i8x64_arg lhs_, EmuSIMD::i8x64_arg rhs_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 #if EMU_CORE_X86_X64_SVML
 		return _mm512_rem_epi8(lhs_, rhs_);
 #else
@@ -1240,65 +1273,112 @@ namespace EmuSIMD::Funcs
 		to_subtract = mul_all_i8x64(to_subtract, rhs_);
 		return sub_i8x64(lhs_, to_subtract);
 #endif
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg lhs, i8x32_arg rhs) { return mod_i8x32(lhs, rhs); }, lhs_, rhs_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 abs_i8x64(EmuSIMD::i8x64_arg in_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_abs_epi8(in_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg a) { return abs_i8x32(a); }, in_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 sqrt_i8x64(EmuSIMD::i8x64_arg in_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return emulate_fp_i8x64([](EmuSIMD::f32x16_arg in_fp_) { return sqrt_f32x16(in_fp_); }, in_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg a) { return sqrt_i8x32(a); }, in_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 rsqrt_i8x64(EmuSIMD::i8x64_arg in_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return emulate_fp_i8x64([](EmuSIMD::f32x16_arg in_fp_) { return rsqrt_f32x16(in_fp_); }, in_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg a) { return rsqrt_i8x32(a); }, in_);
+#endif
 	}
 #pragma endregion
 
 #pragma region NEAR_COMPARISONS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 cmpnear_i8x64(EmuSIMD::i8x64_arg lhs_, EmuSIMD::i8x64_arg rhs_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return cmpeq_i8x64(lhs_, rhs_);
+#else
+		return i8x64(cmpnear_i8x32(lhs_._lane_0, rhs_._lane_0), cmpnear_i8x32(lhs_._lane_1, rhs_._lane_1));
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 cmpnear_i8x64(EmuSIMD::i8x64_arg lhs_, EmuSIMD::i8x64_arg rhs_, EmuSIMD::i8x64_arg epsilon)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return cmple_i8x64(abs_i8x64(sub_i8x64(lhs_, rhs_)), epsilon);
+#else
+		return i8x64(cmpnear_i8x32(lhs_._lane_0, rhs_._lane_0, epsilon._lane_0), cmpnear_i8x32(lhs_._lane_1, rhs_._lane_1, epsilon._lane_1));
+#endif
 	}
 #pragma endregion
 
 #pragma region TRIG
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 cos_i8x64(EmuSIMD::i8x64_arg in_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return emulate_fp_i8x64([](EmuSIMD::f32x16_arg in_fp_) { return cos_f32x16(in_fp_); }, in_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg a) { return cos_i8x32(a); }, in_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 sin_i8x64(EmuSIMD::i8x64_arg in_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return emulate_fp_i8x64([](EmuSIMD::f32x16_arg in_fp_) { return sin_f32x16(in_fp_); }, in_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg a) { return sin_i8x32(a); }, in_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 tan_i8x64(EmuSIMD::i8x64_arg in_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return emulate_fp_i8x64([](EmuSIMD::f32x16_arg in_fp_) { return tan_f32x16(in_fp_); }, in_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg a) { return tan_i8x32(a); }, in_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 acos_i8x64(EmuSIMD::i8x64_arg in_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return emulate_fp_i8x64([](EmuSIMD::f32x16_arg in_fp_) { return acos_f32x16(in_fp_); }, in_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg a) { return acos_i8x32(a); }, in_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 asin_i8x64(EmuSIMD::i8x64_arg in_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return emulate_fp_i8x64([](EmuSIMD::f32x16_arg in_fp_) { return asin_f32x16(in_fp_); }, in_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg a) { return asin_i8x32(a); }, in_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 atan_i8x64(EmuSIMD::i8x64_arg in_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return emulate_fp_i8x64([](EmuSIMD::f32x16_arg in_fp_) { return atan_f32x16(in_fp_); }, in_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](i8x32_arg a) { return atan_i8x32(a); }, in_);
+#endif
 	}
 #pragma endregion
 }

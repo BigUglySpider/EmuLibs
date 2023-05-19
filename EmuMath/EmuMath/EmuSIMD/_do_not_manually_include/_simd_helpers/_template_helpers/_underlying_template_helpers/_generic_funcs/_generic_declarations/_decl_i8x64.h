@@ -197,6 +197,7 @@ namespace EmuSIMD::Funcs
 	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 permute_i8x64(EmuSIMD::i8x64_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		constexpr bool is_reverse_set = false;
 		using target_element_type = signed char;
 		constexpr std::size_t argument_width = 4; // Max value of 15 (0b1111), per index
@@ -211,11 +212,16 @@ namespace EmuSIMD::Funcs
 				[](auto&&...args_) { return set_i8x64(std::forward<decltype(args_)>(args_)...); }
 			)
 		);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](i8x32_arg a) { return EmuSIMD::Funcs::permute_i8x32<ShuffleMask>(a); }, a_);
+#endif
 	}
 
 	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 shuffle_i8x64(EmuSIMD::i8x64_arg a_, EmuSIMD::i8x64_arg b_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		constexpr std::size_t a_permute_mask = duplicate_shuffle_mask_32bit_lane<ShuffleMask_, true>();
 		constexpr std::size_t b_permute_mask = duplicate_shuffle_mask_32bit_lane<ShuffleMask_, false>();
 
@@ -229,6 +235,10 @@ namespace EmuSIMD::Funcs
 		tmp_cast = movelh_f32x16(tmp_cast, cast_i8x64_f32x16(b_permuted));
 
 		return cast_f32x16_i8x64(tmp_cast);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](i8x32_arg a, i8x32_arg b) { return EmuSIMD::Funcs::shuffle_i8x32<ShuffleMask>(a, b); }, a_, b_);
+#endif
 	}
 #pragma endregion
 
@@ -236,6 +246,7 @@ namespace EmuSIMD::Funcs
 	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 blend_i8x64(EmuSIMD::i8x64_arg a_, EmuSIMD::i8x64_arg b_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		constexpr bool is_reverse_set = false;
 		using target_element_type = std::int8_t;
 		constexpr std::size_t num_elements = 64;
@@ -250,6 +261,9 @@ namespace EmuSIMD::Funcs
 				[](auto&&...args_) { return set_i8x64(std::forward<decltype(args_)>(args_)...); }
 			)
 		);
+#else
+		return EmuSIMD::_underlying_impl::emulate_dual_lane_blend_with_mask<BlendMask>(a_, b_, std::make_index_sequence<32>());
+#endif
 	}
 #pragma endregion
 
@@ -284,9 +298,9 @@ namespace EmuSIMD::Funcs
 					set_f32x16
 					(
 						static_cast<float>(data[i + 15]), static_cast<float>(data[i + 14]), static_cast<float>(data[i + 13]), static_cast<float>(data[i + 12]),
-						static_cast<float>(data[i + 11]), static_cast<float>(data[i + 10]), static_cast<float>(data[i + 9]), static_cast<float>(data[i + 8]),
-						static_cast<float>(data[i + 7]), static_cast<float>(data[i + 6]), static_cast<float>(data[i + 5]), static_cast<float>(data[i + 4]),
-						static_cast<float>(data[i + 3]), static_cast<float>(data[i + 2]), static_cast<float>(data[i + 1]), static_cast<float>(data[i])
+						static_cast<float>(data[i + 11]), static_cast<float>(data[i + 10]), static_cast<float>(data[i + 9]),  static_cast<float>(data[i + 8]),
+						static_cast<float>(data[i + 7]),  static_cast<float>(data[i + 6]),  static_cast<float>(data[i + 5]),  static_cast<float>(data[i + 4]),
+						static_cast<float>(data[i + 3]),  static_cast<float>(data[i + 2]),  static_cast<float>(data[i + 1]),  static_cast<float>(data[i])
 					)
 				)
 			);
