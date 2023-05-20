@@ -51,7 +51,11 @@
 /// <para> When emulating, 512-bit registers will be emulated as two 256-bit registers (this will also work when 256-bit registers are emulated). </para>
 /// </summary>
 #define EMU_SIMD_USE_512_REGISTERS (false)
-#define EMU_SIMD_USES_ANY_SIMD_REGISTERS (EMU_SIMD_USE_128_REGISTERS || EMU_SIMD_USE_256_REGISTERS || EMU_SIMD_USE_512_REGISTERS)
+/// <summary>
+/// <para> Preprocessor flag indicating if EmuSIMD uses any SIMD registers. If this is false, all registers are emulated. </para>
+/// <para> As SIMD register width use is hierarchical, this is effectively the same as `EMU_SIMD_USE_128_REGISTERS`, but provides cleaner semantics. </para>
+/// </summary>
+#define EMU_SIMD_USES_ANY_SIMD_REGISTERS (EMU_SIMD_USE_128_REGISTERS)
 
 /// <summary>
 /// <para> Boolean preprocessor flag indicating if 128-bit registers use reference arguments. </para>
