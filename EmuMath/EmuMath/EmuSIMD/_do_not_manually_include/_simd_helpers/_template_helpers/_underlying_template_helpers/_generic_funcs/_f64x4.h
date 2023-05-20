@@ -137,7 +137,11 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cast_f32x16_f64x4(f32x16_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm256_castps_pd(_mm512_castps512_ps256(a_));
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<f64x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cast_f64x2_f64x4(f64x2_arg a_)
@@ -152,7 +156,11 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cast_f64x8_f64x4(f64x8_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castpd512_pd256(a_);
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<f64x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cast_i8x16_f64x4(i8x16_arg a_)
@@ -197,22 +205,38 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cast_i8x64_f64x4(i8x64_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castpd512_pd256(_mm512_castsi512_pd(a_));
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<f64x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cast_i16x32_f64x4(i16x32_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castpd512_pd256(_mm512_castsi512_pd(a_));
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<f64x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cast_i32x16_f64x4(i32x16_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castpd512_pd256(_mm512_castsi512_pd(a_));
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<f64x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cast_i64x8_f64x4(i64x8_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castpd512_pd256(_mm512_castsi512_pd(a_));
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<f64x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cast_u8x16_f64x4(u8x16_arg a_)
@@ -257,22 +281,38 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cast_u8x64_f64x4(u8x64_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castpd512_pd256(_mm512_castsi512_pd(a_));
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<f64x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cast_u16x32_f64x4(u16x32_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castpd512_pd256(_mm512_castsi512_pd(a_));
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<f64x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cast_u32x16_f64x4(u32x16_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castpd512_pd256(_mm512_castsi512_pd(a_));
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<f64x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cast_u64x8_f64x4(u64x8_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castpd512_pd256(_mm512_castsi512_pd(a_));
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<f64x4>(a_);
+#endif
 	}
 #pragma endregion
 
@@ -288,17 +328,25 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cvt_f32x8_f64x4(f32x8_arg a_)
 	{
-		return _mm256_cvtps_pd(_mm256_castps256_ps128(a_));
+#if EMU_SIMD_USES_ANY_SIMD_REGISTERS
+		return cvt_f32x4_f64x4(cast_f32x8_f32x4(a_));
+#else
+		return EmuSIMD::_underlying_impl::emulate_cvt<f64x4, double, 64, true, 8, true, float>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cvt_f32x16_f64x4(f32x16_arg a_)
 	{
-		return _mm256_cvtps_pd(_mm512_castps512_ps128(a_));
+#if EMU_SIMD_USES_ANY_SIMD_REGISTERS
+		return cvt_f32x4_f64x4(cast_f32x16_f32x4(a_));
+#else
+		return EmuSIMD::_underlying_impl::emulate_cvt<f64x4, double, 64, true, 16, true, float>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cvt_f64x2_f64x4(f64x2_arg a_)
 	{
-		return _mm256_castpd128_pd256(a_);
+		return cast_f64x2_f64x4(a_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cvt_f64x4_f64x4(f64x4_arg a_)
@@ -308,7 +356,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cvt_f64x8_f64x4(f64x8_arg a_)
 	{
-		return _mm512_castpd512_pd256(a_);
+		return cast_f64x8_f64x4(a_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cvt_i8x16_f64x4(i8x16_arg a_)
@@ -353,22 +401,38 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cvt_i8x64_f64x4(i8x64_arg a_)
 	{
-		return _mm256_cvtepi64_pd(_mm256_cvtepi8_epi64(_mm512_castsi512_si128(a_)));
+#if EMU_SIMD_USES_ANY_SIMD_REGISTERS
+		return cvt_i8x16_f64x4(cast_i8x64_i8x16(a_));
+#else
+		return EmuSIMD::_underlying_impl::emulate_cvt<f64x4, double, 64, true, 64, true, std::int8_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cvt_i16x32_f64x4(i16x32_arg a_)
 	{
-		return _mm256_cvtepi64_pd(_mm256_cvtepi16_epi64(_mm512_castsi512_si128(a_)));
+#if EMU_SIMD_USES_ANY_SIMD_REGISTERS
+		return cvt_i16x8_f64x4(cast_i16x32_i16x8(a_));
+#else
+		return EmuSIMD::_underlying_impl::emulate_cvt<f64x4, double, 64, true, 32, true, std::int16_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cvt_i32x16_f64x4(i32x16_arg a_)
 	{
-		return _mm256_cvtepi32_pd(_mm512_castsi512_si128(a_));
+#if EMU_SIMD_USES_ANY_SIMD_REGISTERS
+		return cvt_i32x4_f64x4(cast_i32x16_i32x4(a_));
+#else
+		return EmuSIMD::_underlying_impl::emulate_cvt<f64x4, double, 64, true, 16, true, std::int32_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cvt_i64x8_f64x4(i64x8_arg a_)
 	{
-		return _mm256_cvtepi64_pd(_mm512_castsi512_si256(a_));
+#if EMU_SIMD_USES_ANY_SIMD_REGISTERS
+		return cvt_i64x4_f64x4(cast_i64x8_i64x4(a_));
+#else
+		return EmuSIMD::_underlying_impl::emulate_cvt<f64x4, double, 64, true, 8, true, std::int64_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cvt_u8x16_f64x4(u8x16_arg a_)
@@ -413,22 +477,38 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cvt_u8x64_f64x4(u8x64_arg a_)
 	{
-		return _mm256_cvtepi64_pd(_mm256_cvtepu8_epi64(_mm512_castsi512_si128(a_)));
+#if EMU_SIMD_USES_ANY_SIMD_REGISTERS
+		return cvt_u8x16_f64x4(cast_u8x64_u8x16(a_));
+#else
+		return EmuSIMD::_underlying_impl::emulate_cvt<f64x4, double, 64, true, 64, false, std::uint8_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cvt_u16x32_f64x4(u16x32_arg a_)
 	{
-		return _mm256_cvtepi64_pd(_mm256_cvtepu16_epi64(_mm512_castsi512_si128(a_)));
+#if EMU_SIMD_USES_ANY_SIMD_REGISTERS
+		return cvt_u16x8_f64x4(cast_u16x32_u16x8(a_));
+#else
+		return EmuSIMD::_underlying_impl::emulate_cvt<f64x4, double, 64, true, 32, false, std::uint16_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cvt_u32x16_f64x4(u32x16_arg a_)
 	{
-		return _mm256_cvtepu32_pd(_mm512_castsi512_si128(a_));
+#if EMU_SIMD_USES_ANY_SIMD_REGISTERS
+		return cvt_u32x4_f64x4(cast_u32x16_u32x4(a_));
+#else
+		return EmuSIMD::_underlying_impl::emulate_cvt<f64x4, double, 64, true, 16, false, std::uint32_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cvt_u64x8_f64x4(u64x8_arg a_)
 	{
-		return _mm256_cvtepu64_pd(_mm512_castsi512_si256(a_));
+#if EMU_SIMD_USES_ANY_SIMD_REGISTERS
+		return cvt_u64x4_f64x4(cast_u64x8_u64x4(a_));
+#else
+		return EmuSIMD::_underlying_impl::emulate_cvt<f64x4, double, 64, true, 8, false, std::uint64_t>(a_, std::make_index_sequence<4>());
+#endif
 	}
 #pragma endregion
 

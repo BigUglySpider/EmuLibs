@@ -1102,8 +1102,16 @@ namespace EmuSIMD
 		template<class Out_, std::size_t EmulatedWidth_, class LaneT_>
 		[[nodiscard]] constexpr inline Out_ emulate_simd_cast_lesser_width(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& in_)
 		{
-			// When becoming a lesser width, we're guaranteed to only need the lo-lane, so just defer to the cast template for that
-			return EmuSIMD::cast<Out_>(in_._lane_0);
+			if constexpr (std::is_same_v<LaneT_, Out_>)
+			{
+				// We know we're going to a lesser width so only need the lo-lane, and out type is a lane so just return the lane directly
+				return in_._lane_0;
+			}
+			else
+			{
+				// When becoming a lesser width, we're guaranteed to only need the lo-lane, so just defer to the cast template for that
+				return EmuSIMD::cast<Out_>(in_._lane_0);
+			}
 		}
 #pragma endregion
 
