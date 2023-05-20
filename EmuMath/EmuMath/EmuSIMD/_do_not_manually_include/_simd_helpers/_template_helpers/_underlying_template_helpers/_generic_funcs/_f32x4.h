@@ -265,7 +265,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_256_REGISTERS
 		return _mm256_castps256_ps128(_mm256_castsi256_ps(a_));
 #else
-		return _underlying_impl::emulate_simd_cast_same_width<4, float>(a_);
+		return _underlying_impl::emulate_simd_cast_lesser_width<f32x4>(a_);
 #endif
 	}
 
@@ -274,7 +274,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_256_REGISTERS
 		return _mm256_castps256_ps128(_mm256_castsi256_ps(a_));
 #else
-		return _underlying_impl::emulate_simd_cast_same_width<4, float>(a_);
+		return _underlying_impl::emulate_simd_cast_lesser_width<f32x4>(a_);
 #endif
 	}
 
@@ -283,7 +283,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_256_REGISTERS
 		return _mm256_castps256_ps128(_mm256_castsi256_ps(a_));
 #else
-		return _underlying_impl::emulate_simd_cast_same_width<4, float>(a_);
+		return _underlying_impl::emulate_simd_cast_lesser_width<f32x4>(a_);
 #endif
 	}
 
@@ -292,7 +292,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_256_REGISTERS
 		return _mm256_castps256_ps128(_mm256_castsi256_ps(a_));
 #else
-		return _underlying_impl::emulate_simd_cast_same_width<4, float>(a_);
+		return _underlying_impl::emulate_simd_cast_lesser_width<f32x4>(a_);
 #endif
 	}
 
@@ -301,7 +301,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castps512_ps128(_mm512_castsi512_ps(a_));
 #else
-		return _underlying_impl::emulate_simd_cast_same_width<4, float>(a_);
+		return _underlying_impl::emulate_simd_cast_lesser_width<f32x4>(a_);
 #endif
 	}
 
@@ -310,7 +310,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castps512_ps128(_mm512_castsi512_ps(a_));
 #else
-		return _underlying_impl::emulate_simd_cast_same_width<4, float>(a_);
+		return _underlying_impl::emulate_simd_cast_lesser_width<f32x4>(a_);
 #endif
 	}
 
@@ -319,7 +319,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castps512_ps128(_mm512_castsi512_ps(a_));
 #else
-		return _underlying_impl::emulate_simd_cast_same_width<4, float>(a_);
+		return _underlying_impl::emulate_simd_cast_lesser_width<f32x4>(a_);
 #endif
 	}
 
@@ -328,7 +328,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castps512_ps128(_mm512_castsi512_ps(a_));
 #else
-		return _underlying_impl::emulate_simd_cast_same_width<4, float>(a_);
+		return _underlying_impl::emulate_simd_cast_lesser_width<f32x4>(a_);
 #endif
 	}
 
@@ -373,7 +373,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_256_REGISTERS
 		return _mm256_castps256_ps128(_mm256_castsi256_ps(a_));
 #else
-		return _underlying_impl::emulate_simd_cast_same_width<4, float>(a_);
+		return _underlying_impl::emulate_simd_cast_lesser_width<f32x4>(a_);
 #endif
 	}
 
@@ -382,7 +382,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_256_REGISTERS
 		return _mm256_castps256_ps128(_mm256_castsi256_ps(a_));
 #else
-		return _underlying_impl::emulate_simd_cast_same_width<4, float>(a_);
+		return _underlying_impl::emulate_simd_cast_lesser_width<f32x4>(a_);
 #endif
 	}
 
@@ -391,7 +391,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_256_REGISTERS
 		return _mm256_castps256_ps128(_mm256_castsi256_ps(a_));
 #else
-		return _underlying_impl::emulate_simd_cast_same_width<4, float>(a_);
+		return _underlying_impl::emulate_simd_cast_lesser_width<f32x4>(a_);
 #endif
 	}
 
@@ -400,7 +400,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_256_REGISTERS
 		return _mm256_castps256_ps128(_mm256_castsi256_ps(a_));
 #else
-		return _underlying_impl::emulate_simd_cast_same_width<4, float>(a_);
+		return _underlying_impl::emulate_simd_cast_lesser_width<f32x4>(a_);
 #endif
 	}
 
@@ -409,7 +409,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castps512_ps128(_mm512_castsi512_ps(a_));
 #else
-		return _underlying_impl::emulate_simd_cast_same_width<4, float>(a_);
+		return _underlying_impl::emulate_simd_cast_lesser_width<f32x4>(a_);
 #endif
 	}
 
@@ -418,7 +418,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castps512_ps128(_mm512_castsi512_ps(a_));
 #else
-		return _underlying_impl::emulate_simd_cast_same_width<4, float>(a_);
+		return _underlying_impl::emulate_simd_cast_lesser_width<f32x4>(a_);
 #endif
 	}
 
@@ -427,7 +427,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castps512_ps128(_mm512_castsi512_ps(a_));
 #else
-		return _underlying_impl::emulate_simd_cast_same_width<4, float>(a_);
+		return _underlying_impl::emulate_simd_cast_lesser_width<f32x4>(a_);
 #endif
 	}
 
@@ -436,7 +436,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castps512_ps128(_mm512_castsi512_ps(a_));
 #else
-		return _underlying_impl::emulate_simd_cast_same_width<4, float>(a_);
+		return _underlying_impl::emulate_simd_cast_lesser_width<f32x4>(a_);
 #endif
 	}
 #pragma endregion
