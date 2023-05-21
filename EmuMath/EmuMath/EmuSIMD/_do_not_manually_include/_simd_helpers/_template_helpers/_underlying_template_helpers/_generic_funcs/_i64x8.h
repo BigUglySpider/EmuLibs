@@ -702,7 +702,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 cvt_u64x4_i64x8(u64x4_arg a_)
 	{
-		return cast_u64x8_i64x8(a_);
+		return cast_u64x4_i64x8(a_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 cvt_u8x64_i64x8(u8x64_arg a_)

@@ -361,7 +361,7 @@ int main()
 	{
 		constexpr auto elems_u32 = std::array<std::uint32_t, 16>({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 });
 		constexpr auto elems_f32 = std::array<float, 16>({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16});
-		std::uint32_t dump_u32x16[16];
+		[[maybe_unused]] std::uint32_t dump_u32x16[16];
 		float dump_f32x16[16];
 		
 		constexpr auto shuffle_mask = EmuSIMD::Funcs::make_shuffle_mask_32<2, 1, 3, 0>();

@@ -31,7 +31,7 @@ namespace EmuSIMD::TMP
 	{
 	};
 	template<class T_>
-	static constexpr bool is_simd_register_v = is_simd_register<T_>::value;
+	static constexpr bool is_simd_register_v = is_simd_register<typename std::remove_cvref<T_>::type>::value;
 
 	template<class SIMDRegister_>
 	struct simd_register_width : public EmuCore::TMP::type_check_ignore_ref_cv_base<EmuSIMD::TMP::simd_register_width, std::integral_constant<std::size_t, 0>, SIMDRegister_>

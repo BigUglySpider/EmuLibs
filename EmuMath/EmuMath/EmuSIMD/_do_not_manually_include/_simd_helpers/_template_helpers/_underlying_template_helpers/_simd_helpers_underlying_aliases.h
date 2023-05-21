@@ -44,13 +44,13 @@
 /// <para> If this is true, `EMU_SIMD_USE_128_REGISTERS` will also be true. </para>
 /// <para> When emulating, 256-bit registers will be emulated as two 128-bit registers (this will also work when 128-bit registers are emulated). </para>
 /// </summary>
-#define EMU_SIMD_USE_256_REGISTERS (true)
+#define EMU_SIMD_USE_256_REGISTERS ((true) && (EMU_SIMD_USE_128_REGISTERS))
 /// <summary>
 /// <para> Preprocessor flag indicating if EmuSIMD uses 512-bit SIMD registers. If this is false, 512-bit registers are emulated. </para>
 /// <para> If this is true, `EMU_SIMD_USE_256_REGISTERS` and `EMU_SIMD_USE_128_REGISTERS` will also be true. </para>
 /// <para> When emulating, 512-bit registers will be emulated as two 256-bit registers (this will also work when 256-bit registers are emulated). </para>
 /// </summary>
-#define EMU_SIMD_USE_512_REGISTERS (false)
+#define EMU_SIMD_USE_512_REGISTERS ((true) && (EMU_SIMD_USE_256_REGISTERS) && (EMU_SIMD_USE_128_REGISTERS))
 /// <summary>
 /// <para> Preprocessor flag indicating if EmuSIMD uses any SIMD registers. If this is false, all registers are emulated. </para>
 /// <para> As SIMD register width use is hierarchical, this is effectively the same as `EMU_SIMD_USE_128_REGISTERS`, but provides cleaner semantics. </para>
@@ -1074,7 +1074,7 @@ namespace EmuSIMD
 			}
 		}
 
-		template<class Out_, EmuConcepts::KnownSIMD Register_>
+		template<class Out_, class Register_>
 		requires(!is_simd_emulator<Register_>::value)
 		[[nodiscard]] constexpr inline Out_ emulate_simd_cast_greater_width(Register_&& in_register_)
 		{
@@ -1136,6 +1136,12 @@ namespace EmuSIMD
 			}
 		}
 
+		/// <summary>
+		/// <para> Emulates a SIMD conversion with a single-lane emulator input. </para>
+		/// </summary>
+		/// <param name="in_emulator_">Single-lane SIMD emulator to convert.</param>
+		/// <param name="out_indices_">Index sequence for all elements in the output register.</param>
+		/// <returns>Result of an emulated SIMD conversion into the provided `Out_` register or SIMD-emulator type.</returns>
 		template<class Out_, typename OutT_, std::size_t OutPerElementWidth_, bool OutSigned_, std::size_t InElementCount_, bool InSigned_, typename InT_, std::size_t InSize_, EmuConcepts::Arithmetic EmuT_, std::size_t...OutIndices_>
 		[[nodiscard]] constexpr inline auto emulate_cvt(const single_lane_simd_emulator<InSize_, EmuT_>& in_emulator_, std::index_sequence<OutIndices_...> out_indices_)
 			-> typename std::remove_cvref<Out_>::type
@@ -1146,6 +1152,12 @@ namespace EmuSIMD
 			);
 		}
 
+		/// <summary>
+		/// <para> Emulates a SIMD conversion with a dual-lane emulator input. </para>
+		/// </summary>
+		/// <param name="in_emulator_">Dual-lane SIMD emulator to convert.</param>
+		/// <param name="out_indices_">Index sequence for all elements in the output register.</param>
+		/// <returns>Result of an emulated SIMD conversion into the provided `Out_` register or SIMD-emulator type.</returns>
 		template<class Out_, typename OutT_, std::size_t OutPerElementWidth_, bool OutSigned_, std::size_t InElementCount_, bool InSigned_, typename InT_, class LaneT_, std::size_t EmulatedWidth_, std::size_t...OutIndices_>
 		[[nodiscard]] constexpr inline auto emulate_cvt(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& in_emulator_, std::index_sequence<OutIndices_...> out_indices_)
 			-> typename std::remove_cvref<Out_>::type
@@ -1186,8 +1198,18 @@ namespace EmuSIMD
 			}
 		}
 
-		template<class Out_, typename OutT_, std::size_t OutPerElementWidth_, bool OutSigned_, std::size_t InElementCount_, bool InSigned_, typename InT_, EmuConcepts::KnownSIMD In_, std::size_t...OutIndices_>
-		requires(!is_simd_emulator<In_>::value)
+		/// <summary>
+		/// <para> Emulates a SIMD conversion with a SIMD register input. </para>
+		/// <para>
+		///		This can be used for emulating conversions that are not available even when input and output are both actual SIMD registers. 
+		///		Such behaviour allows this to enable actions such as narrowing integer conversions, which are only available with AVX-512 on x86/64.
+		/// </para>
+		/// </summary>
+		/// <param name="in_register_">Register to convert.</param>
+		/// <param name="out_indices_">Index sequence for all elements in the output register.</param>
+		/// <returns>Result of an emulated SIMD conversion into the provided `Out_` register or SIMD-emulator type.</returns>
+		template<class Out_, typename OutT_, std::size_t OutPerElementWidth_, bool OutSigned_, std::size_t InElementCount_, bool InSigned_, typename InT_, class In_, std::size_t...OutIndices_>
+		requires(!EmuSIMD::_underlying_impl::is_simd_emulator<typename std::remove_cvref<In_>::type>::value)
 		[[nodiscard]] constexpr inline auto emulate_cvt(In_&& in_register_, std::index_sequence<OutIndices_...> out_indices_)
 			-> typename std::remove_cvref<Out_>::type
 		{
