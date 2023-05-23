@@ -541,7 +541,7 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 cast_u8x32_u8x64(u8x32_arg a_)
 	{
 #if EMU_SIMD_USE_512_REGISTERS
-		return _mm512_castsi128_si512(a_);
+		return _mm512_castsi256_si512(a_);
 #else
 		return EmuSIMD::_underlying_impl::emulate_simd_cast_greater_width<u8x64>(a_);
 #endif
@@ -550,7 +550,7 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 cast_u16x16_u8x64(u16x16_arg a_)
 	{
 #if EMU_SIMD_USE_512_REGISTERS
-		return _mm512_castsi128_si512(a_);
+		return _mm512_castsi256_si512(a_);
 #else
 		return EmuSIMD::_underlying_impl::emulate_simd_cast_greater_width<u8x64>(a_);
 #endif
@@ -559,7 +559,7 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 cast_u32x8_u8x64(u32x8_arg a_)
 	{
 #if EMU_SIMD_USE_512_REGISTERS
-		return _mm512_castsi128_si512(a_);
+		return _mm512_castsi256_si512(a_);
 #else
 		return EmuSIMD::_underlying_impl::emulate_simd_cast_greater_width<u8x64>(a_);
 #endif
@@ -568,7 +568,7 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 cast_u64x4_u8x64(u64x4_arg a_)
 	{
 #if EMU_SIMD_USE_512_REGISTERS
-		return _mm512_castsi128_si512(a_);
+		return _mm512_castsi256_si512(a_);
 #else
 		return EmuSIMD::_underlying_impl::emulate_simd_cast_greater_width<u8x64>(a_);
 #endif

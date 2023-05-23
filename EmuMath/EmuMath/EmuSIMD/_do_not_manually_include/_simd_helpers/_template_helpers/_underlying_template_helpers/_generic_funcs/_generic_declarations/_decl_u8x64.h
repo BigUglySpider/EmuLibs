@@ -199,7 +199,7 @@ namespace EmuSIMD::Funcs
 	{
 #if EMU_SIMD_USE_512_REGISTERS
 		constexpr bool is_reverse_set = false;
-		using target_element_type = std:uint8_t;
+		using target_element_type = std::uint8_t;
 		constexpr std::size_t argument_width = 4; // Max value of 15 (0b1111), per index
 		constexpr std::size_t num_128_lanes = 4;
 
