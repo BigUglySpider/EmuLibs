@@ -199,7 +199,7 @@ namespace EmuSIMD::Funcs
 	{
 #if EMU_SIMD_USE_512_REGISTERS
 		constexpr bool is_reverse_set = false;
-		using target_element_type = signed char;
+		using target_element_type = std::int8_t;
 		constexpr std::size_t argument_width = 4; // Max value of 15 (0b1111), per index
 		constexpr std::size_t num_128_lanes = 4;
 
@@ -222,19 +222,12 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 shuffle_i8x64(EmuSIMD::i8x64_arg a_, EmuSIMD::i8x64_arg b_)
 	{
 #if EMU_SIMD_USE_512_REGISTERS
-		constexpr std::size_t a_permute_mask = duplicate_shuffle_mask_32bit_lane<ShuffleMask_, true>();
-		constexpr std::size_t b_permute_mask = duplicate_shuffle_mask_32bit_lane<ShuffleMask_, false>();
+		constexpr std::size_t a_permute_mask = duplicate_shuffle_mask_32bit_lane<ShuffleMask_, true>();  // hi 32-bits recurring
+		constexpr std::size_t b_permute_mask = duplicate_shuffle_mask_32bit_lane<ShuffleMask_, false>(); // lo 32-bits recurring
 
 		EmuSIMD::i8x64 a_permuted = permute_i8x64<a_permute_mask>(a_);
 		EmuSIMD::i8x64 b_permuted = permute_i8x64<b_permute_mask>(b_);
-
-		// Use f32x16 reinterpretation to take the lo bits of permuted a and the lo bits of permuted b and combine them into one register, 
-		// where lo(result) = lo(a), hi(result) = lo(b)
-		// --- We take this approach as each permutation has been duplicated across 64-bit lanes within the respective permuted register
-		EmuSIMD::f32x16 tmp_cast = cast_i8x64_f32x16(a_permuted);
-		tmp_cast = movelh_f32x16(tmp_cast, cast_i8x64_f32x16(b_permuted));
-
-		return cast_f32x16_i8x64(tmp_cast);
+		return movelh_i8x64(a_permuted, b_permuted); // { lo(a), lo(b) }
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
 		return emulate_simd_basic([](i8x32_arg a, i8x32_arg b) { return EmuSIMD::Funcs::shuffle_i8x32<ShuffleMask>(a, b); }, a_, b_);

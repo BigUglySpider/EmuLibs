@@ -50,7 +50,7 @@
 /// <para> If this is true, `EMU_SIMD_USE_256_REGISTERS` and `EMU_SIMD_USE_128_REGISTERS` will also be true. </para>
 /// <para> When emulating, 512-bit registers will be emulated as two 256-bit registers (this will also work when 256-bit registers are emulated). </para>
 /// </summary>
-#define EMU_SIMD_USE_512_REGISTERS ((true) && (EMU_SIMD_USE_256_REGISTERS) && (EMU_SIMD_USE_128_REGISTERS))
+#define EMU_SIMD_USE_512_REGISTERS ((false) && (EMU_SIMD_USE_256_REGISTERS) && (EMU_SIMD_USE_128_REGISTERS))
 /// <summary>
 /// <para> Preprocessor flag indicating if EmuSIMD uses any SIMD registers. If this is false, all registers are emulated. </para>
 /// <para> As SIMD register width use is hierarchical, this is effectively the same as `EMU_SIMD_USE_128_REGISTERS`, but provides cleaner semantics. </para>
@@ -61,17 +61,17 @@
 /// <para> Boolean preprocessor flag indicating if 128-bit registers use reference arguments. </para>
 /// <para> This affects the`_arg` variants of all 128-bit register aliases. </para>
 /// </summary>
-#define EMU_SIMD_128_ARG_REFS !(EMU_SIMD_USE_128_REGISTERS)
+#define EMU_SIMD_128_ARG_REFS (!(EMU_SIMD_USE_128_REGISTERS))
 /// <summary>
 /// <para> Boolean preprocessor flag indicating if 256-bit registers use reference arguments. </para>
 /// <para> This affects the`_arg` variants of all 256-bit register aliases. </para>
 /// </summary>
-#define EMU_SIMD_256_ARG_REFS !(EMU_SIMD_USE_256_REGISTERS)
+#define EMU_SIMD_256_ARG_REFS (!(EMU_SIMD_USE_256_REGISTERS))
 /// <summary>
 /// <para> Boolean preprocessor flag indicating if 512-bit registers use reference arguments. </para>
 /// <para> This affects the`_arg` variants of all 512-bit register aliases. </para>
 /// </summary>
-#define EMU_SIMD_512_ARG_REFS !(EMU_SIMD_USE_512_REGISTERS)
+#define EMU_SIMD_512_ARG_REFS (!(EMU_SIMD_USE_512_REGISTERS))
 
 #if EMU_SIMD_128_ARG_REFS
 /// <summary> Helper macro for creating the 128-bit register arg types. `basic_type` is the base register alias (e.g. for `f32x4_arg`, `basic_type` is `f32x4`). </summary>
@@ -99,10 +99,10 @@
 
 /// <summary>
 /// <para> Boolean preprocessor flag indicating if 128-bit, 256-bit, and 512-bit integral registers are generic (i.e. the same regardless of element width and signedness), as per x86/x64 intrinsics. </para>
-/// <para> If true, tests such as `std::is_same_v&lt;i32x4, x16x8&gt;` will evaluate to true. </para>
-/// <para> If false, tests such as `std::is_same_v&lt;i32x4, x16x8&gt;` will evaluate to false. </para>
+/// <para> If true, tests such as `std::is_same_v&lt;i32x4, i16x8&gt;` will evaluate to true. </para>
+/// <para> If false, tests such as `std::is_same_v&lt;i32x4, i16x8&gt;` will evaluate to false. </para>
 /// </summary>
-#define EMU_SIMD_USE_GENERIC_INT_REGISTERS ((EMU_SIMD_USE_128_REGISTERS) && (EMU_CORE_X86_X64))
+#define EMU_SIMD_USE_GENERIC_INT_REGISTERS ((EMU_SIMD_USES_ANY_SIMD_REGISTERS) && (EMU_CORE_X86_X64))
 
 namespace EmuSIMD
 {
