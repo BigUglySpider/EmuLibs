@@ -185,12 +185,18 @@ namespace EmuSIMD::Funcs
 	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x16 permute_u32x16(EmuSIMD::u32x16_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_shuffle_epi32(a_, ShuffleMask_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](u32x8_arg a) { return EmuSIMD::Funcs::permute_u32x8<ShuffleMask>(a); }, a_);
+#endif
 	}
 
 	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x16 shuffle_u32x16(EmuSIMD::u32x16_arg a_, EmuSIMD::u32x16_arg b_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return cast_f32x16_u32x16
 		(
 			shuffle_f32x16<ShuffleMask_>
@@ -199,6 +205,10 @@ namespace EmuSIMD::Funcs
 				cast_u32x16_f32x16(b_)
 			)
 		);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](u32x8_arg a, u32x8_arg b) { return EmuSIMD::Funcs::shuffle_u32x8<ShuffleMask>(a, b); }, a_, b_);
+#endif
 	}
 #pragma endregion
 
@@ -206,6 +216,7 @@ namespace EmuSIMD::Funcs
 	template<EmuSIMD::Funcs::blend_mask_type BlendMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x16 blend_u32x16(EmuSIMD::u32x16_arg a_, EmuSIMD::u32x16_arg b_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return cast_f32x16_u32x16
 		(
 			blend_f32x16<BlendMask_>
@@ -214,6 +225,9 @@ namespace EmuSIMD::Funcs
 				cast_u32x16_f32x16(b_)
 			)
 		);
+#else
+		return EmuSIMD::_underlying_impl::emulate_dual_lane_blend_with_mask<BlendMask>(a_, b_, std::make_index_sequence<8>());
+#endif
 	}
 #pragma endregion
 

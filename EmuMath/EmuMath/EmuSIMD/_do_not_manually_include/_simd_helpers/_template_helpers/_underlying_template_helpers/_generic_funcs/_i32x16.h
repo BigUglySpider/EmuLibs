@@ -347,11 +347,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x16 cast_i32x16_i32x16(i32x16_arg a_)
 	{
-#if EMU_SIMD_USE_512_REGISTERS
 		return a_;
-#else
-		return EmuSIMD::_underlying_impl::emulate_simd_cast_same_width<i32x8>(a_);
-#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x16 cast_i64x8_i32x16(i64x8_arg a_)
