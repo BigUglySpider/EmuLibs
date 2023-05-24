@@ -73,7 +73,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_256_REGISTERS
 			return cast_f32x4_f64x2(_mm256_extractf128_ps(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -87,7 +91,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_512_REGISTERS
 			return cast_f32x4_f64x2(_mm512_extractf32x4_ps(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -108,7 +116,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_256_REGISTERS
 			return _mm256_extractf128_pd(a_, Index_);
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -122,7 +134,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_512_REGISTERS
 			return _mm512_extractf64x2_pd(a_, Index_);
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -143,7 +159,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_256_REGISTERS
 			return cast_i8x16_f64x2(_mm256_extracti128_si256(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -157,7 +177,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_512_REGISTERS
 			return cast_i8x16_f64x2(_mm512_extracti32x4_epi32(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -178,7 +202,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_256_REGISTERS
 			return cast_i16x8_f64x2(_mm256_extracti128_si256(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -192,7 +220,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_512_REGISTERS
 			return cast_i16x8_f64x2(_mm512_extracti32x4_epi32(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -213,7 +245,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_256_REGISTERS
 			return cast_i32x4_f64x2(_mm256_extracti128_si256(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -227,7 +263,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_512_REGISTERS
 			return cast_i32x4_f64x2(_mm512_extracti32x4_epi32(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -248,7 +288,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_256_REGISTERS
 			return cast_i64x2_f64x2(_mm256_extracti128_si256(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -262,7 +306,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_512_REGISTERS
 			return cast_i64x2_f64x2(_mm512_extracti32x4_epi32(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -283,7 +331,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_256_REGISTERS
 			return cast_u8x16_f64x2(_mm256_extracti128_si256(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -297,7 +349,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_512_REGISTERS
 			return cast_u8x16_f64x2(_mm512_extracti32x4_epi32(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -318,7 +374,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_256_REGISTERS
 			return cast_u16x8_f64x2(_mm256_extracti128_si256(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -332,7 +392,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_512_REGISTERS
 			return cast_u16x8_f64x2(_mm512_extracti32x4_epi32(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -353,7 +417,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_256_REGISTERS
 			return cast_u32x4_f64x2(_mm256_extracti128_si256(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -367,7 +435,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_512_REGISTERS
 			return cast_u32x4_f64x2(_mm512_extracti32x4_epi32(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -388,7 +460,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_256_REGISTERS
 			return cast_u64x2_f64x2(_mm256_extracti128_si256(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 
@@ -402,7 +478,11 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
+#if EMU_SIMD_USE_512_REGISTERS
 			return cast_u64x2_f64x2(_mm512_extracti32x4_epi32(a_, Index_));
+#else
+			return EmuSIMD::_underlying_impl::emulate_extraction<f64x2, 128, Index_>(a_);
+#endif
 		}
 	}
 #pragma endregion
