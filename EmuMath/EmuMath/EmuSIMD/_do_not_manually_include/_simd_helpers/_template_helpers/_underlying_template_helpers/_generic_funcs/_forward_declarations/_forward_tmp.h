@@ -170,6 +170,14 @@ namespace EmuSIMD::TMP
 		>::type;
 	};
 
+	template<class SIMDRegister_, std::size_t PerElementWidthIfGenericInt_ = 32>
+	struct register_movemask_type
+	{
+		using type = EmuCore::TMP::emu_tmp_err;
+	};
+	template<class SIMDRegister_, std::size_t PerElementWidthIfGenericInt_ = 32>
+	using register_movemask_type_t = typename register_movemask_type<SIMDRegister_, PerElementWidthIfGenericInt_>::type;
+
 	namespace Concepts
 	{
 		template<typename T_>

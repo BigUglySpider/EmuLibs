@@ -896,6 +896,41 @@ namespace EmuSIMD::TMP
 	};
 #endif
 #pragma endregion
+
+#pragma region REGISTER_MOVEMASK_TYPE
+	template<EmuConcepts::KnownSIMD SIMDRegister_, std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<SIMDRegister_, PerElementWidthIfGenericInt_>
+	{
+	private:
+		static constexpr auto _get()
+		{
+			constexpr std::size_t num_elements = EmuSIMD::TMP::register_element_count_v<typename std::remove_cvref<SIMDRegister_>::type, PerElementWidthIfGenericInt_>;
+			if constexpr (num_elements <= 8)
+			{
+				return std::uint8_t();
+			}
+			else if constexpr (num_elements <= 16)
+			{
+				return std::uint16_t();
+			}
+			else if constexpr (num_elements <= 32)
+			{
+				return std::uint32_t();
+			}
+			else if constexpr (num_elements <= 64)
+			{
+				return std::uint64_t();
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<std::size_t, num_elements>(), "Unable to generate a movemask type via EmuSIMD::TMP::register_movemask_type: The determined number of elements within the SIMD register is greater than the number of bits in the widest unsigned integer type.");
+			}
+		}
+
+	public:
+		using type = decltype(_get());
+	};
+#pragma endregion
 }
 
 namespace EmuSIMD::_underlying_impl

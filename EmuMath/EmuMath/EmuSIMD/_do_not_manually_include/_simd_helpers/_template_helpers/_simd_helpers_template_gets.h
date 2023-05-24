@@ -8,7 +8,8 @@
 namespace EmuSIMD
 {
 	template<std::size_t PerElementWidthIfGenericInt_, EmuConcepts::KnownSIMD Register_>
-	[[nodiscard]] inline decltype(auto) movemask(Register_&& simd_register_)
+	[[nodiscard]] inline auto movemask(Register_&& simd_register_)
+		-> typename EmuSIMD::TMP::register_movemask_type<Register_, PerElementWidthIfGenericInt_>::type
 	{
 		return _underlying_simd_helpers::_movemask<PerElementWidthIfGenericInt_>(std::forward<Register_>(simd_register_));
 	}

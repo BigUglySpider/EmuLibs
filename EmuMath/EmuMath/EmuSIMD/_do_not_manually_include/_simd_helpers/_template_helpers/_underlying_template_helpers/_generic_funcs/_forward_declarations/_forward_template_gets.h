@@ -13,7 +13,8 @@
 namespace EmuSIMD
 {
 	template<std::size_t PerElementWidthIfGenericInt_ = 32, EmuConcepts::KnownSIMD Register_>
-	[[nodiscard]] inline decltype(auto) movemask(Register_&& simd_register_);
+	[[nodiscard]] inline auto movemask(Register_&& simd_register_)
+		-> typename EmuSIMD::TMP::register_movemask_type<Register_, PerElementWidthIfGenericInt_>::type;
 
 	/// <summary>
 	/// <para> Retrieves a specified index from a the passed SIMD register, cast as the provided Out_ type. </para>
