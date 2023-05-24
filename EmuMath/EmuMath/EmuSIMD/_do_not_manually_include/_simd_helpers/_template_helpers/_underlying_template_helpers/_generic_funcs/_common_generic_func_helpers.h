@@ -287,26 +287,6 @@ namespace EmuSIMD::Funcs
 		>();
 	}
 
-	template
-	<
-		shuffle_mask_type I0_, shuffle_mask_type I1_, shuffle_mask_type I2_, shuffle_mask_type I3_,
-		shuffle_mask_type I4_, shuffle_mask_type I5_, shuffle_mask_type I6_, shuffle_mask_type I7_
-	>
-	[[nodiscard]] constexpr inline shuffle_mask_type make_reverse_shuffle_mask_16()
-	{
-		return make_reverse_shuffle_mask_8
-		<
-			(I0_ * 2) + 1, (I0_ * 2),
-			(I1_ * 2) + 1, (I1_ * 2),
-			(I2_ * 2) + 1, (I2_ * 2),
-			(I3_ * 2) + 1, (I3_ * 2),
-			(I4_ * 2) + 1, (I4_ * 2),
-			(I5_ * 2) + 1, (I5_ * 2),
-			(I6_ * 2) + 1, (I6_ * 2),
-			(I7_ * 2) + 1, (I7_ * 2)
-		>();
-	}
-
 	template<shuffle_mask_type Index_>
 	[[nodiscard]] constexpr inline shuffle_mask_type make_looping_shuffle_mask_8x16()
 	{
@@ -327,6 +307,26 @@ namespace EmuSIMD::Funcs
 			std::integer_sequence<shuffle_mask_type, I15_, I14_, I13_, I12_, I11_, I10_, I9_, I8_, I7_, I6_, I5_, I4_, I3_, I2_, I1_, I0_>(),
 			std::make_index_sequence<16>()
 		);
+	}
+
+	template
+	<
+		shuffle_mask_type I0_, shuffle_mask_type I1_, shuffle_mask_type I2_, shuffle_mask_type I3_,
+		shuffle_mask_type I4_, shuffle_mask_type I5_, shuffle_mask_type I6_, shuffle_mask_type I7_
+	>
+	[[nodiscard]] constexpr inline shuffle_mask_type make_reverse_shuffle_mask_16()
+	{
+		return make_reverse_shuffle_mask_8
+		<
+			(I0_ * 2) + 1, (I0_ * 2),
+			(I1_ * 2) + 1, (I1_ * 2),
+			(I2_ * 2) + 1, (I2_ * 2),
+			(I3_ * 2) + 1, (I3_ * 2),
+			(I4_ * 2) + 1, (I4_ * 2),
+			(I5_ * 2) + 1, (I5_ * 2),
+			(I6_ * 2) + 1, (I6_ * 2),
+			(I7_ * 2) + 1, (I7_ * 2)
+		>();
 	}
 
 	namespace _underlying_funcs
