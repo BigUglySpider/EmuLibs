@@ -183,7 +183,7 @@ namespace EmuSIMD::Funcs
 		);
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
-		return emulate_simd_basic([](i64x4_arg a) { return EmuSIMD::Funcs::permute_i64x4<ShuffleMask>(a); }, a_);
+		return emulate_simd_basic([](i64x4_arg a) { return EmuSIMD::Funcs::permute_i64x4<ShuffleMask_>(a); }, a_);
 #endif
 	}
 
@@ -197,7 +197,7 @@ namespace EmuSIMD::Funcs
 		);
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
-		return emulate_simd_basic([](i64x4_arg a, i64x4_arg b) { return EmuSIMD::Funcs::shuffle_i64x4<ShuffleMask>(a, b); }, a_, b_);
+		return emulate_simd_basic([](i64x4_arg a, i64x4_arg b) { return EmuSIMD::Funcs::shuffle_i64x4<ShuffleMask_>(a, b); }, a_, b_);
 #endif
 	}
 #pragma endregion
@@ -216,7 +216,7 @@ namespace EmuSIMD::Funcs
 			)
 		);
 #else
-		return EmuSIMD::_underlying_impl::emulate_dual_lane_blend_with_mask<BlendMask>(a_, b_, std::make_index_sequence<4>());
+		return EmuSIMD::_underlying_impl::emulate_dual_lane_blend_with_mask<BlendMask_>(a_, b_, std::make_index_sequence<4>());
 #endif
 	}
 #pragma endregion

@@ -8,5 +8,6 @@
 #include "_forward_template_cvts.h"
 #include "_forward_template_gets.h"
 #include "_forward_template_sets.h"
+#include "_forward_template_shuffles.h"
 
 #endif

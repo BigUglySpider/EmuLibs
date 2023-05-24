@@ -598,17 +598,26 @@ namespace EmuSIMD
 	using i128_generic = void;
 #endif
 
-#if EMU_SIMD_USE_256_REGISTERS
+#if EMU_SIMD_USES_ANY_SIMD_REGISTERS && EMU_SIMD_USE_GENERIC_INT_REGISTERS
+	#if EMU_SIMD_USE_256_REGISTERS
 	/// <summary> Alias to a generic 256-bit integral register, which is per-element-width-and-signedness-agnostic. If there is no generic register, this will be `void`. </summary>
 	using i256_generic = __m256i;
-#else
+	#else
 	/// <summary> Alias to a generic 256-bit integral register, which is per-element-width-and-signedness-agnostic. If there is no generic register, this will be `void`. </summary>
+	using i256_generic = EmuSIMD::_underlying_impl::dual_lane_simd_emulator<512, i128_generic>;
+	#endif
+#else
 	using i256_generic = void;
 #endif
 
 	/// <summary> Alias to a generic 512-bit integral register, which is per-element-width-and-signedness-agnostic. If there is no generic register, this will be `void`. </summary>
-#if EMU_SIMD_USE_512_REGISTERS
+#if EMU_SIMD_USES_ANY_SIMD_REGISTERS && EMU_SIMD_USE_GENERIC_INT_REGISTERS
+	#if EMU_SIMD_USE_512_REGISTERS
 	using i512_generic = __m512i;
+	#else
+	/// <summary> Alias to a generic 512-bit integral register, which is per-element-width-and-signedness-agnostic. If there is no generic register, this will be `void`. </summary>
+	using i512_generic = EmuSIMD::_underlying_impl::dual_lane_simd_emulator<512, i256_generic>;
+	#endif
 #else
 	/// <summary> Alias to a generic 512-bit integral register, which is per-element-width-and-signedness-agnostic. If there is no generic register, this will be `void`. </summary>
 	using i512_generic = void;

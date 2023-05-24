@@ -174,24 +174,24 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 
 #pragma region SHUFFLE_TEMPLATES
-	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask>
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 shuffle_f64x4(EmuSIMD::f64x4_arg lhs_, EmuSIMD::f64x4_arg rhs_)
 	{
-		return _mm256_shuffle_pd(lhs_, rhs_, ShuffleMask);
+		return _mm256_shuffle_pd(lhs_, rhs_, ShuffleMask_);
 	}
 
-	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask>
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 permute_f64x4(EmuSIMD::f64x4_arg in_)
 	{
-		return _mm256_permute_pd(in_, ShuffleMask);
+		return _mm256_permute_pd(in_, ShuffleMask_);
 	}
 #pragma endregion
 
 #pragma region BLEND_TEMPLATES
-	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 blend_f64x4(EmuSIMD::f64x4_arg a_, EmuSIMD::f64x4_arg b_)
 	{
-		return _mm256_blend_pd(a_, b_, BlendMask);
+		return _mm256_blend_pd(a_, b_, BlendMask_);
 	}
 #pragma endregion
 

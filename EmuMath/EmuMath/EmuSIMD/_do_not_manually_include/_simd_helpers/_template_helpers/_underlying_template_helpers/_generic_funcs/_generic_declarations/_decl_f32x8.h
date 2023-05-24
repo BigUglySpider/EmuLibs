@@ -177,24 +177,24 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 
 #pragma region SHUFFLE_TEMPLATES
-	template<shuffle_mask_type ShuffleMask>
+	template<shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 shuffle_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_)
 	{
-		return _mm256_shuffle_ps(lhs_, rhs_, ShuffleMask);
+		return _mm256_shuffle_ps(lhs_, rhs_, ShuffleMask_);
 	}
 
-	template<shuffle_mask_type ShuffleMask>
+	template<shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 permute_f32x8(EmuSIMD::f32x8_arg in_)
 	{
-		return _mm256_permute_ps(in_, ShuffleMask);
+		return _mm256_permute_ps(in_, ShuffleMask_);
 	}
 #pragma endregion
 
 #pragma region BLEND_TEMPLATES
-	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 blend_f32x8(EmuSIMD::f32x8_arg a_, EmuSIMD::f32x8_arg b_)
 	{
-		return _mm256_blend_ps(a_, b_, BlendMask);
+		return _mm256_blend_ps(a_, b_, BlendMask_);
 	}
 #pragma endregion
 

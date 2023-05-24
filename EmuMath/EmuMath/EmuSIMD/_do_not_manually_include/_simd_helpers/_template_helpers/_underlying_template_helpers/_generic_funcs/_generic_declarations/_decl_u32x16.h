@@ -189,7 +189,7 @@ namespace EmuSIMD::Funcs
 		return _mm512_shuffle_epi32(a_, ShuffleMask_);
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
-		return emulate_simd_basic([](u32x8_arg a) { return EmuSIMD::Funcs::permute_u32x8<ShuffleMask>(a); }, a_);
+		return emulate_simd_basic([](u32x8_arg a) { return EmuSIMD::Funcs::permute_u32x8<ShuffleMask_>(a); }, a_);
 #endif
 	}
 
@@ -207,7 +207,7 @@ namespace EmuSIMD::Funcs
 		);
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
-		return emulate_simd_basic([](u32x8_arg a, u32x8_arg b) { return EmuSIMD::Funcs::shuffle_u32x8<ShuffleMask>(a, b); }, a_, b_);
+		return emulate_simd_basic([](u32x8_arg a, u32x8_arg b) { return EmuSIMD::Funcs::shuffle_u32x8<ShuffleMask_>(a, b); }, a_, b_);
 #endif
 	}
 #pragma endregion
@@ -226,7 +226,7 @@ namespace EmuSIMD::Funcs
 			)
 		);
 #else
-		return EmuSIMD::_underlying_impl::emulate_dual_lane_blend_with_mask<BlendMask>(a_, b_, std::make_index_sequence<8>());
+		return EmuSIMD::_underlying_impl::emulate_dual_lane_blend_with_mask<BlendMask_>(a_, b_, std::make_index_sequence<8>());
 #endif
 	}
 #pragma endregion

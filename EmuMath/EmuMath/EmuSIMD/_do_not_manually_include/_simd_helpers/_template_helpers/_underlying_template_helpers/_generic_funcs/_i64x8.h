@@ -447,13 +447,7 @@ namespace EmuSIMD::Funcs
 #pragma region CONVERSIONS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 cvt_f32x4_i64x8(f32x4_arg a_)
 	{
-#if EMU_SIMD_USE_256_REGISTERS
-		return cast_i64x4_i64x8(_mm256_cvtps_epi64(a_));
-#elif EMU_SIMD_USE_128_REGISTERS
-		return cast_i64x2_i64x8(_mm_cvtps_epi64(a_));
-#else
-		return EmuSIMD::_underlying_impl::emulate_cvt<i64x8, std::int64_t, 64, true, 4, true, float>(a_, std::make_index_sequence<8>());
-#endif
+		return cast_i64x4_i64x8(cvt_f32x4_i64x4(a_));
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 cvt_f32x8_i64x8(f32x8_arg a_)
@@ -461,8 +455,8 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_cvtps_epi64(a_);
 #elif EMU_SIMD_USE_256_REGISTERS
-		i64x4 lo = _mm256_cvtps_epi64(cast_f32x8_f32x4(a_));
-		i64x4 hi = _mm256_cvtps_epi64(cast_f32x8_f32x4(movehl_f32x8(a_, a_)));
+		i64x4 lo = cvt_f32x4_i64x4(cast_f32x8_f32x4(a_));
+		i64x4 hi = cvt_f32x4_i64x4(cast_f32x8_f32x4(movehl_f32x8(a_, a_)));
 		return i64x8(lo, hi);
 #else
 		return EmuSIMD::_underlying_impl::emulate_cvt<i64x8, std::int64_t, 64, true, 8, true, float>(a_, std::make_index_sequence<8>());
@@ -481,7 +475,7 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 cvt_f64x2_i64x8(f64x2_arg a_)
 	{
 #if EMU_SIMD_USE_128_REGISTERS
-		return cast_i64x2_i64x8(_mm_cvtpd_epi64(a_));
+		return cast_i64x2_i64x8(cvt_f64x2_i64x2(a_));
 #else
 		return EmuSIMD::_underlying_impl::emulate_cvt<i64x8, std::int64_t, 64, true, 2, true, double>(a_, std::make_index_sequence<8>());
 #endif
@@ -490,7 +484,7 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x8 cvt_f64x4_i64x8(f64x4_arg a_)
 	{
 #if EMU_SIMD_USE_256_REGISTERS
-		return cast_i64x4_i64x8(_mm256_cvtpd_epi64(a_));
+		return cast_i64x4_i64x8(cvt_f64x4_i64x4(a_));
 #else
 		return EmuSIMD::_underlying_impl::emulate_cvt<i64x8, std::int64_t, 64, true, 4, true, double>(a_, std::make_index_sequence<8>());
 #endif
@@ -636,7 +630,7 @@ namespace EmuSIMD::Funcs
 		return _mm512_cvtepu16_epi64(a_);
 #elif EMU_SIMD_USE_256_REGISTERS
 		i64x4 lo = _mm256_cvtepu16_epi64(a_);
-		i64x4 hi = _mm256_cvtepu16_epi64(movehl_i16x8(a_, a_));
+		i64x4 hi = _mm256_cvtepu16_epi64(movehl_u16x8(a_, a_));
 		return i64x8(lo, hi);
 #else
 		return EmuSIMD::_underlying_impl::emulate_cvt<i64x8, std::int64_t, 64, true, 8, false, std::uint16_t>(a_, std::make_index_sequence<8>());
@@ -649,7 +643,7 @@ namespace EmuSIMD::Funcs
 		return cast_i64x4_i64x8(_mm256_cvtepu32_epi64(a_));
 #elif EMU_SIMD_USE_128_REGISTERS
 		i64x2 lo_lo = _mm_cvtepu32_epi64(a_);
-		i64x2 lo_hi = _mm_cvtepu32_epi64(movehl_i32x4(a_, a_));
+		i64x2 lo_hi = _mm_cvtepu32_epi64(movehl_u32x4(a_, a_));
 		return i64x8(i64x4(lo_lo, lo_hi)); // { a_, zero }
 #else
 		return EmuSIMD::_underlying_impl::emulate_cvt<i64x8, std::int64_t, 64, true, 4, false, std::uint32_t>(a_, std::make_index_sequence<8>());
@@ -688,7 +682,7 @@ namespace EmuSIMD::Funcs
 		i64x4 hi = _mm256_cvtepu32_epi64(cast_u32x8_u32x4(movehl_u32x8(a_, a_)));
 		return i64x8(lo, hi);
 #elif EMU_SIMD_USE_128_REGISTERS
-		i32x4 a_lane = a_._lane_0;
+		u32x4 a_lane = a_._lane_0;
 		i64x2 lo_lo = _mm_cvtepu32_epi64(a_lane);
 		i64x2 lo_hi = _mm_cvtepu32_epi64(movehl_u32x4(a_lane, a_lane));
 		a_lane = a_._lane_1;

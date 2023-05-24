@@ -962,7 +962,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_sub_epi32(_mm512_setzero_si512(), to_negate_);
 #else
-		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u32x8_arg to_negate, u32x8_arg rhs) { return negate_u32x8(to_negate); }, to_negate_);
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u32x8_arg to_negate) { return negate_u32x8(to_negate); }, to_negate_);
 #endif
 	}
 

@@ -181,35 +181,35 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 
 #pragma region SHUFFLE_TEMPLATES
-	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask>
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 shuffle_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
 #if EMU_SIMD_USE_128_REGISTERS
-		return _mm_shuffle_ps(lhs_, rhs_, ShuffleMask);
+		return _mm_shuffle_ps(lhs_, rhs_, ShuffleMask_);
 #else
-		return EmuSIMD::_underlying_impl::_emulate_single_lane_shuffle<ShuffleMask, 2>(lhs_, rhs_, std::make_index_sequence<4>());
+		return EmuSIMD::_underlying_impl::_emulate_single_lane_shuffle<ShuffleMask_, 2>(lhs_, rhs_, std::make_index_sequence<4>());
 #endif
 	}
 
-	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask>
+	template<EmuSIMD::Funcs::shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 permute_f32x4(EmuSIMD::f32x4_arg in_)
 	{
 #if EMU_SIMD_USE_128_REGISTERS
-		return _mm_permute_ps(in_, ShuffleMask);
+		return _mm_permute_ps(in_, ShuffleMask_);
 #else
-		return EmuSIMD::_underlying_impl::_emulate_single_lane_permute<ShuffleMask, 2>(in_, std::make_index_sequence<4>());
+		return EmuSIMD::_underlying_impl::_emulate_single_lane_permute<ShuffleMask_, 2>(in_, std::make_index_sequence<4>());
 #endif
 	}
 #pragma endregion
 
 #pragma region BLEND_TEMPLATES
-	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 blend_f32x4(EmuSIMD::f32x4_arg a_, EmuSIMD::f32x4_arg b_)
 	{
 #if EMU_SIMD_USE_128_REGISTERS
-		return _mm_blend_ps(a_, b_, BlendMask);
+		return _mm_blend_ps(a_, b_, BlendMask_);
 #else
-		return EmuSIMD::_underlying_impl::emulate_single_lane_blend_with_mask<BlendMask>(a_, b_, std::make_index_sequence<4>());
+		return EmuSIMD::_underlying_impl::emulate_single_lane_blend_with_mask<BlendMask_>(a_, b_, std::make_index_sequence<4>());
 #endif
 	}
 #pragma endregion

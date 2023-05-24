@@ -1279,7 +1279,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return emulate_fp_u8x64([](EmuSIMD::f32x16_arg in_fp_) { return sqrt_f32x16(in_fp_); }, in_);
 #else
-		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u8x32_arg a, u8x32_arg) { return sqrt_u8x32(a); }, in_);
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u8x32_arg a) { return sqrt_u8x32(a); }, in_);
 #endif
 	}
 
@@ -1288,7 +1288,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return emulate_fp_u8x64([](EmuSIMD::f32x16_arg in_fp_) { return rsqrt_f32x16(in_fp_); }, in_);
 #else
-		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u8x32_arg a, u8x32_arg) { return rsqrt_u8x32(a); }, in_);
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u8x32_arg a) { return rsqrt_u8x32(a); }, in_);
 #endif
 	}
 #pragma endregion
@@ -1315,7 +1315,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return emulate_fp_u8x64([](EmuSIMD::f32x16_arg in_fp_) { return cos_f32x16(in_fp_); }, in_);
 #else
-		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u8x32_arg a, u8x32_arg) { return cos_u8x32(a); }, in_);
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u8x32_arg a) { return cos_u8x32(a); }, in_);
 #endif
 	}
 
@@ -1324,7 +1324,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return emulate_fp_u8x64([](EmuSIMD::f32x16_arg in_fp_) { return sin_f32x16(in_fp_); }, in_);
 #else
-		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u8x32_arg a, u8x32_arg) { return sin_u8x32(a); }, in_);
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u8x32_arg a) { return sin_u8x32(a); }, in_);
 #endif
 	}
 
@@ -1333,7 +1333,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return emulate_fp_u8x64([](EmuSIMD::f32x16_arg in_fp_) { return tan_f32x16(in_fp_); }, in_);
 #else
-		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u8x32_arg a, u8x32_arg) { return tan_u8x32(a); }, in_);
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u8x32_arg a) { return tan_u8x32(a); }, in_);
 #endif
 	}
 
@@ -1342,7 +1342,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return emulate_fp_u8x64([](EmuSIMD::f32x16_arg in_fp_) { return acos_f32x16(in_fp_); }, in_);
 #else
-		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u8x32_arg a, u8x32_arg) { return acos_u8x32(a); }, in_);
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u8x32_arg a) { return acos_u8x32(a); }, in_);
 #endif
 	}
 
@@ -1351,7 +1351,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return emulate_fp_u8x64([](EmuSIMD::f32x16_arg in_fp_) { return asin_f32x16(in_fp_); }, in_);
 #else
-		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u8x32_arg a, u8x32_arg) { return asin_u8x32(a); }, in_);
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u8x32_arg a) { return asin_u8x32(a); }, in_);
 #endif
 	}
 
@@ -1360,7 +1360,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		return emulate_fp_u8x64([](EmuSIMD::f32x16_arg in_fp_) { return atan_f32x16(in_fp_); }, in_);
 #else
-		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u8x32_arg a, u8x32_arg) { return atan_u8x32(a); }, in_);
+		return EmuSIMD::_underlying_impl::emulate_simd_basic([](u8x32_arg a) { return atan_u8x32(a); }, in_);
 #endif
 	}
 #pragma endregion

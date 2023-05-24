@@ -189,37 +189,37 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 
 #pragma region SHUFFLE_TEMPLATES
-	template<shuffle_mask_type ShuffleMask>
+	template<shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 shuffle_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
 	{
 #if EMU_SIMD_USE_512_REGISTERS
-		return _mm512_shuffle_ps(lhs_, rhs_, ShuffleMask);
+		return _mm512_shuffle_ps(lhs_, rhs_, ShuffleMask_);
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
-		return emulate_simd_basic([](EmuSIMD::f32x8_arg lhs, EmuSIMD::f32x8_arg rhs) { return shuffle_f32x8<ShuffleMask>(lhs, rhs); }, lhs_, rhs_);
+		return emulate_simd_basic([](EmuSIMD::f32x8_arg lhs, EmuSIMD::f32x8_arg rhs) { return shuffle_f32x8<ShuffleMask_>(lhs, rhs); }, lhs_, rhs_);
 #endif
 	}
 
-	template<shuffle_mask_type ShuffleMask>
+	template<shuffle_mask_type ShuffleMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 permute_f32x16(EmuSIMD::f32x16_arg in_)
 	{
 #if EMU_SIMD_USE_512_REGISTERS
-		return _mm512_permute_ps(in_, ShuffleMask);
+		return _mm512_permute_ps(in_, ShuffleMask_);
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
-		return emulate_simd_basic([](EmuSIMD::f32x8_arg ab) { return permute_f32x8<ShuffleMask>(ab); }, in_);
+		return emulate_simd_basic([](EmuSIMD::f32x8_arg ab) { return permute_f32x8<ShuffleMask_>(ab); }, in_);
 #endif
 	}
 #pragma endregion
 
 #pragma region BLEND_TEMPLATES
-	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 blend_f32x16(EmuSIMD::f32x16_arg a_, EmuSIMD::f32x16_arg b_)
 	{
 #if EMU_SIMD_USE_512_REGISTERS
-		return _mm512_mask_blend_ps(BlendMask, a_, b_);
+		return _mm512_mask_blend_ps(BlendMask_, a_, b_);
 #else
-		return EmuSIMD::_underlying_impl::emulate_dual_lane_blend_with_mask<BlendMask>(a_, b_, std::make_index_sequence<8>());
+		return EmuSIMD::_underlying_impl::emulate_dual_lane_blend_with_mask<BlendMask_>(a_, b_, std::make_index_sequence<8>());
 #endif
 	}
 #pragma endregion

@@ -220,7 +220,7 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 
 #pragma region BLEND_TEMPLATES
-	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 blend_i8x16(EmuSIMD::i8x16_arg a_, EmuSIMD::i8x16_arg b_)
 	{
 		constexpr bool is_reverse_set = false;
@@ -231,7 +231,7 @@ namespace EmuSIMD::Funcs
 		(
 			a_,
 			b_,
-			EmuSIMD::Funcs::blend_mask_to_vector<BlendMask, is_reverse_set, target_element_type>
+			EmuSIMD::Funcs::blend_mask_to_vector<BlendMask_, is_reverse_set, target_element_type>
 			(
 				std::make_index_sequence<num_elements>(),
 				[](auto&&...args_) { return set_i8x16(std::forward<decltype(args_)>(args_)...); }

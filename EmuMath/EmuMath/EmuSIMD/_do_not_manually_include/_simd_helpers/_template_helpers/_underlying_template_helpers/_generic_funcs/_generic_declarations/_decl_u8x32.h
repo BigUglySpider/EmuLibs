@@ -198,7 +198,7 @@ namespace EmuSIMD::Funcs
 			a_,
 			EmuSIMD::Funcs::shuffle_mask_to_vector<ShuffleMask_, is_reverse_set, argument_width, num_128_lanes, target_element_type>
 			(
-				std::make_index_sequence<32>(),
+				std::make_index_sequence<16>(),
 				[](auto&&...args_) { return set_u8x32(std::forward<decltype(args_)>(args_)...); }
 			)
 		);
@@ -224,7 +224,7 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 
 #pragma region BLEND_TEMPLATES
-	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 blend_u8x32(EmuSIMD::u8x32_arg a_, EmuSIMD::u8x32_arg b_)
 	{
 		constexpr bool is_reverse_set = false;
@@ -235,7 +235,7 @@ namespace EmuSIMD::Funcs
 		(
 			a_,
 			b_,
-			EmuSIMD::Funcs::blend_mask_to_vector<BlendMask, is_reverse_set, target_element_type>
+			EmuSIMD::Funcs::blend_mask_to_vector<BlendMask_, is_reverse_set, target_element_type>
 			(
 				std::make_index_sequence<num_elements>(),
 				[](auto&&...args_) { return set_u8x32(std::forward<decltype(args_)>(args_)...); }

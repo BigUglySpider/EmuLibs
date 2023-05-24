@@ -208,13 +208,13 @@ namespace EmuSIMD::Funcs
 			a_,
 			EmuSIMD::Funcs::shuffle_mask_to_vector<ShuffleMask_, is_reverse_set, argument_width, num_128_lanes, target_element_type>
 			(
-				std::make_index_sequence<64>(),
+				std::make_index_sequence<16>(),
 				[](auto&&...args_) { return set_i8x64(std::forward<decltype(args_)>(args_)...); }
 			)
 		);
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
-		return emulate_simd_basic([](i8x32_arg a) { return EmuSIMD::Funcs::permute_i8x32<ShuffleMask>(a); }, a_);
+		return emulate_simd_basic([](i8x32_arg a) { return EmuSIMD::Funcs::permute_i8x32<ShuffleMask_>(a); }, a_);
 #endif
 	}
 
@@ -230,13 +230,13 @@ namespace EmuSIMD::Funcs
 		return movelh_i8x64(a_permuted, b_permuted); // { lo(a), lo(b) }
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
-		return emulate_simd_basic([](i8x32_arg a, i8x32_arg b) { return EmuSIMD::Funcs::shuffle_i8x32<ShuffleMask>(a, b); }, a_, b_);
+		return emulate_simd_basic([](i8x32_arg a, i8x32_arg b) { return EmuSIMD::Funcs::shuffle_i8x32<ShuffleMask_>(a, b); }, a_, b_);
 #endif
 	}
 #pragma endregion
 
 #pragma region BLEND_TEMPLATES
-	template<EmuSIMD::Funcs::blend_mask_type BlendMask>
+	template<EmuSIMD::Funcs::blend_mask_type BlendMask_>
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 blend_i8x64(EmuSIMD::i8x64_arg a_, EmuSIMD::i8x64_arg b_)
 	{
 #if EMU_SIMD_USE_512_REGISTERS
@@ -248,14 +248,14 @@ namespace EmuSIMD::Funcs
 		(
 			a_,
 			b_,
-			EmuSIMD::Funcs::blend_mask_to_vector<BlendMask, is_reverse_set, target_element_type>
+			EmuSIMD::Funcs::blend_mask_to_vector<BlendMask_, is_reverse_set, target_element_type>
 			(
 				std::make_index_sequence<num_elements>(),
 				[](auto&&...args_) { return set_i8x64(std::forward<decltype(args_)>(args_)...); }
 			)
 		);
 #else
-		return EmuSIMD::_underlying_impl::emulate_dual_lane_blend_with_mask<BlendMask>(a_, b_, std::make_index_sequence<32>());
+		return EmuSIMD::_underlying_impl::emulate_dual_lane_blend_with_mask<BlendMask_>(a_, b_, std::make_index_sequence<32>());
 #endif
 	}
 #pragma endregion

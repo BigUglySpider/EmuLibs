@@ -117,7 +117,7 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 	
 #pragma region BLENDS
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 bleudv_i64x4(EmuSIMD::u64x4_arg a_, EmuSIMD::u64x4_arg b_, EmuSIMD::u64x4_arg shuffle_mask_vec_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x4 blendv_u64x4(EmuSIMD::u64x4_arg a_, EmuSIMD::u64x4_arg b_, EmuSIMD::u64x4_arg shuffle_mask_vec_);
 #pragma endregion
 
 #pragma region MINMAX_FUNCS
