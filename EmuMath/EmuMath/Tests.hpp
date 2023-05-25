@@ -621,14 +621,14 @@ namespace EmuCore::TestingHelpers
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t BASE_NUM_LOOPS = 6400000;
+		static constexpr std::size_t BASE_NUM_LOOPS = 64000000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Tan (Scalar)";
+		static constexpr std::string_view NAME = "(Scalar)";
 
 		using scalar_type = float;
 		static constexpr std::size_t NUM_LOOPS = BASE_NUM_LOOPS / 1;
 		static constexpr std::size_t total_scalars = NUM_LOOPS * 1;
-		static constexpr std::size_t print_max_size = 16;
+		static constexpr std::size_t print_max_size = 20;
 
 		ScalarTan()
 		{
@@ -638,15 +638,18 @@ namespace EmuCore::TestingHelpers
 			out.resize(total_scalars);
 
 			in.reserve(total_scalars);
+			rhs.reserve(total_scalars);
 			EmuMath::RngWrapper<true> rng(-90, 90, shared_fill_seed_);
 			for (std::size_t i = 0; i < total_scalars; ++i)
 			{
 				in.emplace_back(rng.NextReal<scalar_type>());
+				rhs.emplace_back(rng.NextReal<scalar_type>());
 			}
 		}
 		void operator()(std::size_t i_)
 		{
-			out[i_] = tan(in[i_]);
+			//out[i_] = tan(in[i_]);
+			out[i_] = in[i_] + rhs[i_];
 		}
 		void OnTestsOver()
 		{
@@ -665,6 +668,7 @@ namespace EmuCore::TestingHelpers
 		}
 
 		std::vector<scalar_type> in;
+		std::vector<scalar_type> rhs;
 		std::vector<scalar_type> out;
 	};
 
@@ -674,7 +678,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t BASE_NUM_LOOPS = ScalarTan::BASE_NUM_LOOPS;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Tan (SIMD 128)";
+		static constexpr std::string_view NAME = "(SIMD 128)";
 
 		using scalar_type = float;
 		static constexpr std::size_t register_width = 128;
@@ -694,17 +698,20 @@ namespace EmuCore::TestingHelpers
 			out.resize(total_scalars);
 
 			in.reserve(total_scalars);
+			rhs.reserve(total_scalars);
 			EmuMath::RngWrapper<true> rng(-90, 90, shared_fill_seed_);
 			for (std::size_t i = 0; i < total_scalars; ++i)
 			{
 				in.emplace_back(rng.NextReal<scalar_type>());
+				rhs.emplace_back(rng.NextReal<scalar_type>());
 			}
 		}
 		void operator()(std::size_t i_)
 		{
 			std::size_t offset = i_ * elements_per_register;
 			auto reg = EmuSIMD::load<register_type>(in.data() + offset);
-			reg = EmuSIMD::tan<scalar_width, scalar_signed>(reg);
+			//reg = EmuSIMD::tan<scalar_width, scalar_signed>(reg);
+			reg = EmuSIMD::add<scalar_width>(reg, EmuSIMD::load<register_type>(rhs.data() + offset));
 			EmuSIMD::store(std::move(reg), out.data() + offset);
 		}
 		void OnTestsOver()
@@ -724,6 +731,7 @@ namespace EmuCore::TestingHelpers
 		}
 
 		std::vector<scalar_type> in;
+		std::vector<scalar_type> rhs;
 		std::vector<scalar_type> out;
 	};
 
@@ -733,7 +741,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t BASE_NUM_LOOPS = ScalarTan::BASE_NUM_LOOPS;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Tan (SIMD 256)";
+		static constexpr std::string_view NAME = "(SIMD 256)";
 
 		using scalar_type = float;
 		static constexpr std::size_t register_width = 256;
@@ -753,17 +761,20 @@ namespace EmuCore::TestingHelpers
 			out.resize(total_scalars);
 
 			in.reserve(total_scalars);
+			rhs.reserve(total_scalars);
 			EmuMath::RngWrapper<true> rng(-90, 90, shared_fill_seed_);
 			for (std::size_t i = 0; i < total_scalars; ++i)
 			{
 				in.emplace_back(rng.NextReal<scalar_type>());
+				rhs.emplace_back(rng.NextReal<scalar_type>());
 			}
 		}
 		void operator()(std::size_t i_)
 		{
 			std::size_t offset = i_ * elements_per_register;
 			auto reg = EmuSIMD::load<register_type>(in.data() + offset);
-			reg = EmuSIMD::tan<scalar_width, scalar_signed>(reg);
+			//reg = EmuSIMD::tan<scalar_width, scalar_signed>(reg);
+			reg = EmuSIMD::add<scalar_width>(reg, EmuSIMD::load<register_type>(rhs.data() + offset));
 			EmuSIMD::store(std::move(reg), out.data() + offset);
 		}
 		void OnTestsOver()
@@ -783,6 +794,7 @@ namespace EmuCore::TestingHelpers
 		}
 
 		std::vector<scalar_type> in;
+		std::vector<scalar_type> rhs;
 		std::vector<scalar_type> out;
 	};
 
@@ -792,7 +804,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t BASE_NUM_LOOPS = ScalarTan::BASE_NUM_LOOPS;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Tan (SIMD 512)";
+		static constexpr std::string_view NAME = "(SIMD 512)";
 
 		using scalar_type = float;
 		static constexpr std::size_t register_width = 512;
@@ -812,17 +824,20 @@ namespace EmuCore::TestingHelpers
 			out.resize(total_scalars);
 
 			in.reserve(total_scalars);
+			rhs.reserve(total_scalars);
 			EmuMath::RngWrapper<true> rng(-90, 90, shared_fill_seed_);
 			for (std::size_t i = 0; i < total_scalars; ++i)
 			{
 				in.emplace_back(rng.NextReal<scalar_type>());
+				rhs.emplace_back(rng.NextReal<scalar_type>());
 			}
 		}
 		void operator()(std::size_t i_)
 		{
 			std::size_t offset = i_ * elements_per_register;
 			auto reg = EmuSIMD::load<register_type>(in.data() + offset);
-			reg = EmuSIMD::tan<scalar_width, scalar_signed>(reg);
+			//reg = EmuSIMD::tan<scalar_width, scalar_signed>(reg);
+			reg = EmuSIMD::add<scalar_width>(reg, EmuSIMD::load<register_type>(rhs.data() + offset));
 			EmuSIMD::store(std::move(reg), out.data() + offset);
 		}
 		void OnTestsOver()
@@ -842,6 +857,7 @@ namespace EmuCore::TestingHelpers
 		}
 
 		std::vector<scalar_type> in;
+		std::vector<scalar_type> rhs;
 		std::vector<scalar_type> out;
 	};
 
