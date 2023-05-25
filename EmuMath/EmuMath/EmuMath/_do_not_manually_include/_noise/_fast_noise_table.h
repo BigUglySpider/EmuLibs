@@ -42,6 +42,7 @@ namespace EmuMath
 		using this_type = FastNoiseTable<NumDimensions_, MajorDimensionIndex_>;
 		using options_type = EmuMath::NoiseTableOptions<NumDimensions_, value_type>;
 		using coordinate_type = EmuMath::Vector<num_dimensions, std::size_t>;
+		using default_simd_register_type = EmuSIMD::f32x4;
 
 		template<std::size_t Size_, typename T_>
 		[[nodiscard]] static inline coordinate_type make_coords_from_vector(const EmuMath::Vector<Size_, T_>& vector_)
@@ -235,10 +236,11 @@ namespace EmuMath
 		}
 
 #pragma region GENERATION
-		template<EmuMath::NoiseType NoiseType_, class SampleProcessor_>
-		inline bool GenerateNoise(const options_type& options_, SampleProcessor_ sample_processor_)
+		template<EmuConcepts::KnownSIMD SIMDRegister_, EmuMath::NoiseType NoiseType_, class SampleProcessor_>
+		inline bool GenerateNoise(const options_type& options_, SampleProcessor_&& sample_processor_)
 		{
-			using register_type = __m128;
+			using sample_processor_no_ref = typename std::remove_reference<SampleProcessor_>::type;
+			using register_type = typename std::remove_cvref<SIMDRegister_>::type;
 			using underlying_noise_gen_functor = EmuMath::fast_noise_gen_functor<num_dimensions, NoiseType_, register_type>;
 
 			if (_valid_resolution(options_.table_resolution))
@@ -248,7 +250,7 @@ namespace EmuMath
 				if (options_.use_fractal_noise)
 				{
 					using fractal_generator = EmuMath::Functors::fractal_noise_wrapper<underlying_noise_gen_functor, register_type>;
-					_do_generation<register_type, fractal_generator, SampleProcessor_&>
+					_do_generation<register_type, fractal_generator, sample_processor_no_ref&>
 					(
 						fractal_generator
 						(
@@ -256,7 +258,7 @@ namespace EmuMath
 							options_.permutation_info.MakePermutations(),
 							options_.fractal_noise_info
 						),
-						sample_processor_,
+						EmuCore::TMP::lval_ref_cast<SampleProcessor_>(std::forward<SampleProcessor_>(sample_processor_)),
 						options_.start_point,
 						options_.MakeStep()
 					);
@@ -264,14 +266,14 @@ namespace EmuMath
 				else
 				{
 					using no_fractal_generator = EmuMath::Functors::no_fractal_noise_wrapper<underlying_noise_gen_functor, register_type>;
-					_do_generation<register_type, no_fractal_generator, SampleProcessor_&>
+					_do_generation<register_type, no_fractal_generator, sample_processor_no_ref&>
 					(
 						no_fractal_generator
 						(
 							options_.freq,
 							options_.permutation_info.MakePermutations()
 						),
-						sample_processor_,
+						EmuCore::TMP::lval_ref_cast<SampleProcessor_>(std::forward<SampleProcessor_>(sample_processor_)),
 						options_.start_point,
 						options_.MakeStep()
 					);
@@ -283,10 +285,20 @@ namespace EmuMath
 				return false;
 			}
 		}
+		template<EmuMath::NoiseType NoiseType_, class SampleProcessor_>
+		inline bool GenerateNoise(const options_type& options_, SampleProcessor_&& sample_processor_)
+		{
+			return GenerateNoise<default_simd_register_type, NoiseType_>(options_, std::forward<SampleProcessor_>(sample_processor_));
+		}
+		template<EmuConcepts::KnownSIMD SIMDRegister_, EmuMath::NoiseType NoiseType_, class SampleProcessor_ = EmuMath::Functors::fast_noise_sample_processor_default>
+		inline bool GenerateNoise(const options_type& options_)
+		{
+			return GenerateNoise<SIMDRegister_, NoiseType_>(options_, SampleProcessor_());
+		}
 		template<EmuMath::NoiseType NoiseType_, class SampleProcessor_ = EmuMath::Functors::fast_noise_sample_processor_default>
 		inline bool GenerateNoise(const options_type& options_)
 		{
-			return GenerateNoise<NoiseType_, SampleProcessor_>(options_, SampleProcessor_());
+			return GenerateNoise<NoiseType_>(options_, SampleProcessor_());
 		}
 #pragma endregion
 

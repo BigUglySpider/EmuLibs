@@ -201,6 +201,36 @@ namespace EmuSIMD::TMP
 		template<typename T_>
 		concept KnownSIMD = EmuSIMD::TMP::is_simd_register_v<T_>;
 	}
+
+	template<class SIMDRegister_>
+	struct register_as_integral
+	{
+	private:
+		using _register_uq = typename std::remove_cvref<SIMDRegister_>::type;
+
+	public:
+		using type = typename std::conditional_t
+		<
+			std::is_same_v<SIMDRegister_, _register_uq>,
+			EmuCore::TMP::dummy_type_wrapper<EmuCore::TMP::emu_tmp_err>,
+			register_as_integral<_register_uq>
+		>::type;
+	};
+
+	template<class SIMDRegister_>
+	struct register_as_arg_type
+	{
+	private:
+		using _register_uq = typename std::remove_cvref<SIMDRegister_>::type;
+
+	public:
+		using type = typename std::conditional_t
+		<
+			std::is_same_v<SIMDRegister_, _register_uq>,
+			EmuCore::TMP::dummy_type_wrapper<EmuCore::TMP::emu_tmp_err>,
+			register_as_arg_type<_register_uq>
+		>::type;
+	};
 }
 
 namespace EmuConcepts

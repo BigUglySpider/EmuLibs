@@ -40,8 +40,417 @@
 // Tuple stuff
 #include "EmuCore/TMPHelpers/RuntimeTupleTable.h"
 
+// Basic Arg Parser
+#include <map>
+
 constexpr auto test_dot = EmuCore::dot<float>(1, 2, 6, 3, 7, 10);
 constexpr auto test_dot_2 = EmuCore::dot(5, 7);
+
+struct BasicArgParser
+{
+
+public:
+	using string_type = std::string;
+	using char_type = string_type::value_type;
+	using string_view_type = std::string_view;
+	using config_args_map_type = std::map<string_type, string_type>;
+	using switch_to_full_name_map_type = std::map<char_type, string_type>;
+	static constexpr string_view_type default_config_name_only_value{ "true" };
+
+private:
+	template<class ArgsCollection_>
+	struct _is_compatible_args_collection
+	{
+	private:
+		[[nodiscard]] static constexpr inline bool _get()
+		{
+			if constexpr (std::is_same_v<ArgsCollection_, typename std::remove_cvref<ArgsCollection_>::type>)
+			{
+				return false;
+			}
+			else
+			{
+				return _is_compatible_args_collection<typename std::remove_cvref<ArgsCollection_>::type>::value;
+			}
+		}
+
+	public:
+		static constexpr bool value = _get();
+	};
+
+	template<class ArrayValue_, std::size_t ArraySize_>
+	struct _is_compatible_args_collection<std::array<ArrayValue_, ArraySize_>>
+	{
+		static constexpr bool value = std::is_constructible_v<string_type, ArrayValue_>;
+	};
+
+	template<class VectorValue_>
+	struct _is_compatible_args_collection<std::vector<VectorValue_>>
+	{
+		static constexpr bool value = std::is_constructible_v<string_type, VectorValue_>;
+	};
+
+	template<class ArgsCollection_>
+	[[nodiscard]] static constexpr inline std::size_t _get_args_collection_size(const ArgsCollection_& args_collection_)
+	{
+		return args_collection_.size();
+	}
+
+	template<bool CanMove_, class ArgsCollection_>
+	[[nodiscard]] static constexpr inline string_type _get_arg_from_collection(ArgsCollection_&& args_collection_, std::size_t index_)
+	{
+		if constexpr (CanMove_)
+		{
+			return std::move(std::forward<ArgsCollection_>(args_collection_)[index_]);
+		}
+		else
+		{
+			return std::forward<ArgsCollection_>(args_collection_)[index_];
+		}
+	}
+
+public:
+	static inline std::vector<string_type> make_vector_from_main_args(int argc, char** argv)
+	{
+		std::vector<string_type> args_vector;
+		const std::size_t argc_as_size = static_cast<std::size_t>(argc);
+		args_vector.reserve(argc_as_size);
+		for (std::size_t i = 0; i < argc_as_size; ++i)
+		{
+			args_vector.emplace_back(string_type{ argv[i] });
+		}
+		return args_vector;
+	}
+
+	template<class ArgsCollection_>
+	[[nodiscard]] static constexpr inline bool is_compatible_args_collection()
+	{
+		return _is_compatible_args_collection<ArgsCollection_>::value;
+	}
+
+	BasicArgParser(int argc, char** argv) : 
+		BasicArgParser(make_vector_from_main_args(argc, argv), string_type(default_config_name_only_value), config_args_map_type(), switch_to_full_name_map_type())
+	{
+	}
+
+	template<class ArgsCollection_>
+	requires((is_compatible_args_collection<ArgsCollection_>()))
+	BasicArgParser
+	(
+		ArgsCollection_&& args_collection_,
+		string_type config_name_only_value_,
+		config_args_map_type&& default_config_args_,
+		switch_to_full_name_map_type&& switch_to_full_name_map_
+	) : default_config_args(default_config_args_),
+		switch_to_full_name_map(switch_to_full_name_map_),
+		parsed_config_args()
+	{
+		constexpr bool can_move = !std::is_lvalue_reference_v<ArgsCollection_>;
+		auto& args_collection_ref = EmuCore::TMP::lval_ref_cast<ArgsCollection_>(std::forward<ArgsCollection_>(args_collection_));
+		bool is_full_name_config_arg = false;
+		bool is_switch_config_arg = false;
+		std::string current_config_arg_name = "";
+		const std::size_t input_arg_count = _get_args_collection_size(args_collection_ref);
+		for (std::size_t i = 0; i < input_arg_count; ++i)
+		{
+			auto arg_string = _get_arg_from_collection<can_move>(args_collection_ref, i);
+			if (is_full_name_config_arg)
+			{
+				if (arg_string.size() == 0)
+				{
+					// Empty argument, so just set to the default and move on
+					this->set_config_value<true>(std::move(current_config_arg_name), config_name_only_value_);
+				}
+				else if (arg_string[0] == '-')
+				{
+					// We've moved on to a different config argument, so set the previous to the default and then determine what we're working with for next iteration
+					this->set_config_value<true>(std::move(current_config_arg_name), config_name_only_value_);
+					EMU_CORE_PUSH_WARNING_STACK
+					EMU_CORE_MSVC_DISABLE_WARNING(26800)
+					if (this->_determine_config_arg_type(arg_string, current_config_arg_name, is_switch_config_arg, is_full_name_config_arg))
+					{
+						this->_set_config_args_if_no_more_input(i, input_arg_count, is_switch_config_arg, is_full_name_config_arg, current_config_arg_name, config_name_only_value_);
+					}
+					EMU_CORE_POP_WARNING_STACK
+				}
+				else
+				{
+					this->set_config_value<true>(std::move(current_config_arg_name), std::move(arg_string));
+				}
+			}
+			else if(is_switch_config_arg)
+			{
+				if (arg_string.size() == 0)
+				{
+					// Empty argument, so just set to the default and move on
+					this->_set_multiple_switch_args(current_config_arg_name, config_name_only_value_);
+				}
+				else if (arg_string[0] == '-')
+				{
+					// We've moved on to a different config argument, so set the previous to the default and then determine what we're working with for next iteration
+					this->_set_multiple_switch_args(current_config_arg_name, config_name_only_value_);
+					if (this->_determine_config_arg_type(arg_string, current_config_arg_name, is_switch_config_arg, is_full_name_config_arg))
+					{
+						this->_set_config_args_if_no_more_input(i, input_arg_count, is_switch_config_arg, is_full_name_config_arg, current_config_arg_name, config_name_only_value_);
+					}
+				}
+				else
+				{
+					this->_set_multiple_switch_args(current_config_arg_name, arg_string);
+				}
+			}
+			else
+			{
+				if (arg_string.size() == 0)
+				{
+					// Random empty spot considered an arg for some reason; skip
+					continue;
+				}
+				else if (arg_string[0] == '-')
+				{
+					this->_determine_config_arg_type(arg_string, current_config_arg_name, is_switch_config_arg, is_full_name_config_arg);
+					this->_set_config_args_if_no_more_input(i, input_arg_count, is_switch_config_arg, is_full_name_config_arg, current_config_arg_name, config_name_only_value_);
+				}
+				else
+				{
+					// Non-config arg being parsed, so just move it to the general vector
+					parsed_non_config_args.emplace_back(std::move(arg_string));
+				}
+			}
+		}
+	}
+
+	template<bool ReplaceAllowed_, EmuConcepts::UnqualifiedMatch<string_type> ConfigName_, EmuConcepts::UnqualifiedMatch<string_type> Value_>
+	inline bool set_config_value(ConfigName_&& config_name_, Value_&& value_)
+	{
+		if constexpr (ReplaceAllowed_)
+		{
+			parsed_config_args[std::forward<ConfigName_>(config_name_)] = std::forward<Value_>(value_);
+			return true;
+		}
+		else
+		{
+			string_type config_name = std::forward<ConfigName_>(config_name_);
+			auto map_it = parsed_config_args.find(config_name);
+			if (map_it == parsed_config_args.end())
+			{
+				parsed_config_args.emplace(std::make_pair(std::move(config_name), std::forward<Value_>(value_)));
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+
+	[[nodiscard]] inline std::string translate_switch_to_full_name(const char_type switch_char) const
+	{
+		auto map_it = switch_to_full_name_map.find(switch_char);
+		if (map_it != switch_to_full_name_map.end())
+		{
+			return map_it->second;
+		}
+		else
+		{
+			return string_type(1, switch_char);
+		}
+	}
+
+	template<bool IncludeDefaults_ = true>
+	inline std::ostream& append_to_stream(std::ostream& str_) const
+	{
+		const string_type group_opener = ": {\n";
+		const string_type group_closer = "\n}\n";
+		const string_type single_indent = "    ";
+
+		str_ << "Basic arguments";
+		str_ << group_opener;
+		append_non_config_args_to_stream(str_, single_indent);
+		str_ << group_closer;
+
+		str_ << "Config arguments";
+		str_ << group_opener;
+		append_config_args_to_stream(str_, single_indent);
+		str_ << group_closer;
+
+		if constexpr (IncludeDefaults_)
+		{
+			str_ << "Default arguments";
+			str_ << group_opener;
+			append_default_args_to_stream(str_, single_indent);
+			str_ << group_closer;
+		}
+
+		return str_;
+	}
+
+	inline std::ostream& append_non_config_args_to_stream(std::ostream& str_) const
+	{
+		return _append_basic_collection_to_stream(str_, parsed_non_config_args, _underlying_no_indent());
+	}
+
+	template<class Indent_>
+	inline std::ostream& append_non_config_args_to_stream(std::ostream& str_, const Indent_& indent_) const
+	{
+		return _append_basic_collection_to_stream(str_, parsed_non_config_args, indent_);
+	}
+
+	inline std::ostream& append_config_args_to_stream(std::ostream& str_) const
+	{
+		return _append_config_map_to_stream(str_, parsed_config_args, _underlying_no_indent());
+	}
+
+	template<class Indent_>
+	inline std::ostream& append_config_args_to_stream(std::ostream& str_, const Indent_& indent_) const
+	{
+		return _append_config_map_to_stream(str_, parsed_config_args, indent_);
+	}
+
+	inline std::ostream& append_default_args_to_stream(std::ostream& str_) const
+	{
+		return _append_config_map_to_stream(str_, default_config_args, _underlying_no_indent());
+	}
+
+	template<class Indent_>
+	inline std::ostream& append_default_args_to_stream(std::ostream& str_, const Indent_& indent_) const
+	{
+		return _append_config_map_to_stream(str_, default_config_args, indent_);
+	}
+
+private:
+	struct _underlying_no_indent {};
+
+	template<class Indent_>
+	static inline std::ostream& _append_config_map_to_stream(std::ostream& str_, const config_args_map_type& config_map_, const Indent_& indent_)
+	{
+		auto it = config_map_.begin();
+		auto end = config_map_.end();
+		if (it != end)
+		{
+			_append_indent(str_, indent_);
+			str_ << it->first;
+			str_ << '=';
+			str_ << it->second;
+			++it;
+			while (it != end)
+			{
+				str_ << '\n';
+				_append_indent(str_, indent_);
+				str_ << it->first;
+				str_ << '=';
+				str_ << it->second;
+				++it;
+			}
+		}
+		return str_;
+	}
+
+	template<class Indent_, class Collection_>
+	static inline std::ostream& _append_basic_collection_to_stream(std::ostream& str_, const Collection_& basic_collection_, const Indent_& indent_)
+	{
+		auto it = basic_collection_.begin();
+		auto end = basic_collection_.end();
+		if (it != end)
+		{
+			_append_indent(str_, indent_);
+			str_ << (*it);
+			++it;
+			while (it != end)
+			{
+				str_ << '\n';
+				_append_indent(str_, indent_);
+				str_ << (*it);
+				++it;
+			}
+		}
+		return str_;
+	}
+
+	template<class Indent_>
+	static inline void _append_indent(std::ostream& str_, const Indent_& indent_)
+	{
+		if constexpr (!std::is_same_v<Indent_, typename std::remove_cvref<_underlying_no_indent>::type>)
+		{
+			str_ << indent_;
+		}
+	}
+
+	/// <summary>
+	/// <para> Suitably sets config arg(s) to the passed `value_` if the passed index is the final argument index. </para>
+	/// <para> Does nothing if more indices remain after the current one. </para>
+	/// </summary>
+	/// <param name="arg_index_">Index of the current argument.</param>
+	/// <param name="arg_index_">Total number of input arguments.</param>
+	/// <param name="is_switch_config_arg_">True if setting a series of switches representing different config args, otherwise false.</param>
+	/// <param name="is_full_name_config_arg_">True if setting a single full name config arg, otherwise false.</param>
+	/// <param name="current_config_arg_name">Reference to either the full name of the current arg or a string to use as an array of characters indicating individual switches, based on which of the passed bools is true.</param>
+	/// <param name="value_">Value to set config arg(s) to.</param>
+	inline void _set_config_args_if_no_more_input
+	(
+		const std::size_t arg_index_,
+		const std::size_t num_args_,
+		const bool is_switch_config_arg_,
+		const bool is_full_name_config_arg_,
+		string_type& current_config_arg_name,
+		const string_type& value_
+	)
+	{
+		if ((arg_index_ + 1) >= num_args_)
+		{
+			if (is_full_name_config_arg_)
+			{
+				this->set_config_value<true>(std::move(current_config_arg_name), value_);
+			}
+			else if(is_switch_config_arg_)
+			{
+				this->_set_multiple_switch_args(current_config_arg_name, value_);
+			}
+		}
+	}
+
+	inline void _set_multiple_switch_args(const string_type& switch_chars_array_, const std::string& value_)
+	{
+		for (const auto& switch_char : switch_chars_array_)
+		{
+			this->set_config_value<true>(this->translate_switch_to_full_name(switch_char), value_);
+		}
+	}
+
+	static inline bool _determine_config_arg_type(const std::string& arg_string_, std::string& out_current_config_arg_name_, bool& is_switch_config_arg_, bool& is_full_name_config_arg_)
+	{
+		// Do not accept just `-`; it should be discarded
+		if (arg_string_.size() > 1)
+		{
+			if (arg_string_[1] == '-')
+			{
+				// Do not accept just "--"; it should be discarded
+				if (arg_string_.size() > 2)
+				{
+					// We have a valid full name arg
+					out_current_config_arg_name_ = arg_string_.substr(2);
+					is_full_name_config_arg_ = true;
+					is_switch_config_arg_ = false;
+					return true;
+				}
+			}
+			else
+			{
+				// We have a valid switch arg - store all switches in the current name; in this case, it is considered an array of switches
+				out_current_config_arg_name_ = arg_string_.substr(1);
+				is_full_name_config_arg_ = false;
+				is_switch_config_arg_ = true;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	config_args_map_type parsed_config_args;
+	const config_args_map_type default_config_args;
+	switch_to_full_name_map_type switch_to_full_name_map;
+	std::vector<std::string> parsed_non_config_args;
+};
 
 inline void universal_pause(const std::string& msg)
 {
@@ -356,8 +765,14 @@ constexpr inline decltype(auto) setr_test_helper(Func_&& func_, std::index_seque
 	return EmuSIMD::setr<VecType_, ElementWidth_>(std::forward<Func_>(func_)(val_ + Indices_)...);
 }
 
-int main()
+int main(int argc, char** argv)
 {
+	{
+		BasicArgParser basic_arg_parser = BasicArgParser(argc, argv);
+		basic_arg_parser.append_to_stream(std::cout) << '\n';
+		universal_pause();
+	}
+
 	{
 		constexpr auto elems_u32 = std::array<std::uint32_t, 16>({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 });
 		constexpr auto elems_f32 = std::array<float, 16>({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16});
@@ -1446,12 +1861,15 @@ int main()
 		constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN; 
 		constexpr std::size_t test_noise_dimensions = 3;
 		constexpr auto z_depth = 1;
-		constexpr auto sample_count_1080p = EmuMath::make_vector<std::size_t>(1920, 1080, z_depth);	// Small (file size)
-		constexpr auto sample_count_4k = EmuMath::make_vector<std::size_t>(3840, 2160, z_depth);	// Average
-		constexpr auto sample_count_8k = EmuMath::make_vector<std::size_t>(7680, 4320, z_depth);	// Large
-		constexpr auto sample_count_16k = EmuMath::make_vector<std::size_t>(15360, 8640, z_depth);	// Quite hefty
-		constexpr auto sample_count_32k = EmuMath::make_vector<std::size_t>(30720, 17280, z_depth); // Extremely large, be wary
-		constexpr auto sample_count = sample_count_4k;
+		constexpr auto sample_count_16x16 = EmuMath::make_vector<std::size_t>(16, 16, z_depth);         // Tiny
+		constexpr auto sample_count_16x16x16 = EmuMath::make_vector<std::size_t>(16, 16, 16);           // Less-Tiny
+		constexpr auto sample_count_16x16x128 = EmuMath::make_vector<std::size_t>(16, 16, 128);         // Even-Less-Tiny
+		constexpr auto sample_count_1080p = EmuMath::make_vector<std::size_t>(1920, 1080, z_depth);	    // Small (file size)
+		constexpr auto sample_count_4k = EmuMath::make_vector<std::size_t>(3840, 2160, z_depth);	    // Average
+		constexpr auto sample_count_8k = EmuMath::make_vector<std::size_t>(7680, 4320, z_depth);	    // Large
+		constexpr auto sample_count_16k = EmuMath::make_vector<std::size_t>(15360, 8640, z_depth);	    // Quite hefty
+		constexpr auto sample_count_32k = EmuMath::make_vector<std::size_t>(30720, 17280, z_depth);     // Extremely large, be wary
+		constexpr auto sample_count = sample_count_16x16x16;
 		constexpr auto scaled_step = EmuMath::Vector<test_noise_dimensions, float>(1.0f) / sample_count;
 		constexpr auto custom_step = EmuMath::Vector<test_noise_dimensions, float>(1.0f / 1024.0f);
 		constexpr float used_freq = 3.0f;
@@ -1461,9 +1879,13 @@ int main()
 	
 		constexpr std::size_t num_iterations = 1;
 		std::vector<EmuMath::NoiseTable<test_noise_dimensions, float>> noise_;
-		std::vector<EmuMath::FastNoiseTable<test_noise_dimensions, 0>> fast_noise_;
+		std::vector<EmuMath::FastNoiseTable<test_noise_dimensions, 0>> fast_noise_128;
+		std::vector<EmuMath::FastNoiseTable<test_noise_dimensions, 0>> fast_noise_256;
+		std::vector<EmuMath::FastNoiseTable<test_noise_dimensions, 0>> fast_noise_512;
 		noise_.resize(num_iterations, decltype(noise_)::value_type());
-		fast_noise_.resize(num_iterations, decltype(fast_noise_)::value_type());
+		fast_noise_128.resize(num_iterations, decltype(fast_noise_128)::value_type());
+		fast_noise_256.resize(num_iterations, decltype(fast_noise_256)::value_type());
+		fast_noise_512.resize(num_iterations, decltype(fast_noise_512)::value_type());
 	
 		constexpr std::size_t noise_num_perms = 4096;
 		constexpr EmuMath::Info::NoisePermutationShuffleMode noise_perm_shuffle_mode = EmuMath::Info::NoisePermutationShuffleMode::SEED_32;
@@ -1495,9 +1917,9 @@ int main()
 	
 	
 			timer_.Restart();
-			fast_noise_[i].GenerateNoise<test_noise_type_flag, fast_test_noise_processor>
+			fast_noise_128[i].GenerateNoise<EmuSIMD::f32x4, test_noise_type_flag, fast_test_noise_processor>
 			(
-				decltype(fast_noise_)::value_type::make_options
+				decltype(fast_noise_128)::value_type::make_options
 				(
 					sample_count,
 					EmuMath::Vector<test_noise_dimensions, float>(0.0f),
@@ -1510,7 +1932,43 @@ int main()
 				)
 			);
 			timer_.Pause();
-			std::cout << "FINISHED FAST NOISE IN: " << timer_.GetMilli() << "ms\n";
+			std::cout << "FINISHED FAST NOISE (128) IN: " << timer_.GetMilli() << "ms\n";
+
+			timer_.Restart();
+			fast_noise_256[i].GenerateNoise<EmuSIMD::f32x8, test_noise_type_flag, fast_test_noise_processor>
+			(
+				decltype(fast_noise_256)::value_type::make_options
+				(
+					sample_count,
+					EmuMath::Vector<test_noise_dimensions, float>(0.0f),
+					custom_step,
+					used_freq,
+					true,
+					use_fractal,
+					EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
+					EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+				)
+			);
+			timer_.Pause();
+			std::cout << "FINISHED FAST NOISE (256) IN: " << timer_.GetMilli() << "ms\n";
+
+			//timer_.Restart();
+			//fast_noise_256[i].GenerateNoise<EmuSIMD::f32x16, test_noise_type_flag, fast_test_noise_processor>
+			//(
+			//	decltype(fast_noise_256)::value_type::make_options
+			//	(
+			//		sample_count,
+			//		EmuMath::Vector<test_noise_dimensions, float>(0.0f),
+			//		custom_step,
+			//		used_freq,
+			//		true,
+			//		use_fractal,
+			//		EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
+			//		EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+			//	)
+			//);
+			//timer_.Pause();
+			//std::cout << "FINISHED FAST NOISE (512) IN: " << timer_.GetMilli() << "ms\n";
 		}
 	
 		EmuMath::Gradient<float> gradient_colours_;
@@ -1529,7 +1987,9 @@ int main()
 		auto& noise_gradient_ = gradient_colours_;
 	
 		WriteNoiseTableToPPM(noise_, noise_gradient_, "test_noise_scalar");
-		WriteNoiseTableToPPM(fast_noise_, noise_gradient_, "test_noise_simd");
+		WriteNoiseTableToPPM(fast_noise_128, noise_gradient_, "test_noise_simd_128");
+		WriteNoiseTableToPPM(fast_noise_256, noise_gradient_, "test_noise_simd_256");
+		WriteNoiseTableToPPM(fast_noise_256, noise_gradient_, "test_noise_simd_512");
 	}
 #pragma endregion
 	//*/

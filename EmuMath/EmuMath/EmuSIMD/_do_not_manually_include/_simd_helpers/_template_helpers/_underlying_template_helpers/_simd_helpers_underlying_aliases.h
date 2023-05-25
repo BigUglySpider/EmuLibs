@@ -1128,6 +1128,410 @@ namespace EmuSIMD::TMP
 	};
 #endif
 #pragma endregion
+
+#pragma region REGISTER_AS_INTEGRAL
+	template<>
+	struct register_as_integral<EmuSIMD::f32x4>
+	{
+		using type = EmuSIMD::i32x4;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::f32x8>
+	{
+		using type = EmuSIMD::i32x8;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::f32x16>
+	{
+		using type = EmuSIMD::i32x16;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::f64x2>
+	{
+		using type = EmuSIMD::i64x2;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::f64x4>
+	{
+		using type = EmuSIMD::i64x4;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::f64x8>
+	{
+		using type = EmuSIMD::i64x8;
+	};
+
+#if EMU_SIMD_USE_GENERIC_INT_REGISTERS
+	template<>
+	struct register_as_integral<EmuSIMD::i128_generic>
+	{
+		using type = EmuSIMD::i128_generic;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::i256_generic>
+	{
+		using type = EmuSIMD::i256_generic;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::i512_generic>
+	{
+		using type = EmuSIMD::i512_generic;
+	};
+#else
+	template<>
+	struct register_as_integral<EmuSIMD::i8x16>
+	{
+		using type = EmuSIMD::i8x16;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::i16x8>
+	{
+		using type = EmuSIMD::i16x8;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::i32x4>
+	{
+		using type = EmuSIMD::i32x4;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::i64x2>
+	{
+		using type = EmuSIMD::i64x2;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::i8x32>
+	{
+		using type = EmuSIMD::i8x32;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::i16x16>
+	{
+		using type = EmuSIMD::i16x16;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::i32x8>
+	{
+		using type = EmuSIMD::i32x8;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::i64x4>
+	{
+		using type = EmuSIMD::i64x4;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::i8x64>
+	{
+		using type = EmuSIMD::i8x64;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::i16x32>
+	{
+		using type = EmuSIMD::i16x32;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::i32x16>
+	{
+		using type = EmuSIMD::i32x16;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::i64x8>
+	{
+		using type = EmuSIMD::i64x8;
+	};
+	
+	template<>
+	struct register_as_integral<EmuSIMD::u8x16>
+	{
+		using type = EmuSIMD::u8x16;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::u16x8>
+	{
+		using type = EmuSIMD::u16x8;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::u32x4>
+	{
+		using type = EmuSIMD::u32x4;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::u64x2>
+	{
+		using type = EmuSIMD::u64x2;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::u8x32>
+	{
+		using type = EmuSIMD::u8x32;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::u16x16>
+	{
+		using type = EmuSIMD::u16x16;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::u32x8>
+	{
+		using type = EmuSIMD::u32x8;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::u64x4>
+	{
+		using type = EmuSIMD::u64x4;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::u8x64>
+	{
+		using type = EmuSIMD::u8x64;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::u16x32>
+	{
+		using type = EmuSIMD::u16x32;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::u32x16>
+	{
+		using type = EmuSIMD::u32x16;
+	};
+
+	template<>
+	struct register_as_integral<EmuSIMD::u64x8>
+	{
+		using type = EmuSIMD::u64x8;
+	};
+#endif
+#pragma endregion
+
+#pragma region REGISTER_AS_ARG_TYPE
+	template<>
+	struct register_as_arg_type<EmuSIMD::f32x4>
+	{
+		using type = EmuSIMD::f32x4_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::f32x8>
+	{
+		using type = EmuSIMD::f32x8_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::f32x16>
+	{
+		using type = EmuSIMD::f32x16_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::f64x2>
+	{
+		using type = EmuSIMD::f64x2_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::f64x4>
+	{
+		using type = EmuSIMD::f64x4_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::f64x8>
+	{
+		using type = EmuSIMD::f64x8_arg;
+	};
+
+#if EMU_SIMD_USE_GENERIC_INT_REGISTERS
+	template<>
+	struct register_as_arg_type<EmuSIMD::i128_generic>
+	{
+		using type = EmuSIMD::i128_generic_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::i256_generic>
+	{
+		using type = EmuSIMD::i256_generic_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::i512_generic>
+	{
+		using type = EmuSIMD::i512_generic_arg;
+	};
+#else
+	template<>
+	struct register_as_arg_type<EmuSIMD::i8x16>
+	{
+		using type = EmuSIMD::i8x16_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::i16x8>
+	{
+		using type = EmuSIMD::i16x8_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::i32x4>
+	{
+		using type = EmuSIMD::i32x4_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::i64x2>
+	{
+		using type = EmuSIMD::i64x2_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::i8x32>
+	{
+		using type = EmuSIMD::i8x32_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::i16x16>
+	{
+		using type = EmuSIMD::i16x16_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::i32x8>
+	{
+		using type = EmuSIMD::i32x8_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::i64x4>
+	{
+		using type = EmuSIMD::i64x4_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::i8x64>
+	{
+		using type = EmuSIMD::i8x64_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::i16x32>
+	{
+		using type = EmuSIMD::i16x32_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::i32x16>
+	{
+		using type = EmuSIMD::i32x16_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::i64x8>
+	{
+		using type = EmuSIMD::i64x8_arg;
+	};
+	
+	template<>
+	struct register_as_arg_type<EmuSIMD::u8x16>
+	{
+		using type = EmuSIMD::u8x16_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::u16x8>
+	{
+		using type = EmuSIMD::u16x8_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::u32x4>
+	{
+		using type = EmuSIMD::u32x4_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::u64x2>
+	{
+		using type = EmuSIMD::u64x2_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::u8x32>
+	{
+		using type = EmuSIMD::u8x32_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::u16x16>
+	{
+		using type = EmuSIMD::u16x16_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::u32x8>
+	{
+		using type = EmuSIMD::u32x8_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::u64x4>
+	{
+		using type = EmuSIMD::u64x4_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::u8x64>
+	{
+		using type = EmuSIMD::u8x64_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::u16x32>
+	{
+		using type = EmuSIMD::u16x32_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::u32x16>
+	{
+		using type = EmuSIMD::u32x16_arg;
+	};
+
+	template<>
+	struct register_as_arg_type<EmuSIMD::u64x8>
+	{
+		using type = EmuSIMD::u64x8_arg;
+	};
+#endif
+#pragma endregion
 }
 
 namespace EmuSIMD::_underlying_impl
