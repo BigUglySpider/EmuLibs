@@ -625,7 +625,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr std::string_view NAME = "(Scalar)";
 
-		using scalar_type = float;
+		using scalar_type = double;
 		static constexpr std::size_t NUM_LOOPS = BASE_NUM_LOOPS / 1;
 		static constexpr std::size_t total_scalars = NUM_LOOPS * 1;
 		static constexpr std::size_t print_max_size = 20;
@@ -680,7 +680,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr std::string_view NAME = "(SIMD 128)";
 
-		using scalar_type = float;
+		using scalar_type = ScalarTan::scalar_type;
 		static constexpr std::size_t register_width = 128;
 		static constexpr std::size_t scalar_width = sizeof(scalar_type) * 8;
 		static constexpr bool scalar_signed = std::is_signed_v<scalar_type>;
@@ -743,7 +743,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr std::string_view NAME = "(SIMD 256)";
 
-		using scalar_type = float;
+		using scalar_type = ScalarTan::scalar_type;
 		static constexpr std::size_t register_width = 256;
 		static constexpr std::size_t scalar_width = sizeof(scalar_type) * 8;
 		static constexpr bool scalar_signed = std::is_signed_v<scalar_type>;
@@ -806,7 +806,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr std::string_view NAME = "(SIMD 512)";
 
-		using scalar_type = float;
+		using scalar_type = ScalarTan::scalar_type;
 		static constexpr std::size_t register_width = 512;
 		static constexpr std::size_t scalar_width = sizeof(scalar_type) * 8;
 		static constexpr bool scalar_signed = std::is_signed_v<scalar_type>;
