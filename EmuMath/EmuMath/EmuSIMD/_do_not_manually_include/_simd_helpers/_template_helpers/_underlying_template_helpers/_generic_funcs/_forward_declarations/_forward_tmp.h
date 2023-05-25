@@ -173,7 +173,25 @@ namespace EmuSIMD::TMP
 	template<class SIMDRegister_, std::size_t PerElementWidthIfGenericInt_ = 32>
 	struct register_movemask_type
 	{
-		using type = EmuCore::TMP::emu_tmp_err;
+	private:
+		static constexpr auto _get()
+		{
+			if constexpr (std::is_same_v<SIMDRegister_, typename std::remove_cvref<SIMDRegister_>::type>)
+			{
+				return EmuCore::TMP::emu_tmp_err();
+			}
+			else
+			{
+				return typename register_movemask_type
+				<
+					typename std::remove_cvref<SIMDRegister_>::type,
+					PerElementWidthIfGenericInt_
+				>::type();
+			}
+		}
+
+	public:
+		using type = decltype(_get());
 	};
 	template<class SIMDRegister_, std::size_t PerElementWidthIfGenericInt_ = 32>
 	using register_movemask_type_t = typename register_movemask_type<SIMDRegister_, PerElementWidthIfGenericInt_>::type;

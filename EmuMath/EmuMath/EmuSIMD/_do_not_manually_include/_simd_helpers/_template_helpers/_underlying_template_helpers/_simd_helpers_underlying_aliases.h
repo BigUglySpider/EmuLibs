@@ -898,38 +898,235 @@ namespace EmuSIMD::TMP
 #pragma endregion
 
 #pragma region REGISTER_MOVEMASK_TYPE
-	template<EmuConcepts::KnownSIMD SIMDRegister_, std::size_t PerElementWidthIfGenericInt_>
-	struct register_movemask_type<SIMDRegister_, PerElementWidthIfGenericInt_>
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<f32x4, PerElementWidthIfGenericInt_>
 	{
-	private:
-		static constexpr auto _get()
-		{
-			constexpr std::size_t num_elements = EmuSIMD::TMP::register_element_count_v<typename std::remove_cvref<SIMDRegister_>::type, PerElementWidthIfGenericInt_>;
-			if constexpr (num_elements <= 8)
-			{
-				return std::uint8_t();
-			}
-			else if constexpr (num_elements <= 16)
-			{
-				return std::uint16_t();
-			}
-			else if constexpr (num_elements <= 32)
-			{
-				return std::uint32_t();
-			}
-			else if constexpr (num_elements <= 64)
-			{
-				return std::uint64_t();
-			}
-			else
-			{
-				static_assert(EmuCore::TMP::get_false<std::size_t, num_elements>(), "Unable to generate a movemask type via EmuSIMD::TMP::register_movemask_type: The determined number of elements within the SIMD register is greater than the number of bits in the widest unsigned integer type.");
-			}
-		}
-
-	public:
-		using type = decltype(_get());
+		using type = std::uint8_t;
 	};
+
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<f32x8, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint8_t;
+	};
+
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<f32x16, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint16_t;
+	};
+
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<f64x2, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint8_t;
+	};
+
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<f64x4, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint8_t;
+	};
+
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<f64x8, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint8_t;
+	};
+
+#if EMU_SIMD_USE_GENERIC_INT_REGISTERS
+	template<>
+	struct register_movemask_type<i128_generic, 8>
+	{
+		using type = std::uint16_t;
+	};
+	template<>
+	struct register_movemask_type<i256_generic, 8>
+	{
+		using type = std::uint32_t;
+	};
+	template<>
+	struct register_movemask_type<i512_generic, 8>
+	{
+		using type = std::uint64_t;
+	};
+
+	template<>
+	struct register_movemask_type<i128_generic, 16>
+	{
+		using type = std::uint8_t;
+	};
+	template<>
+	struct register_movemask_type<i256_generic, 16>
+	{
+		using type = std::uint16_t;
+	};
+	template<>
+	struct register_movemask_type<i512_generic, 16>
+	{
+		using type = std::uint32_t;
+	};
+
+	template<>
+	struct register_movemask_type<i128_generic, 32>
+	{
+		using type = std::uint8_t;
+	};
+	template<>
+	struct register_movemask_type<i256_generic, 32>
+	{
+		using type = std::uint8_t;
+	};
+	template<>
+	struct register_movemask_type<i512_generic, 32>
+	{
+		using type = std::uint16_t;
+	};
+
+	template<>
+	struct register_movemask_type<i128_generic, 64>
+	{
+		using type = std::uint8_t;
+	};
+	template<>
+	struct register_movemask_type<i256_generic, 64>
+	{
+		using type = std::uint8_t;
+	};
+	template<>
+	struct register_movemask_type<i512_generic, 64>
+	{
+		using type = std::uint8_t;
+	};
+#else
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<i8x16, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint16_t;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<i8x32, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint32_t;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<i8x64, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint64_t;
+	};
+
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<i16x8, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint8_t;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<i16x16, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint16_t;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<i16x32, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint32_t;
+	};
+
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<i32x4, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint8_t;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<i32x8, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint8_t;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<i32x16, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint16_t;
+	};
+
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<i64x2, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint8_t;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<i64x4, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint8_t;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<i64x8, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint8_t;
+	};
+
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<u8x16, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint16_t;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<u8x32, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint32_t;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<u8x64, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint64_t;
+	};
+
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<u16x8, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint8_t;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<u16x16, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint16_t;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<u16x32, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint32_t;
+	};
+
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<u32x4, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint8_t;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<u32x8, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint8_t;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<u32x16, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint16_t;
+	};
+
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<u64x2, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint8_t;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<u64x4, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint8_t;
+	};
+	template<std::size_t PerElementWidthIfGenericInt_>
+	struct register_movemask_type<u64x8, PerElementWidthIfGenericInt_>
+	{
+		using type = std::uint8_t;
+	};
+#endif
 #pragma endregion
 }
 
