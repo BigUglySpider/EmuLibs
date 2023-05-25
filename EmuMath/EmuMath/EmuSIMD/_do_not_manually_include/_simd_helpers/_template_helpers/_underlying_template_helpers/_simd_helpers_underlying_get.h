@@ -444,11 +444,11 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				EmuSIMD::Funcs::store_f32x16(reinterpret_cast<void*>(p_out_), register_);
+				EmuSIMD::Funcs::store_f32x16(reinterpret_cast<float*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				EmuSIMD::Funcs::store_f64x8(reinterpret_cast<void*>(p_out_), register_);
+				EmuSIMD::Funcs::store_f64x8(reinterpret_cast<double*>(p_out_), register_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 			{
