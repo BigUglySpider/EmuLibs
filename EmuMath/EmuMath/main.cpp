@@ -128,12 +128,12 @@ public:
 		return _is_compatible_args_collection<ArgsCollection_>::value;
 	}
 
-	BasicArgParser(int argc, char** argv) : 
+	inline BasicArgParser(int argc, char** argv) : 
 		BasicArgParser(make_vector_from_main_args(argc, argv), string_type(default_config_name_only_value), config_args_map_type(), switch_to_full_name_map_type())
 	{
 	}
 
-	BasicArgParser(int argc, char** argv, string_type config_name_only_value_, config_args_map_type&& default_config_args_, switch_to_full_name_map_type&& switch_to_full_name_map_) :
+	inline BasicArgParser(int argc, char** argv, string_type config_name_only_value_, config_args_map_type&& default_config_args_, switch_to_full_name_map_type&& switch_to_full_name_map_) :
 		BasicArgParser(make_vector_from_main_args(argc, argv), std::move(config_name_only_value_), std::move(default_config_args_), std::move(switch_to_full_name_map_))
 	{
 	}
@@ -191,7 +191,6 @@ public:
 				{
 					// Empty argument, so just set to the default and move on
 					this->_set_multiple_switch_args(current_config_arg_name, config_name_only_value_);
-					std::cout << "???\n";
 				}
 				else if (arg_string[0] == '-')
 				{
@@ -504,46 +503,295 @@ public:
 		}
 	}
 
+	/// <summary>
+	/// <para> Converts the specified config arg to an integer. </para>
+	/// <para> If `get_config_arg` is an unsuccessful operation, this will throw an exception. </para>
+	/// <para> Subject to usual string-to-integer conversion exceptions where applicable. </para>
+	/// </summary>
+	/// <param name="config_name_">Name of the config argument to parse into an integer.</param>
+	/// <returns>Specified config argument parsed into an integer.</returns>
 	template<EmuConcepts::Integer OutInt_>
 	[[nodiscard]] inline auto ToInt(const string_type& config_name_) const
 		-> typename std::remove_cvref<OutInt_>::type
 	{
-		const string_type& config_string = this->get_config_arg(config_name_);
-		constexpr bool is_signed = std::is_signed_v<typename std::remove_cvref<OutInt_>::type>;
-		constexpr std::size_t num_bytes = sizeof(typename std::remove_cvref<OutInt_>::type);
-		if constexpr(num_bytes <= sizeof(int))
-		{
-			return static_cast<typename std::remove_cvref<OutInt_>::type>(std::stoi(config_string));
-		}
-		else if constexpr(num_bytes <= sizeof(long))
-		{
-			if constexpr(is_signed)
-			{
-				return static_cast<typename std::remove_cvref<OutInt_>::type>(std::stol(config_string));
-			}
-			else
-			{
-				return static_cast<typename std::remove_cvref<OutInt_>::type>(std::stoul(config_string));
-			}
-		}
-		else
-		{
-			if constexpr(is_signed)
-			{
-				return static_cast<typename std::remove_cvref<OutInt_>::type>(std::stoll(config_string));
-			}
-			else
-			{
-				return static_cast<typename std::remove_cvref<OutInt_>::type>(std::stoull(config_string));
-			}
-		}
+		const string_type& arg_value = this->get_config_arg(config_name_);
+		return _built_in_cvt_arg_to_int<OutInt_>(arg_value);
 	}
 
+	/// <summary>
+	/// <para> Converts the specified config switch to an integer. </para>
+	/// <para> The passed switch will be automatically translated to its full name. </para>
+	/// <para> If `get_config_arg` is an unsuccessful operation, this will throw an exception. </para>
+	/// <para> Subject to usual string-to-integer conversion exceptions where applicable. </para>
+	/// </summary>
+	/// <param name="config_switch_char_">Switch for the config argument to parse into an integer.</param>
+	/// <returns>Specified config argument parsed into an integer.</returns>
 	template<EmuConcepts::Integer OutInt_>
 	[[nodiscard]] inline auto ToInt(const char_type& config_switch_char_) const
 		-> typename std::remove_cvref<OutInt_>::type
 	{
 		return ToInt<OutInt_>(this->translate_switch_to_full_name(config_switch_char_));
+	}
+
+	/// <summary>
+	/// <para> Converts the specified config arg to an integer, if it can be found. </para>
+	/// <para> Subject to usual string-to-integer conversion exceptions where applicable. </para>
+	/// </summary>
+	/// <param name="config_name_">Name of the config argument to parse into an integer.</param>
+	/// <returns>Specified config argument parsed into an integer if the specified config arg can be found; otherwise a default, unqualified `OutInt_`.</returns>
+	template<EmuConcepts::Integer OutInt_>
+	[[nodiscard]] inline auto TryToInt(const string_type& config_name_) const
+		-> typename std::remove_cvref<OutInt_>::type
+	{
+		const string_type* p_arg_value;
+		if (this->try_get_config_arg(config_name_, &p_arg_value))
+		{
+			return _built_in_cvt_arg_to_int<OutInt_>(*p_arg_value);
+		}
+		else
+		{
+			return typename std::remove_cvref<OutInt_>::type();
+		}
+	}
+
+	/// <summary>
+	/// <para> Converts the specified config switch to an integer, if it can be found. </para>
+	/// <para> The passed switch will be automatically translated to its full name. </para>
+	/// <para> Subject to usual string-to-integer conversion exceptions where applicable. </para>
+	/// </summary>
+	/// <param name="config_switch_char_">Switch for the config argument to parse into an integer.</param>
+	/// <returns>Specified config argument parsed into an integer if the specified config arg can be found; otherwise a default, unqualified `OutInt_`.</returns>
+	template<EmuConcepts::Integer OutInt_>
+	[[nodiscard]] inline auto TryToInt(const char_type& config_switch_char_) const
+		-> typename std::remove_cvref<OutInt_>::type
+	{
+		return TryToInt<OutInt_>(this->translate_switch_to_full_name(config_switch_char_));
+	}
+
+	/// <summary>
+	/// <para> Converts the specified config arg to an integer, if it can be found. </para>
+	/// <para> Subject to usual string-to-integer conversion exceptions where applicable. </para>
+	/// </summary>
+	/// <param name="config_name_">Name of the config argument to parse into an integer.</param>
+	/// <param name="out_if_not_found_">Default output value if the specified config arg cannot be found.</param>
+	/// <returns>Specified config argument parsed into an integer if the specified config arg can be found; otherwise the passed `out_if_not_found_` value converted to an unqualified `OutInt_`.</returns>
+	template<EmuConcepts::Integer OutInt_, EmuConcepts::Integer OutIfNotFound_>
+	requires(EmuCore::TMP::is_static_castable_v<OutIfNotFound_&&, typename std::remove_cvref<OutInt_>::type>)
+	[[nodiscard]] inline auto TryToInt(const string_type& config_name_, OutIfNotFound_&& out_if_not_found_) const
+		-> typename std::remove_cvref<OutInt_>::type
+	{
+		const string_type* p_arg_value;
+		if (this->try_get_config_arg(config_name_, &p_arg_value))
+		{
+			return _built_in_cvt_arg_to_int<OutInt_>(*p_arg_value);
+		}
+		else
+		{
+			return static_cast<typename std::remove_cvref<OutInt_>::type>(std::forward<OutIfNotFound_>(out_if_not_found_));
+		}
+	}
+
+	/// <summary>
+	/// <para> Converts the specified config switch to an integer, if it can be found. </para>
+	/// <para> The passed switch will be automatically translated to its full name. </para>
+	/// <para> Subject to usual string-to-integer conversion exceptions where applicable. </para>
+	/// </summary>
+	/// <param name="config_switch_char_">Switch for the config argument to parse into an integer.</param>
+	/// <param name="out_if_not_found_">Default output value if the specified config arg cannot be found.</param>
+	/// <returns>Specified config argument parsed into an integer if the specified config arg can be found; otherwise the passed `out_if_not_found_` value converted to an unqualified `OutInt_`.</returns>
+	template<EmuConcepts::Integer OutInt_, EmuConcepts::Integer OutIfNotFound_>
+	requires(EmuCore::TMP::is_static_castable_v<OutIfNotFound_&&, typename std::remove_cvref<OutInt_>::type>)
+	[[nodiscard]] inline auto TryToInt(const char_type& config_switch_char_, OutIfNotFound_&& out_if_not_found_) const
+		-> typename std::remove_cvref<OutInt_>::type
+	{
+		return TryToInt<OutInt_>(this->translate_switch_to_full_name(config_switch_char_), std::forward<OutIfNotFound_>(out_if_not_found_));
+	}
+
+	/// <summary>
+	/// <para> Converts the specified config arg to a floating-point. </para>
+	/// <para> If `get_config_arg` is an unsuccessful operation, this will throw an exception. </para>
+	/// <para> Subject to usual string-to-floating-point conversion exceptions where applicable. </para>
+	/// </summary>
+	/// <param name="config_name_">Name of the config argument to parse into a floating-point.</param>
+	/// <returns>Specified config argument parsed into a floating-point.</returns>
+	template<EmuConcepts::FloatingPoint OutFP_>
+	[[nodiscard]] inline auto ToFloatingPoint(const string_type& config_name_) const
+		-> typename std::remove_cvref<OutFP_>::type
+	{
+		const string_type& config_string = this->get_config_arg(config_name_);
+		return _built_in_cvt_arg_to_fp<OutFP_>(config_name_);
+	}
+
+	/// <summary>
+	/// <para> Converts the specified config switch to a floating-point. </para>
+	/// <para> The passed switch will be automatically translated to its full name. </para>
+	/// <para> If `get_config_arg` is an unsuccessful operation, this will throw an exception. </para>
+	/// <para> Subject to usual string-to-floating-point conversion exceptions where applicable. </para>
+	/// </summary>
+	/// <param name="config_switch_char_">Switch for the config argument to parse into a floating-point.</param>
+	/// <returns>Specified config argument parsed into a floating-point.</returns>
+	template<EmuConcepts::FloatingPoint OutFP_>
+	[[nodiscard]] inline auto ToFloatingPoint(const char_type& config_switch_char_) const
+		-> typename std::remove_cvref<OutFP_>::type
+	{
+		return ToFloatingPoint<OutFP_>(this->translate_switch_to_full_name(config_switch_char_));
+	}
+
+	/// <summary>
+	/// <para> Converts the specified config arg to a floating-point, if it can be found. </para>
+	/// <para> Subject to usual string-to-floating-point conversion exceptions where applicable. </para>
+	/// </summary>
+	/// <param name="config_name_">Name of the config argument to parse into a floating-point.</param>
+	/// <returns>Specified config argument parsed into a floating-point if the specified config arg can be found; otherwise a default, unqualified `OutFP_`.</returns>
+	template<EmuConcepts::FloatingPoint OutFP_>
+	[[nodiscard]] inline auto TryToFloatingPoint(const string_type& config_name_) const
+		-> typename std::remove_cvref<OutFP_>::type
+	{
+		const string_type* p_arg_value;
+		if (this->try_get_config_arg(config_name_, &p_arg_value))
+		{
+			return _built_in_cvt_arg_to_fp<OutFP_>(*p_arg_value);
+		}
+		else
+		{
+			return typename std::remove_cvref<OutFP_>::type();
+		}
+	}
+
+	/// <summary>
+	/// <para> Converts the specified config switch to a floating-point, if it can be found. </para>
+	/// <para> The passed switch will be automatically translated to its full name. </para>
+	/// <para> Subject to usual string-to-floating-point conversion exceptions where applicable. </para>
+	/// </summary>
+	/// <param name="config_switch_char_">Switch for the config argument to parse into a floating-point.</param>
+	/// <returns>Specified config argument parsed into a floating-point if the specified config arg can be found; otherwise a default, unqualified `OutFP_`.</returns>
+	template<EmuConcepts::FloatingPoint OutFP_>
+	[[nodiscard]] inline auto TryToFloatingPoint(const char_type& config_switch_char_) const
+		-> typename std::remove_cvref<OutFP_>::type
+	{
+		return TryToFloatingPoint<OutFP_>(this->translate_switch_to_full_name(config_switch_char_));
+	}
+
+	/// <summary>
+	/// <para> Converts the specified config arg to a floating-point, if it can be found. </para>
+	/// <para> Subject to usual string-to-floating-point conversion exceptions where applicable. </para>
+	/// </summary>
+	/// <param name="config_name_">Name of the config argument to parse into a floating-point.</param>
+	/// <param name="out_if_not_found_">Default output value if the specified config arg cannot be found.</param>
+	/// <returns>Specified config argument parsed into a floating-point if the specified config arg can be found; otherwise the passed `out_if_not_found_` value converted to an unqualified `OutFP_`.</returns>
+	template<EmuConcepts::FloatingPoint OutFP_, EmuConcepts::FloatingPoint OutIfNotFound_>
+	requires(EmuCore::TMP::is_static_castable_v<OutIfNotFound_&&, typename std::remove_cvref<OutFP_>::type>)
+	[[nodiscard]] inline auto TryToFloatingPoint(const string_type& config_name_, OutIfNotFound_&& out_if_not_found_) const
+		-> typename std::remove_cvref<OutFP_>::type
+	{
+		const string_type* p_arg_value;
+		if (this->try_get_config_arg(config_name_, &p_arg_value))
+		{
+			return _built_in_cvt_arg_to_fp<OutFP_>(*p_arg_value);
+		}
+		else
+		{
+			return static_cast<typename std::remove_cvref<OutFP_>::type>(std::forward<OutIfNotFound_>(out_if_not_found_));
+		}
+	}
+
+	/// <summary>
+	/// <para> Converts the specified config switch to a floating-point, if it can be found. </para>
+	/// <para> The passed switch will be automatically translated to its full name. </para>
+	/// <para> Subject to usual string-to-floating-point conversion exceptions where applicable. </para>
+	/// </summary>
+	/// <param name="config_switch_char_">Switch for the config argument to parse into a floating-point.</param>
+	/// <param name="out_if_not_found_">Default output value if the specified config arg cannot be found.</param>
+	/// <returns>Specified config argument parsed into a floating-point if the specified config arg can be found; otherwise the passed `out_if_not_found_` value converted to an unqualified `OutFP_`.</returns>
+	template<EmuConcepts::FloatingPoint OutFP_, EmuConcepts::FloatingPoint OutIfNotFound_>
+	requires(EmuCore::TMP::is_static_castable_v<OutIfNotFound_&&, typename std::remove_cvref<OutFP_>::type>)
+	[[nodiscard]] inline auto TryToFloatingPoint(const char_type& config_switch_char_, OutIfNotFound_&& out_if_not_found_) const
+		-> typename std::remove_cvref<OutFP_>::type
+	{
+		return TryToFloatingPoint<OutFP_>(this->translate_switch_to_full_name(config_switch_char_), std::forward<OutIfNotFound_>(out_if_not_found_));
+	}
+
+	/// <summary>
+	/// <para> Converts the specified config arg via the provided custom conversion function. </para>
+	/// <para> The conversion function must be invocable with a constant reference to this parser's string_type, however it does not have any return requirements. </para>
+	/// <para> If `get_config_arg` is an unsuccessful operation, this will throw an exception. </para>
+	/// </summary>
+	/// <param name="config_name_">Name of the config argument to parse via the custom conversion function.</param>
+	/// <param name="conversion_func_">Function which is invocable when passed a constant reference to this parser's string_type. May return anything.</param>
+	/// <returns>Result of the passed conversion function when invoked with the specified config argument.</returns>
+	template<class ConversionFunc_>
+	requires(std::is_invocable_v<ConversionFunc_, const string_type&>)
+	[[nodiscard]] inline decltype(auto) Convert(const string_type& config_name_, ConversionFunc_&& conversion_func_) const
+	{
+		const string_type& config_string = this->get_config_arg(config_name_);
+		return std::forward<ConversionFunc_>(conversion_func_)(config_string);
+	}
+
+	/// <summary>
+	/// <para> Converts the specified config switch via the provided custom conversion function. </para>
+	/// <para> The passed switch will be automatically translated to its full name. </para>
+	/// <para> The conversion function must be invocable with a constant reference to this parser's string_type, however it does not have any return requirements. </para>
+	/// <para> If `get_config_arg` is an unsuccessful operation, this will throw an exception. </para>
+	/// </summary>
+	/// <param name="config_switch_char_">Switch for the config argument to parse via the custom conversion function.</param>
+	/// <param name="conversion_func_">Function which is invocable when passed a constant reference to this parser's string_type. May return anything.</param>
+	/// <returns>Result of the passed conversion function when invoked with the specified config argument.</returns>
+	template<class ConversionFunc_>
+	requires(std::is_invocable_v<ConversionFunc_, const string_type&>)
+	[[nodiscard]] inline decltype(auto) Convert(const char_type& config_switch_char_, ConversionFunc_&& conversion_func_) const
+	{
+		return Convert(this->translate_switch_to_full_name(config_switch_char_), std::forward<conversion_func_>(conversion_func_));
+	}
+
+	/// <summary>
+	/// <para> Converts the specified config arg via the provided custom conversion function. </para>
+	/// <para>
+	///		The conversion function must be invocable with a constant reference to this parser's string_type and also invocable with no arguments, but it does not have any return requirements. 
+	///		However, both required signatures must return the same type.
+	/// </para>
+	/// <para> If `get_config_arg` is an unsuccessful operation, this will throw an exception. </para>
+	/// </summary>
+	/// <param name="config_name_">Name of the config argument to parse via the custom conversion function.</param>
+	/// <param name="conversion_func_">
+	///		Function which is invocable when passed a constant reference to this parser's string_type and also when passed nothing. 
+	///		May return anything, but both required signatures must return the same type.
+	/// </param>
+	/// <returns>Result of the passed conversion function when invoked with the specified config argument if it can be found, or when invoked with no arguments otherwise.</returns>
+	template<class ConversionFunc_>
+	requires(std::is_invocable_v<ConversionFunc_&&, const string_type&> && std::is_invocable_v<ConversionFunc_&&>)
+	[[nodiscard]] inline decltype(auto) TryConvert(const string_type& config_name_, ConversionFunc_&& conversion_func_) const
+	{
+		const string_type* p_arg_value;
+		if (this->try_get_config_arg(config_name_, &p_arg_value))
+		{
+			return std::forward<ConversionFunc_>(conversion_func_)(*p_arg_value);
+		}
+		else
+		{
+			return std::forward<ConversionFunc_>(conversion_func_)();
+		}
+	}
+
+	/// <summary>
+	/// <para> Converts the specified config switch via the provided custom conversion function. </para>
+	/// <para> The passed switch will be automatically translated to its full name. </para>
+	/// <para>
+	///		The conversion function must be invocable with a constant reference to this parser's string_type and also invocable with no arguments, but it does not have any return requirements. 
+	///		However, both required signatures must return the same type.
+	/// </para>
+	/// <para> If `get_config_arg` is an unsuccessful operation, this will throw an exception. </para>
+	/// </summary>
+	/// <param name="config_switch_char_">Switch for the config argument to parse via the custom conversion function.</param>
+	/// <param name="conversion_func_">
+	///		Function which is invocable when passed a constant reference to this parser's string_type and also when passed nothing. 
+	///		May return anything, but both required signatures must return the same type.
+	/// </param>
+	/// <returns>Result of the passed conversion function when invoked with the specified config argument if it can be found, or when invoked with no arguments otherwise.</returns>
+	template<class ConversionFunc_>
+	requires(std::is_invocable_v<ConversionFunc_, const string_type&>)
+	[[nodiscard]] inline decltype(auto) TryConvert(const char_type& config_switch_char_, ConversionFunc_&& conversion_func_) const
+	{
+		return TryConvert(this->translate_switch_to_full_name(config_switch_char_), std::forward<conversion_func_>(conversion_func_));
 	}
 
 	template<bool IncludeDefaults_ = true>
@@ -609,6 +857,57 @@ public:
 
 private:
 	struct _underlying_no_indent {};
+
+	template<EmuConcepts::Integer OutInt_>
+	[[nodiscard]] static inline auto _built_in_cvt_arg_to_int(const string_type& arg_value_)
+	{
+		constexpr bool is_signed = std::is_signed_v<typename std::remove_cvref<OutInt_>::type>;
+		constexpr std::size_t num_bytes = sizeof(typename std::remove_cvref<OutInt_>::type);
+		if constexpr (num_bytes <= sizeof(int))
+		{
+			return static_cast<typename std::remove_cvref<OutInt_>::type>(std::stoi(arg_value_));
+		}
+		else if constexpr (num_bytes <= sizeof(long))
+		{
+			if constexpr (is_signed)
+			{
+				return static_cast<typename std::remove_cvref<OutInt_>::type>(std::stol(arg_value_));
+			}
+			else
+			{
+				return static_cast<typename std::remove_cvref<OutInt_>::type>(std::stoul(arg_value_));
+			}
+		}
+		else
+		{
+			if constexpr (is_signed)
+			{
+				return static_cast<typename std::remove_cvref<OutInt_>::type>(std::stoll(arg_value_));
+			}
+			else
+			{
+				return static_cast<typename std::remove_cvref<OutInt_>::type>(std::stoull(arg_value_));
+			}
+		}
+	}
+
+	template<EmuConcepts::FloatingPoint OutFP_>
+	[[nodiscard]] static inline auto _built_in_cvt_arg_to_fp(const string_type& arg_value_)
+	{
+		constexpr std::size_t num_bytes = sizeof(typename std::remove_cvref<OutFP_>::type);
+		if constexpr (num_bytes <= sizeof(float))
+		{
+			return static_cast<typename std::remove_cvref<OutFP_>::type>(std::stof(arg_value_));
+		}
+		else if constexpr (num_bytes <= sizeof(double))
+		{
+			return static_cast<typename std::remove_cvref<OutFP_>::type>(std::stod(arg_value_));
+		}
+		else
+		{
+			return static_cast<typename std::remove_cvref<OutFP_>::type>(std::stold(arg_value_));
+		}
+	}
 
 	template<class Indent_>
 	static inline std::ostream& _append_config_map_to_stream(std::ostream& str_, const config_args_map_type& config_map_, const Indent_& indent_)
