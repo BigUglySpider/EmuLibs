@@ -182,6 +182,7 @@ public:
 				else
 				{
 					this->set_config_value<true>(std::move(current_config_arg_name), std::move(arg_string));
+					is_full_name_config_arg = false;
 				}
 			}
 			else if(is_switch_config_arg)
@@ -190,6 +191,7 @@ public:
 				{
 					// Empty argument, so just set to the default and move on
 					this->_set_multiple_switch_args(current_config_arg_name, config_name_only_value_);
+					std::cout << "???\n";
 				}
 				else if (arg_string[0] == '-')
 				{
@@ -203,6 +205,7 @@ public:
 				else
 				{
 					this->_set_multiple_switch_args(current_config_arg_name, arg_string);
+					is_switch_config_arg = false;
 				}
 			}
 			else
@@ -501,6 +504,48 @@ public:
 		}
 	}
 
+	template<EmuConcepts::Integer OutInt_>
+	[[nodiscard]] inline auto ToInt(const string_type& config_name_) const
+		-> typename std::remove_cvref<OutInt_>::type
+	{
+		const string_type& config_string = this->get_config_arg(config_name_);
+		constexpr bool is_signed = std::is_signed_v<typename std::remove_cvref<OutInt_>::type>;
+		constexpr std::size_t num_bytes = sizeof(typename std::remove_cvref<OutInt_>::type);
+		if constexpr(num_bytes <= sizeof(int))
+		{
+			return static_cast<typename std::remove_cvref<OutInt_>::type>(std::stoi(config_string));
+		}
+		else if constexpr(num_bytes <= sizeof(long))
+		{
+			if constexpr(is_signed)
+			{
+				return static_cast<typename std::remove_cvref<OutInt_>::type>(std::stol(config_string));
+			}
+			else
+			{
+				return static_cast<typename std::remove_cvref<OutInt_>::type>(std::stoul(config_string));
+			}
+		}
+		else
+		{
+			if constexpr(is_signed)
+			{
+				return static_cast<typename std::remove_cvref<OutInt_>::type>(std::stoll(config_string));
+			}
+			else
+			{
+				return static_cast<typename std::remove_cvref<OutInt_>::type>(std::stoull(config_string));
+			}
+		}
+	}
+
+	template<EmuConcepts::Integer OutInt_>
+	[[nodiscard]] inline auto ToInt(const char_type& config_switch_char_) const
+		-> typename std::remove_cvref<OutInt_>::type
+	{
+		return ToInt<OutInt_>(this->translate_switch_to_full_name(config_switch_char_));
+	}
+
 	template<bool IncludeDefaults_ = true>
 	inline std::ostream& append_to_stream(std::ostream& str_) const
 	{
@@ -763,6 +808,12 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::str
 	constexpr std::size_t num_dimensions = NoiseTable_::num_dimensions;
 	EmuMath::Vector<3, FP_> white_(255.0f, 255.0f, 255.0f);
 
+	std::string const required_directory = "./noise_output/";
+	if(!std::filesystem::exists(required_directory))
+	{
+		std::filesystem::create_directories(required_directory);
+	}
+
 	if constexpr (num_dimensions == 3)
 	{
 		EmuMath::Vector<3, std::size_t> resolution_ = noise_table_.size();
@@ -771,7 +822,7 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::str
 			std::cout << "\nOutputting image layer #" << z << "...\n";
 
 			std::ostringstream name_;
-			name_ << "./" << out_name_ << "_" << z << ".ppm";
+			name_ << required_directory << out_name_ << "_" << z << ".ppm";
 			std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
 			out_ppm_ << "P6" << std::endl << resolution_.at<0>() << ' ' << resolution_.at<1>() << std::endl << "255" << std::endl;
 
@@ -793,7 +844,7 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::str
 		std::cout << "\nOutputting image...\n";
 
 		std::ostringstream name_;
-		name_ << "./2d_test_noise_.ppm";
+		name_ << required_directory << "2d_test_noise_.ppm";
 		std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
 		out_ppm_ << "P6" << std::endl << noise_table_.template size<0>() << ' ' << noise_table_.template size<1>() << std::endl << "255" << std::endl;
 
@@ -820,6 +871,12 @@ inline void WriteNoiseTableToPPM
 )
 {
 	constexpr std::size_t num_dimensions = NoiseTable_::num_dimensions;
+	std::string const required_directory = "./noise_output/";
+	if(!std::filesystem::exists(required_directory))
+	{
+		std::filesystem::create_directories(required_directory);
+	}
+
 	if (noise_table_vector_.size() != 0)
 	{
 		if constexpr (num_dimensions == 3)
@@ -831,7 +888,7 @@ inline void WriteNoiseTableToPPM
 				std::cout << "\nOutputting image layer #" << z << "...\n";
 
 				std::ostringstream name_;
-				name_ << "./" << out_name_ << "_" << z << ".ppm";
+				name_ << required_directory << out_name_ << "_" << z << ".ppm";
 				std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
 				out_ppm_ << "P6" << std::endl << resolution_.at<0>() << ' ' << resolution_.at<1>() << std::endl << "255" << std::endl;
 
@@ -854,7 +911,7 @@ inline void WriteNoiseTableToPPM
 			std::cout << "\nOutputting 2D noise image layer...\n";
 
 			std::ostringstream name_;
-			name_ << "./" << out_name_ << ".ppm";
+			name_ << required_directory << out_name_ << ".ppm";
 			std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
 			out_ppm_ << "P6" << std::endl << resolution_.at<0>() << ' ' << resolution_.at<1>() << std::endl << "255" << std::endl;
 
@@ -875,7 +932,7 @@ inline void WriteNoiseTableToPPM
 			std::cout << "\nOutputting 1D noise image layer from full vector...\n";
 
 			std::ostringstream name_;
-			name_ << "./" << out_name_ << ".ppm";
+			name_ << required_directory << out_name_ << ".ppm";
 			std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
 			out_ppm_ << "P6" << std::endl << resolution_.at<0>() << ' ' << resolution_.at<1>() << std::endl << "255" << std::endl;
 
@@ -2129,8 +2186,15 @@ int main(int argc, char** argv)
 		constexpr auto sample_count_8k = EmuMath::make_vector<std::size_t>(7680, 4320, z_depth);	    // Large
 		constexpr auto sample_count_16k = EmuMath::make_vector<std::size_t>(15360, 8640, z_depth);	    // Quite hefty
 		constexpr auto sample_count_32k = EmuMath::make_vector<std::size_t>(30720, 17280, z_depth);     // Extremely large, be wary
-		constexpr auto sample_count = sample_count_16x16x16;
-		constexpr auto scaled_step = EmuMath::Vector<test_noise_dimensions, float>(1.0f) / sample_count;
+
+		auto custom_sample_count = EmuMath::make_vector<std::size_t>
+		(
+			basic_arg_parser.ToInt<std::size_t>('x'),
+			basic_arg_parser.ToInt<std::size_t>('y'),
+			basic_arg_parser.ToInt<std::size_t>('z')
+		);
+		auto sample_count = custom_sample_count;
+		auto scaled_step = EmuMath::Vector<test_noise_dimensions, float>(1.0f) / sample_count;
 		constexpr auto custom_step = EmuMath::Vector<test_noise_dimensions, float>(1.0f / 1024.0f);
 		constexpr float used_freq = 3.0f;
 		constexpr bool use_fractal = true;
