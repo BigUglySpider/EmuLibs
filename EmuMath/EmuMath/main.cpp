@@ -158,7 +158,8 @@ public:
 		const std::size_t input_arg_count = _get_args_collection_size(args_collection_ref);
 		for (std::size_t i = 0; i < input_arg_count; ++i)
 		{
-			auto arg_string = _get_arg_from_collection<can_move>(args_collection_ref, i);
+			string_type arg_string = _get_arg_from_collection<can_move>(args_collection_ref, i);
+			parsed_non_config_args.emplace_back(arg_string);
 			if (is_full_name_config_arg)
 			{
 				if (arg_string.size() == 0)
@@ -215,11 +216,6 @@ public:
 				{
 					this->_determine_config_arg_type(arg_string, current_config_arg_name, is_switch_config_arg, is_full_name_config_arg);
 					this->_set_config_args_if_no_more_input(i, input_arg_count, is_switch_config_arg, is_full_name_config_arg, current_config_arg_name, config_name_only_value_);
-				}
-				else
-				{
-					// Non-config arg being parsed, so just move it to the general vector
-					parsed_non_config_args.emplace_back(std::move(arg_string));
 				}
 			}
 		}
