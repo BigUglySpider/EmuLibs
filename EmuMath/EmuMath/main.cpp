@@ -133,6 +133,11 @@ public:
 	{
 	}
 
+	BasicArgParser(int argc, char** argv, string_type config_name_only_value_, config_args_map_type&& default_config_args_, switch_to_full_name_map_type&& switch_to_full_name_map_) :
+		BasicArgParser(make_vector_from_main_args(argc, argv), std::move(config_name_only_value_), std::move(default_config_args_), std::move(switch_to_full_name_map_))
+	{
+	}
+
 	template<class ArgsCollection_>
 	requires((is_compatible_args_collection<ArgsCollection_>()))
 	BasicArgParser
@@ -218,6 +223,249 @@ public:
 				}
 			}
 		}
+	}
+
+	/// <summary>
+	/// <para> Shorthand for `get_config_arg` with the same arguments. </para>
+	/// </summary>
+	[[nodiscard]] inline const string_type& operator[](const string_type& config_name_) const
+	{
+		return get_config_arg(config_name_);
+	}
+
+	/// <summary>
+	/// <para> Shorthand for `get_config_arg` with the same arguments. </para>
+	/// </summary>
+	[[nodiscard]] inline const string_type& operator[](const char_type& config_switch_char_) const
+	{
+		return get_config_arg(config_switch_char_);
+	}
+
+	/// <summary>
+	/// <para> Shorthand for `try_get_config_arg` with the same arguments. </para>
+	/// </summary>
+	[[nodiscard]] inline bool operator()(const string_type& config_name_, const string_type** pp_out_string_) const
+	{
+		return try_get_config_arg(config_name_, pp_out_string_);
+	}
+
+	/// <summary>
+	/// <para> Shorthand for `try_get_config_arg` with the same arguments. </para>
+	/// </summary>
+	[[nodiscard]] inline bool operator()(const char_type& config_switch_char_, const string_type** pp_out_string_) const
+	{
+		return try_get_config_arg(config_switch_char_, pp_out_string_);
+	}
+
+	/// <summary>
+	/// <para> Shorthand for `try_get_config_arg` with the same arguments. </para>
+	/// </summary>
+	[[nodiscard]] inline bool operator()(const string_type& config_name_, std::reference_wrapper<const string_type>& out_string_) const
+	{
+		return try_get_config_arg(config_name_, out_string_);
+	}
+
+	/// <summary>
+	/// <para> Shorthand for `try_get_config_arg` with the same arguments. </para>
+	/// </summary>
+	[[nodiscard]] inline bool operator()(const char_type& config_switch_char_, std::reference_wrapper<const string_type>& out_string_) const
+	{
+		return try_get_config_arg(config_switch_char_, out_string_);
+	}
+
+	/// <summary>
+	/// <para> Shorthand for `try_get_config_arg` with the same arguments. </para>
+	/// </summary>
+	[[nodiscard]] inline bool operator()(const string_type& config_name_, string_type& out_string_) const
+	{
+		return try_get_config_arg(config_name_, out_string_);
+	}
+
+	/// <summary>
+	/// <para> Shorthand for `try_get_config_arg` with the same arguments. </para>
+	/// </summary>
+	[[nodiscard]] inline bool operator()(const char_type& config_switch_char_, string_type& out_string_) const
+	{
+		return try_get_config_arg(config_switch_char_, out_string_);
+	}
+
+	/// <summary>
+	/// <para> Retrieves a constant reference to the value of the specified config argument. </para>
+	/// <para> If the passed argument has not been parsed, this will return the argument's default value. </para>
+	/// <para> If the passed argument has not been parsed and there is no default value for it, this will throw a standard out_of_range exception. </para>
+	/// </summary>
+	/// <param name="config_name_">Full name of the config argument to retrieve the value of.</param>
+	/// <returns>Constant reference to the value for the specified config argument.</returns>
+	[[nodiscard]] inline const string_type& get_config_arg(const string_type& config_name_) const
+	{
+		auto it = parsed_config_args.find(config_name_);
+		if (it != parsed_config_args.end())
+		{
+			return it->second;
+		}
+		else
+		{
+			it = default_config_args.find(config_name_);
+			if (it != default_config_args.end())
+			{
+				return it->second;
+			}
+			else
+			{
+				throw std::out_of_range("Invalid config name provided to retrieve from a parser - it has neither been parsed nor provided a default value.");
+			}
+		}
+	}
+
+	/// <summary>
+	/// <para> Retrieves a constant reference to the value of the specified config argument switch. </para>
+	/// <para> The passed switch will be automatically translated to its full name. </para>
+	/// <para> If the passed argument has not been parsed, this will return the argument's default value. </para>
+	/// <para> If the passed argument has not been parsed and there is no default value for it, this will throw a standard out_of_range exception. </para>
+	/// </summary>
+	/// <param name="config_switch_char_">Character switch for the config argument to retrieve the value of.</param>
+	/// <returns>Constant reference to the value for the config argument specified by the passed switch character.</returns>
+	[[nodiscard]] inline const string_type& get_config_arg(const char_type& config_switch_char_) const
+	{
+		return get_config_arg(this->translate_switch_to_full_name(config_switch_char_));
+	}
+
+	/// <summary>
+	/// <para> Tries to output a read-only pointer to the value of the specified config argument, returning a boolean which indicates if the operation was a success. </para>
+	/// <para> If the passed argument has not been parsed, this will output a pointer to the argument's default value. </para>
+	/// <para> If the passed argument has not been parsed and there is no default value for it, this will output a nullptr and return false. </para>
+	/// </summary>
+	/// <param name="config_name_">Full name of the config argument to output the value of.</param>
+	/// <param name="pp_out_string_">Pointer to the string pointer to update with the specified config value (if it can be found).</param>
+	/// <returns>True if the operation is successful; otherwise false.</returns>
+	[[nodiscard]] inline bool try_get_config_arg(const string_type& config_name_, const string_type** pp_out_string_) const
+	{
+		auto it = parsed_config_args.find(config_name_);
+		if (it != parsed_config_args.end())
+		{
+			*pp_out_string_ = &(it->second);
+			return true;
+		}
+		else
+		{
+			it = default_config_args.find(config_name_);
+			if (it != default_config_args.end())
+			{
+				*pp_out_string_ = &(it->second);
+				return true;
+			}
+			else
+			{
+				*pp_out_string_ = nullptr;
+				return false;
+			}
+		}
+	}
+
+	/// <summary>
+	/// <para> Tries to output a read-only pointer to the value of the specified config argument switch, returning a boolean which indicates if the operation was a success. </para>
+	/// <para> The passed switch will be automatically translated to its full name. </para>
+	/// <para> If the passed argument has not been parsed, this will output a pointer to the argument's default value. </para>
+	/// <para> If the passed argument has not been parsed and there is no default value for it, this will output a nullptr and return false. </para>
+	/// </summary>
+	/// <param name="config_switch_char_">Character switch for the config argument to output the value of.</param>
+	/// <param name="pp_out_string_">Pointer to the string pointer to update with the specified config value (if it can be found).</param>
+	/// <returns>True if the operation is successful; otherwise false.</returns>
+	[[nodiscard]] inline bool try_get_config_arg(const char_type& config_switch_char_, const string_type** pp_out_string_) const
+	{
+		return try_get_config_arg(this->translate_switch_to_full_name(config_switch_char_), pp_out_string_);
+	}
+
+	/// <summary>
+	/// <para> Tries to output a read-only reference to the value of the specified config argument, returning a boolean which indicates if the operation was a success. </para>
+	/// <para> If the passed argument has not been parsed, this will output a constant reference to the argument's default value. </para>
+	/// <para> If the passed argument has not been parsed and there is no default value for it, this will not modify the output parameter. </para>
+	/// </summary>
+	/// <param name="config_name_">Full name of the config argument to output the value of.</param>
+	/// <param name="out_string_">Reference wrapper to output a constant reference to the specified config value via (if it can be found).</param>
+	/// <returns>True if the operation is successful; otherwise false.</returns>
+	[[nodiscard]] inline bool try_get_config_arg(const string_type& config_name_, std::reference_wrapper<const string_type>& out_string_) const
+	{
+		auto it = parsed_config_args.find(config_name_);
+		if (it != parsed_config_args.end())
+		{
+			out_string_ = std::reference_wrapper<const string_type>(it->second);
+			return true;
+		}
+		else
+		{
+			it = default_config_args.find(config_name_);
+			if (it != default_config_args.end())
+			{
+				out_string_ = std::reference_wrapper<const string_type>(it->second);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+
+	/// <summary>
+	/// <para> Tries to output a read-only reference to the value of the specified config argument switch, returning a boolean which indicates if the operation was a success. </para>
+	/// <para> The passed switch will be automatically translated to its full name. </para>
+	/// <para> If the passed argument has not been parsed, this will output a constant reference to the argument's default value. </para>
+	/// <para> If the passed argument has not been parsed and there is no default value for it, this will not modify the output parameter. </para>
+	/// </summary>
+	/// <param name="config_switch_char_">Character switch for the config argument to output the value of.</param>
+	/// <param name="out_string_">Reference to output a copy of the specified config value via (if it can be found).</param>
+	/// <returns>True if the operation is successful; otherwise false.</returns>
+	[[nodiscard]] inline bool try_get_config_arg(const char_type& config_switch_char_, std::reference_wrapper<const string_type>& out_string_) const
+	{
+		return try_get_config_arg(this->translate_switch_to_full_name(config_switch_char_), out_string_);
+	}
+
+	/// <summary>
+	/// <para> Tries to output a copy of the value of the specified config argument, returning a boolean which indicates if the operation was a success. </para>
+	/// <para> The passed switch will be automatically translated to its full name. </para>
+	/// <para> If the passed argument has not been parsed, this will output a copy of the argument's default value. </para>
+	/// <para> If the passed argument has not been parsed and there is no default value for it, this will not modify the output parameter. </para>
+	/// </summary>
+	/// <param name="config_name_">Full name of the config argument to output the value of.</param>
+	/// <param name="out_string_">Reference to output a copy of the specified config value via (if it can be found).</param>
+	/// <returns>True if the operation is successful; otherwise false.</returns>
+	[[nodiscard]] inline bool try_get_config_arg(const string_type& config_name_, string_type& out_string_) const
+	{
+		auto it = parsed_config_args.find(config_name_);
+		if (it != parsed_config_args.end())
+		{
+			out_string_ = it->second;
+			return true;
+		}
+		else
+		{
+			it = default_config_args.find(config_name_);
+			if (it != default_config_args.end())
+			{
+				out_string_ = it->second;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+
+
+	/// <summary>
+	/// <para> Tries to output a copy of the value of the specified config argument switch, returning a boolean which indicates if the operation was a success. </para>
+	/// <para> The passed switch will be automatically translated to its full name. </para>
+	/// <para> If the passed argument has not been parsed, this will output a copy of the argument's default value. </para>
+	/// <para> If the passed argument has not been parsed and there is no default value for it, this will not modify the output parameter. </para>
+	/// </summary>
+	/// <param name="config_switch_char_">Character switch for the config argument to output the value of.</param>
+	/// <param name="out_string_">Reference wrapper to output a constant reference to the specified config value via (if it can be found).></param>
+	/// <returns>True if the operation is successful; otherwise false.</returns>
+	[[nodiscard]] inline bool try_get_config_arg(const char_type& config_switch_char_, string_type& out_string_) const
+	{
+		return try_get_config_arg(this->translate_switch_to_full_name(config_switch_char_), out_string_);
 	}
 
 	template<bool ReplaceAllowed_, EmuConcepts::UnqualifiedMatch<string_type> ConfigName_, EmuConcepts::UnqualifiedMatch<string_type> Value_>
@@ -767,11 +1015,27 @@ constexpr inline decltype(auto) setr_test_helper(Func_&& func_, std::index_seque
 
 int main(int argc, char** argv)
 {
-	{
-		BasicArgParser basic_arg_parser = BasicArgParser(argc, argv);
-		basic_arg_parser.append_to_stream(std::cout) << '\n';
-		universal_pause();
-	}
+	BasicArgParser basic_arg_parser = BasicArgParser
+	(
+		argc,
+		argv,
+		"true",
+		BasicArgParser::config_args_map_type
+		{
+			{ "noise-x", "1024" },
+			{ "noise-y", "1024" },
+			{ "noise-z", "1" }
+		},
+		BasicArgParser::switch_to_full_name_map_type
+		{
+			{ 'x', "noise-x" },
+			{ 'y', "noise-y" },
+			{ 'z', "noise-z" }
+		}
+	);
+	basic_arg_parser.append_to_stream(std::cout) << '\n';
+	std::cout << "Retrieved noise-x: " << basic_arg_parser["noise-x"] << " | Retrieved x: " << basic_arg_parser['x'] << std::endl;
+	universal_pause();
 
 	{
 		constexpr auto elems_u32 = std::array<std::uint32_t, 16>({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 });
