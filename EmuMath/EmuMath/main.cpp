@@ -375,25 +375,27 @@ constexpr inline decltype(auto) setr_test_helper(Func_&& func_, std::index_seque
 int main(int argc, char** argv)
 {
 	using EmuCore::BasicArgParser;
-	BasicArgParser basic_arg_parser = BasicArgParser
+	auto basic_arg_parser = BasicArgParser<std::string>
 	(
 		argc,
 		argv,
 		"true",
-		BasicArgParser::config_args_map_type
+		BasicArgParser<std::string>::config_args_map_type
 		{
 			{ "noise-x", "1024" },
 			{ "noise-y", "1024" },
-			{ "noise-z", "1" }
+			{ "noise-z", "1" },
+			{ "noise-speed-test-count", "1" }
 		},
-		BasicArgParser::switch_to_full_name_map_type
+		BasicArgParser<std::string>::switch_to_full_name_map_type
 		{
+			{ 'c', "noise-speed-test-count" },
 			{ 'x', "noise-x" },
 			{ 'y', "noise-y" },
 			{ 'z', "noise-z" }
 		}
 	);
-	basic_arg_parser.append_to_stream(std::cout) << '\n';
+	basic_arg_parser.AppendToStream(std::cout) << '\n';
 	std::cout << "Retrieved noise-x: " << basic_arg_parser["noise-x"] << " | Retrieved x: " << basic_arg_parser['x'] << std::endl;
 	universal_pause();
 
@@ -1512,11 +1514,9 @@ int main(int argc, char** argv)
 		std::vector<EmuMath::NoiseTable<test_noise_dimensions, float>> noise_;
 		std::vector<EmuMath::FastNoiseTable<test_noise_dimensions, 0>> fast_noise_128;
 		std::vector<EmuMath::FastNoiseTable<test_noise_dimensions, 0>> fast_noise_256;
-		std::vector<EmuMath::FastNoiseTable<test_noise_dimensions, 0>> fast_noise_512;
 		noise_.resize(num_iterations, decltype(noise_)::value_type());
 		fast_noise_128.resize(num_iterations, decltype(fast_noise_128)::value_type());
 		fast_noise_256.resize(num_iterations, decltype(fast_noise_256)::value_type());
-		fast_noise_512.resize(num_iterations, decltype(fast_noise_512)::value_type());
 	
 		constexpr std::size_t noise_num_perms = 4096;
 		constexpr EmuMath::Info::NoisePermutationShuffleMode noise_perm_shuffle_mode = EmuMath::Info::NoisePermutationShuffleMode::SEED_32;
@@ -1524,82 +1524,73 @@ int main(int argc, char** argv)
 		constexpr EmuMath::Info::NoisePermutationInfo::seed_32_type noise_perm_seed_32 = 1337;
 		constexpr EmuMath::Info::NoisePermutationInfo::seed_64_type noise_perm_seed_64 = 1337;
 	
-		universal_pause();
-		for (std::size_t i = 0; i < num_iterations; ++i)
+		universal_pause("Press enter to start noise speed tests...");
+		std::size_t speed_test_count = basic_arg_parser.ToInt<std::size_t>('c');
+		timer_.Restart();
+		for(std::size_t test_iteration = 0; test_iteration < speed_test_count; ++test_iteration)
 		{
-			std::cout << "\nNOISE BATCH " << i << "\n";
-			timer_.Restart();
-			noise_[i].GenerateNoise<test_noise_type_flag, scalar_test_noise_processor>
-			(
-				decltype(noise_)::value_type::MakeOptions
+			for (std::size_t i = 0; i < num_iterations; ++i)
+			{
+				noise_[i].GenerateNoise<test_noise_type_flag, scalar_test_noise_processor>
 				(
-					sample_count,
-					EmuMath::Vector<test_noise_dimensions, float>(0.0f),
-					custom_step,
-					used_freq,
-					true,
-					use_fractal,
-					EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
-					EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
-				)
-			);
+					decltype(noise_)::value_type::MakeOptions
+					(
+						sample_count,
+						EmuMath::Vector<test_noise_dimensions, float>(0.0f),
+						custom_step,
+						used_freq,
+						true,
+						use_fractal,
+						EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
+						EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+					)
+				);
+			}
 			timer_.Pause();
 			std::cout << "FINISHED SCALAR NOISE IN: " << timer_.GetMilli() << "ms\n";
 	
 	
 			timer_.Restart();
-			fast_noise_128[i].GenerateNoise<EmuSIMD::f32x4, test_noise_type_flag, fast_test_noise_processor>
-			(
-				decltype(fast_noise_128)::value_type::make_options
+			for (std::size_t i = 0; i < num_iterations; ++i)
+			{
+				fast_noise_128[i].GenerateNoise<EmuSIMD::f32x4, test_noise_type_flag, fast_test_noise_processor>
 				(
-					sample_count,
-					EmuMath::Vector<test_noise_dimensions, float>(0.0f),
-					custom_step,
-					used_freq,
-					true,
-					use_fractal,
-					EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
-					EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
-				)
-			);
+					decltype(fast_noise_128)::value_type::make_options
+					(
+						sample_count,
+						EmuMath::Vector<test_noise_dimensions, float>(0.0f),
+						custom_step,
+						used_freq,
+						true,
+						use_fractal,
+						EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
+						EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+					)
+				);
+			}
 			timer_.Pause();
 			std::cout << "FINISHED FAST NOISE (128) IN: " << timer_.GetMilli() << "ms\n";
 
 			timer_.Restart();
-			fast_noise_256[i].GenerateNoise<EmuSIMD::f32x8, test_noise_type_flag, fast_test_noise_processor>
-			(
-				decltype(fast_noise_256)::value_type::make_options
+			for (std::size_t i = 0; i < num_iterations; ++i)
+			{
+				fast_noise_256[i].GenerateNoise<EmuSIMD::f32x8, test_noise_type_flag, fast_test_noise_processor>
 				(
-					sample_count,
-					EmuMath::Vector<test_noise_dimensions, float>(0.0f),
-					custom_step,
-					used_freq,
-					true,
-					use_fractal,
-					EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
-					EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
-				)
-			);
+					decltype(fast_noise_256)::value_type::make_options
+					(
+						sample_count,
+						EmuMath::Vector<test_noise_dimensions, float>(0.0f),
+						custom_step,
+						used_freq,
+						true,
+						use_fractal,
+						EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
+						EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+					)
+				);
+			}
 			timer_.Pause();
 			std::cout << "FINISHED FAST NOISE (256) IN: " << timer_.GetMilli() << "ms\n";
-
-			//timer_.Restart();
-			//fast_noise_256[i].GenerateNoise<EmuSIMD::f32x16, test_noise_type_flag, fast_test_noise_processor>
-			//(
-			//	decltype(fast_noise_256)::value_type::make_options
-			//	(
-			//		sample_count,
-			//		EmuMath::Vector<test_noise_dimensions, float>(0.0f),
-			//		custom_step,
-			//		used_freq,
-			//		true,
-			//		use_fractal,
-			//		EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
-			//		EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
-			//	)
-			//);
-			//timer_.Pause();
-			//std::cout << "FINISHED FAST NOISE (512) IN: " << timer_.GetMilli() << "ms\n";
 		}
 	
 		EmuMath::Gradient<float> gradient_colours_;
@@ -1620,7 +1611,6 @@ int main(int argc, char** argv)
 		WriteNoiseTableToPPM(noise_, noise_gradient_, "test_noise_scalar");
 		WriteNoiseTableToPPM(fast_noise_128, noise_gradient_, "test_noise_simd_128");
 		WriteNoiseTableToPPM(fast_noise_256, noise_gradient_, "test_noise_simd_256");
-		WriteNoiseTableToPPM(fast_noise_256, noise_gradient_, "test_noise_simd_512");
 	}
 #pragma endregion
 	//*/

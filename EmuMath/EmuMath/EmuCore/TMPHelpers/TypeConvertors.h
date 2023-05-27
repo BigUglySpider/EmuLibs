@@ -549,6 +549,25 @@ namespace EmuCore::TMP
 	{
 		using type = T_;
 	};
+
+	/// <summary>
+	/// <para> Dereferences the input value if it is a pointer, or simply forwards it back if it is not. </para>
+	/// <para> Intended for cases where a value can be either a pointer or a reference. </para>
+	/// </summary>
+	/// <param name="value_">Pointer to dereference or reference to forward back.</param>
+	/// <returns>`value_` dereferenced if it is a pointer, or `value_` forwarded otherwise.</returns>
+	template<class T_>
+	[[nodiscard]] constexpr inline decltype(auto) do_dereference(T_&& value_) noexcept(!std::is_pointer_v<typename std::remove_cvref<T_>::type>)
+	{
+		if constexpr (std::is_pointer_v<typename std::remove_cvref<T_>::type>)
+		{
+			return *value_;
+		}
+		else
+		{
+			return std::forward<T_>(value_);
+		}
+	}
 }
 
 #endif
