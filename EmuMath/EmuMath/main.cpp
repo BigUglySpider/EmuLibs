@@ -1524,8 +1524,10 @@ int main(int argc, char** argv)
 		constexpr EmuMath::Info::NoisePermutationInfo::seed_32_type noise_perm_seed_32 = 1337;
 		constexpr EmuMath::Info::NoisePermutationInfo::seed_64_type noise_perm_seed_64 = 1337;
 	
+		const std::size_t speed_test_count = basic_arg_parser.ToInt<std::size_t>('c');
+		std::cout << "Noise Size: " << sample_count << '\n';
+		std::cout << "Iterations to perform: " << speed_test_count << '\n';
 		universal_pause("Press enter to start noise speed tests...");
-		std::size_t speed_test_count = basic_arg_parser.ToInt<std::size_t>('c');
 		timer_.Restart();
 		for(std::size_t test_iteration = 0; test_iteration < speed_test_count; ++test_iteration)
 		{
