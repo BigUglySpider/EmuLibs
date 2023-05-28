@@ -42,7 +42,7 @@ namespace EmuCore
 			else
 			{
 				using _string_uq = typename std::remove_cvref<StringOrChar_>::type;
-				std::transform(string_or_char_.begin(), string_or_char_.end(), out_string_or_char_.begin(), to_lower<_string_uq::value_type>());
+				std::transform(string_or_char_.begin(), string_or_char_.end(), out_string_or_char_.begin(), to_lower<typename _string_uq::value_type>());
 			}
 			return out_string_or_char_;
 		}
