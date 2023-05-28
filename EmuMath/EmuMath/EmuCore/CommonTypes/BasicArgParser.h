@@ -3,6 +3,7 @@
 
 #include "../CommonConcepts/Arithmetic.h"
 #include "../CommonConcepts/CommonRequirements.h"
+#include "../Functors/Convertors.h"
 #include "../TMPHelpers/OperatorChecks.h"
 #include "../TMPHelpers/TypeComparators.h"
 #include "../TMPHelpers/TypeConvertors.h"
@@ -968,6 +969,90 @@ namespace EmuCore
 			-> typename std::remove_cvref<OutFP_>::type
 		{
 			return TryToFloatingPoint<OutFP_>(this->TranslateSwitch(config_switch_char_), std::forward<OutIfNotFound_>(out_if_not_found_));
+		}
+
+		/// <summary>
+		/// <para> Converts the specified config switch to a boolean. </para>
+		/// <para> If `GetConfigArg` is an unsuccessful operation, this will throw an exception. </para>
+		/// </summary>
+		/// <param name="config_switch_char_">Switch for the config argument to parse into a boolean.</param>
+		/// <returns>Specified config argument parsed into a boolean.</returns>
+		[[nodiscard]] inline bool ToBool(const string_type& config_name_) const
+		{
+			const string_type& config_string = this->GetConfigArg(config_name_);
+			return EmuCore::string_to_bool<string_type>()(config_string);
+		}
+
+		/// <summary>
+		/// <para> Converts the specified config switch to a boolean. </para>
+		/// <para> The passed switch will be automatically translated to its full name. </para>
+		/// <para> If `GetConfigArg` is an unsuccessful operation, this will throw an exception. </para>
+		/// </summary>
+		/// <param name="config_switch_char_">Switch for the config argument to parse into a boolean.</param>
+		/// <returns>Specified config argument parsed into a boolean.</returns>
+		[[nodiscard]] inline bool ToBool(const char_type& config_switch_char_) const
+		{
+			return ToBool(this->TranslateSwitch(config_switch_char_));
+		}
+
+		/// <summary>
+		/// <para> Converts the specified config arg to a boolean, if it can be found. </para>
+		/// </summary>
+		/// <param name="config_name_">Name of the config argument to parse into a boolean.</param>
+		/// <param name="out_if_not_found_">Default output value if the specified config arg cannot be found.</param>
+		/// <returns>Specified config argument parsed into a boolean if the specified config arg can be found; otherwise `false`.</returns>
+		[[nodiscard]] inline bool TryToBool(const string_type& config_name_) const
+		{
+			const string_type* p_arg_value;
+			if (this->TryGetConfigArg(config_name_, &p_arg_value))
+			{
+				return EmuCore::string_to_bool<string_type>()(*p_arg_value);
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// <para> Converts the specified config switch to a boolean, if it can be found. </para>
+		/// </summary>
+		/// <param name="config_switch_char_">Switch for the config argument to parse into a boolean.</param>
+		/// <param name="out_if_not_found_">Default output value if the specified config arg cannot be found.</param>
+		/// <returns>Specified config argument parsed into a boolean if the specified config arg can be found; otherwise `false`.</returns>
+		[[nodiscard]] inline bool TryToBool(const char_type& config_switch_char_) const
+		{
+			return TryToBool(this->TranslateSwitch(config_switch_char_));
+		}
+
+		/// <summary>
+		/// <para> Converts the specified config arg to a boolean, if it can be found. </para>
+		/// </summary>
+		/// <param name="config_name_">Name of the config argument to parse into a boolean.</param>
+		/// <param name="out_if_not_found_">Default output value if the specified config arg cannot be found.</param>
+		/// <returns>Specified config argument parsed into a boolean if the specified config arg can be found; otherwise the passed `out_if_not_found_`.</returns>
+		[[nodiscard]] inline bool TryToBool(const string_type& config_name_, bool out_if_not_found_) const
+		{
+			const string_type* p_arg_value;
+			if (this->TryGetConfigArg(config_name_, &p_arg_value))
+			{
+				return EmuCore::string_to_bool<string_type>()(*p_arg_value);
+			}
+			else
+			{
+				return out_if_not_found_;
+			}
+		}
+
+		/// <summary>
+		/// <para> Converts the specified config switch to a boolean, if it can be found. </para>
+		/// </summary>
+		/// <param name="config_switch_char_">Switch for the config argument to parse into a boolean.</param>
+		/// <param name="out_if_not_found_">Default output value if the specified config arg cannot be found.</param>
+		/// <returns>Specified config argument parsed into a boolean if the specified config arg can be found; otherwise the passed `out_if_not_found_`.</returns>
+		[[nodiscard]] inline bool TryToBool(const char_type& config_switch_char_, bool out_if_not_found_) const
+		{
+			return TryToBool(this->TranslateSwitch(config_switch_char_), out_if_not_found_);
 		}
 #pragma endregion
 

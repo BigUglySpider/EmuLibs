@@ -72,6 +72,8 @@ namespace EmuMath::Helpers
 	template<typename OutT_, EmuConcepts::EmuFastQuaternion FastQuaternion_>
 	constexpr inline void fast_quaternion_store(FastQuaternion_&& fast_quaternion_, EmuMath::Quaternion<OutT_>& out_quaternion_)
 	{
+		// TODO: FIX, ALLOWS BAD STORES TO OCCUR
+		// --- E.g. storing 256-bit input straight into 128-bit
 		using _in_fast_quat_uq = typename EmuCore::TMP::remove_ref_cv<FastQuaternion_>::type;
 		if constexpr (_in_fast_quat_uq::num_registers > 1)
 		{
