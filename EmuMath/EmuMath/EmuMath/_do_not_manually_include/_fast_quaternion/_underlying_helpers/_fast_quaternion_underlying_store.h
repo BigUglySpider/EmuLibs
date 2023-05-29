@@ -15,15 +15,17 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 		);
 	}
 
-	template<std::size_t RegisterIndex_, typename Out_, EmuConcepts::EmuFastQuaternion FastQuaternion_>
+	template<std::size_t OutputTotalWidth_, std::size_t RegisterIndex_, typename Out_, EmuConcepts::EmuFastQuaternion FastQuaternion_>
 	constexpr inline void _store_quaternion_register_to_pointer(Out_* p_out_, FastQuaternion_&& fast_quaternion_) noexcept
 	{
 		if constexpr (!std::is_const_v<Out_>)
 		{
 			using _in_fast_quat_uq = typename EmuCore::TMP::remove_ref_cv<FastQuaternion_>::type;
+			constexpr std::size_t required_width_for_full_store_this_index = (RegisterIndex_ * _in_fast_quat_uq::register_width);
+			constexpr bool out_has_space_for_direct_store = OutputTotalWidth_ >= required_width_for_full_store_this_index;
 			constexpr std::size_t elements_per_register = _in_fast_quat_uq::elements_per_register;
 			constexpr std::size_t offset = RegisterIndex_ * elements_per_register;
-			if constexpr (std::is_same_v<typename std::remove_cv<Out_>::type, typename _in_fast_quat_uq::value_type>)
+			if constexpr (std::is_same_v<typename std::remove_cv<Out_>::type, typename _in_fast_quat_uq::value_type> && out_has_space_for_direct_store)
 			{
 				EmuSIMD::store
 				(
@@ -52,7 +54,7 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 		}
 	}
 
-	template<typename Out_, EmuConcepts::EmuFastQuaternion FastQuaternion_, std::size_t...RegisterIndices_>
+	template<std::size_t OutputTotalWidth_, typename Out_, EmuConcepts::EmuFastQuaternion FastQuaternion_, std::size_t...RegisterIndices_>
 	constexpr inline void _store_quaternion_registers_to_pointer
 	(
 		Out_* p_out_,
@@ -63,7 +65,7 @@ namespace EmuMath::Helpers::_fast_quaternion_underlying
 EMU_CORE_MSVC_PUSH_WARNING_STACK
 EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		(
-			_store_quaternion_register_to_pointer<RegisterIndices_>
+			_store_quaternion_register_to_pointer<OutputTotalWidth_, RegisterIndices_>
 			(
 				p_out_,
 				std::forward<FastQuaternion_>(fast_quaternion_)

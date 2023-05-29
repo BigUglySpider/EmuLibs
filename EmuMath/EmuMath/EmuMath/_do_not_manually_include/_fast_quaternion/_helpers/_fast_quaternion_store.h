@@ -21,10 +21,12 @@ namespace EmuMath::Helpers
 		>
 	{
 		using _in_fast_quat_uq = typename EmuCore::TMP::remove_ref_cv<FastQuaternion_>::type;
-		typename _in_fast_quat_uq::value_type data_dump[_in_fast_quat_uq::full_width_size];
+		constexpr std::size_t full_width_size = _in_fast_quat_uq::full_width_size;
+		typename _in_fast_quat_uq::value_type data_dump[full_width_size];
 		if constexpr (_in_fast_quat_uq::num_registers > 1)
 		{
-			_fast_quaternion_underlying::_store_quaternion_registers_to_pointer
+			constexpr std::size_t full_width_to_store = _in_fast_quat_uq::register_width * _in_fast_quat_uq::num_registers;
+			_fast_quaternion_underlying::_store_quaternion_registers_to_pointer<full_width_to_store>
 			(
 				data_dump,
 				std::forward<FastQuaternion_>(fast_quaternion_),
@@ -45,14 +47,17 @@ namespace EmuMath::Helpers
 		);
 	}
 
-	template<typename Out_, EmuConcepts::EmuFastQuaternion FastQuaternion_>
+	template<typename Out_, std::size_t OutDataElementCount_ = (std::numeric_limits<std::size_t>::max()), EmuConcepts::EmuFastQuaternion FastQuaternion_>
 	requires (!std::is_const_v<Out_>)
 	constexpr inline void fast_quaternion_store(FastQuaternion_&& fast_quaternion_, Out_* p_out_)
 	{
 		using _in_fast_quat_uq = typename EmuCore::TMP::remove_ref_cv<FastQuaternion_>::type;
+		constexpr std::size_t full_width_size = _in_fast_quat_uq::full_width_size;
+		constexpr std::size_t output_size = OutDataElementCount_ >= full_width_size ? full_width_size : OutDataElementCount_;
+		constexpr std::size_t output_total_width = sizeof(Out_) * output_size * 8;
 		if constexpr (_in_fast_quat_uq::num_registers > 1)
 		{
-			_fast_quaternion_underlying::_store_quaternion_registers_to_pointer
+			_fast_quaternion_underlying::_store_quaternion_registers_to_pointer<output_total_width>
 			(
 				p_out_,
 				std::forward<FastQuaternion_>(fast_quaternion_),
@@ -61,7 +66,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			_fast_quaternion_underlying::_store_quaternion_register_to_pointer<0>
+			_fast_quaternion_underlying::_store_quaternion_register_to_pointer<output_total_width, 0>
 			(
 				p_out_,
 				std::forward<FastQuaternion_>(fast_quaternion_)
@@ -75,9 +80,11 @@ namespace EmuMath::Helpers
 		// TODO: FIX, ALLOWS BAD STORES TO OCCUR
 		// --- E.g. storing 256-bit input straight into 128-bit
 		using _in_fast_quat_uq = typename EmuCore::TMP::remove_ref_cv<FastQuaternion_>::type;
+		constexpr std::size_t out_num_elements = 4;
+		constexpr std::size_t output_total_width = sizeof(OutT_) * out_num_elements * 8;
 		if constexpr (_in_fast_quat_uq::num_registers > 1)
 		{
-			_fast_quaternion_underlying::_store_quaternion_registers_to_pointer
+			_fast_quaternion_underlying::_store_quaternion_registers_to_pointer<output_total_width>
 			(
 				out_quaternion_.DataPointer(),
 				std::forward<FastQuaternion_>(fast_quaternion_),
@@ -86,7 +93,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			_fast_quaternion_underlying::_store_quaternion_register_to_pointer<0>
+			_fast_quaternion_underlying::_store_quaternion_register_to_pointer<output_total_width, 0>
 			(
 				out_quaternion_.DataPointer(),
 				std::forward<FastQuaternion_>(fast_quaternion_)
