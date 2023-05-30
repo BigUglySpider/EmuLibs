@@ -999,7 +999,6 @@ namespace EmuCore
 		/// <para> Converts the specified config arg to a boolean, if it can be found. </para>
 		/// </summary>
 		/// <param name="config_name_">Name of the config argument to parse into a boolean.</param>
-		/// <param name="out_if_not_found_">Default output value if the specified config arg cannot be found.</param>
 		/// <returns>Specified config argument parsed into a boolean if the specified config arg can be found; otherwise `false`.</returns>
 		[[nodiscard]] inline bool TryToBool(const string_type& config_name_) const
 		{

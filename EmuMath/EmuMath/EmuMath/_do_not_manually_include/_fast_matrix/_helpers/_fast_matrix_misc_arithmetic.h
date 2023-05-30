@@ -12,6 +12,20 @@ namespace EmuMath::Helpers
 	{
 		return _fast_matrix_underlying::_fast_matrix_abs<false>(std::forward<FastMatrix_>(fast_matrix_));
 	}
+
+	template<EmuConcepts::EmuFastMatrix FastMatrix_>
+	[[nodiscard]] constexpr inline auto fast_matrix_min(FastMatrix_&& fast_matrix_)
+		-> typename std::remove_cvref<FastMatrix_>::type
+	{
+		return _fast_matrix_underlying::_fast_matrix_min_or_max<false, false>(std::forward<FastMatrix_>(fast_matrix_));
+	}
+
+	template<EmuConcepts::EmuFastMatrix FastMatrix_>
+	[[nodiscard]] constexpr inline auto fast_matrix_max(FastMatrix_&& fast_matrix_)
+		-> typename std::remove_cvref<FastMatrix_>::type
+	{
+		return _fast_matrix_underlying::_fast_matrix_min_or_max<true, false>(std::forward<FastMatrix_>(fast_matrix_));
+	}
 #pragma endregion
 }
 

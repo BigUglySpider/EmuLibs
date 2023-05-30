@@ -398,9 +398,21 @@ int main(int argc, char** argv)
 			{ 'z', "noise-z" }
 		}
 	);
-	basic_arg_parser.AppendToStream(std::cout) << '\n';
-	std::cout << "Retrieved noise-x: " << basic_arg_parser["noise-x"] << " | Retrieved x: " << basic_arg_parser['x'] << std::endl;
-	universal_pause();
+
+	{
+		std::ostringstream parser_str;
+		basic_arg_parser.AppendToStream(parser_str) << "\nPress enter to continue with this config...";
+		universal_pause(parser_str.str());
+	}
+
+	{
+		auto rng = EmuMath::RngWrapper<false>(-2500.0, 2500.0);
+		auto a = EmuMath::FastMatrix<4, 4, float, true, 128>(rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal());
+		auto b = EmuMath::FastMatrix<4, 4, float, true, 128>(rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal());
+		std::cout << "\n---A:\n" << a << "\nMIN A:\n" << EmuMath::Helpers::fast_matrix_min(a) << "\nMAX A:\n" << EmuMath::Helpers::fast_matrix_max(a) << "\n";
+		std::cout << "\n---B:\n" << b << "\nMIN B:\n" << EmuMath::Helpers::fast_matrix_min(b) << "\nMAX B:\n" << EmuMath::Helpers::fast_matrix_max(b) << "\n";
+		universal_pause();
+	}
 
 	{
 		constexpr auto elems_u32 = std::array<std::uint32_t, 16>({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 });
