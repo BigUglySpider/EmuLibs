@@ -651,7 +651,7 @@ namespace EmuSIMD::Funcs
 		return cvt_u32x4_u16x8(last_4_result);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 horizontal_min_full_u16x8(EmuSIMD::u16x8_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 horizontal_min_fill_u16x8(EmuSIMD::u16x8_arg a_)
 	{
 		constexpr auto all_el0_mask = make_shuffle_mask_16<0, 0, 0, 0, 0, 0, 0, 0>();
 		return permute_u16x8<all_el0_mask>(horizontal_min_u16x8(a_));
@@ -678,7 +678,7 @@ namespace EmuSIMD::Funcs
 		return cvt_u32x4_u16x8(last_4_result);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 horizontal_min_fill_u16x8(EmuSIMD::u16x8_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 horizontal_man_fill_u16x8(EmuSIMD::u16x8_arg a_)
 	{
 		constexpr auto all_el0_mask = make_shuffle_mask_16<0, 0, 0, 0, 0, 0, 0, 0>();
 		return permute_u16x8<all_el0_mask>(horizontal_max_u16x8(a_));

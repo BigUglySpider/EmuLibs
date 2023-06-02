@@ -49,11 +49,11 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 			_register_type ignored_values_register;
 			if constexpr (IsMax_)
 			{
-				ignored_values_register = EmuSIMD::set1<_register_type, per_element_width>(std::numeric_limits<_fast_mat_uq::value_type>::lowest());
+				ignored_values_register = EmuSIMD::set1<_register_type, per_element_width>(std::numeric_limits<typename _fast_mat_uq::value_type>::lowest());
 			}
 			else
 			{
-				ignored_values_register = EmuSIMD::set1<_register_type, per_element_width>(std::numeric_limits<_fast_mat_uq::value_type>::max());
+				ignored_values_register = EmuSIMD::set1<_register_type, per_element_width>(std::numeric_limits<typename _fast_mat_uq::value_type>::max());
 			}
 			ignored_values_register = EmuSIMD::bitwise_andnot(used_mask, ignored_values_register);
 			_fast_matrix_mutate_mask_major_ends<false, false, true>
