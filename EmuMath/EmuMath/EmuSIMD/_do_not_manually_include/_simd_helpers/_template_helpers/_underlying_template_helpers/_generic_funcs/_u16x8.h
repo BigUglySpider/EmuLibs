@@ -644,12 +644,24 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 horizontal_min_u16x8(EmuSIMD::u16x8_arg a_)
 	{
-		EmuSIMD::u16x8 min = movelh_u16x8(a_, a_);
-		min = min_u16x8(min, a_);
-		EmuSIMD::i32x4 last_4_min = cvt_u16x8_u32x4(min);
-		last_4_min = horizontal_min_u32x4(last_4_min);
-		min = cvt_u32x4_u16x8(last_4_min);
-		return permute_u16x8<make_shuffle_mask_16<0, 0, 0, 0, 0, 0, 0, 0>()>(min);
+		EmuSIMD::u16x8 result = movelh_u16x8(a_, a_);
+		result = min_u16x8(result, a_);
+		EmuSIMD::u32x4 last_4_result = cvt_u16x8_u32x4(result);
+		last_4_result = horizontal_min_u32x4(last_4_result);
+		return cvt_u32x4_u16x8(last_4_result);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 horizontal_min_full_u16x8(EmuSIMD::u16x8_arg a_)
+	{
+		constexpr auto all_el0_mask = make_shuffle_mask_16<0, 0, 0, 0, 0, 0, 0, 0>();
+		return permute_u16x8<all_el0_mask>(horizontal_min_u16x8(a_));
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_min_scalar_u16x8(EmuSIMD::u16x8_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		return static_cast<typename std::remove_cvref<Out_>::type>(get_first_u16x8(horizontal_min_u16x8(a_)));
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 max_u16x8(EmuSIMD::u16x8_arg a_, EmuSIMD::u16x8_arg b_)
@@ -659,12 +671,24 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 horizontal_max_u16x8(EmuSIMD::u16x8_arg a_)
 	{
-		EmuSIMD::u16x8 max = movelh_u16x8(a_, a_);
-		max = max_u16x8(max, a_);
-		EmuSIMD::u32x4 last_4_max = cvt_u16x8_u32x4(max);
-		last_4_max = horizontal_max_u32x4(last_4_max);
-		max = cvt_u32x4_u16x8(last_4_max);
-		return permute_u16x8<make_shuffle_mask_16<0, 0, 0, 0, 0, 0, 0, 0>()>(max);
+		EmuSIMD::u16x8 result = movelh_u16x8(a_, a_);
+		result = max_u16x8(result, a_);
+		EmuSIMD::u32x4 last_4_result = cvt_u16x8_u32x4(result);
+		last_4_result = horizontal_max_u32x4(last_4_result);
+		return cvt_u32x4_u16x8(last_4_result);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 horizontal_min_fill_u16x8(EmuSIMD::u16x8_arg a_)
+	{
+		constexpr auto all_el0_mask = make_shuffle_mask_16<0, 0, 0, 0, 0, 0, 0, 0>();
+		return permute_u16x8<all_el0_mask>(horizontal_max_u16x8(a_));
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_max_scalar_u16x8(EmuSIMD::u16x8_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		return static_cast<typename std::remove_cvref<Out_>::type>(get_first_u16x8(horizontal_max_u16x8(a_)));
 	}
 #pragma endregion
 

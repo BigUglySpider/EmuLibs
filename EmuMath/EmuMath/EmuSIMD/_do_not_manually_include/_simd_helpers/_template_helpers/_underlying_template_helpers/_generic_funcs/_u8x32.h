@@ -729,8 +729,21 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 horizontal_min_u8x32(EmuSIMD::u8x32_arg a_)
 	{
 		u8x16 lane = min_u8x16(cast_u8x32_u8x16(a_), extract_u8x32_lane_u8x16<1>(a_));
-		lane = horizontal_min_u8x16(lane);
+		return cast_u8x16_u8x32(horizontal_min_u8x16(lane));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 horizontal_min_fill_u8x32(EmuSIMD::u8x32_arg a_)
+	{
+		u8x16 lane = min_u8x16(cast_u8x32_u8x16(a_), extract_u8x32_lane_u8x16<1>(a_));
+		lane = horizontal_min_fill_u8x16(lane);
 		return _mm256_inserti128_si256(cast_u8x16_u8x32(lane), lane, 1);
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 horizontal_min_scalar_u8x32(EmuSIMD::u8x32_arg a_)
+	{
+		u8x16 lane = min_u8x16(cast_u8x32_u8x16(a_), extract_u8x32_lane_u8x16<1>(a_));
+		return horizontal_min_scalar_u8x16<Out_>(lane);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 max_u8x32(EmuSIMD::u8x32_arg a_, EmuSIMD::u8x32_arg b_)
@@ -741,8 +754,21 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 horizontal_max_u8x32(EmuSIMD::u8x32_arg a_)
 	{
 		u8x16 lane = max_u8x16(cast_u8x32_u8x16(a_), extract_u8x32_lane_u8x16<1>(a_));
-		lane = horizontal_max_u8x16(lane);
+		return cast_u8x16_u8x32(horizontal_max_u8x16(lane));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 horizontal_max_fill_u8x32(EmuSIMD::u8x32_arg a_)
+	{
+		u8x16 lane = max_u8x16(cast_u8x32_u8x16(a_), extract_u8x32_lane_u8x16<1>(a_));
+		lane = horizontal_max_fill_u8x16(lane);
 		return _mm256_inserti128_si256(cast_u8x16_u8x32(lane), lane, 1);
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x32 horizontal_max_scalar_u8x32(EmuSIMD::u8x32_arg a_)
+	{
+		u8x16 lane = max_u8x16(cast_u8x32_u8x16(a_), extract_u8x32_lane_u8x16<1>(a_));
+		return horizontal_max_scalar_u8x16<Out_>(lane);
 	}
 #pragma endregion
 

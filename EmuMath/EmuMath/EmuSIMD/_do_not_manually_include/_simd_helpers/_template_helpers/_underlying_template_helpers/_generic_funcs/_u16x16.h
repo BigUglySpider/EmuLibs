@@ -671,8 +671,22 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 horizontal_min_u16x16(EmuSIMD::u16x16_arg a_)
 	{
 		u16x8 lane = min_u16x8(cast_u16x16_u16x8(a_), extract_u16x16_lane_u16x8<1>(a_));
-		lane = horizontal_min_u16x8(lane);
+		return cast_u16x8_u16x16(horizontal_min_u16x8(lane));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 horizontal_min_fill_u16x16(EmuSIMD::u16x16_arg a_)
+	{
+		u16x8 lane = min_u16x8(cast_u16x16_u16x8(a_), extract_u16x16_lane_u16x8<1>(a_));
+		lane = horizontal_min_fill_u16x8(lane);
 		return _mm256_inserti128_si256(cast_u16x8_u16x16(lane), lane, 1);
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_min_scalar_u16x16(EmuSIMD::u16x16_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		u16x8 lane = min_u16x8(cast_u16x16_u16x8(a_), extract_u16x16_lane_u16x8<1>(a_));
+		return horizontal_min_scalar_u16x8<Out_>(lane);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 max_u16x16(EmuSIMD::u16x16_arg a_, EmuSIMD::u16x16_arg b_)
@@ -683,8 +697,22 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 horizontal_max_u16x16(EmuSIMD::u16x16_arg a_)
 	{
 		u16x8 lane = max_u16x8(cast_u16x16_u16x8(a_), extract_u16x16_lane_u16x8<1>(a_));
-		lane = horizontal_max_u16x8(lane);
+		return cast_u16x8_u16x16(horizontal_max_u16x8(lane));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 horizontal_max_fill_u16x16(EmuSIMD::u16x16_arg a_)
+	{
+		u16x8 lane = max_u16x8(cast_u16x16_u16x8(a_), extract_u16x16_lane_u16x8<1>(a_));
+		lane = horizontal_max_fill_u16x8(lane);
 		return _mm256_inserti128_si256(cast_u16x8_u16x16(lane), lane, 1);
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_max_scalar_u16x16(EmuSIMD::u16x16_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		u16x8 lane = max_u16x8(cast_u16x16_u16x8(a_), extract_u16x16_lane_u16x8<1>(a_));
+		return horizontal_max_scalar_u16x8<Out_>(lane);
 	}
 #pragma endregion
 

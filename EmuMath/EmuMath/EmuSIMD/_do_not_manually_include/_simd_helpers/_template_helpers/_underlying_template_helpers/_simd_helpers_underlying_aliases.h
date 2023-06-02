@@ -2923,7 +2923,7 @@ namespace EmuSIMD::_underlying_impl
 		
 		template<typename Out_, bool IsMax_, std::size_t NumElements_, typename T_, std::size_t...IndicesExcept0_>
 		[[nodiscard]] constexpr inline auto emulate_horizontal_min_or_max_scalar(const single_lane_simd_emulator<NumElements_, T_>& a_, std::index_sequence<IndicesExcept0_...> indices_except_0_)
-			-> single_lane_simd_emulator<NumElements_, T_>
+			-> typename std::remove_cvref<Out_>::type
 		{
 			T_ result = retrieve_emulated_single_lane_simd_element<T_, 0, false>(a_);
 			auto update_result = [&result](const T_& val_)
@@ -2953,6 +2953,22 @@ namespace EmuSIMD::_underlying_impl
 				auto lane = EmuSIMD::min<PerElementWidth_, IsSigned_>(a_._lane_0, a_._lane_1);
 				lane = EmuSIMD::horizontal_min<PerElementWidth_, IsSigned_>(lane);
 				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>(lane, lane);
+			}
+		}
+
+		template<typename Out_, bool IsMax_, std::size_t PerElementWidth_, bool IsSigned_, std::size_t EmulatedWidth_, class LaneT_>
+		[[nodiscard]] constexpr inline auto emulate_horizontal_min_or_max_scalar(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& a_)
+			-> typename std::remove_cvref<Out_>::type
+		{
+			if constexpr (IsMax_)
+			{
+				auto lane = EmuSIMD::max<PerElementWidth_, IsSigned_>(a_._lane_0, a_._lane_1);
+				return EmuSIMD::horizontal_max_scalar<Out_, PerElementWidth_, IsSigned_>(lane);
+			}
+			else
+			{
+				auto lane = EmuSIMD::min<PerElementWidth_, IsSigned_>(a_._lane_0, a_._lane_1);
+				return EmuSIMD::horizontal_min_scalar<Out_, PerElementWidth_, IsSigned_>(lane);
 			}
 		}
 #pragma endregion

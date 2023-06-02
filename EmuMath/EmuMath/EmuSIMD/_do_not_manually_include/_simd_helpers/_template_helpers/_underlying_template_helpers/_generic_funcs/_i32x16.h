@@ -945,10 +945,32 @@ namespace EmuSIMD::Funcs
 	{
 #if EMU_SIMD_USE_512_REGISTERS
 		i32x8 lane = min_i32x8(cast_i32x16_i32x8(a_), extract_i32x16_lane_i32x8<1>(a_));
+		return cast_i32x8_i32x16(horizontal_min_i32x8(lane));
+#else
+		return EmuSIMD::_underlying_impl::emulate_horizontal_min_or_max<false, 32, true>(a_);
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x16 horizontal_min_fill_i32x16(EmuSIMD::i32x16_arg a_)
+	{
+#if EMU_SIMD_USE_512_REGISTERS
+		i32x8 lane = min_i32x8(cast_i32x16_i32x8(a_), extract_i32x16_lane_i32x8<1>(a_));
 		lane = horizontal_min_i32x8(lane);
 		return _mm512_inserti32x8(cast_i32x8_i32x16(lane), lane, 1);
 #else
 		return EmuSIMD::_underlying_impl::emulate_horizontal_min_or_max<false, 32, true>(a_);
+#endif
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_min_scalar_i32x16(EmuSIMD::i32x16_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+#if EMU_SIMD_USE_512_REGISTERS
+		i32x8 lane = min_i32x8(cast_i32x16_i32x8(a_), extract_i32x16_lane_i32x8<1>(a_));
+		return horizontal_min_scalar_i32x8<Out_>(lane);
+#else
+		return EmuSIMD::_underlying_impl::emulate_horizontal_min_or_max_scalar<Out_, false, 32, true>(a_);
 #endif
 	}
 
@@ -965,10 +987,32 @@ namespace EmuSIMD::Funcs
 	{
 #if EMU_SIMD_USE_512_REGISTERS
 		i32x8 lane = max_i32x8(cast_i32x16_i32x8(a_), extract_i32x16_lane_i32x8<1>(a_));
+		return cast_i32x8_i32x16(horizontal_max_i32x8(lane));
+#else
+		return EmuSIMD::_underlying_impl::emulate_horizontal_min_or_max<true, 32, true>(a_);
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x16 horizontal_max_fill_i32x16(EmuSIMD::i32x16_arg a_)
+	{
+#if EMU_SIMD_USE_512_REGISTERS
+		i32x8 lane = max_i32x8(cast_i32x16_i32x8(a_), extract_i32x16_lane_i32x8<1>(a_));
 		lane = horizontal_max_i32x8(lane);
 		return _mm512_inserti32x8(cast_i32x8_i32x16(lane), lane, 1);
 #else
 		return EmuSIMD::_underlying_impl::emulate_horizontal_min_or_max<true, 32, true>(a_);
+#endif
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_max_scalar_i32x16(EmuSIMD::i32x16_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+#if EMU_SIMD_USE_512_REGISTERS
+		i32x8 lane = max_i32x8(cast_i32x16_i32x8(a_), extract_i32x16_lane_i32x8<1>(a_));
+		return horizontal_max_scalar_i32x8<Out_>(lane);
+#else
+		return EmuSIMD::_underlying_impl::emulate_horizontal_min_or_max_scalar<Out_, true, 32, true>(a_);
 #endif
 	}
 #pragma endregion

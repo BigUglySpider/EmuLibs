@@ -646,14 +646,26 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 horizontal_min_i32x4(EmuSIMD::i32x4_arg a_)
 	{
-		EmuSIMD::i32x4 min = movehl_i32x4(a_, a_);
-		min = min_i32x4(min, a_);
-		min = min_i32x4
+		EmuSIMD::i32x4 result = movehl_i32x4(a_, a_);
+		result = min_i32x4(result, a_);
+		return min_i32x4
 		(
-			permute_i32x4<make_shuffle_mask_32<0, 1, 0, 1>()>(min),
-			min
+			permute_i32x4<make_shuffle_mask_32<0, 1, 0, 1>()>(result),
+			result
 		);
-		return permute_i32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(min);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 horizontal_min_fill_i32x4(EmuSIMD::i32x4_arg a_)
+	{
+		constexpr auto all_el0_mask = make_shuffle_mask_32<0, 0, 0, 0>();
+		return permute_i32x4<all_el0_mask>(horizontal_min_i32x4(a_));
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_min_scalar_i32x4(EmuSIMD::i32x4_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		return static_cast<typename std::remove_cvref<Out_>::type>(get_first_i32x4(horizontal_min_i32x4(a_)));
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 max_i32x4(EmuSIMD::i32x4_arg a_, EmuSIMD::i32x4_arg b_)
@@ -663,14 +675,26 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 horizontal_max_i32x4(EmuSIMD::i32x4_arg a_)
 	{
-		EmuSIMD::i32x4 max = movehl_i32x4(a_, a_);
-		max = max_i32x4(max, a_);
-		max = max_i32x4
+		EmuSIMD::i32x4 result = movehl_i32x4(a_, a_);
+		result = max_i32x4(result, a_);
+		return max_i32x4
 		(
-			permute_i32x4<make_shuffle_mask_32<0, 1, 0, 1>()>(max),
-			max
+			permute_i32x4<make_shuffle_mask_32<0, 1, 0, 1>()>(result),
+			result
 		);
-		return permute_i32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(max);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x4 horizontal_max_fill_i32x4(EmuSIMD::i32x4_arg a_)
+	{
+		constexpr auto all_el0_mask = make_shuffle_mask_32<0, 0, 0, 0>();
+		return permute_i32x4<all_el0_mask>(horizontal_max_i32x4(a_));
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_max_scalar_i32x4(EmuSIMD::i32x4_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		return static_cast<typename std::remove_cvref<Out_>::type>(get_first_i32x4(horizontal_max_i32x4(a_)));
 	}
 #pragma endregion
 

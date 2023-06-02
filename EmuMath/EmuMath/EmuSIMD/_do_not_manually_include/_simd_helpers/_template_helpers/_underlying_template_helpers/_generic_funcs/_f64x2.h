@@ -651,7 +651,7 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_min_scalar_f64x2(EmuSIMD::f64x2_arg a_)
 		-> typename std::remove_cvref<Out_>::type
 	{
-		return static_cast<typename std::remove_cvref<Out_>::type>(horizontal_min_f64x2(a_));
+		return static_cast<typename std::remove_cvref<Out_>::type>(get_first_f64x2(horizontal_min_f64x2(a_)));
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 max_f64x2(EmuSIMD::f64x2_arg a_, EmuSIMD::f64x2_arg b_)
@@ -673,7 +673,7 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_max_scalar_f64x2(EmuSIMD::f64x2_arg a_)
 		-> typename std::remove_cvref<Out_>::type
 	{
-		return static_cast<typename std::remove_cvref<Out_>::type>(horizontal_max_f64x2(a_));
+		return static_cast<typename std::remove_cvref<Out_>::type>(get_first_f64x2(horizontal_max_f64x2(a_)));
 	}
 #pragma endregion
 

@@ -643,6 +643,18 @@ namespace EmuSIMD::Funcs
 		return min_i64x2(a_, permute_i64x2<make_shuffle_mask_64x2<0, 1>()>(a_));
 	}
 
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 horizontal_min_fill_i64x2(EmuSIMD::i64x2_arg a_)
+	{
+		return horizontal_min_i64x2(a_);
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_min_fill_i64x2(EmuSIMD::i64x2_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		return static_cast<typename std::remove_cvref<Out_>::type>(get_first_i64x2(horizontal_min_i64x2(a_)));
+	}
+
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 max_i64x2(EmuSIMD::i64x2_arg a_, EmuSIMD::i64x2_arg b_)
 	{
 		return _mm_max_epi64(a_, b_);
@@ -651,6 +663,18 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 horizontal_max_i64x2(EmuSIMD::i64x2_arg a_)
 	{
 		return max_i64x2(a_, permute_i64x2<make_shuffle_mask_64x2<0, 1>()>(a_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x2 horizontal_max_fill_i64x2(EmuSIMD::i64x2_arg a_)
+	{
+		return horizontal_max_i64x2(a_);
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_max_fill_i64x2(EmuSIMD::i64x2_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		return static_cast<typename std::remove_cvref<Out_>::type>(get_first_i64x2(horizontal_max_i64x2(a_)));
 	}
 #pragma endregion
 

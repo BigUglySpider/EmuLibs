@@ -912,7 +912,7 @@ namespace EmuSIMD::Funcs
 		-> typename std::remove_cvref<Out_>::type
 	{
 #if EMU_SIMD_USE_128_REGISTERS
-		return static_cast<typename std::remove_cvref<Out_>::type>(horizontal_min_f32x4(a_));
+		return static_cast<typename std::remove_cvref<Out_>::type>(get_first_f32x4(horizontal_min_f32x4(a_)));
 #else
 		return _underlying_impl::emulate_horizontal_min_or_max_scalar<Out_, false>(a_, EmuCore::TMP::make_index_sequence_excluding_0<4>());
 #endif
@@ -959,7 +959,7 @@ namespace EmuSIMD::Funcs
 		-> typename std::remove_cvref<Out_>::type
 	{
 #if EMU_SIMD_USE_128_REGISTERS
-		return static_cast<typename std::remove_cvref<Out_>::type>(horizontal_max_f32x4(a_));
+		return static_cast<typename std::remove_cvref<Out_>::type>(get_first_f32x4(horizontal_max_f32x4(a_)));
 #else
 		return _underlying_impl::emulate_horizontal_min_or_max_scalar<Out_, true>(a_, EmuCore::TMP::make_index_sequence_excluding_0<4>());
 #endif

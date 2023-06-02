@@ -633,8 +633,22 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 horizontal_min_i64x4(EmuSIMD::i64x4_arg a_)
 	{
 		i64x2 lane = min_i64x2(cast_i64x4_i64x2(a_), extract_i64x4_lane_i64x2<1>(a_));
-		lane = horizontal_min_i64x2(lane);
+		return cast_i64x2_i64x4(horizontal_min_i64x2(lane));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 horizontal_min_fill_i64x4(EmuSIMD::i64x4_arg a_)
+	{
+		i64x2 lane = min_i64x2(cast_i64x4_i64x2(a_), extract_i64x4_lane_i64x2<1>(a_));
+		lane = horizontal_min_fill_i64x2(lane);
 		return _mm256_inserti128_si256(cast_i64x2_i64x4(lane), lane, 1);
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_min_scalar_i64x4(EmuSIMD::i64x4_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		i64x2 lane = min_i64x2(cast_i64x4_i64x2(a_), extract_i64x4_lane_i64x2<1>(a_));
+		return horizontal_min_scalar_i64x2<Out_>(lane);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 max_i64x4(EmuSIMD::i64x4_arg a_, EmuSIMD::i64x4_arg b_)
@@ -645,8 +659,22 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 horizontal_max_i64x4(EmuSIMD::i64x4_arg a_)
 	{
 		i64x2 lane = max_i64x2(cast_i64x4_i64x2(a_), extract_i64x4_lane_i64x2<1>(a_));
-		lane = horizontal_max_i64x2(lane);
+		return cast_i64x2_i64x4(horizontal_max_i64x2(lane));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 horizontal_max_fill_i64x4(EmuSIMD::i64x4_arg a_)
+	{
+		i64x2 lane = max_i64x2(cast_i64x4_i64x2(a_), extract_i64x4_lane_i64x2<1>(a_));
+		lane = horizontal_max_fill_i64x2(lane);
 		return _mm256_inserti128_si256(cast_i64x2_i64x4(lane), lane, 1);
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_max_scalar_i64x4(EmuSIMD::i64x4_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		i64x2 lane = max_i64x2(cast_i64x4_i64x2(a_), extract_i64x4_lane_i64x2<1>(a_));
+		return horizontal_max_scalar_i64x2<Out_>(lane);
 	}
 #pragma endregion
 

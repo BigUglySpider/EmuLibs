@@ -233,9 +233,17 @@ namespace EmuSIMD
 	[[nodiscard]] inline auto horizontal_min(Register_&& a_)
 		-> typename std::remove_cvref<Register_>::type;
 
+	template<typename OutScalar_, std::size_t PerElementWidthIfGenericInt_ = 32, bool SignedIfGenericInt_ = true, EmuConcepts::KnownSIMD Register_>
+	[[nodiscard]] inline auto horizontal_min_scalar(Register_&& a_)
+		-> typename std::remove_cvref<OutScalar_>::type;
+
 	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, EmuConcepts::KnownSIMD Register_>
 	[[nodiscard]] inline auto horizontal_max(Register_&& a_)
 		-> typename std::remove_cvref<Register_>::type;
+
+	template<typename OutScalar_, std::size_t PerElementWidthIfGenericInt_ = 32, bool SignedIfGenericInt_ = true, EmuConcepts::KnownSIMD Register_>
+	[[nodiscard]] inline auto horizontal_max_scalar(Register_&& a_)
+		-> typename std::remove_cvref<OutScalar_>::type;
 
 	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
 	[[nodiscard]] inline Register_ clamp_min(Register_ register_, Register_ min_);
