@@ -887,14 +887,34 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_128_REGISTERS
 		EmuSIMD::f32x4 min = movehl_f32x4(a_, a_);
 		min = min_f32x4(min, a_);
-		min = min_f32x4
+		return min_f32x4
 		(
 			permute_f32x4<make_shuffle_mask_32<0, 1, 0, 1>()>(min),
 			min
 		);
-		return permute_f32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(min);
 #else
 		return _underlying_impl::emulate_horizontal_min_or_max<false>(a_, EmuCore::TMP::make_index_sequence_excluding_0<4>());
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 horizontal_min_fill_f32x4(EmuSIMD::f32x4_arg a_)
+	{
+#if EMU_SIMD_USE_128_REGISTERS
+		constexpr auto all_el0_mask = make_shuffle_mask_32<0, 0, 0, 0>();
+		return permute_f32x4<all_el0_mask>(horizontal_min_f32x4(a_));
+#else
+		return _underlying_impl::emulate_horizontal_min_or_max<false>(a_, EmuCore::TMP::make_index_sequence_excluding_0<4>());
+#endif
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_min_scalar_f32x4(EmuSIMD::f32x4_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+#if EMU_SIMD_USE_128_REGISTERS
+		return static_cast<typename std::remove_cvref<Out_>::type>(horizontal_min_f32x4(a_));
+#else
+		return _underlying_impl::emulate_horizontal_min_or_max_scalar<Out_, false>(a_, EmuCore::TMP::make_index_sequence_excluding_0<4>());
 #endif
 	}
 
@@ -914,14 +934,34 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_128_REGISTERS
 		EmuSIMD::f32x4 max = movehl_f32x4(a_, a_);
 		max = max_f32x4(max, a_);
-		max = max_f32x4
+		return max_f32x4
 		(
 			permute_f32x4<make_shuffle_mask_32<0, 1, 0, 1>()>(max),
 			max
 		);
-		return permute_f32x4<make_shuffle_mask_32<0, 0, 0, 0>()>(max);
 #else
 		return _underlying_impl::emulate_horizontal_min_or_max<true>(a_, EmuCore::TMP::make_index_sequence_excluding_0<4>());
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 horizontal_max_fill_f32x4(EmuSIMD::f32x4_arg a_)
+	{
+#if EMU_SIMD_USE_128_REGISTERS
+		constexpr auto all_el0_mask = make_shuffle_mask_32<0, 0, 0, 0>();
+		return permute_f32x4<all_el0_mask>(horizontal_max_f32x4(a_));
+#else
+		return _underlying_impl::emulate_horizontal_min_or_max<false>(a_, EmuCore::TMP::make_index_sequence_excluding_0<4>());
+#endif
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_max_scalar_f32x4(EmuSIMD::f32x4_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+#if EMU_SIMD_USE_128_REGISTERS
+		return static_cast<typename std::remove_cvref<Out_>::type>(horizontal_max_f32x4(a_));
+#else
+		return _underlying_impl::emulate_horizontal_min_or_max_scalar<Out_, true>(a_, EmuCore::TMP::make_index_sequence_excluding_0<4>());
 #endif
 	}
 #pragma endregion

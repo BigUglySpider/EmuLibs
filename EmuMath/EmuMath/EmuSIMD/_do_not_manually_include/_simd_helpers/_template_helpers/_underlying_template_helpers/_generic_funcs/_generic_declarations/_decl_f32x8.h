@@ -123,8 +123,16 @@ namespace EmuSIMD::Funcs
 #pragma region MINMAX_FUNCS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 min_f32x8(EmuSIMD::f32x8_arg a_, EmuSIMD::f32x8_arg b_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 horizontal_min_f32x8(EmuSIMD::f32x8_arg a_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 horizontal_min_fill_f32x8(EmuSIMD::f32x8_arg a_);
+	template<typename Out_ = float>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_min_scalar_f32x8(EmuSIMD::f32x8_arg a_)
+		-> typename std::remove_cvref<Out_>::type;
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 max_f32x8(EmuSIMD::f32x8_arg a_, EmuSIMD::f32x8_arg b_);
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 horizontal_max_f32x8(EmuSIMD::f32x8_arg a_);
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 horizontal_max_fill_f32x8(EmuSIMD::f32x8_arg a_);
+	template<typename Out_ = float>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_max_scalar_f32x8(EmuSIMD::f32x8_arg a_)
+		-> typename std::remove_cvref<Out_>::type;
 #pragma endregion
 
 #pragma region BASIC_ARITHMETIC

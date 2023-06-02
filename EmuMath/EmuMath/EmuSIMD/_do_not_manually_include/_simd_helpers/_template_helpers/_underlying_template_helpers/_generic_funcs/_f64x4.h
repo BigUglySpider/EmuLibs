@@ -649,10 +649,26 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 horizontal_min_f64x4(EmuSIMD::f64x4_arg a_)
 	{
-		EmuSIMD::f64x2 min128 = cast_f64x4_f64x2(a_);
-		min128 = min_f64x2(min128, _mm256_extractf128_pd(a_, 1));
-		min128 = horizontal_min_f64x2(min128);
-		return _mm256_insertf128_pd(cast_f64x2_f64x4(min128), min128, 1);
+		EmuSIMD::f64x2 lane = cast_f64x4_f64x2(a_);
+		lane = min_f64x2(lane, _mm256_extractf128_pd(a_, 1));
+		return cast_f64x2_f64x4(horizontal_min_f64x2(lane));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 horizontal_min_fill_f64x4(EmuSIMD::f64x4_arg a_)
+	{
+		EmuSIMD::f64x2 lane = cast_f64x4_f64x2(a_);
+		lane = min_f64x2(lane, _mm256_extractf128_pd(a_, 1));
+		lane = horizontal_min_fill_f64x2(lane);
+		return _mm256_insertf128_pd(cast_f64x2_f64x4(lane), lane, 1);
+	}
+
+	template<class Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_min_scalar_f64x4(EmuSIMD::f64x4_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		EmuSIMD::f64x2 lane = cast_f64x4_f64x2(a_);
+		lane = min_f64x2(lane, _mm256_extractf128_pd(a_, 1));
+		return horizontal_min_scalar_f64x2<Out_>(lane);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 max_f64x4(EmuSIMD::f64x4_arg a_, EmuSIMD::f64x4_arg b_)
@@ -662,10 +678,26 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 horizontal_max_f64x4(EmuSIMD::f64x4_arg a_)
 	{
-		EmuSIMD::f64x2 max128 = cast_f64x4_f64x2(a_);
-		max128 = max_f64x2(max128, _mm256_extractf128_pd(a_, 1));
-		max128 = horizontal_max_f64x2(max128);
-		return _mm256_insertf128_pd(cast_f64x2_f64x4(max128), max128, 1);
+		EmuSIMD::f64x2 lane = cast_f64x4_f64x2(a_);
+		lane = max_f64x2(lane, _mm256_extractf128_pd(a_, 1));
+		return cast_f64x2_f64x4(horizontal_max_f64x2(lane));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 horizontal_max_fill_f64x4(EmuSIMD::f64x4_arg a_)
+	{
+		EmuSIMD::f64x2 lane = cast_f64x4_f64x2(a_);
+		lane = max_f64x2(lane, _mm256_extractf128_pd(a_, 1));
+		lane = horizontal_max_fill_f64x2(lane);
+		return _mm256_insertf128_pd(cast_f64x2_f64x4(lane), lane, 1);
+	}
+
+	template<class Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_max_scalar_f64x4(EmuSIMD::f64x4_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		EmuSIMD::f64x2 lane = cast_f64x4_f64x2(a_);
+		lane = max_f64x2(lane, _mm256_extractf128_pd(a_, 1));
+		return horizontal_max_scalar_f64x2<Out_>(lane);
 	}
 #pragma endregion
 

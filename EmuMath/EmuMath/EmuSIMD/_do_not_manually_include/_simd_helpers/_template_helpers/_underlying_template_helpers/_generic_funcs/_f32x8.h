@@ -658,10 +658,26 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 horizontal_min_f32x8(EmuSIMD::f32x8_arg a_)
 	{
-		EmuSIMD::f32x4 min128 = cast_f32x8_f32x4(a_);
-		min128 = min_f32x4(min128, _mm256_extractf128_ps(a_, 1));
-		min128 = horizontal_min_f32x4(min128);
-		return _mm256_insertf128_ps(cast_f32x4_f32x8(min128), min128, 1);
+		EmuSIMD::f32x4 lane = cast_f32x8_f32x4(a_);
+		lane = min_f32x4(lane, _mm256_extractf128_ps(a_, 1));
+		return cast_f32x4_f32x8(horizontal_min_f32x4(lane));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 horizontal_min_fill_f32x8(EmuSIMD::f32x8_arg a_)
+	{
+		EmuSIMD::f32x4 lane = cast_f32x8_f32x4(a_);
+		lane = min_f32x4(lane, _mm256_extractf128_ps(a_, 1));
+		lane = horizontal_min_fill_f32x4(lane);
+		return _mm256_insertf128_ps(cast_f32x4_f32x8(lane), lane, 1);
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_min_scalar_f32x8(EmuSIMD::f32x8_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		EmuSIMD::f32x4 lane = cast_f32x8_f32x4(a_);
+		lane = min_f32x4(lane, _mm256_extractf128_ps(a_, 1));
+		return horizontal_min_scalar_f32x4<Out_>(lane);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 max_f32x8(EmuSIMD::f32x8_arg a_, EmuSIMD::f32x8_arg b_)
@@ -671,10 +687,26 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 horizontal_max_f32x8(EmuSIMD::f32x8_arg a_)
 	{
-		EmuSIMD::f32x4 max128 = cast_f32x8_f32x4(a_);
-		max128 = max_f32x4(max128, _mm256_extractf128_ps(a_, 1));
-		max128 = horizontal_max_f32x4(max128);
-		return _mm256_insertf128_ps(cast_f32x4_f32x8(max128), max128, 1);
+		EmuSIMD::f32x4 lane = cast_f32x8_f32x4(a_);
+		lane = max_f32x4(lane, _mm256_extractf128_ps(a_, 1));
+		return cast_f32x4_f32x8(horizontal_max_f32x4(lane));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 horizontal_max_fill_f32x8(EmuSIMD::f32x8_arg a_)
+	{
+		EmuSIMD::f32x4 lane = cast_f32x8_f32x4(a_);
+		lane = max_f32x4(lane, _mm256_extractf128_ps(a_, 1));
+		lane = horizontal_max_fill_f32x4(lane);
+		return _mm256_insertf128_ps(cast_f32x4_f32x8(lane), lane, 1);
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_max_scalar_f32x8(EmuSIMD::f32x8_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		EmuSIMD::f32x4 lane = cast_f32x8_f32x4(a_);
+		lane = max_f32x4(lane, _mm256_extractf128_ps(a_, 1));
+		return horizontal_max_scalar_f32x4<Out_>(lane);
 	}
 #pragma endregion
 

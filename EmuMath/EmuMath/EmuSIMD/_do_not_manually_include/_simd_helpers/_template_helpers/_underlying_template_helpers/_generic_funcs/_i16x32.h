@@ -1007,9 +1007,9 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x32 horizontal_min_i16x32(EmuSIMD::i16x32_arg a_)
 	{
 #if EMU_SIMD_USE_512_REGISTERS
-		i16x16 min_lane = min_i16x16(cast_i16x32_i16x16(a_), extract_i16x32_lane_i16x16<1>(a_));
-		min_lane = horizontal_min_i16x16(min_lane);
-		return _mm512_inserti32x8(cast_i16x16_i16x32(min_lane), min_lane, 1);
+		i16x16 lane = min_i16x16(cast_i16x32_i16x16(a_), extract_i16x32_lane_i16x16<1>(a_));
+		lane = horizontal_min_i16x16(lane);
+		return _mm512_inserti32x8(cast_i16x16_i16x32(lane), lane, 1);
 #else
 		return EmuSIMD::_underlying_impl::emulate_horizontal_min_or_max<false, 16, true>(a_);
 #endif
@@ -1027,9 +1027,9 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x32 horizontal_max_i16x32(EmuSIMD::i16x32_arg a_)
 	{
 #if EMU_SIMD_USE_512_REGISTERS
-		i16x16 max_lane = max_i16x16(cast_i16x32_i16x16(a_), extract_i16x32_lane_i16x16<1>(a_));
-		max_lane = horizontal_max_i16x16(max_lane);
-		return _mm512_inserti32x8(cast_i16x16_i16x32(max_lane), max_lane, 1);
+		i16x16 lane = max_i16x16(cast_i16x32_i16x16(a_), extract_i16x32_lane_i16x16<1>(a_));
+		lane = horizontal_max_i16x16(lane);
+		return _mm512_inserti32x8(cast_i16x16_i16x32(lane), lane, 1);
 #else
 		return EmuSIMD::_underlying_impl::emulate_horizontal_min_or_max<true, 16, true>(a_);
 #endif

@@ -22,7 +22,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 
 	// Logic is identical for Min/Max, just calling different functions, 
 	// so to keep things consistent (especially with potential future optimisations) we do both here and just select functions based on template arg IsMax_
-	template<bool IsMax_, bool Assigning_, EmuConcepts::EmuFastMatrix FastMatrix_>
+	template<bool IsMax_, bool Assigning_, bool OutputScalar_, EmuConcepts::EmuFastMatrix FastMatrix_>
 	[[nodiscard]] constexpr inline decltype(auto) _fast_matrix_min_or_max(FastMatrix_&& matrix_)
 	{
 		using _fast_mat_uq = typename std::remove_cvref<FastMatrix_>::type;
@@ -97,13 +97,28 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		}
 
 		// Horizontal min/max will have a full register of the overall min/max value
+		// --- This is the exit point when returning a scalar as `EmuSIMD` provides specialised algorithms for horizontal max with scalar output
 		if constexpr (IsMax_)
 		{
-			min_or_max = EmuSIMD::horizontal_max<per_element_width, is_signed>(min_or_max);
+			if constexpr (OutputScalar_)
+			{
+				// TODO: return EmuSIMD::horizontal_max_scalar<OutTypeIfScalar_>(min_or_max);
+			}
+			else
+			{
+				min_or_max = EmuSIMD::horizontal_max<per_element_width, is_signed>(min_or_max);
+			}
 		}
 		else
 		{
-			min_or_max = EmuSIMD::horizontal_min<per_element_width, is_signed>(min_or_max);
+			if constexpr (OutputScalar_)
+			{
+				// TODO: return EmuSIMD::horizontal_min_scalar<OutTypeIfScalar_>(min_or_max);
+			}
+			else
+			{
+				min_or_max = EmuSIMD::horizontal_min<per_element_width, is_signed>(min_or_max);
+			}
 		}
 
 		// Populate either existing matrix via assignment or new matrix via set1 construction
@@ -111,6 +126,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		using full_register_index_sequence = typename base_index_sequences::register_index_sequence;
 		if constexpr (Assigning_)
 		{
+			static_assert(!OutputScalar_, "INTERNAL EMUMATH ERROR: Attempting to find the min or max element within a FastMatrix and assign the result, but the output has also been flagged as scalar. These options are mutually exclusive.");
 			_fast_matrix_mutate<true, true>
 			(
 				std::forward<FastMatrix_>(matrix_),

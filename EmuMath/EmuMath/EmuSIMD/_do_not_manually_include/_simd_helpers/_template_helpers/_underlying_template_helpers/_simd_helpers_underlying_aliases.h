@@ -2920,6 +2920,23 @@ namespace EmuSIMD::_underlying_impl
 			(update_result(retrieve_emulated_single_lane_simd_element<T_, IndicesExcept0_, false>(a_)), ...);
 			return set1_single_lane_simd_emulator<NumElements_, T_>(result);
 		}
+		
+		template<typename Out_, bool IsMax_, std::size_t NumElements_, typename T_, std::size_t...IndicesExcept0_>
+		[[nodiscard]] constexpr inline auto emulate_horizontal_min_or_max_scalar(const single_lane_simd_emulator<NumElements_, T_>& a_, std::index_sequence<IndicesExcept0_...> indices_except_0_)
+			-> single_lane_simd_emulator<NumElements_, T_>
+		{
+			T_ result = retrieve_emulated_single_lane_simd_element<T_, 0, false>(a_);
+			auto update_result = [&result](const T_& val_)
+			{
+				using _cmp_func = typename std::conditional<IsMax_, std::greater_equal<T_>, std::less_equal<T_>>::type;
+				if (_cmp_func()(val_, result))
+				{
+					result = val_;
+				}
+			};
+			(update_result(retrieve_emulated_single_lane_simd_element<T_, IndicesExcept0_, false>(a_)), ...);
+			return static_cast<typename std::remove_cvref<Out_>::type>(result);
+		}
 
 		template<bool IsMax_, std::size_t PerElementWidth_, bool IsSigned_, std::size_t EmulatedWidth_, class LaneT_>
 		[[nodiscard]] constexpr inline auto emulate_horizontal_min_or_max(const dual_lane_simd_emulator<EmulatedWidth_, LaneT_>& a_)
@@ -2927,15 +2944,15 @@ namespace EmuSIMD::_underlying_impl
 		{
 			if constexpr (IsMax_)
 			{
-				auto max_lane = EmuSIMD::max<PerElementWidth_, IsSigned_>(a_._lane_0, a_._lane_1);
-				max_lane = EmuSIMD::horizontal_max<PerElementWidth_, IsSigned_>(max_lane);
-				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>(max_lane, max_lane);
+				auto lane = EmuSIMD::max<PerElementWidth_, IsSigned_>(a_._lane_0, a_._lane_1);
+				lane = EmuSIMD::horizontal_max<PerElementWidth_, IsSigned_>(lane);
+				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>(lane, lane);
 			}
 			else
 			{
-				auto min_lane = EmuSIMD::min<PerElementWidth_, IsSigned_>(a_._lane_0, a_._lane_1);
-				min_lane = EmuSIMD::horizontal_min<PerElementWidth_, IsSigned_>(min_lane);
-				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>(min_lane, min_lane);
+				auto lane = EmuSIMD::min<PerElementWidth_, IsSigned_>(a_._lane_0, a_._lane_1);
+				lane = EmuSIMD::horizontal_min<PerElementWidth_, IsSigned_>(lane);
+				return dual_lane_simd_emulator<EmulatedWidth_, LaneT_>(lane, lane);
 			}
 		}
 #pragma endregion
