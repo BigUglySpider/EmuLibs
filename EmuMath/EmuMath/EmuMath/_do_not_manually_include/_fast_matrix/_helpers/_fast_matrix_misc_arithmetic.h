@@ -30,7 +30,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool IsColumnMajor_, std::size_t RegisterWidth_>
-	[[nodiscard]] constexpr inline void fast_matrix_min_assign
+	constexpr inline void fast_matrix_min_assign
 	(
 		EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& in_out_a_,
 		const EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& b_
@@ -77,7 +77,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool IsColumnMajor_, std::size_t RegisterWidth_>
-	[[nodiscard]] constexpr inline void fast_matrix_max_assign
+	constexpr inline void fast_matrix_max_assign
 	(
 		EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& in_out_a_,
 		const EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& b_
