@@ -1305,19 +1305,75 @@ namespace EmuMath
 #pragma region MISC_ARITHMETIC
 	public:
 		[[nodiscard]] constexpr inline auto Abs() const
-			->EmuMath::FastMatrix<num_columns, num_rows, value_type, is_column_major, register_width>
+			-> EmuMath::FastMatrix<num_columns, num_rows, value_type, is_column_major, register_width>
 		{
 			return EmuMath::Helpers::fast_matrix_abs(*this);
+		}
+
+		[[nodiscard]] constexpr inline auto Min(const EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& b_) const
+		{
+			return EmuMath::Helpers::fast_matrix_min(*this, b_);
+		}
+
+		[[nodiscard]] constexpr inline auto Min() const
+			-> EmuMath::FastMatrix<num_columns, num_rows, value_type, is_column_major, register_width>
+		{
+			return EmuMath::Helpers::fast_matrix_min(*this);
+		}
+
+		template<typename OutScalar_ = value_type>
+		[[nodiscard]] constexpr inline auto MinScalar() const
+			-> typename std::remove_cvref<OutScalar_>::type
+		{
+			return EmuMath::Helpers::fast_matrix_min_scalar<typename std::remove_cvref<OutScalar_>::type>(*this);
+		}
+
+		[[nodiscard]] constexpr inline auto Max(const EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& b_) const
+		{
+			return EmuMath::Helpers::fast_matrix_max(*this, b_);
+		}
+
+		[[nodiscard]] constexpr inline auto Max() const
+			-> EmuMath::FastMatrix<num_columns, num_rows, value_type, is_column_major, register_width>
+		{
+			return EmuMath::Helpers::fast_matrix_max(*this);
+		}
+
+		template<typename OutScalar_ = value_type>
+		[[nodiscard]] constexpr inline auto MaxScalar() const
+			-> typename std::remove_cvref<OutScalar_>::type
+		{
+			return EmuMath::Helpers::fast_matrix_max_scalar<typename std::remove_cvref<OutScalar_>::type>(*this);
+		}
+
+		constexpr inline void AbsAssign()
+		{
+			EmuMath::Helpers::fast_matrix_abs_assign(*this);
+		}
+
+		constexpr inline void MinAssign()
+		{
+			EmuMath::Helpers::fast_matrix_min_assign(*this);
+		}
+
+		constexpr inline void MinAssign(const EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& b_)
+		{
+			EmuMath::Helpers::fast_matrix_min_assign(*this, b_);
+		}
+
+		constexpr inline void MaxAssign()
+		{
+			EmuMath::Helpers::fast_matrix_max_assign(*this);
+		}
+
+		constexpr inline void MaxAssign(const EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& b_)
+		{
+			EmuMath::Helpers::fast_matrix_max_assign(*this, b_);
 		}
 #pragma endregion
 
 		/*
 		* TODO:
-		*	- Abs()
-		*	- Min()
-		*	- Min(b)
-		*	- Max()
-		*	- Max(b)
 		*	- Lerp(b, t)
 		*	- ClampMin(min)
 		*	- ClampMax(max)

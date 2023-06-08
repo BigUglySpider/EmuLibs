@@ -409,8 +409,15 @@ int main(int argc, char** argv)
 		auto rng = EmuMath::RngWrapper<false>(-2500.0, 2500.0);
 		auto a = EmuMath::FastMatrix<4, 4, float, true, 128>(rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal());
 		auto b = EmuMath::FastMatrix<4, 4, float, true, 128>(rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal());
-		std::cout << "\n---A:\n" << a << "\nMIN A:\n" << EmuMath::Helpers::fast_matrix_min(a) << "\nMAX A:\n" << EmuMath::Helpers::fast_matrix_max(a) << "\n";
-		std::cout << "\n---B:\n" << b << "\nMIN B:\n" << EmuMath::Helpers::fast_matrix_min(b) << "\nMAX B:\n" << EmuMath::Helpers::fast_matrix_max(b) << "\n";
+		std::cout << "\n---A:\n" << a;
+		std::cout << "\nMIN A:\n" << a.Min() << "\n\t" << a.MinScalar<float>() << "\n\t" << a.MinScalar<std::int64_t>() << "\n\t" << a.MinScalar();
+		std::cout << "\nMAX A:\n" << a.Max() << "\n\t" << a.MaxScalar<float>() << "\n\t" << a.MaxScalar<std::int64_t>() << "\n\t" << a.MaxScalar();
+		std::cout << "\n---B:\n" << b;
+		std::cout << "\nMIN B:\n" << b.Min() << "\n\t" << b.MinScalar<float>() << "\n\t" << b.MinScalar<std::int64_t>() << "\n\t" << b.MinScalar();
+		std::cout << "\nMAX B:\n" << b.Max() << "\n\t" << b.MaxScalar<float>() << "\n\t" << b.MaxScalar<std::int64_t>() << "\n\t" << b.MaxScalar();
+		std::cout << "\n---MIN(A, B):\n" << a.Min(b);
+		std::cout << "\n---MAX(B, A):\n" << b.Max(a);
+		std::cout << std::endl;
 		universal_pause();
 	}
 

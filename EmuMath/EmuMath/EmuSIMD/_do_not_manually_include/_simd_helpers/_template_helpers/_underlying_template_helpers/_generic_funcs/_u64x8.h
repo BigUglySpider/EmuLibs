@@ -964,8 +964,6 @@ namespace EmuSIMD::Funcs
 #endif
 	}
 
-	// TODO: TEMPLATE FUNCS FOR NEW HORIZONTAL MIN/MAX
-
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x8 horizontal_max_u64x8(EmuSIMD::u64x8_arg a_)
 	{
 #if EMU_SIMD_USE_512_REGISTERS

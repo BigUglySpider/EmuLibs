@@ -546,6 +546,36 @@ namespace EmuSIMD
 	}
 
 	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, EmuConcepts::KnownSIMD Register_>
+	[[nodiscard]] inline auto horizontal_min_fill(Register_&& a_)
+		-> typename std::remove_cvref<Register_>::type
+	{
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _underlying_simd_helpers::_horizontal_min_fill<PerElementWidthIfInt_, SignedIfInt_>(std::forward<Register_>(a_));
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::horizontal_min_fill with an unsupported type as the passed Register_.");
+		}
+	}
+
+	template<typename OutScalar_, std::size_t PerElementWidthIfGenericInt_, bool SignedIfGenericInt_, EmuConcepts::KnownSIMD Register_>
+	[[nodiscard]] inline auto horizontal_min_scalar(Register_&& a_)
+		-> typename std::remove_cvref<OutScalar_>::type
+	{
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _underlying_simd_helpers::_horizontal_min_scalar<typename std::remove_cvref<OutScalar_>::type, PerElementWidthIfGenericInt_, SignedIfGenericInt_>(std::forward<Register_>(a_));
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::horizontal_min_scalar with an unsupported type as the passed Register_.");
+		}
+	}
+
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, EmuConcepts::KnownSIMD Register_>
 	[[nodiscard]] inline auto horizontal_max(Register_&& a_)
 		-> typename std::remove_cvref<Register_>::type
 	{
@@ -557,6 +587,36 @@ namespace EmuSIMD
 		else
 		{
 			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::horizontal_max with an unsupported type as the passed Register_.");
+		}
+	}
+
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, EmuConcepts::KnownSIMD Register_>
+	[[nodiscard]] inline auto horizontal_max_fill(Register_&& a_)
+		-> typename std::remove_cvref<Register_>::type
+	{
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _underlying_simd_helpers::_horizontal_max_fill<PerElementWidthIfInt_, SignedIfInt_>(std::forward<Register_>(a_));
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::horizontal_max_fill with an unsupported type as the passed Register_.");
+		}
+	}
+
+	template<typename OutScalar_, std::size_t PerElementWidthIfGenericInt_, bool SignedIfGenericInt_, EmuConcepts::KnownSIMD Register_>
+	[[nodiscard]] inline auto horizontal_max_scalar(Register_&& a_)
+		-> typename std::remove_cvref<OutScalar_>::type
+	{
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _underlying_simd_helpers::_horizontal_max_scalar<typename std::remove_cvref<OutScalar_>::type, PerElementWidthIfGenericInt_, SignedIfGenericInt_>(std::forward<Register_>(a_));
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::horizontal_max_scalar with an unsupported type as the passed Register_.");
 		}
 	}
 
