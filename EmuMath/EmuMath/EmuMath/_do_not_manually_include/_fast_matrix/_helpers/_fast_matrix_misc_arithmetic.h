@@ -118,10 +118,10 @@ namespace EmuMath::Helpers
 	}
 
 	template<EmuConcepts::EmuFastMatrix FastMatrix_, class B_, class Weighting_>
-	[[nodiscard]] constexpr inline auto fast_matrix_lerp(FastMatrix_&& fast_matrix_a_, B_&& b_, Weighting_&& t_)
-		-> typename std::remove_cvref<FastMatrix_>::value_type
+	[[nodiscard]] constexpr inline auto fast_matrix_lerp(FastMatrix_&& fast_matrix_, B_&& b_, Weighting_&& t_)
+		-> typename std::remove_cvref<FastMatrix_>::type
 	{
-		return _fast_matrix_underlying::_fast_matrix_lerp<false, false>(std::forward<FastMatrix_>(fast_matrix_a_), std::forward<B_>(b_), std::forward<Weighting_>(t_));
+		return _fast_matrix_underlying::_fast_matrix_lerp<false, false>(std::forward<FastMatrix_>(fast_matrix_), std::forward<B_>(b_), std::forward<Weighting_>(t_));
 	}
 
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool IsColumnMajor_, std::size_t RegisterWidth_, class B_, class Weighting_>
@@ -132,11 +132,10 @@ namespace EmuMath::Helpers
 	}
 
 	template<EmuConcepts::EmuFastMatrix FastMatrix_, class B_, class Weighting_>
-	requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<FastMatrix_, B_, Weighting_>)
-	[[nodiscard]] constexpr inline auto fast_matrix_fused_lerp(FastMatrix_&& fast_matrix_a_, B_&& b_, Weighting_&& t_)
-		-> typename std::remove_cvref<FastMatrix_>::value_type
+	[[nodiscard]] constexpr inline auto fast_matrix_fused_lerp(FastMatrix_&& fast_matrix_, B_&& b_, Weighting_&& t_)
+		-> typename std::remove_cvref<FastMatrix_>::type
 	{
-		return _fast_matrix_underlying::_fast_matrix_lerp<false, true>(std::forward<FastMatrix_>(fast_matrix_a_), std::forward<B_>(b_), std::forward<Weighting_>(t_));
+		return _fast_matrix_underlying::_fast_matrix_lerp<false, true>(std::forward<FastMatrix_>(fast_matrix_), std::forward<B_>(b_), std::forward<Weighting_>(t_));
 	}
 
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool IsColumnMajor_, std::size_t RegisterWidth_, class B_, class Weighting_>

@@ -1379,7 +1379,7 @@ namespace EmuMath
 		}
 
 		template<class B_>
-			requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_>)
+		requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_>)
 		[[nodiscard]] constexpr inline auto Max(B_&& b_) const
 		{
 			return EmuMath::Helpers::fast_matrix_max(*this, std::forward<B_>(b_));
@@ -1401,6 +1401,7 @@ namespace EmuMath
 		template<class B_, class Weighting_>
 		requires EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_, Weighting_>
 		[[nodiscard]] constexpr inline auto Lerp(B_&& b_, Weighting_&& t_) const
+			-> EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>
 		{
 			return EmuMath::Helpers::fast_matrix_lerp(*this, std::forward<B_>(b_), std::forward<Weighting_>(t_));
 		}
@@ -1408,8 +1409,9 @@ namespace EmuMath
 		template<class B_, class Weighting_>
 		requires EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_, Weighting_>
 		[[nodiscard]] constexpr inline auto FusedLerp(B_&& b_, Weighting_&& t_) const
+			-> EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>
 		{
-			return EmuMath::Helpers::fast_matrix_fused_lerp(*this, *this, *this);
+			return EmuMath::Helpers::fast_matrix_fused_lerp(*this, std::forward<B_>(b_), std::forward<Weighting_>(t_));
 		}
 
 		template<class B_, class Weighting_>

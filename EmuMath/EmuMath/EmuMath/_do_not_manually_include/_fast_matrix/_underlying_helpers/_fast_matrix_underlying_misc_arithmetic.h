@@ -68,14 +68,15 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		return _fast_matrix_mutate_with_extra_args<Assigning_, false, false>
 		(
 			std::forward<FastMatrixA_>(lhs_matrix_),
-			[](auto&& lhs_register_, auto&& rhs_register_)
+			[](auto&& lhs_register_, auto&& b_register_, auto&& c_register_)
 			{
 				if constexpr (Fused_)
 				{
 					return EmuSIMD::fused_lerp<per_element_width>
 					(
 						std::forward<decltype(lhs_register_)>(lhs_register_),
-						std::forward<decltype(rhs_register_)>(rhs_register_)
+						std::forward<decltype(b_register_)>(b_register_),
+						std::forward<decltype(c_register_)>(c_register_)
 					);
 				}
 				else
@@ -83,7 +84,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 					return EmuSIMD::lerp<per_element_width>
 					(
 						std::forward<decltype(lhs_register_)>(lhs_register_),
-						std::forward<decltype(rhs_register_)>(rhs_register_)
+						std::forward<decltype(b_register_)>(b_register_),
+						std::forward<decltype(c_register_)>(c_register_)
 					);
 				}
 			},

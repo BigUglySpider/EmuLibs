@@ -154,10 +154,10 @@ namespace EmuMath::Concepts
 		template<class Lhs_, class Rhs_>
 		concept _any_basic_op_compatible_single_lhs =
 		(
-			EmuConcepts::EmuFastMatricesBasicOpCompatible<Lhs_, Rhs_> ||
-			EmuConcepts::EmuFastMatrixAndVectorsBasicOpCompatible<Lhs_, Rhs_> ||
-			EmuConcepts::EmuFastMatrixAndRegistersBasicOpCompatible<Lhs_, Rhs_> ||
-			EmuConcepts::EmuFastMatrixAndScalarsBasicOpCompatible<Lhs_, Rhs_>
+			(EmuConcepts::EmuFastMatricesBasicOpCompatible<Lhs_, Rhs_>) ||
+			(EmuConcepts::EmuFastMatrixAndVectorsBasicOpCompatible<Lhs_, Rhs_>) ||
+			(EmuConcepts::EmuFastMatrixAndRegistersBasicOpCompatible<Lhs_, Rhs_>) ||
+			(EmuConcepts::EmuFastMatrixAndScalarsBasicOpCompatible<Lhs_, Rhs_>)
 		);
 	}
 
