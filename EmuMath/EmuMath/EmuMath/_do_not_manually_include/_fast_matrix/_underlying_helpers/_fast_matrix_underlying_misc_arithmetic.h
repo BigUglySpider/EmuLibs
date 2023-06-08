@@ -20,8 +20,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		);
 	}
 
-	template<bool IsMax_, bool Assigning_, EmuConcepts::EmuFastMatrix FastMatrixA_, EmuConcepts::UnqualifiedMatch<FastMatrixA_> FastMatrixB_>
-	[[nodiscard]] constexpr inline decltype(auto) _fast_matrix_min_or_max(FastMatrixA_&& lhs_matrix_, FastMatrixB_&& rhs_matrix_)
+	template<bool IsMax_, bool Assigning_, EmuConcepts::EmuFastMatrix FastMatrixA_, class B_>
+	[[nodiscard]] constexpr inline decltype(auto) _fast_matrix_min_or_max(FastMatrixA_&& lhs_matrix_, B_&& rhs_)
 	{
 		using _fast_mat_uq = typename std::remove_cvref<FastMatrixA_>::type;
 		constexpr std::size_t per_element_width = _fast_mat_uq::per_element_width;
@@ -53,7 +53,44 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 			},
 			major_indices(),
 			register_indices(),
-			std::forward<FastMatrixB_>(rhs_matrix_)
+			std::forward<B_>(rhs_)
+		);
+	}
+
+	template<bool Assigning_, bool Fused_, EmuConcepts::EmuFastMatrix FastMatrixA_, class B_, class Weighting_>
+	[[nodiscard]] constexpr inline decltype(auto) _fast_matrix_lerp(FastMatrixA_&& lhs_matrix_, B_&& b_, Weighting_&& t_)
+	{
+		using _fast_mat_uq = typename std::remove_cvref<FastMatrixA_>::type;
+		constexpr std::size_t per_element_width = _fast_mat_uq::per_element_width;
+		using index_sequences = EmuMath::TMP::fast_matrix_full_register_sequences<_fast_mat_uq>;
+		using major_indices = typename index_sequences::major_index_sequence;
+		using register_indices = typename index_sequences::register_index_sequence;
+		return _fast_matrix_mutate_with_extra_args<Assigning_, false, false>
+		(
+			std::forward<FastMatrixA_>(lhs_matrix_),
+			[](auto&& lhs_register_, auto&& rhs_register_)
+			{
+				if constexpr (Fused_)
+				{
+					return EmuSIMD::fused_lerp<per_element_width>
+					(
+						std::forward<decltype(lhs_register_)>(lhs_register_),
+						std::forward<decltype(rhs_register_)>(rhs_register_)
+					);
+				}
+				else
+				{
+					return EmuSIMD::lerp<per_element_width>
+					(
+						std::forward<decltype(lhs_register_)>(lhs_register_),
+						std::forward<decltype(rhs_register_)>(rhs_register_)
+					);
+				}
+			},
+			major_indices(),
+			register_indices(),
+			std::forward<B_>(b_),
+			std::forward<Weighting_>(t_)
 		);
 	}
 

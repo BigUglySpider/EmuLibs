@@ -418,6 +418,12 @@ int main(int argc, char** argv)
 		std::cout << "\n---MIN(A, B):\n" << a.Min(b);
 		std::cout << "\n---MAX(B, A):\n" << b.Max(a);
 		std::cout << std::endl;
+
+		std::cout << "### lerp ###\n";
+		auto c = EmuMath::FastMatrix<16, 16, float, true, 512>(50.0f);
+		auto d = EmuMath::FastMatrix<16, 16, float, true, 512>(100.0f);
+		auto e = EmuMath::FastMatrix<16, 16, float, true, 512>(EmuSIMD::setr<EmuSIMD::f32x16, 32>(0.1f, 0.2f, 0.25f, 0.3f, 0.33f, 0.4f, 0.5f, 0.6f, 0.7f, 0.75f, 0.8f, 0.9f, 1.0f, 2.0f, 2.5f, -1.0f));
+		std::cout << "LERP\n" << c << "\n|\n" << d << "\n|\n" << e << "\n=\n" << c.Lerp(d, e) << "\nOR\n" << c.FusedLerp(d, e) << std::endl;
 		universal_pause();
 	}
 

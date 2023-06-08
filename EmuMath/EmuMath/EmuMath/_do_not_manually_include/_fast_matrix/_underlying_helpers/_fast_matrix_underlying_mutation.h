@@ -460,6 +460,19 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		}
 	}
 
+	template<class TargetRegister_, std::size_t TargetElementWidth_, class Arg_>
+	[[nodiscard]] constexpr inline decltype(auto) _fast_matrix_make_usable_with_registers(Arg_&& arg_)
+	{
+		if constexpr (EmuConcepts::EmuFastMatrix<Arg_> || EmuConcepts::EmuFastVector<Arg_> || EmuConcepts::KnownSIMD<Arg_>)
+		{
+			return std::forward<Arg_>(arg_);
+		}
+		else if constexpr(EmuConcepts::Arithmetic<Arg_>)
+		{
+			return EmuSIMD::set1<TargetRegister_, TargetElementWidth_>(std::forward<Arg_>(arg_));
+		}
+	}
+
 	template
 	<
 		bool Assigning_, bool NoReturn_, bool AlertRegisterOutOfRange_, std::size_t...MajorIndices_, std::size_t...RegisterIndices_,
@@ -474,7 +487,19 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		ExtraArgs_&&...extra_args_
 	)
 	{
-		if constexpr (Assigning_ || NoReturn_)
+		if constexpr ((... || EmuConcepts::Arithmetic<ExtraArgs_>))
+		{
+			// Convert scalar args to registers before continuing
+			return _fast_matrix_mutate_with_extra_args<Assigning_, NoReturn_, AlertRegisterOutOfRange_>
+			(
+				std::forward<FastMatrix_>(matrix_),
+				std::forward<Func_>(func_),
+				std::index_sequence<MajorIndices_...>(),
+				std::index_sequence<RegisterIndices_...>(),
+				_fast_matrix_make_usable_with_registers(std::forward<ExtraArgs_>(extra_args_))...
+			);
+		}
+		else if constexpr (Assigning_ || NoReturn_)
 		{
 			(
 				_fast_matrix_mutate_register_with_extra_args<Assigning_, NoReturn_, AlertRegisterOutOfRange_, MajorIndices_, RegisterIndices_>

@@ -164,7 +164,7 @@ namespace EmuMath::Concepts
 	template<class Lhs_, class...Others_>
 	concept EmuFastMatrixBasicOpCompatible =
 	(
-		(... && EmuConcepts::_fast_matrix_underlying::_any_basic_op_compatible_single_lhs<Lhs_, Others_>)
+		(... && (EmuConcepts::_fast_matrix_underlying::_any_basic_op_compatible_single_lhs<Lhs_, Others_>))
 	);
 }
 

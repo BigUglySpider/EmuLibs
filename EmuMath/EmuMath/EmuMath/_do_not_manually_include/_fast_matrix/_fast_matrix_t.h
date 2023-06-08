@@ -129,12 +129,24 @@ namespace EmuMath
 		}
 
 		template<std::size_t Unused_, typename...Args_>
+		[[nodiscard]] static constexpr inline bool _valid_set1_construction_args()
+		{
+			return
+			(
+				Unused_ >= 0 &&
+				sizeof...(Args_) == 1 &&
+				(... && (EmuConcepts::Arithmetic<Args_> || EmuConcepts::UnqualifiedMatch<register_type, Args_>))
+			);
+		}
+
+		template<std::size_t Unused_, typename...Args_>
 		[[nodiscard]] static constexpr inline bool _valid_variadic_construction_args()
 		{
 			return
 			(
 				_valid_per_element_construction_args<Unused_, Args_...>() ||
-				_valid_major_chunk_construction<Unused_, Args_...>()
+				_valid_major_chunk_construction<Unused_, Args_...>() ||
+				_valid_set1_construction_args<Unused_, Args_...>()
 			);
 		}
 
@@ -383,6 +395,32 @@ namespace EmuMath
 			});
 		}
 
+		template<std::size_t MajorIndex_, std::size_t...MajorRegisterIndices_>
+		[[nodiscard]] static constexpr inline auto _make_major_chunk_from_single_register(register_arg_type set1_register_, std::index_sequence<MajorRegisterIndices_...> major_register_indices_)
+			-> major_chunk_type
+		{
+			if constexpr (num_registers_per_major > 1)
+			{
+				return major_chunk_type
+				({
+					EmuCore::TMP::discard_template_arg_forward_func_arg<MajorRegisterIndices_>(set1_register_)...
+				});
+			}
+			else
+			{
+				return set1_register_;
+			}
+		}
+
+		template<std::size_t...MajorIndices_>
+		[[nodiscard]] static constexpr inline data_type _make_data_from_single_register(register_arg_type set1_register_, std::index_sequence<MajorIndices_...> major_indices_)
+		{
+			return data_type
+			({
+				_make_major_chunk_from_single_register<MajorIndices_>(set1_register_, major_register_sequence())...
+			});
+		}
+
 		template<typename...Args_>
 		[[nodiscard]] static constexpr inline data_type _make_data_from_variadic_args(Args_&&...args_)
 		{
@@ -398,6 +436,16 @@ namespace EmuMath
 			else if constexpr (valid_major_chunk_construction<Args_...>())
 			{
 				return data_type({ std::forward<Args_>(args_)... });
+			}
+			else if constexpr (sizeof...(Args_) == 1 && (... && EmuConcepts::Arithmetic<Args_>))
+			{
+				using index_sequences = EmuMath::TMP::fast_matrix_full_register_sequences<this_type>;
+				register_type set1_register = EmuSIMD::set1<register_type, per_element_width>(std::forward<Args_>(args_)...);
+				return _make_data_from_single_register(set1_register, major_index_sequence());
+			}
+			else if constexpr (sizeof...(Args_) == 1 && (... && EmuConcepts::UnqualifiedMatch<register_type, Args_>))
+			{
+				return _make_data_from_single_register(std::forward<Args_>(args_)..., major_index_sequence());
 			}
 			else
 			{
@@ -1310,9 +1358,11 @@ namespace EmuMath
 			return EmuMath::Helpers::fast_matrix_abs(*this);
 		}
 
-		[[nodiscard]] constexpr inline auto Min(const EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& b_) const
+		template<class B_>
+		requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_>)
+		[[nodiscard]] constexpr inline auto Min(B_&& b_) const
 		{
-			return EmuMath::Helpers::fast_matrix_min(*this, b_);
+			return EmuMath::Helpers::fast_matrix_min(*this, std::forward<B_>(b_));
 		}
 
 		[[nodiscard]] constexpr inline auto Min() const
@@ -1328,9 +1378,11 @@ namespace EmuMath
 			return EmuMath::Helpers::fast_matrix_min_scalar<typename std::remove_cvref<OutScalar_>::type>(*this);
 		}
 
-		[[nodiscard]] constexpr inline auto Max(const EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& b_) const
+		template<class B_>
+			requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_>)
+		[[nodiscard]] constexpr inline auto Max(B_&& b_) const
 		{
-			return EmuMath::Helpers::fast_matrix_max(*this, b_);
+			return EmuMath::Helpers::fast_matrix_max(*this, std::forward<B_>(b_));
 		}
 
 		[[nodiscard]] constexpr inline auto Max() const
@@ -1344,6 +1396,34 @@ namespace EmuMath
 			-> typename std::remove_cvref<OutScalar_>::type
 		{
 			return EmuMath::Helpers::fast_matrix_max_scalar<typename std::remove_cvref<OutScalar_>::type>(*this);
+		}
+
+		template<class B_, class Weighting_>
+		requires EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_, Weighting_>
+		[[nodiscard]] constexpr inline auto Lerp(B_&& b_, Weighting_&& t_) const
+		{
+			return EmuMath::Helpers::fast_matrix_lerp(*this, std::forward<B_>(b_), std::forward<Weighting_>(t_));
+		}
+
+		template<class B_, class Weighting_>
+		requires EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_, Weighting_>
+		[[nodiscard]] constexpr inline auto FusedLerp(B_&& b_, Weighting_&& t_) const
+		{
+			return EmuMath::Helpers::fast_matrix_fused_lerp(*this, *this, *this);
+		}
+
+		template<class B_, class Weighting_>
+		requires EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_, Weighting_>
+		constexpr inline void LerpAssign(B_&& b_, Weighting_&& t_)
+		{
+			EmuMath::Helpers::fast_matrix_lerp_assign(*this, std::forward<B_>(b_), std::forward<Weighting_>(t_));
+		}
+
+		template<class B_, class Weighting_>
+		requires EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_, Weighting_>
+		constexpr inline void FusedLerpAssign(B_&& b_, Weighting_&& t_)
+		{
+			EmuMath::Helpers::fast_matrix_fused_lerp_assign(*this, std::forward<B_>(b_), std::forward<Weighting_>(t_));
 		}
 
 		constexpr inline void AbsAssign()
