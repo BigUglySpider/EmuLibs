@@ -383,6 +383,7 @@ int main(int argc, char** argv)
 		"true",
 		BasicArgParser<std::string>::config_args_map_type
 		{
+			{ "help", "false" },
 			{ "is-finished", "maybe" },
 			{ "noise-x", "1024" },
 			{ "noise-y", "1024" },
@@ -393,12 +394,23 @@ int main(int argc, char** argv)
 		BasicArgParser<std::string>::switch_to_full_name_map_type
 		{
 			{ 'c', "noise-speed-test-count" },
+			{ 'h', "help" },
 			{ 't', "do-test-harness" },
 			{ 'x', "noise-x" },
 			{ 'y', "noise-y" },
 			{ 'z', "noise-z" }
 		}
 	);
+	if(basic_arg_parser.TryToBool("help", false))
+	{
+		std::cout << "Default Arguments:\n";
+		basic_arg_parser.AppendDefaultArgsToStream(std::cout, '\t');
+		std::cout << "\nSwitches:\n";
+		basic_arg_parser.AppendSwitchNameTranslationsToStream(std::cout, '\t');
+		std::cout << '\n' << std::endl;
+		return 0;
+	}
+
 	basic_arg_parser.ApplyDefaults<false>();
 
 	{
