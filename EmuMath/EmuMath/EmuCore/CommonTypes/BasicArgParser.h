@@ -273,6 +273,7 @@ namespace EmuCore
 #pragma endregion
 
 #pragma region PARSING_FUNCS
+	public:
 		template<bool CanReplace_>
 		inline void ParseConfigArgs(int argc, char** argv)
 		{
@@ -373,6 +374,7 @@ namespace EmuCore
 #pragma endregion
 
 #pragma region ACCESS_OPERATORS
+	public:
 		/// <summary>
 		/// <para> Shorthand for `GetConfigArg` with the same arguments. </para>
 		/// </summary>
@@ -439,6 +441,7 @@ namespace EmuCore
 #pragma endregion
 
 #pragma region EXCEPTING_ACCESS_FUNCS
+	public:
 		/// <summary>
 		/// <para> Retrieves a constant reference to the value of the specified config argument. </para>
 		/// <para> If the passed argument has not been parsed, this will return the argument's default value. </para>
@@ -502,6 +505,7 @@ namespace EmuCore
 #pragma endregion
 
 #pragma region TRY_ACCESS_FUNCS
+	public:
 		/// <summary>
 		/// <para> Tries to output a read-only pointer to the value of the specified config argument, returning a boolean which indicates if the operation was a success. </para>
 		/// <para> If the passed argument has not been parsed, this will output a pointer to the argument's default value. </para>
@@ -641,6 +645,7 @@ namespace EmuCore
 #pragma endregion
 
 #pragma region VALUE_SETTERS
+	public:
 		/// <summary>
 		/// <para> Sets the config argument of the specified name to the passed value. </para>
 		/// <para> If `CanReplace_` is true, this will always set the value for the specified name and always return true. </para>
@@ -695,6 +700,7 @@ namespace EmuCore
 #pragma endregion
 
 #pragma region TRANSLATION_FUNCS
+	public:
 		/// <summary>
 		/// <para> Translates the input switch into its full nane string translation. </para>
 		/// </summary>
@@ -763,6 +769,7 @@ namespace EmuCore
 #pragma endregion
 
 #pragma region BUILT_IN_CONVERSION_FUNCS
+	public:
 		/// <summary>
 		/// <para> Converts the specified config arg to an integer. </para>
 		/// <para> If `GetConfigArg` is an unsuccessful operation, this will throw an exception. </para>
@@ -1056,6 +1063,7 @@ namespace EmuCore
 #pragma endregion
 
 #pragma region CUSTOM_CONVERSION_FUNCS
+	public:
 		/// <summary>
 		/// <para> Converts the specified config arg via the provided custom conversion function. </para>
 		/// <para> The conversion function must be invocable with a constant reference to this parser's string_type, however it does not have any return requirements. </para>
@@ -1141,6 +1149,7 @@ namespace EmuCore
 #pragma endregion
 
 #pragma region VALIDATION_FUNCS
+	public:
 		/// <summary>
 		/// <para>
 		///		Validates the parsed config arguments within this parser, 
@@ -1173,9 +1182,52 @@ namespace EmuCore
 				}
 			}
 		}
+
+		/// <summary>
+		/// <para> Sets config values to their provided defaults. </para>
+		/// <para> If `ReplaceExisting_` is false, this will only apply defaults to values that do not already exist, and existing values will remain the same as before this function call. </para>
+		/// <para> This does not have any effects on items not listed to have a default. </para>
+		/// </summary>
+		/// <returns>Number of items to which a default has been applied.</returns>
+		template<bool ReplaceExisting_>
+		std::size_t ApplyDefaults()
+		{
+			auto end_it = parsed_config_args.end();
+			if constexpr (ReplaceExisting_)
+			{
+				for (auto& key_default_pair : default_config_args)
+				{
+					auto it = parsed_config_args.find(key_default_pair.first);
+					if (it != end_it)
+					{
+						it->second = key_default_pair.second;
+					}
+					else
+					{
+						parsed_config_args.emplace(key_default_pair);
+					}
+				}
+				return default_config_args.size();
+			}
+			else
+			{
+				std::size_t replaced_count = 0;
+				for (auto& key_default_pair : default_config_args)
+				{
+					if (parsed_config_args.find(key_default_pair.first) == end_it)
+					{
+						parsed_config_args.emplace(key_default_pair);
+						end_it = parsed_config_args.end();
+						++replaced_count;
+					}
+				}
+				return replaced_count;
+			}
+		}
 #pragma endregion
 
 #pragma region STREAM_APPENDING_FUNCS
+	public:
 		template<bool IncludeDefaults_ = true, bool IncludeSwitchTranslations_ = false>
 		std::ostream& AppendToStream(std::ostream& str_) const
 		{
@@ -1183,7 +1235,7 @@ namespace EmuCore
 			const string_type group_closer = "\n}";
 			const string_type single_indent = "    ";
 
-			str_ << "Basic arguments";
+			str_ << "Non-Config arguments";
 			str_ << group_opener;
 			AppendNonConfigArgsToStream(str_, single_indent);
 			str_ << group_closer;
@@ -1257,9 +1309,53 @@ namespace EmuCore
 		}
 #pragma endregion
 
+#pragma region ALL_ARGS_ACCESS_FUNCS
+	public:
+		[[nodiscard]] constexpr inline const std::deque<string_type>& ViewAllParsedArgs() const
+		{
+			return all_parsed_args;
+		}
+
+		[[nodiscard]] constexpr inline std::string StringifyAllParsedArgs() const
+		{
+			auto it = all_parsed_args.begin();
+			auto end = all_parsed_args.end();
+			if (it != end)
+			{
+				std::ostringstream str;
+				_append_iterator_to_str_until_end_prevalidated(str, it, end);
+				return str.str();
+			}
+			else
+			{
+				return std::string("");
+			}
+		}
+
+		constexpr inline std::ostream& StringifyAllParsedArgs(std::ostream& str_) const
+		{
+			auto it = all_parsed_args.begin();
+			auto end = all_parsed_args.end();
+			_append_iterator_to_str_until_end_prevalidated(str_, it, end);
+			return str_;
+		}
+#pragma endregion
+
 	private:
 		/// <summary> Meta-type used as an indentation argument to perform no indentation in functions that may provide indents, allowing to avoid empty stream appends when not wanted. </summary>
 		struct _underlying_no_indent {};
+
+		static inline void _append_iterator_to_str_until_end_prevalidated(std::ostream& str_, auto& it, auto& end)
+		{
+			str_ << *it;
+			++it;
+			while (it != end)
+			{
+				str_ << ' ';
+				str_ << *it;
+				++it;
+			}
+		}
 
 		template<bool AllowNegativeNumbers_>
 		[[nodiscard]] static inline bool _is_likely_config_name_string(const string_type& str_)

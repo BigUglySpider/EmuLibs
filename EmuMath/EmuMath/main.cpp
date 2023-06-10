@@ -383,6 +383,7 @@ int main(int argc, char** argv)
 		"true",
 		BasicArgParser<std::string>::config_args_map_type
 		{
+			{ "is-finished", "maybe" },
 			{ "noise-x", "1024" },
 			{ "noise-y", "1024" },
 			{ "noise-z", "1" },
@@ -398,10 +399,12 @@ int main(int argc, char** argv)
 			{ 'z', "noise-z" }
 		}
 	);
+	basic_arg_parser.ApplyDefaults<false>();
 
 	{
 		std::ostringstream parser_str;
-		basic_arg_parser.AppendToStream(parser_str) << "\nPress enter to continue with this config...";
+		parser_str << "Input arguments: " << basic_arg_parser.StringifyAllParsedArgs() << '\n';
+		basic_arg_parser.AppendToStream<false>(parser_str) << "\nPress enter to continue with this config...";
 		universal_pause(parser_str.str());
 	}
 
