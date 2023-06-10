@@ -421,8 +421,9 @@ int main(int argc, char** argv)
 	}
 
 	{
-		constexpr EmuMath::Matrix<4, 4, double, true> example_mat(12, -26, 23.14, 26.61, 29, -17, 15, -26.61, 41, 0, 29, 512.61, 53, 1, 10041, -666);
-
+		using example_mat_type = EmuMath::Matrix<4, 4, float, true>;
+		constexpr auto example_mat = example_mat_type(12, -26, 23.14, 26.61, 29, -17, 15, -26.61, 41, 0, 29, 512.61, 53, 1, 10041, -666);
+		constexpr auto inv_mat = EmuMath::Helpers::_matrix_underlying::_calculate_matrix_inverse_gauss_jordan<example_mat_type, example_mat_type, float>(example_mat);
 	}
 
 	{
