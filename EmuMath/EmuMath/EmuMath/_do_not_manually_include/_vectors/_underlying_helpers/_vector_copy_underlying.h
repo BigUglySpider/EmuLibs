@@ -372,10 +372,10 @@ namespace EmuMath::Helpers::_vector_underlying
 	constexpr inline void _vector_copy_assign_execution(std::index_sequence<Indices_...> indices_, OutVector_& out_, In_&& in_)
 	{
 		// We don't allow moves where a problem would occur, so silence false-positive VS warning here
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		(_vector_copy_index_in_range<Indices_, CopyBegin_, CopyEnd_, ReadOffset_, AllowScalarMove_>(out_, std::forward<In_>(in_)), ...);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 	
 	template<std::size_t CopyBegin_, std::size_t CopyEnd_, std::size_t ReadOffset_, class In_, std::size_t OutSize_, typename OutT_>

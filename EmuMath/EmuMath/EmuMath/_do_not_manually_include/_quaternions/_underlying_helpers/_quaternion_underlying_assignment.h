@@ -52,7 +52,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 
 #pragma region CONVERSION_FUNCS
 	template<typename LhsT_, typename RhsT_>
-	[[nodiscard]] constexpr inline void _convert_assign(EmuMath::Quaternion<LhsT_>& lhs_, const EmuMath::Quaternion<RhsT_>& rhs_)
+	constexpr inline void _convert_assign(EmuMath::Quaternion<LhsT_>& lhs_, const EmuMath::Quaternion<RhsT_>& rhs_)
 	{
 		if constexpr (_can_const_convert_assign<LhsT_, RhsT_>())
 		{
@@ -69,7 +69,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 	}
 
 	template<typename LhsT_, typename RhsT_>
-	[[nodiscard]] constexpr inline void _convert_assign(EmuMath::Quaternion<LhsT_>& lhs_, EmuMath::Quaternion<RhsT_>& rhs_)
+	constexpr inline void _convert_assign(EmuMath::Quaternion<LhsT_>& lhs_, EmuMath::Quaternion<RhsT_>& rhs_)
 	{
 		if constexpr (_can_non_const_convert_assign<LhsT_, RhsT_>())
 		{
@@ -86,19 +86,19 @@ namespace EmuMath::Helpers::_quaternion_underlying
 	}
 
 	template<typename LhsT_, typename RhsT_>
-	[[nodiscard]] constexpr inline void _convert_assign(EmuMath::Quaternion<LhsT_>& lhs_, EmuMath::Quaternion<RhsT_>&& rhs_)
+	constexpr inline void _convert_assign(EmuMath::Quaternion<LhsT_>& lhs_, EmuMath::Quaternion<RhsT_>&& rhs_)
 	{
 		if constexpr (_can_move_convert_assign<LhsT_, RhsT_>())
 		{
 			// Warning disabled as we are only ever moving separate indices in a well-formed specialisation
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 			using lhs_value_uq = typename EmuMath::Quaternion<LhsT_>::value_type_uq;
 			EmuCore::TMP::assign_direct_or_cast<lhs_value_uq>(_get_x(lhs_), std::move(_get_x(std::forward<EmuMath::Quaternion<RhsT_>>(rhs_))));
 			EmuCore::TMP::assign_direct_or_cast<lhs_value_uq>(_get_y(lhs_), std::move(_get_y(std::forward<EmuMath::Quaternion<RhsT_>>(rhs_))));
 			EmuCore::TMP::assign_direct_or_cast<lhs_value_uq>(_get_z(lhs_), std::move(_get_z(std::forward<EmuMath::Quaternion<RhsT_>>(rhs_))));
 			EmuCore::TMP::assign_direct_or_cast<lhs_value_uq>(_get_w(lhs_), std::move(_get_w(std::forward<EmuMath::Quaternion<RhsT_>>(rhs_))));
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 		else
 		{

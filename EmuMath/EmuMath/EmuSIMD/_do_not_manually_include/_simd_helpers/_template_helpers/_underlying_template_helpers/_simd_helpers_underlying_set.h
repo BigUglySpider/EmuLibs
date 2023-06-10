@@ -1,24 +1,26 @@
 #ifndef EMU_SIMD_TEMPLATE_HELPERS_UNDERLYING_SET_H_INC_
 #define EMU_SIMD_TEMPLATE_HELPERS_UNDERLYING_SET_H_INC_ 1
 
+#include <climits>
 #include "_common_underlying_simd_template_helper_includes.h"
 #include "../../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD::_underlying_simd_helpers
 {
-	template<class Register_, std::size_t ElementWidth_, bool Reverse_, typename...Args_>
+	template<class Register_, std::size_t PerElementWidthIfGenericInt_, bool Reverse_, typename...Args_>
 	[[nodiscard]] inline Register_ _set_int(Args_&&...args_)
 	{
 		static_assert
 		(
-			EmuSIMD::TMP::_assert_valid_simd_int_element_width<ElementWidth_>(),
+			EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfGenericInt_>(),
 			"Invalid ElementWidth_ provided when setting an integral SIMD register via EmuSIMD helpers."
 		);
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		constexpr std::size_t num_args_ = sizeof...(Args_);
 		constexpr std::size_t register_width_ = EmuSIMD::TMP::simd_register_width_v<register_type_uq>;
-		constexpr std::size_t expected_num_args_ = register_width_ / ElementWidth_;
-		using width_int = EmuCore::TMP::int_of_size_t<ElementWidth_ / 8>;
+		constexpr std::size_t per_element_width = EmuSIMD::TMP::determine_register_per_element_width<Register_, PerElementWidthIfGenericInt_>();
+		constexpr std::size_t expected_num_args_ = register_width_ / per_element_width;
+		using width_int = EmuCore::TMP::int_of_size_t<per_element_width / 8>;
 
 		if constexpr (!std::is_same_v<width_int, std::false_type>)
 		{
@@ -29,145 +31,421 @@ namespace EmuSIMD::_underlying_simd_helpers
 					if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 					{
 						// 128-bit
-						if constexpr (ElementWidth_ == 8)
+						if constexpr (per_element_width == 8)
 						{
 							if constexpr (Reverse_)
 							{
-								return EmuSIMD::Funcs::setr_i8x16(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::setr_i8x16(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 							else
 							{
-								return EmuSIMD::Funcs::set_i8x16(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::set_i8x16(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 						}
-						else if constexpr (ElementWidth_ == 16)
+						else if constexpr (per_element_width == 16)
 						{
 							if constexpr (Reverse_)
 							{
-								return EmuSIMD::Funcs::setr_i16x8(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::setr_i16x8(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 							else
 							{
-								return EmuSIMD::Funcs::set_i16x8(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::set_i16x8(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 						}
-						else if constexpr (ElementWidth_ == 32)
+						else if constexpr (per_element_width == 32)
 						{
 							if constexpr (Reverse_)
 							{
-								return EmuSIMD::Funcs::setr_i32x4(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::setr_i32x4(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 							else
 							{
-								return EmuSIMD::Funcs::set_i32x4(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::set_i32x4(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 						}
 						else
 						{
 							if constexpr (Reverse_)
 							{
-								return EmuSIMD::Funcs::setr_i64x2(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::setr_i64x2(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 							else
 							{
-								return EmuSIMD::Funcs::set_i64x2(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::set_i64x2(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 						}
 					}
 					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 					{
 						// 256-bit
-						if constexpr (ElementWidth_ == 8)
+						if constexpr (per_element_width == 8)
 						{
 							if constexpr (Reverse_)
 							{
-								return EmuSIMD::Funcs::setr_i8x32(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::setr_i8x32(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 							else
 							{
-								return EmuSIMD::Funcs::set_i8x32(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::set_i8x32(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 						}
-						else if constexpr (ElementWidth_ == 16)
+						else if constexpr (per_element_width == 16)
 						{
 							if constexpr (Reverse_)
 							{
-								return EmuSIMD::Funcs::setr_i16x16(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::setr_i16x16(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 							else
 							{
-								return EmuSIMD::Funcs::set_i16x16(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::set_i16x16(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 						}
-						else if constexpr (ElementWidth_ == 32)
+						else if constexpr (per_element_width == 32)
 						{
 							if constexpr (Reverse_)
 							{
-								return EmuSIMD::Funcs::setr_i32x8(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::setr_i32x8(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 							else
 							{
-								return EmuSIMD::Funcs::set_i32x8(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::set_i32x8(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 						}
 						else
 						{
 							if constexpr (Reverse_)
 							{
-								return EmuSIMD::Funcs::setr_i64x4(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::setr_i64x4(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 							else
 							{
-								return EmuSIMD::Funcs::set_i64x4(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::set_i64x4(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 						}
 					}
 					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
 					{
 						// 512-bit
-						if constexpr (ElementWidth_ == 8)
+						if constexpr (per_element_width == 8)
 						{
 							if constexpr (Reverse_)
 							{
-								return EmuSIMD::Funcs::setr_i8x64(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::setr_i8x64(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 							else
 							{
-								return EmuSIMD::Funcs::set_i8x64(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::set_i8x64(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 						}
-						else if constexpr (ElementWidth_ == 16)
+						else if constexpr (per_element_width == 16)
 						{
 							if constexpr (Reverse_)
 							{
-								return EmuSIMD::Funcs::setr_i16x32(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::setr_i16x32(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 							else
 							{
-								return EmuSIMD::Funcs::set_i16x32(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::set_i16x32(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 						}
-						else if constexpr (ElementWidth_ == 32)
+						else if constexpr (per_element_width == 32)
 						{
 							if constexpr (Reverse_)
 							{
-								return EmuSIMD::Funcs::setr_i32x16(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::setr_i32x16(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 							else
 							{
-								return EmuSIMD::Funcs::set_i32x16(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::set_i32x16(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 						}
 						else
 						{
 							if constexpr (Reverse_)
 							{
-								return EmuSIMD::Funcs::setr_i64x8(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::setr_i64x8(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
 							else
 							{
-								return EmuSIMD::Funcs::set_i64x8(static_cast<width_int>(args_)...);
+								return EmuSIMD::Funcs::set_i64x8(static_cast<width_int>(std::forward<Args_>(args_))...);
 							}
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+					{
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_i8x16(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_i8x16(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+					{
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_i8x32(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_i8x32(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+					{
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_i8x64(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_i8x64(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+					{
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_i16x8(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_i16x8(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+					{
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_i16x16(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_i16x16(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+					{
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_i16x32(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_i16x32(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+					{
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_i32x4(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_i32x4(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+					{
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_i32x8(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_i32x8(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+					{
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_i32x16(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_i32x16(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+					{
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_i64x2(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_i64x2(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+					{
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_i64x4(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_i64x4(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+					{
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_i64x8(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_i64x8(static_cast<width_int>(std::forward<Args_>(args_))...);
+						}
+					}					
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+					{
+						using unsigned_width_int = typename std::make_unsigned<width_int>::type;
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_u8x16(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_u8x16(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+					{
+						using unsigned_width_int = typename std::make_unsigned<width_int>::type;
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_u8x32(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_u8x32(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+					{
+						using unsigned_width_int = typename std::make_unsigned<width_int>::type;
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_u8x64(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_u8x64(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+					{
+						using unsigned_width_int = typename std::make_unsigned<width_int>::type;
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_u16x8(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_u16x8(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+					{
+						using unsigned_width_int = typename std::make_unsigned<width_int>::type;
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_u16x16(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_u16x16(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+					{
+						using unsigned_width_int = typename std::make_unsigned<width_int>::type;
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_u16x32(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_u16x32(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+					{
+						using unsigned_width_int = typename std::make_unsigned<width_int>::type;
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_u32x4(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_u32x4(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+					{
+						using unsigned_width_int = typename std::make_unsigned<width_int>::type;
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_u32x8(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_u32x8(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+					{
+						using unsigned_width_int = typename std::make_unsigned<width_int>::type;
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_u32x16(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_u32x16(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+					{
+						using unsigned_width_int = typename std::make_unsigned<width_int>::type;
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_u64x2(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_u64x2(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+					{
+						using unsigned_width_int = typename std::make_unsigned<width_int>::type;
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_u64x4(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_u64x4(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+					{
+						using unsigned_width_int = typename std::make_unsigned<width_int>::type;
+						if constexpr (Reverse_)
+						{
+							return EmuSIMD::Funcs::setr_u64x8(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
+						}
+						else
+						{
+							return EmuSIMD::Funcs::set_u64x8(static_cast<unsigned_width_int>(std::forward<Args_>(args_))...);
 						}
 					}
 					else
@@ -187,7 +465,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set an integral SIMD register via EmuSIMD helpers, but an invalid number of arguments was provided. The following argument counts are required, with element bit-widths contained in square parantheses []: (EmuSIMD::i128_generic[8]: 16), (EmuSIMD::i128_generic[16]: 8), (EmuSIMD::i128_generic[32]: 4), (EmuSIMD::i128_generic[64]: 2), (EmuSIMD::i256_generic[8]: 32), (EmuSIMD::i256_generic[16]: 16), (EmuSIMD::i256_generic[32]: 8), (EmuSIMD::i256_generic[64]: 4), (EmuSIMD::i512_generic[8]: 64), (EmuSIMD::i512_generic[16]: 32), (EmuSIMD::i512_generic[32] : 16), (EmuSIMD::i512_generic[64]: 8).");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set an integral SIMD register via EmuSIMD helpers, but an invalid number of arguments was provided. If integral registers are not generic, the required number of arguments is equal to the second number in the alias name (e.g. 8 arguments for i32x8). The following argument counts are required for generic register types, with element bit-widths contained in square parantheses []: (EmuSIMD::i128_generic[8]: 16), (EmuSIMD::i128_generic[16]: 8), (EmuSIMD::i128_generic[32]: 4), (EmuSIMD::i128_generic[64]: 2), (EmuSIMD::i256_generic[8]: 32), (EmuSIMD::i256_generic[16]: 16), (EmuSIMD::i256_generic[32]: 8), (EmuSIMD::i256_generic[64]: 4), (EmuSIMD::i512_generic[8]: 64), (EmuSIMD::i512_generic[16]: 32), (EmuSIMD::i512_generic[32] : 16), (EmuSIMD::i512_generic[64]: 8).");
 			}
 		}
 		else
@@ -216,33 +494,33 @@ namespace EmuSIMD::_underlying_simd_helpers
 					{
 						if constexpr (Reverse_)
 						{
-							return EmuSIMD::Funcs::setr_f32x4(static_cast<float>(args_)...);
+							return EmuSIMD::Funcs::setr_f32x4(static_cast<float>(std::forward<Args_>(args_))...);
 						}
 						else
 						{
-							return EmuSIMD::Funcs::set_f32x4(static_cast<float>(args_)...);
+							return EmuSIMD::Funcs::set_f32x4(static_cast<float>(std::forward<Args_>(args_))...);
 						}
 					}
 					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 					{
 						if constexpr (Reverse_)
 						{
-							return EmuSIMD::Funcs::setr_f32x8(static_cast<float>(args_)...);
+							return EmuSIMD::Funcs::setr_f32x8(static_cast<float>(std::forward<Args_>(args_))...);
 						}
 						else
 						{
-							return EmuSIMD::Funcs::set_f32x8(static_cast<float>(args_)...);
+							return EmuSIMD::Funcs::set_f32x8(static_cast<float>(std::forward<Args_>(args_))...);
 						}
 					}
 					else
 					{
 						if constexpr (Reverse_)
 						{
-							return EmuSIMD::Funcs::setr_f32x16(static_cast<float>(args_)...);
+							return EmuSIMD::Funcs::setr_f32x16(static_cast<float>(std::forward<Args_>(args_))...);
 						}
 						else
 						{
-							return EmuSIMD::Funcs::set_f32x16(static_cast<float>(args_)...);
+							return EmuSIMD::Funcs::set_f32x16(static_cast<float>(std::forward<Args_>(args_))...);
 						}
 					}
 				}
@@ -271,33 +549,33 @@ namespace EmuSIMD::_underlying_simd_helpers
 					{
 						if constexpr (Reverse_)
 						{
-							return EmuSIMD::Funcs::setr_f64x2(static_cast<double>(args_)...);
+							return EmuSIMD::Funcs::setr_f64x2(static_cast<double>(std::forward<Args_>(args_))...);
 						}
 						else
 						{
-							return EmuSIMD::Funcs::set_f64x2(static_cast<double>(args_)...);
+							return EmuSIMD::Funcs::set_f64x2(static_cast<double>(std::forward<Args_>(args_))...);
 						}
 					}
 					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 					{
 						if constexpr (Reverse_)
 						{
-							return EmuSIMD::Funcs::setr_f64x4(static_cast<double>(args_)...);
+							return EmuSIMD::Funcs::setr_f64x4(static_cast<double>(std::forward<Args_>(args_))...);
 						}
 						else
 						{
-							return EmuSIMD::Funcs::set_f64x2(static_cast<double>(args_)...);
+							return EmuSIMD::Funcs::set_f64x4(static_cast<double>(std::forward<Args_>(args_))...);
 						}
 					}
 					else
 					{
 						if constexpr (Reverse_)
 						{
-							return EmuSIMD::Funcs::setr_f64x8(static_cast<double>(args_)...);
+							return EmuSIMD::Funcs::setr_f64x8(static_cast<double>(std::forward<Args_>(args_))...);
 						}
 						else
 						{
-							return EmuSIMD::Funcs::set_f64x2(static_cast<double>(args_)...);
+							return EmuSIMD::Funcs::set_f64x8(static_cast<double>(std::forward<Args_>(args_))...);
 						}
 					}
 				}
@@ -316,7 +594,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			// UNSUPPORTED
 			static_assert
 			(
-				false,
+				EmuCore::TMP::get_false<Register_>(),
 				"Attempted to set a floating-point SIMD register via EmuSIMD helpers, but the provided Register_ type was not a supported floating-point SIMD register."
 			);
 		}
@@ -354,15 +632,111 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 			{
-				return _mm_setzero_si128();
+				return EmuSIMD::Funcs::setzero_i32x4();
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 			{
-				return _mm256_setzero_si256();
+				return EmuSIMD::Funcs::setzero_i32x8();
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
 			{
-				return _mm512_setzero_si512();
+				return EmuSIMD::Funcs::setzero_i32x16();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+			{
+				return EmuSIMD::Funcs::setzero_i8x16();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+			{
+				return EmuSIMD::Funcs::setzero_i16x8();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+			{
+				return EmuSIMD::Funcs::setzero_i32x4();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+			{
+				return EmuSIMD::Funcs::setzero_i64x2();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+			{
+				return EmuSIMD::Funcs::setzero_i8x32();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+			{
+				return EmuSIMD::Funcs::setzero_i16x16();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+			{
+				return EmuSIMD::Funcs::setzero_i32x8();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+			{
+				return EmuSIMD::Funcs::setzero_i64x4();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+			{
+				return EmuSIMD::Funcs::setzero_i8x64();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+			{
+				return EmuSIMD::Funcs::setzero_i16x32();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+			{
+				return EmuSIMD::Funcs::setzero_i32x16();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+			{
+				return EmuSIMD::Funcs::setzero_i64x8();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+			{
+				return EmuSIMD::Funcs::setzero_u8x16();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+			{
+				return EmuSIMD::Funcs::setzero_u16x8();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+			{
+				return EmuSIMD::Funcs::setzero_u32x4();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+			{
+				return EmuSIMD::Funcs::setzero_u64x2();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+			{
+				return EmuSIMD::Funcs::setzero_u8x32();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+			{
+				return EmuSIMD::Funcs::setzero_u16x16();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+			{
+				return EmuSIMD::Funcs::setzero_u32x8();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+			{
+				return EmuSIMD::Funcs::setzero_u64x4();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+			{
+				return EmuSIMD::Funcs::setzero_u8x64();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+			{
+				return EmuSIMD::Funcs::setzero_u16x32();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+			{
+				return EmuSIMD::Funcs::setzero_u32x16();
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+			{
+				return EmuSIMD::Funcs::setzero_u64x8();
 			}
 			else
 			{
@@ -499,6 +873,102 @@ namespace EmuSIMD::_underlying_simd_helpers
 				{
 					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set an integral SIMD register with all elements at the same value via EmuSIMD helpers, but the provided per-element width is invalid.");
 				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+			{
+				return EmuSIMD::Funcs::set1_i8x16(static_cast<std::int8_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+			{
+				return EmuSIMD::Funcs::set1_i8x32(static_cast<std::int8_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+			{
+				return EmuSIMD::Funcs::set1_i8x64(static_cast<std::int8_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+			{
+				return EmuSIMD::Funcs::set1_i16x8(static_cast<std::int16_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+			{
+				return EmuSIMD::Funcs::set1_i16x16(static_cast<std::int16_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+			{
+				return EmuSIMD::Funcs::set1_i16x32(static_cast<std::int16_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+			{
+				return EmuSIMD::Funcs::set1_i32x4(static_cast<std::int32_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+			{
+				return EmuSIMD::Funcs::set1_i32x8(static_cast<std::int32_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+			{
+				return EmuSIMD::Funcs::set1_i32x16(static_cast<std::int32_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+			{
+				return EmuSIMD::Funcs::set1_i64x2(static_cast<std::int64_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+			{
+				return EmuSIMD::Funcs::set1_i64x4(static_cast<std::int64_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+			{
+				return EmuSIMD::Funcs::set1_i64x8(static_cast<std::int64_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+			{
+				return EmuSIMD::Funcs::set1_u8x16(static_cast<std::uint8_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+			{
+				return EmuSIMD::Funcs::set1_u8x32(static_cast<std::uint8_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+			{
+				return EmuSIMD::Funcs::set1_u8x64(static_cast<std::uint8_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+			{
+				return EmuSIMD::Funcs::set1_u16x8(static_cast<std::uint16_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+			{
+				return EmuSIMD::Funcs::set1_u16x16(static_cast<std::uint16_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+			{
+				return EmuSIMD::Funcs::set1_u16x32(static_cast<std::uint16_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+			{
+				return EmuSIMD::Funcs::set1_u32x4(static_cast<std::uint32_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+			{
+				return EmuSIMD::Funcs::set1_u32x8(static_cast<std::uint32_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+			{
+				return EmuSIMD::Funcs::set1_u32x16(static_cast<std::uint32_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+			{
+				return EmuSIMD::Funcs::set1_u64x2(static_cast<std::uint64_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+			{
+				return EmuSIMD::Funcs::set1_u64x4(static_cast<std::uint64_t>(val_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+			{
+				return EmuSIMD::Funcs::set1_u64x8(static_cast<std::uint64_t>(val_));
 			}
 			else
 			{
@@ -637,30 +1107,54 @@ namespace EmuSIMD::_underlying_simd_helpers
 					}
 				}
 			}
-			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::i128_generic, EmuSIMD::i256_generic, EmuSIMD::i512_generic>::value)
+			else if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<register_type_uq>)
 			{
-				if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfInt_>())
+				// This branch alone is perhaps the most horrific template anyone has ever written
+				// I'm so sorry
+				constexpr std::size_t per_element_width = EmuSIMD::TMP::determine_register_per_element_width<register_type_uq, PerElementWidthIfInt_>();
+				constexpr std::size_t register_width = EmuSIMD::TMP::simd_register_width_v<register_type_uq>;
+				if constexpr (per_element_width == 8)
 				{
-					if constexpr (PerElementWidthIfInt_ == 8)
-					{
-						constexpr std::int8_t val_0_ = static_cast<std::int8_t>(StartingVal_);
-						constexpr std::int8_t val_1_ = static_cast<std::int8_t>(func_(StartingVal_, 1));
-						constexpr std::int8_t val_2_ = static_cast<std::int8_t>(func_(StartingVal_, 2));
-						constexpr std::int8_t val_3_ = static_cast<std::int8_t>(func_(StartingVal_, 3));
-						constexpr std::int8_t val_4_ = static_cast<std::int8_t>(func_(StartingVal_, 4));
-						constexpr std::int8_t val_5_ = static_cast<std::int8_t>(func_(StartingVal_, 5));
-						constexpr std::int8_t val_6_ = static_cast<std::int8_t>(func_(StartingVal_, 6));
-						constexpr std::int8_t val_7_ = static_cast<std::int8_t>(func_(StartingVal_, 7));
-						constexpr std::int8_t val_8_ = static_cast<std::int8_t>(func_(StartingVal_, 8));
-						constexpr std::int8_t val_9_ = static_cast<std::int8_t>(func_(StartingVal_, 9));
-						constexpr std::int8_t val_10_ = static_cast<std::int8_t>(func_(StartingVal_, 10));
-						constexpr std::int8_t val_11_ = static_cast<std::int8_t>(func_(StartingVal_, 11));
-						constexpr std::int8_t val_12_ = static_cast<std::int8_t>(func_(StartingVal_, 12));
-						constexpr std::int8_t val_13_ = static_cast<std::int8_t>(func_(StartingVal_, 13));
-						constexpr std::int8_t val_14_ = static_cast<std::int8_t>(func_(StartingVal_, 14));
-						constexpr std::int8_t val_15_ = static_cast<std::int8_t>(func_(StartingVal_, 15));
+					#pragma region MAKE_8_BIT
+					constexpr std::int8_t val_0_ = static_cast<std::int8_t>(StartingVal_);
+					constexpr std::int8_t val_1_ = static_cast<std::int8_t>(func_(StartingVal_, 1));
+					constexpr std::int8_t val_2_ = static_cast<std::int8_t>(func_(StartingVal_, 2));
+					constexpr std::int8_t val_3_ = static_cast<std::int8_t>(func_(StartingVal_, 3));
+					constexpr std::int8_t val_4_ = static_cast<std::int8_t>(func_(StartingVal_, 4));
+					constexpr std::int8_t val_5_ = static_cast<std::int8_t>(func_(StartingVal_, 5));
+					constexpr std::int8_t val_6_ = static_cast<std::int8_t>(func_(StartingVal_, 6));
+					constexpr std::int8_t val_7_ = static_cast<std::int8_t>(func_(StartingVal_, 7));
+					constexpr std::int8_t val_8_ = static_cast<std::int8_t>(func_(StartingVal_, 8));
+					constexpr std::int8_t val_9_ = static_cast<std::int8_t>(func_(StartingVal_, 9));
+					constexpr std::int8_t val_10_ = static_cast<std::int8_t>(func_(StartingVal_, 10));
+					constexpr std::int8_t val_11_ = static_cast<std::int8_t>(func_(StartingVal_, 11));
+					constexpr std::int8_t val_12_ = static_cast<std::int8_t>(func_(StartingVal_, 12));
+					constexpr std::int8_t val_13_ = static_cast<std::int8_t>(func_(StartingVal_, 13));
+					constexpr std::int8_t val_14_ = static_cast<std::int8_t>(func_(StartingVal_, 14));
+					constexpr std::int8_t val_15_ = static_cast<std::int8_t>(func_(StartingVal_, 15));
 
+					if constexpr (register_width == 128)
+					{
 						if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
+						{
+							if constexpr (Reverse_)
+							{
+								return EmuSIMD::Funcs::setr_i8x16
+								(
+									val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+									val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_
+								);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::set_i8x16
+								(
+									val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+									val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_
+								);
+							}
+						}
+						else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
 						{
 							if constexpr (Reverse_)
 							{
@@ -681,24 +1175,69 @@ namespace EmuSIMD::_underlying_simd_helpers
 						}
 						else
 						{
-							constexpr std::int8_t val_16_ = static_cast<std::int8_t>(func_(StartingVal_, 16));
-							constexpr std::int8_t val_17_ = static_cast<std::int8_t>(func_(StartingVal_, 17));
-							constexpr std::int8_t val_18_ = static_cast<std::int8_t>(func_(StartingVal_, 18));
-							constexpr std::int8_t val_19_ = static_cast<std::int8_t>(func_(StartingVal_, 19));
-							constexpr std::int8_t val_20_ = static_cast<std::int8_t>(func_(StartingVal_, 20));
-							constexpr std::int8_t val_21_ = static_cast<std::int8_t>(func_(StartingVal_, 21));
-							constexpr std::int8_t val_22_ = static_cast<std::int8_t>(func_(StartingVal_, 22));
-							constexpr std::int8_t val_23_ = static_cast<std::int8_t>(func_(StartingVal_, 23));
-							constexpr std::int8_t val_24_ = static_cast<std::int8_t>(func_(StartingVal_, 24));
-							constexpr std::int8_t val_25_ = static_cast<std::int8_t>(func_(StartingVal_, 25));
-							constexpr std::int8_t val_26_ = static_cast<std::int8_t>(func_(StartingVal_, 26));
-							constexpr std::int8_t val_27_ = static_cast<std::int8_t>(func_(StartingVal_, 27));
-							constexpr std::int8_t val_28_ = static_cast<std::int8_t>(func_(StartingVal_, 28));
-							constexpr std::int8_t val_29_ = static_cast<std::int8_t>(func_(StartingVal_, 29));
-							constexpr std::int8_t val_30_ = static_cast<std::int8_t>(func_(StartingVal_, 30));
-							constexpr std::int8_t val_31_ = static_cast<std::int8_t>(func_(StartingVal_, 31));
+							if constexpr (Reverse_)
+							{
+								return EmuSIMD::Funcs::setr_u8x16
+								(
+									val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+									val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_
+								);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::set_u8x16
+								(
+									val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+									val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_
+								);
+							}
+						}
+					}
+					else
+					{
+						constexpr std::int8_t val_16_ = static_cast<std::int8_t>(func_(StartingVal_, 16));
+						constexpr std::int8_t val_17_ = static_cast<std::int8_t>(func_(StartingVal_, 17));
+						constexpr std::int8_t val_18_ = static_cast<std::int8_t>(func_(StartingVal_, 18));
+						constexpr std::int8_t val_19_ = static_cast<std::int8_t>(func_(StartingVal_, 19));
+						constexpr std::int8_t val_20_ = static_cast<std::int8_t>(func_(StartingVal_, 20));
+						constexpr std::int8_t val_21_ = static_cast<std::int8_t>(func_(StartingVal_, 21));
+						constexpr std::int8_t val_22_ = static_cast<std::int8_t>(func_(StartingVal_, 22));
+						constexpr std::int8_t val_23_ = static_cast<std::int8_t>(func_(StartingVal_, 23));
+						constexpr std::int8_t val_24_ = static_cast<std::int8_t>(func_(StartingVal_, 24));
+						constexpr std::int8_t val_25_ = static_cast<std::int8_t>(func_(StartingVal_, 25));
+						constexpr std::int8_t val_26_ = static_cast<std::int8_t>(func_(StartingVal_, 26));
+						constexpr std::int8_t val_27_ = static_cast<std::int8_t>(func_(StartingVal_, 27));
+						constexpr std::int8_t val_28_ = static_cast<std::int8_t>(func_(StartingVal_, 28));
+						constexpr std::int8_t val_29_ = static_cast<std::int8_t>(func_(StartingVal_, 29));
+						constexpr std::int8_t val_30_ = static_cast<std::int8_t>(func_(StartingVal_, 30));
+						constexpr std::int8_t val_31_ = static_cast<std::int8_t>(func_(StartingVal_, 31));
 
+						if constexpr (register_width == 256)
+						{
 							if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+							{
+								if constexpr (Reverse_)
+								{
+									return EmuSIMD::Funcs::setr_i8x32
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_,
+										val_16_, val_17_, val_18_, val_19_, val_20_, val_21_, val_22_, val_23_,
+										val_24_, val_25_, val_26_, val_27_, val_28_, val_29_, val_30_, val_31_
+									);
+								}
+								else
+								{
+									return EmuSIMD::Funcs::set_i8x32
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_,
+										val_16_, val_17_, val_18_, val_19_, val_20_, val_21_, val_22_, val_23_,
+										val_24_, val_25_, val_26_, val_27_, val_28_, val_29_, val_30_, val_31_
+									);
+								}
+							}
+							else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
 							{
 								if constexpr (Reverse_)
 								{
@@ -723,39 +1262,65 @@ namespace EmuSIMD::_underlying_simd_helpers
 							}
 							else
 							{
-								constexpr std::int8_t val_32_ = static_cast<std::int8_t>(func_(StartingVal_, 32));
-								constexpr std::int8_t val_33_ = static_cast<std::int8_t>(func_(StartingVal_, 33));
-								constexpr std::int8_t val_34_ = static_cast<std::int8_t>(func_(StartingVal_, 34));
-								constexpr std::int8_t val_35_ = static_cast<std::int8_t>(func_(StartingVal_, 35));
-								constexpr std::int8_t val_36_ = static_cast<std::int8_t>(func_(StartingVal_, 36));
-								constexpr std::int8_t val_37_ = static_cast<std::int8_t>(func_(StartingVal_, 37));
-								constexpr std::int8_t val_38_ = static_cast<std::int8_t>(func_(StartingVal_, 38));
-								constexpr std::int8_t val_39_ = static_cast<std::int8_t>(func_(StartingVal_, 39));
-								constexpr std::int8_t val_40_ = static_cast<std::int8_t>(func_(StartingVal_, 40));
-								constexpr std::int8_t val_41_ = static_cast<std::int8_t>(func_(StartingVal_, 41));
-								constexpr std::int8_t val_42_ = static_cast<std::int8_t>(func_(StartingVal_, 42));
-								constexpr std::int8_t val_43_ = static_cast<std::int8_t>(func_(StartingVal_, 43));
-								constexpr std::int8_t val_44_ = static_cast<std::int8_t>(func_(StartingVal_, 44));
-								constexpr std::int8_t val_45_ = static_cast<std::int8_t>(func_(StartingVal_, 45));
-								constexpr std::int8_t val_46_ = static_cast<std::int8_t>(func_(StartingVal_, 46));
-								constexpr std::int8_t val_47_ = static_cast<std::int8_t>(func_(StartingVal_, 47));
-								constexpr std::int8_t val_48_ = static_cast<std::int8_t>(func_(StartingVal_, 48));
-								constexpr std::int8_t val_49_ = static_cast<std::int8_t>(func_(StartingVal_, 49));
-								constexpr std::int8_t val_50_ = static_cast<std::int8_t>(func_(StartingVal_, 50));
-								constexpr std::int8_t val_51_ = static_cast<std::int8_t>(func_(StartingVal_, 51));
-								constexpr std::int8_t val_52_ = static_cast<std::int8_t>(func_(StartingVal_, 52));
-								constexpr std::int8_t val_53_ = static_cast<std::int8_t>(func_(StartingVal_, 53));
-								constexpr std::int8_t val_54_ = static_cast<std::int8_t>(func_(StartingVal_, 54));
-								constexpr std::int8_t val_55_ = static_cast<std::int8_t>(func_(StartingVal_, 55));
-								constexpr std::int8_t val_56_ = static_cast<std::int8_t>(func_(StartingVal_, 56));
-								constexpr std::int8_t val_57_ = static_cast<std::int8_t>(func_(StartingVal_, 57));
-								constexpr std::int8_t val_58_ = static_cast<std::int8_t>(func_(StartingVal_, 58));
-								constexpr std::int8_t val_59_ = static_cast<std::int8_t>(func_(StartingVal_, 59));
-								constexpr std::int8_t val_60_ = static_cast<std::int8_t>(func_(StartingVal_, 60));
-								constexpr std::int8_t val_61_ = static_cast<std::int8_t>(func_(StartingVal_, 61));
-								constexpr std::int8_t val_62_ = static_cast<std::int8_t>(func_(StartingVal_, 62));
-								constexpr std::int8_t val_63_ = static_cast<std::int8_t>(func_(StartingVal_, 63));
+								if constexpr (Reverse_)
+								{
+									return EmuSIMD::Funcs::setr_u8x32
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_,
+										val_16_, val_17_, val_18_, val_19_, val_20_, val_21_, val_22_, val_23_,
+										val_24_, val_25_, val_26_, val_27_, val_28_, val_29_, val_30_, val_31_
+									);
+								}
+								else
+								{
+									return EmuSIMD::Funcs::set_u8x32
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_,
+										val_16_, val_17_, val_18_, val_19_, val_20_, val_21_, val_22_, val_23_,
+										val_24_, val_25_, val_26_, val_27_, val_28_, val_29_, val_30_, val_31_
+									);
+								}
+							}
+						}
+						else
+						{
+							constexpr std::int8_t val_32_ = static_cast<std::int8_t>(func_(StartingVal_, 32));
+							constexpr std::int8_t val_33_ = static_cast<std::int8_t>(func_(StartingVal_, 33));
+							constexpr std::int8_t val_34_ = static_cast<std::int8_t>(func_(StartingVal_, 34));
+							constexpr std::int8_t val_35_ = static_cast<std::int8_t>(func_(StartingVal_, 35));
+							constexpr std::int8_t val_36_ = static_cast<std::int8_t>(func_(StartingVal_, 36));
+							constexpr std::int8_t val_37_ = static_cast<std::int8_t>(func_(StartingVal_, 37));
+							constexpr std::int8_t val_38_ = static_cast<std::int8_t>(func_(StartingVal_, 38));
+							constexpr std::int8_t val_39_ = static_cast<std::int8_t>(func_(StartingVal_, 39));
+							constexpr std::int8_t val_40_ = static_cast<std::int8_t>(func_(StartingVal_, 40));
+							constexpr std::int8_t val_41_ = static_cast<std::int8_t>(func_(StartingVal_, 41));
+							constexpr std::int8_t val_42_ = static_cast<std::int8_t>(func_(StartingVal_, 42));
+							constexpr std::int8_t val_43_ = static_cast<std::int8_t>(func_(StartingVal_, 43));
+							constexpr std::int8_t val_44_ = static_cast<std::int8_t>(func_(StartingVal_, 44));
+							constexpr std::int8_t val_45_ = static_cast<std::int8_t>(func_(StartingVal_, 45));
+							constexpr std::int8_t val_46_ = static_cast<std::int8_t>(func_(StartingVal_, 46));
+							constexpr std::int8_t val_47_ = static_cast<std::int8_t>(func_(StartingVal_, 47));
+							constexpr std::int8_t val_48_ = static_cast<std::int8_t>(func_(StartingVal_, 48));
+							constexpr std::int8_t val_49_ = static_cast<std::int8_t>(func_(StartingVal_, 49));
+							constexpr std::int8_t val_50_ = static_cast<std::int8_t>(func_(StartingVal_, 50));
+							constexpr std::int8_t val_51_ = static_cast<std::int8_t>(func_(StartingVal_, 51));
+							constexpr std::int8_t val_52_ = static_cast<std::int8_t>(func_(StartingVal_, 52));
+							constexpr std::int8_t val_53_ = static_cast<std::int8_t>(func_(StartingVal_, 53));
+							constexpr std::int8_t val_54_ = static_cast<std::int8_t>(func_(StartingVal_, 54));
+							constexpr std::int8_t val_55_ = static_cast<std::int8_t>(func_(StartingVal_, 55));
+							constexpr std::int8_t val_56_ = static_cast<std::int8_t>(func_(StartingVal_, 56));
+							constexpr std::int8_t val_57_ = static_cast<std::int8_t>(func_(StartingVal_, 57));
+							constexpr std::int8_t val_58_ = static_cast<std::int8_t>(func_(StartingVal_, 58));
+							constexpr std::int8_t val_59_ = static_cast<std::int8_t>(func_(StartingVal_, 59));
+							constexpr std::int8_t val_60_ = static_cast<std::int8_t>(func_(StartingVal_, 60));
+							constexpr std::int8_t val_61_ = static_cast<std::int8_t>(func_(StartingVal_, 61));
+							constexpr std::int8_t val_62_ = static_cast<std::int8_t>(func_(StartingVal_, 62));
+							constexpr std::int8_t val_63_ = static_cast<std::int8_t>(func_(StartingVal_, 63));
 
+							if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
+							{
 								if constexpr (Reverse_)
 								{
 									return EmuSIMD::Funcs::setr_i8x64
@@ -785,20 +1350,98 @@ namespace EmuSIMD::_underlying_simd_helpers
 									);
 								}
 							}
+							else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+							{
+								if constexpr (Reverse_)
+								{
+									return EmuSIMD::Funcs::setr_i8x64
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_,
+										val_16_, val_17_, val_18_, val_19_, val_20_, val_21_, val_22_, val_23_,
+										val_24_, val_25_, val_26_, val_27_, val_28_, val_29_, val_30_, val_31_,
+										val_32_, val_33_, val_34_, val_35_, val_36_, val_37_, val_38_, val_39_,
+										val_40_, val_41_, val_42_, val_43_, val_44_, val_45_, val_46_, val_47_,
+										val_48_, val_49_, val_50_, val_51_, val_52_, val_53_, val_54_, val_55_,
+										val_56_, val_57_, val_58_, val_59_, val_60_, val_61_, val_62_, val_63_
+									);
+								}
+								else
+								{
+									return EmuSIMD::Funcs::set_i8x64
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_,
+										val_16_, val_17_, val_18_, val_19_, val_20_, val_21_, val_22_, val_23_,
+										val_24_, val_25_, val_26_, val_27_, val_28_, val_29_, val_30_, val_31_,
+										val_32_, val_33_, val_34_, val_35_, val_36_, val_37_, val_38_, val_39_,
+										val_40_, val_41_, val_42_, val_43_, val_44_, val_45_, val_46_, val_47_,
+										val_48_, val_49_, val_50_, val_51_, val_52_, val_53_, val_54_, val_55_,
+										val_56_, val_57_, val_58_, val_59_, val_60_, val_61_, val_62_, val_63_
+									);
+								}
+							}
+							else
+							{
+								if constexpr (Reverse_)
+								{
+									return EmuSIMD::Funcs::setr_u8x64
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_,
+										val_16_, val_17_, val_18_, val_19_, val_20_, val_21_, val_22_, val_23_,
+										val_24_, val_25_, val_26_, val_27_, val_28_, val_29_, val_30_, val_31_,
+										val_32_, val_33_, val_34_, val_35_, val_36_, val_37_, val_38_, val_39_,
+										val_40_, val_41_, val_42_, val_43_, val_44_, val_45_, val_46_, val_47_,
+										val_48_, val_49_, val_50_, val_51_, val_52_, val_53_, val_54_, val_55_,
+										val_56_, val_57_, val_58_, val_59_, val_60_, val_61_, val_62_, val_63_
+									);
+								}
+								else
+								{
+									return EmuSIMD::Funcs::set_u8x64
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_,
+										val_16_, val_17_, val_18_, val_19_, val_20_, val_21_, val_22_, val_23_,
+										val_24_, val_25_, val_26_, val_27_, val_28_, val_29_, val_30_, val_31_,
+										val_32_, val_33_, val_34_, val_35_, val_36_, val_37_, val_38_, val_39_,
+										val_40_, val_41_, val_42_, val_43_, val_44_, val_45_, val_46_, val_47_,
+										val_48_, val_49_, val_50_, val_51_, val_52_, val_53_, val_54_, val_55_,
+										val_56_, val_57_, val_58_, val_59_, val_60_, val_61_, val_62_, val_63_
+									);
+								}
+							}
 						}
 					}
-					else if constexpr (PerElementWidthIfInt_ == 16)
-					{
-						constexpr std::int16_t val_0_ = static_cast<std::int16_t>(StartingVal_);
-						constexpr std::int16_t val_1_ = static_cast<std::int16_t>(func_(StartingVal_, 1));
-						constexpr std::int16_t val_2_ = static_cast<std::int16_t>(func_(StartingVal_, 2));
-						constexpr std::int16_t val_3_ = static_cast<std::int16_t>(func_(StartingVal_, 3));
-						constexpr std::int16_t val_4_ = static_cast<std::int16_t>(func_(StartingVal_, 4));
-						constexpr std::int16_t val_5_ = static_cast<std::int16_t>(func_(StartingVal_, 5));
-						constexpr std::int16_t val_6_ = static_cast<std::int16_t>(func_(StartingVal_, 6));
-						constexpr std::int16_t val_7_ = static_cast<std::int16_t>(func_(StartingVal_, 7));
+					#pragma endregion
+				}
+				else if constexpr (per_element_width == 16)
+				{
+					#pragma region MAKE_16_BIT
+					constexpr std::int16_t val_0_ = static_cast<std::int16_t>(StartingVal_);
+					constexpr std::int16_t val_1_ = static_cast<std::int16_t>(func_(StartingVal_, 1));
+					constexpr std::int16_t val_2_ = static_cast<std::int16_t>(func_(StartingVal_, 2));
+					constexpr std::int16_t val_3_ = static_cast<std::int16_t>(func_(StartingVal_, 3));
+					constexpr std::int16_t val_4_ = static_cast<std::int16_t>(func_(StartingVal_, 4));
+					constexpr std::int16_t val_5_ = static_cast<std::int16_t>(func_(StartingVal_, 5));
+					constexpr std::int16_t val_6_ = static_cast<std::int16_t>(func_(StartingVal_, 6));
+					constexpr std::int16_t val_7_ = static_cast<std::int16_t>(func_(StartingVal_, 7));
 
+					if constexpr (register_width == 128)
+					{
 						if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
+						{
+							if constexpr (Reverse_)
+							{
+								return EmuSIMD::Funcs::setr_i16x8(val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::set_i16x8(val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_);
+							}
+						}
+						else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
 						{
 							if constexpr (Reverse_)
 							{
@@ -811,16 +1454,49 @@ namespace EmuSIMD::_underlying_simd_helpers
 						}
 						else
 						{
-							constexpr std::int16_t val_8_ = static_cast<std::int16_t>(func_(StartingVal_, 8));
-							constexpr std::int16_t val_9_ = static_cast<std::int16_t>(func_(StartingVal_, 9));
-							constexpr std::int16_t val_10_ = static_cast<std::int16_t>(func_(StartingVal_, 10));
-							constexpr std::int16_t val_11_ = static_cast<std::int16_t>(func_(StartingVal_, 11));
-							constexpr std::int16_t val_12_ = static_cast<std::int16_t>(func_(StartingVal_, 12));
-							constexpr std::int16_t val_13_ = static_cast<std::int16_t>(func_(StartingVal_, 13));
-							constexpr std::int16_t val_14_ = static_cast<std::int16_t>(func_(StartingVal_, 14));
-							constexpr std::int16_t val_15_ = static_cast<std::int16_t>(func_(StartingVal_, 15));
+							if constexpr (Reverse_)
+							{
+								return EmuSIMD::Funcs::setr_u16x8(val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::set_u16x8(val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_);
+							}
+						}
+					}
+					else
+					{
+						constexpr std::int16_t val_8_ = static_cast<std::int16_t>(func_(StartingVal_, 8));
+						constexpr std::int16_t val_9_ = static_cast<std::int16_t>(func_(StartingVal_, 9));
+						constexpr std::int16_t val_10_ = static_cast<std::int16_t>(func_(StartingVal_, 10));
+						constexpr std::int16_t val_11_ = static_cast<std::int16_t>(func_(StartingVal_, 11));
+						constexpr std::int16_t val_12_ = static_cast<std::int16_t>(func_(StartingVal_, 12));
+						constexpr std::int16_t val_13_ = static_cast<std::int16_t>(func_(StartingVal_, 13));
+						constexpr std::int16_t val_14_ = static_cast<std::int16_t>(func_(StartingVal_, 14));
+						constexpr std::int16_t val_15_ = static_cast<std::int16_t>(func_(StartingVal_, 15));
 
+						if constexpr (register_width == 256)
+						{
 							if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+							{
+								if constexpr (Reverse_)
+								{
+									return EmuSIMD::Funcs::setr_i16x16
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_
+									);
+								}
+								else
+								{
+									return EmuSIMD::Funcs::set_i16x16
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_
+									);
+								}
+							}
+							else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
 							{
 								if constexpr (Reverse_)
 								{
@@ -841,23 +1517,45 @@ namespace EmuSIMD::_underlying_simd_helpers
 							}
 							else
 							{
-								constexpr std::int16_t val_16_ = static_cast<std::int16_t>(func_(StartingVal_, 16));
-								constexpr std::int16_t val_17_ = static_cast<std::int16_t>(func_(StartingVal_, 17));
-								constexpr std::int16_t val_18_ = static_cast<std::int16_t>(func_(StartingVal_, 18));
-								constexpr std::int16_t val_19_ = static_cast<std::int16_t>(func_(StartingVal_, 19));
-								constexpr std::int16_t val_20_ = static_cast<std::int16_t>(func_(StartingVal_, 20));
-								constexpr std::int16_t val_21_ = static_cast<std::int16_t>(func_(StartingVal_, 21));
-								constexpr std::int16_t val_22_ = static_cast<std::int16_t>(func_(StartingVal_, 22));
-								constexpr std::int16_t val_23_ = static_cast<std::int16_t>(func_(StartingVal_, 23));
-								constexpr std::int16_t val_24_ = static_cast<std::int16_t>(func_(StartingVal_, 24));
-								constexpr std::int16_t val_25_ = static_cast<std::int16_t>(func_(StartingVal_, 25));
-								constexpr std::int16_t val_26_ = static_cast<std::int16_t>(func_(StartingVal_, 26));
-								constexpr std::int16_t val_27_ = static_cast<std::int16_t>(func_(StartingVal_, 27));
-								constexpr std::int16_t val_28_ = static_cast<std::int16_t>(func_(StartingVal_, 28));
-								constexpr std::int16_t val_29_ = static_cast<std::int16_t>(func_(StartingVal_, 29));
-								constexpr std::int16_t val_30_ = static_cast<std::int16_t>(func_(StartingVal_, 30));
-								constexpr std::int16_t val_31_ = static_cast<std::int16_t>(func_(StartingVal_, 31));
+								if constexpr (Reverse_)
+								{
+									return EmuSIMD::Funcs::setr_u16x16
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_
+									);
+								}
+								else
+								{
+									return EmuSIMD::Funcs::set_u16x16
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_
+									);
+								}
+							}
+						}
+						else
+						{
+							constexpr std::int16_t val_16_ = static_cast<std::int16_t>(func_(StartingVal_, 16));
+							constexpr std::int16_t val_17_ = static_cast<std::int16_t>(func_(StartingVal_, 17));
+							constexpr std::int16_t val_18_ = static_cast<std::int16_t>(func_(StartingVal_, 18));
+							constexpr std::int16_t val_19_ = static_cast<std::int16_t>(func_(StartingVal_, 19));
+							constexpr std::int16_t val_20_ = static_cast<std::int16_t>(func_(StartingVal_, 20));
+							constexpr std::int16_t val_21_ = static_cast<std::int16_t>(func_(StartingVal_, 21));
+							constexpr std::int16_t val_22_ = static_cast<std::int16_t>(func_(StartingVal_, 22));
+							constexpr std::int16_t val_23_ = static_cast<std::int16_t>(func_(StartingVal_, 23));
+							constexpr std::int16_t val_24_ = static_cast<std::int16_t>(func_(StartingVal_, 24));
+							constexpr std::int16_t val_25_ = static_cast<std::int16_t>(func_(StartingVal_, 25));
+							constexpr std::int16_t val_26_ = static_cast<std::int16_t>(func_(StartingVal_, 26));
+							constexpr std::int16_t val_27_ = static_cast<std::int16_t>(func_(StartingVal_, 27));
+							constexpr std::int16_t val_28_ = static_cast<std::int16_t>(func_(StartingVal_, 28));
+							constexpr std::int16_t val_29_ = static_cast<std::int16_t>(func_(StartingVal_, 29));
+							constexpr std::int16_t val_30_ = static_cast<std::int16_t>(func_(StartingVal_, 30));
+							constexpr std::int16_t val_31_ = static_cast<std::int16_t>(func_(StartingVal_, 31));
 
+							if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
+							{
 								if constexpr (Reverse_)
 								{
 									return EmuSIMD::Funcs::setr_i16x32
@@ -879,16 +1577,78 @@ namespace EmuSIMD::_underlying_simd_helpers
 									);
 								}
 							}
+							else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+							{
+								if constexpr (Reverse_)
+								{
+									return EmuSIMD::Funcs::setr_i16x32
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_,
+										val_16_, val_17_, val_18_, val_19_, val_20_, val_21_, val_22_, val_23_,
+										val_24_, val_25_, val_26_, val_27_, val_28_, val_29_, val_30_, val_31_
+									);
+								}
+								else
+								{
+									return EmuSIMD::Funcs::set_i16x32
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_,
+										val_16_, val_17_, val_18_, val_19_, val_20_, val_21_, val_22_, val_23_,
+										val_24_, val_25_, val_26_, val_27_, val_28_, val_29_, val_30_, val_31_
+									);
+								}
+							}
+							else
+							{
+								if constexpr (Reverse_)
+								{
+									return EmuSIMD::Funcs::setr_u16x32
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_,
+										val_16_, val_17_, val_18_, val_19_, val_20_, val_21_, val_22_, val_23_,
+										val_24_, val_25_, val_26_, val_27_, val_28_, val_29_, val_30_, val_31_
+									);
+								}
+								else
+								{
+									return EmuSIMD::Funcs::set_u16x32
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_,
+										val_16_, val_17_, val_18_, val_19_, val_20_, val_21_, val_22_, val_23_,
+										val_24_, val_25_, val_26_, val_27_, val_28_, val_29_, val_30_, val_31_
+									);
+								}
+							}
 						}
 					}
-					else if constexpr (PerElementWidthIfInt_ == 32)
-					{
-						constexpr std::int32_t val_0_ = static_cast<std::int32_t>(StartingVal_);
-						constexpr std::int32_t val_1_ = static_cast<std::int32_t>(func_(StartingVal_, 1));
-						constexpr std::int32_t val_2_ = static_cast<std::int32_t>(func_(StartingVal_, 2));
-						constexpr std::int32_t val_3_ = static_cast<std::int32_t>(func_(StartingVal_, 3));
+					#pragma endregion
+				}
+				else if constexpr (per_element_width == 32)
+				{
+					#pragma region MAKE_32_BIT
+					constexpr std::int32_t val_0_ = static_cast<std::int32_t>(StartingVal_);
+					constexpr std::int32_t val_1_ = static_cast<std::int32_t>(func_(StartingVal_, 1));
+					constexpr std::int32_t val_2_ = static_cast<std::int32_t>(func_(StartingVal_, 2));
+					constexpr std::int32_t val_3_ = static_cast<std::int32_t>(func_(StartingVal_, 3));
 
+					if constexpr (register_width == 128)
+					{
 						if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
+						{
+							if constexpr (Reverse_)
+							{
+								return EmuSIMD::Funcs::setr_i32x4(val_0_, val_1_, val_2_, val_3_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::set_i32x4(val_0_, val_1_, val_2_, val_3_);
+							}
+						}
+						else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
 						{
 							if constexpr (Reverse_)
 							{
@@ -901,12 +1661,37 @@ namespace EmuSIMD::_underlying_simd_helpers
 						}
 						else
 						{
-							constexpr std::int32_t val_4_ = static_cast<std::int32_t>(func_(StartingVal_, 4));
-							constexpr std::int32_t val_5_ = static_cast<std::int32_t>(func_(StartingVal_, 5));
-							constexpr std::int32_t val_6_ = static_cast<std::int32_t>(func_(StartingVal_, 6));
-							constexpr std::int32_t val_7_ = static_cast<std::int32_t>(func_(StartingVal_, 7));
+							if constexpr (Reverse_)
+							{
+								return EmuSIMD::Funcs::setr_u32x4(val_0_, val_1_, val_2_, val_3_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::set_u32x4(val_0_, val_1_, val_2_, val_3_);
+							}
+						}
+					}
+					else
+					{
+						constexpr std::int32_t val_4_ = static_cast<std::int32_t>(func_(StartingVal_, 4));
+						constexpr std::int32_t val_5_ = static_cast<std::int32_t>(func_(StartingVal_, 5));
+						constexpr std::int32_t val_6_ = static_cast<std::int32_t>(func_(StartingVal_, 6));
+						constexpr std::int32_t val_7_ = static_cast<std::int32_t>(func_(StartingVal_, 7));
 
+						if constexpr (register_width == 256)
+						{
 							if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+							{
+								if constexpr (Reverse_)
+								{
+									return EmuSIMD::Funcs::setr_i32x8(val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_);
+								}
+								else
+								{
+									return EmuSIMD::Funcs::set_i32x8(val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_);
+								}
+							}
+							else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
 							{
 								if constexpr (Reverse_)
 								{
@@ -919,15 +1704,29 @@ namespace EmuSIMD::_underlying_simd_helpers
 							}
 							else
 							{
-								constexpr std::int32_t val_8_ = static_cast<std::int32_t>(func_(StartingVal_, 8));
-								constexpr std::int32_t val_9_ = static_cast<std::int32_t>(func_(StartingVal_, 9));
-								constexpr std::int32_t val_10_ = static_cast<std::int32_t>(func_(StartingVal_, 10));
-								constexpr std::int32_t val_11_ = static_cast<std::int32_t>(func_(StartingVal_, 11));
-								constexpr std::int32_t val_12_ = static_cast<std::int32_t>(func_(StartingVal_, 12));
-								constexpr std::int32_t val_13_ = static_cast<std::int32_t>(func_(StartingVal_, 13));
-								constexpr std::int32_t val_14_ = static_cast<std::int32_t>(func_(StartingVal_, 14));
-								constexpr std::int32_t val_15_ = static_cast<std::int32_t>(func_(StartingVal_, 15));
+								if constexpr (Reverse_)
+								{
+									return EmuSIMD::Funcs::setr_u32x8(val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_);
+								}
+								else
+								{
+									return EmuSIMD::Funcs::set_u32x8(val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_);
+								}
+							}
+						}
+						else
+						{
+							constexpr std::int32_t val_8_ = static_cast<std::int32_t>(func_(StartingVal_, 8));
+							constexpr std::int32_t val_9_ = static_cast<std::int32_t>(func_(StartingVal_, 9));
+							constexpr std::int32_t val_10_ = static_cast<std::int32_t>(func_(StartingVal_, 10));
+							constexpr std::int32_t val_11_ = static_cast<std::int32_t>(func_(StartingVal_, 11));
+							constexpr std::int32_t val_12_ = static_cast<std::int32_t>(func_(StartingVal_, 12));
+							constexpr std::int32_t val_13_ = static_cast<std::int32_t>(func_(StartingVal_, 13));
+							constexpr std::int32_t val_14_ = static_cast<std::int32_t>(func_(StartingVal_, 14));
+							constexpr std::int32_t val_15_ = static_cast<std::int32_t>(func_(StartingVal_, 15));
 
+							if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
+							{
 								if constexpr (Reverse_)
 								{
 									return EmuSIMD::Funcs::setr_i32x16
@@ -945,14 +1744,68 @@ namespace EmuSIMD::_underlying_simd_helpers
 									);
 								}
 							}
+							else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+							{
+								if constexpr (Reverse_)
+								{
+									return EmuSIMD::Funcs::setr_i32x16
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_
+									);
+								}
+								else
+								{
+									return EmuSIMD::Funcs::set_i32x16
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_
+									);
+								}
+							}
+							else
+							{
+								if constexpr (Reverse_)
+								{
+									return EmuSIMD::Funcs::setr_u32x16
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_
+									);
+								}
+								else
+								{
+									return EmuSIMD::Funcs::set_u32x16
+									(
+										val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_,
+										val_8_, val_9_, val_10_, val_11_, val_12_, val_13_, val_14_, val_15_
+									);
+								}
+							}
 						}
 					}
-					else
-					{
-						constexpr std::int64_t val_0_ = static_cast<std::int64_t>(StartingVal_);
-						constexpr std::int64_t val_1_ = static_cast<std::int64_t>(func_(StartingVal_, 1));
+					#pragma endregion
+				}
+				else if constexpr (per_element_width == 64)
+				{
+					#pragma region MAKE_64_BIT
+					constexpr std::int64_t val_0_ = static_cast<std::int64_t>(StartingVal_);
+					constexpr std::int64_t val_1_ = static_cast<std::int64_t>(func_(StartingVal_, 1));
 
+					if constexpr (register_width == 128)
+					{
 						if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
+						{
+							if constexpr (Reverse_)
+							{
+								return EmuSIMD::Funcs::setr_i64x2(val_0_, val_1_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::set_i64x2(val_0_, val_1_);
+							}
+						}
+						else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
 						{
 							if constexpr (Reverse_)
 							{
@@ -965,10 +1818,35 @@ namespace EmuSIMD::_underlying_simd_helpers
 						}
 						else
 						{
-							constexpr std::int64_t val_2_ = static_cast<std::int64_t>(func_(StartingVal_, 2));
-							constexpr std::int64_t val_3_ = static_cast<std::int64_t>(func_(StartingVal_, 3));
+							if constexpr (Reverse_)
+							{
+								return EmuSIMD::Funcs::setr_u64x2(val_0_, val_1_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::set_u64x2(val_0_, val_1_);
+							}
+						}
+					}
+					else
+					{
+						constexpr std::int64_t val_2_ = static_cast<std::int64_t>(func_(StartingVal_, 2));
+						constexpr std::int64_t val_3_ = static_cast<std::int64_t>(func_(StartingVal_, 3));
 
+						if constexpr (register_width == 256)
+						{
 							if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+							{
+								if constexpr (Reverse_)
+								{
+									return EmuSIMD::Funcs::setr_i64x4(val_0_, val_1_, val_2_, val_3_);
+								}
+								else
+								{
+									return EmuSIMD::Funcs::set_i64x4(val_0_, val_1_, val_2_, val_3_);
+								}
+							}
+							else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
 							{
 								if constexpr (Reverse_)
 								{
@@ -981,11 +1859,25 @@ namespace EmuSIMD::_underlying_simd_helpers
 							}
 							else
 							{
-								constexpr std::int64_t val_4_ = static_cast<std::int64_t>(func_(StartingVal_, 4));
-								constexpr std::int64_t val_5_ = static_cast<std::int64_t>(func_(StartingVal_, 5));
-								constexpr std::int64_t val_6_ = static_cast<std::int64_t>(func_(StartingVal_, 6));
-								constexpr std::int64_t val_7_ = static_cast<std::int64_t>(func_(StartingVal_, 7));
+								if constexpr (Reverse_)
+								{
+									return EmuSIMD::Funcs::setr_u64x4(val_0_, val_1_, val_2_, val_3_);
+								}
+								else
+								{
+									return EmuSIMD::Funcs::set_u64x4(val_0_, val_1_, val_2_, val_3_);
+								}
+							}
+						}
+						else
+						{
+							constexpr std::int64_t val_4_ = static_cast<std::int64_t>(func_(StartingVal_, 4));
+							constexpr std::int64_t val_5_ = static_cast<std::int64_t>(func_(StartingVal_, 5));
+							constexpr std::int64_t val_6_ = static_cast<std::int64_t>(func_(StartingVal_, 6));
+							constexpr std::int64_t val_7_ = static_cast<std::int64_t>(func_(StartingVal_, 7));
 
+							if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
+							{
 								if constexpr (Reverse_)
 								{
 									return EmuSIMD::Funcs::setr_i64x8(val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_);
@@ -995,12 +1887,35 @@ namespace EmuSIMD::_underlying_simd_helpers
 									return EmuSIMD::Funcs::set_i64x8(val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_);
 								}
 							}
+							else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+							{
+								if constexpr (Reverse_)
+								{
+									return EmuSIMD::Funcs::setr_i64x8(val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_);
+								}
+								else
+								{
+									return EmuSIMD::Funcs::set_i64x8(val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_);
+								}
+							}
+							else
+							{
+								if constexpr (Reverse_)
+								{
+									return EmuSIMD::Funcs::setr_u64x8(val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_);
+								}
+								else
+								{
+									return EmuSIMD::Funcs::set_u64x8(val_0_, val_1_, val_2_, val_3_, val_4_, val_5_, val_6_, val_7_);
+								}
+							}
 						}
 					}
+					#pragma endregion
 				}
 				else
 				{
-					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set an integral SIMD register with a progressively modified value via EmuSIMD helpers, but the provided bit-width per element is invalid.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set an integral SIMD register with a progressively modified value via EmuSIMD helpers, but the determined bit-width per element is invalid.");
 				}
 			}
 			else
@@ -1030,7 +1945,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
-				return EmuSIMD::Funcs::load_f32x16(p_to_load_);
+				return EmuSIMD::Funcs::load_f32x16(reinterpret_cast<const float*>(p_to_load_));
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
@@ -1042,19 +1957,115 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
-				return EmuSIMD::Funcs::load_f64x8(p_to_load_);
+				return EmuSIMD::Funcs::load_f64x8(reinterpret_cast<const double*>(p_to_load_));
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 			{
-				return _mm_load_si128(reinterpret_cast<const EmuSIMD::i128_generic*>(p_to_load_));
+				return EmuSIMD::Funcs::load_i8x16(reinterpret_cast<const std::int8_t*>(p_to_load_));
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 			{
-				return _mm256_load_si256(reinterpret_cast<const EmuSIMD::i256_generic*>(p_to_load_));
+				return EmuSIMD::Funcs::load_i8x32(reinterpret_cast<const std::int8_t*>(p_to_load_));
 			}
 			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
 			{
-				return _mm512_load_si512(p_to_load_);
+				return EmuSIMD::Funcs::load_i8x64(reinterpret_cast<const std::int8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+			{
+				return EmuSIMD::Funcs::load_i8x16(reinterpret_cast<const std::int8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+			{
+				return EmuSIMD::Funcs::load_i8x32(reinterpret_cast<const std::int8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+			{
+				return EmuSIMD::Funcs::load_i8x64(reinterpret_cast<const std::int8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+			{
+				return EmuSIMD::Funcs::load_i16x8(reinterpret_cast<const std::int16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+			{
+				return EmuSIMD::Funcs::load_i16x16(reinterpret_cast<const std::int16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+			{
+				return EmuSIMD::Funcs::load_i16x32(reinterpret_cast<const std::int16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+			{
+				return EmuSIMD::Funcs::load_i32x4(reinterpret_cast<const std::int32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+			{
+				return EmuSIMD::Funcs::load_i32x8(reinterpret_cast<const std::int32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+			{
+				return EmuSIMD::Funcs::load_i32x16(reinterpret_cast<const std::int32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+			{
+				return EmuSIMD::Funcs::load_i64x2(reinterpret_cast<const std::int64_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+			{
+				return EmuSIMD::Funcs::load_i64x4(reinterpret_cast<const std::int64_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+			{
+				return EmuSIMD::Funcs::load_i64x8(reinterpret_cast<const std::int64_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+			{
+				return EmuSIMD::Funcs::load_u8x16(reinterpret_cast<const std::uint8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+			{
+				return EmuSIMD::Funcs::load_u8x32(reinterpret_cast<const std::uint8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+			{
+				return EmuSIMD::Funcs::load_u8x64(reinterpret_cast<const std::uint8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+			{
+				return EmuSIMD::Funcs::load_u16x8(reinterpret_cast<const std::uint16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+			{
+				return EmuSIMD::Funcs::load_u16x16(reinterpret_cast<const std::uint16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+			{
+				return EmuSIMD::Funcs::load_u16x32(reinterpret_cast<const std::uint16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+			{
+				return EmuSIMD::Funcs::load_u32x4(reinterpret_cast<const std::uint32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+			{
+				return EmuSIMD::Funcs::load_u32x8(reinterpret_cast<const std::uint32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+			{
+				return EmuSIMD::Funcs::load_u32x16(reinterpret_cast<const std::uint32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+			{
+				return EmuSIMD::Funcs::load_u64x2(reinterpret_cast<const std::uint64_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+			{
+				return EmuSIMD::Funcs::load_u64x4(reinterpret_cast<const std::uint64_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+			{
+				return EmuSIMD::Funcs::load_u64x8(reinterpret_cast<const std::uint64_t*>(p_to_load_));
 			}
 			else
 			{
@@ -1065,6 +2076,204 @@ namespace EmuSIMD::_underlying_simd_helpers
 		{
 			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to load a SIMD register from memory via EmuSIMD helpers, but the provided Register_ type was not recognised as a supported SIMD register.");
 		}
+	}
+
+	template<class Register_, typename In_>
+	[[nodiscard]] inline Register_ _aligned_load(const In_* p_to_load_)
+	{
+		using register_type_uq = EmuCore::TMP::remove_ref_cv_t<Register_>;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
+			{
+				return EmuSIMD::Funcs::aligned_load_f32x4(reinterpret_cast<const float*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
+			{
+				return EmuSIMD::Funcs::aligned_load_f32x8(reinterpret_cast<const float*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
+			{
+				return EmuSIMD::Funcs::aligned_load_f32x16(reinterpret_cast<const float*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
+			{
+				return EmuSIMD::Funcs::aligned_load_f64x2(reinterpret_cast<const double*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
+			{
+				return EmuSIMD::Funcs::aligned_load_f64x4(reinterpret_cast<const double*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
+			{
+				return EmuSIMD::Funcs::aligned_load_f64x8(reinterpret_cast<const double*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i8x16(reinterpret_cast<const std::int8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i8x32(reinterpret_cast<const std::int8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i8x64(reinterpret_cast<const std::int8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i8x16(reinterpret_cast<const std::int8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i8x32(reinterpret_cast<const std::int8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i8x64(reinterpret_cast<const std::int8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i16x8(reinterpret_cast<const std::int16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i16x16(reinterpret_cast<const std::int16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i16x32(reinterpret_cast<const std::int16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i32x4(reinterpret_cast<const std::int32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i32x8(reinterpret_cast<const std::int32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i32x16(reinterpret_cast<const std::int32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i64x2(reinterpret_cast<const std::int64_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i64x4(reinterpret_cast<const std::int64_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+			{
+				return EmuSIMD::Funcs::aligned_load_i64x8(reinterpret_cast<const std::int64_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u8x16(reinterpret_cast<const std::uint8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u8x32(reinterpret_cast<const std::uint8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u8x64(reinterpret_cast<const std::uint8_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u16x8(reinterpret_cast<const std::uint16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u16x16(reinterpret_cast<const std::uint16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u16x32(reinterpret_cast<const std::uint16_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u32x4(reinterpret_cast<const std::uint32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u32x8(reinterpret_cast<const std::uint32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u32x16(reinterpret_cast<const std::uint32_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u64x2(reinterpret_cast<const std::uint64_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u64x4(reinterpret_cast<const std::uint64_t*>(p_to_load_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+			{
+				return EmuSIMD::Funcs::aligned_load_u64x8(reinterpret_cast<const std::uint64_t*>(p_to_load_));
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to aligned-load a SIMD register from memory via EmuSIMD helpers, but the provided SIMD register type is not supported for this operation.");
+			}
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to aligned-load a SIMD register from memory via EmuSIMD helpers, but the provided Register_ type was not recognised as a supported SIMD register.");
+		}
+	}
+
+	template<class Register_, std::size_t PerElementWidthIfGenericInt_, bool Reverse_, bool...SignAtIndex_>
+	[[nodiscard]] inline Register_ _make_sign_mask()
+	{
+		using register_type_uq = EmuCore::TMP::remove_ref_cv_t<Register_>;
+		if constexpr (EmuSIMD::TMP::register_element_count_v< register_type_uq, PerElementWidthIfGenericInt_> == sizeof...(SignAtIndex_))
+		{
+			if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<register_type_uq>)
+			{
+				constexpr std::size_t per_element_width = EmuSIMD::TMP::determine_register_per_element_width<Register_, PerElementWidthIfGenericInt_>();
+				using int_type = EmuCore::TMP::int_of_size_t<per_element_width / CHAR_BIT>;
+				constexpr int_type sign_bit = std::numeric_limits<int_type>::min();
+				constexpr int_type no_bit = int_type(0);
+				return _set_int<Register_, PerElementWidthIfGenericInt_, Reverse_>
+				(
+					EmuCore::TMP::conditional_value_v<SignAtIndex_, int_type, sign_bit, no_bit>...
+				);
+			}
+			else
+			{
+				using fp_type = typename std::conditional
+				<
+					(EmuSIMD::TMP::simd_register_width_v<register_type_uq> / EmuSIMD::TMP::register_element_count_v<register_type_uq, PerElementWidthIfGenericInt_>) == 4,
+					float,
+					double
+				>::type;
+				constexpr fp_type sign_bit = fp_type(-0.0);
+				constexpr fp_type no_bit = fp_type(0.0);
+				return _set_fp<Register_, Reverse_>
+				(
+					EmuCore::TMP::conditional_value_v<SignAtIndex_, fp_type, sign_bit, no_bit>...
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Register_>(),
+				"Attempted to set a sign mask SIMD register via EmuSIMD Helpers, but the provided booleans for respective indices did not match the number of elements in the resulting register."
+			);
+		}
+	}
+
+	template<class Register_, std::size_t PerElementWidthIfInt_, bool OddSign_, bool Reverse_, std::size_t...Indices_>
+	[[nodiscard]] inline Register_ _make_alternating_sign_mask(std::index_sequence<Indices_...> indices_)
+	{
+		return _make_sign_mask<Register_, PerElementWidthIfInt_, OddSign_, ((Indices_ % 2) == 1)...>();
 	}
 }
 

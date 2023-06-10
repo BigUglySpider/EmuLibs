@@ -9,7 +9,7 @@
 namespace EmuMath::Functors::_underlying_noise_gen
 {
 	template<>
-	struct perlin_gradients<3, __m128>
+	struct perlin_gradients<3, EmuSIMD::f32x4>
 	{
 	public:
 		using underlying_gradients_instance = perlin_gradients<3, float>;
@@ -18,7 +18,7 @@ namespace EmuMath::Functors::_underlying_noise_gen
 		static constexpr std::size_t num_gradients = underlying_gradients_instance::num_gradients;
 		static constexpr std::size_t mask = underlying_gradients_instance::mask;
 
-		using register_array = std::array<const __m128, num_gradients>;
+		using register_array = std::array<const EmuSIMD::f32x4, num_gradients>;
 
 		/// <summary>
 		/// <para> Constructs an array of SIMD 128f registers representing this selection of perlin gradients. </para>
@@ -60,14 +60,14 @@ namespace EmuMath::Functors::_underlying_noise_gen
 
 	private:
 		template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_>
-		[[nodiscard]] static inline __m128 _set_register(const gradient_type& scalar_)
+		[[nodiscard]] static inline EmuSIMD::f32x4 _set_register(const gradient_type& scalar_)
 		{
-			return EmuSIMD::set<__m128>(scalar_.at<W_>(), scalar_.at<Z_>(), scalar_.at<Y_>(), scalar_.at<X_>());
+			return EmuSIMD::set<EmuSIMD::f32x4>(scalar_.at<W_>(), scalar_.at<Z_>(), scalar_.at<Y_>(), scalar_.at<X_>());
 		}
 	};
 
 	template<>
-	struct perlin_gradients<2, __m128>
+	struct perlin_gradients<2, EmuSIMD::f32x4>
 	{
 	public:
 		using underlying_gradients_instance = perlin_gradients<2, float>;
@@ -76,7 +76,7 @@ namespace EmuMath::Functors::_underlying_noise_gen
 		static constexpr std::size_t num_gradients = underlying_gradients_instance::num_gradients;
 		static constexpr std::size_t mask = underlying_gradients_instance::mask;
 
-		using register_array = std::array<const __m128, num_gradients>;
+		using register_array = std::array<const EmuSIMD::f32x4, num_gradients>;
 
 		/// <summary>
 		/// <para> Constructs an array of SIMD 128f registers representing this selection of perlin gradients. </para>
@@ -117,14 +117,14 @@ namespace EmuMath::Functors::_underlying_noise_gen
 
 	private:
 		template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_>
-		[[nodiscard]] static inline __m128 _set_register(const gradient_type& scalar_)
+		[[nodiscard]] static inline EmuSIMD::f32x4 _set_register(const gradient_type& scalar_)
 		{
-			return EmuSIMD::set<__m128>(scalar_.at<W_>(), scalar_.at<Z_>(), scalar_.at<Y_>(), scalar_.at<X_>());
+			return EmuSIMD::set<EmuSIMD::f32x4>(scalar_.at<W_>(), scalar_.at<Z_>(), scalar_.at<Y_>(), scalar_.at<X_>());
 		}
 	};
 
 	template<>
-	struct perlin_gradients<1, __m128>
+	struct perlin_gradients<1, EmuSIMD::f32x4>
 	{
 	public:
 		using underlying_gradients_instance = perlin_gradients<1, float>;
@@ -133,7 +133,7 @@ namespace EmuMath::Functors::_underlying_noise_gen
 		static constexpr std::size_t num_gradients = underlying_gradients_instance::num_gradients;
 		static constexpr std::size_t mask = underlying_gradients_instance::mask;
 
-		using register_array = std::array<const __m128, num_gradients>;
+		using register_array = std::array<const EmuSIMD::f32x4, num_gradients>;
 
 		/// <summary>
 		/// <para> Constructs an array of SIMD 128f registers representing this selection of perlin gradients. </para>
@@ -145,13 +145,13 @@ namespace EmuMath::Functors::_underlying_noise_gen
 		{
 			return
 			{
-				EmuSIMD::set1<__m128>(underlying_gradients_instance::values[0].at<0>()),
-				EmuSIMD::set1<__m128>(underlying_gradients_instance::values[1].at<0>()),
+				EmuSIMD::set1<EmuSIMD::f32x4>(underlying_gradients_instance::values[0].at<0>()),
+				EmuSIMD::set1<EmuSIMD::f32x4>(underlying_gradients_instance::values[1].at<0>()),
 			};
 		}
-		[[nodiscard]] static inline __m128 init_registers(std::size_t x_, std::size_t y_, std::size_t z_, std::size_t w_)
+		[[nodiscard]] static inline EmuSIMD::f32x4 init_registers(std::size_t x_, std::size_t y_, std::size_t z_, std::size_t w_)
 		{
-			return EmuSIMD::set<__m128>
+			return EmuSIMD::set<EmuSIMD::f32x4>
 			(
 				underlying_gradients_instance::values[w_].at<0>(),
 				underlying_gradients_instance::values[z_].at<0>(),
@@ -175,7 +175,6 @@ namespace EmuMath::Functors::_underlying_noise_gen
 
 		[[nodiscard]] inline register_type operator()(register_type t_) const
 		{
-			register_type six_fifteen_ten_ = EmuSIMD::set<register_type>(0.0f, 10.0f, 15.0f, 6.0f);
 			register_type result_ = EmuSIMD::fmsub(t_, six, fifteen);
 			result_ = EmuSIMD::fmadd(t_, result_, ten);
 

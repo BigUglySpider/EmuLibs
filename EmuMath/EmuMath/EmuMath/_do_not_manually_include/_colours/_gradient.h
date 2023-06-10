@@ -325,7 +325,7 @@ namespace EmuMath
 		template<typename InChannelType_, bool InContainsAlpha_>
 		inline void AddClampedColourAnchor(anchor_type anchor_, const EmuMath::Colour<InChannelType_, InContainsAlpha_>& colour_)
 		{
-			_add_item_to_container(clamp_anchor(anchor_), colour_.Clamped<channel_type, false>(), colours);
+			_add_item_to_container(clamp_anchor(anchor_), colour_.template Clamped<channel_type, false>(), colours);
 		}
 		/// <summary>
 		/// <para> Adds the provided colour_ at the provided anchor_ point, wrapping the provided colour into a valid intensity range. </para>
@@ -336,7 +336,7 @@ namespace EmuMath
 		template<typename InChannelType_, bool InContainsAlpha_>
 		inline void AddWrappedColourAnchor(anchor_type anchor_, const EmuMath::Colour<InChannelType_, InContainsAlpha_>& colour_)
 		{
-			_add_item_to_container(clamp_anchor(anchor_), colour_.Wrapped<channel_type, false>(), colours);
+			_add_item_to_container(clamp_anchor(anchor_), colour_.template Wrapped<channel_type, false>(), colours);
 		}
 
 		/// <summary>
@@ -373,7 +373,7 @@ namespace EmuMath
 		template<typename InChannelType_, bool InContainsAlpha_>
 		[[nodiscard]] inline std::size_t AddClampedColourAnchor_GetIndex(anchor_type anchor_, const EmuMath::Colour<InChannelType_, InContainsAlpha_>& colour_)
 		{
-			return _add_item_to_container_with_index_return(clamp_anchor(anchor_), colour_.Clamped<channel_type, false>(), colours);
+			return _add_item_to_container_with_index_return(clamp_anchor(anchor_), colour_.template Clamped<channel_type, false>(), colours);
 		}
 		/// <summary>
 		/// <para> Adds the provided colour_ at the provided anchor_ point, wrapping the provided colour into a valid intensity range. </para>
@@ -386,7 +386,7 @@ namespace EmuMath
 		template<typename InChannelType_, bool InContainsAlpha_>
 		[[nodiscard]] inline std::size_t AddWrappedColourAnchor_GetIndex(anchor_type anchor_, const EmuMath::Colour<InChannelType_, InContainsAlpha_>& colour_)
 		{
-			return _add_item_to_container_with_index_return(clamp_anchor(anchor_), colour_.Wrapped<channel_type, false>(), colours);
+			return _add_item_to_container_with_index_return(clamp_anchor(anchor_), colour_.template Wrapped<channel_type, false>(), colours);
 		}
 
 		/// <summary>
@@ -990,32 +990,32 @@ namespace EmuMath
 		template<class OtherChannel_>
 		inline void _copy_gradient(const Gradient<OtherChannel_>& to_copy_)
 		{
-			colours.insert(to_copy_.ViewColours().begin(), to_copy_.ViewColours().end());
-			std::transform
-			(
-				to_copy_.ViewAlphas().begin(),
-				to_copy_.ViewAlphas().end(),
-				std::inserter(alphas, alphas.end()),
-				[&](const auto& item_)	// Lambda will convert the passed item's alpha to the correct channel type; this is automatically handled for colours
-				{
-					return typename alpha_map::value_type
-					(
-						item_.first,
-						EmuMath::Helpers::colour_convert_channel<channel_type, OtherChannel_>(item_.second)
-					); 
-				}
-			);
-			// Validity check in case an invalid gradient was copied
-			ForceValidation();
-		}
-		/// <summary> Optimised copy of the same type of gradient, avoiding unneeeded operations. </summary>
-		/// <param name="to_copy_">Gradient to copy the data of.</param>
-		template<>
-		inline void _copy_gradient<channel_type>(const Gradient<channel_type>& to_copy_)
-		{
-			colours = to_copy_.colours;
-			alphas = to_copy_.colours;
-			ForceValidation();
+			if constexpr(std::is_same_v<channel_type, OtherChannel_>)
+			{
+				colours = to_copy_.colours;
+				alphas = to_copy_.colours;
+				ForceValidation();
+			}
+			else
+			{
+				colours.insert(to_copy_.ViewColours().begin(), to_copy_.ViewColours().end());
+				std::transform
+				(
+					to_copy_.ViewAlphas().begin(),
+					to_copy_.ViewAlphas().end(),
+					std::inserter(alphas, alphas.end()),
+					[&](const auto& item_)	// Lambda will convert the passed item's alpha to the correct channel type; this is automatically handled for colours
+					{
+						return typename alpha_map::value_type
+						(
+							item_.first,
+							EmuMath::Helpers::colour_convert_channel<channel_type, OtherChannel_>(item_.second)
+						); 
+					}
+				);
+				// Validity check in case an invalid gradient was copied
+				ForceValidation();
+			}
 		}
 
 		/// <summary> Performs an equality comparison with the rhs_ gradient, performing any necessary conversions if RhsChannel_ is incompatible. </summary>

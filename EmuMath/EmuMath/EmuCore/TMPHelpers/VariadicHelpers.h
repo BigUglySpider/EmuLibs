@@ -9,6 +9,31 @@
 namespace EmuCore::TMP
 {
 #pragma region TEMPLATE_HELPERS
+	template<typename Lhs_, typename...Rhs_>
+	[[nodiscard]] constexpr inline bool is_one_of(const Lhs_& lhs_, Rhs_&&...rhs_)
+	{
+		return (... || (lhs_ == rhs_));
+	}
+
+	template<bool CastRhs_, typename Lhs_, typename...Rhs_>
+	[[nodiscard]] constexpr inline bool is_one_of(const Lhs_& lhs_, Rhs_&&...rhs_)
+	{
+		if constexpr (CastRhs_)
+		{
+			return (... || (lhs_ == static_cast<typename std::remove_cvref<Lhs_>::type>(rhs_)));
+		}
+		else
+		{
+			return (... || (lhs_ == rhs_));
+		}
+	}
+
+	template<auto Lhs_, auto...Rhs_>
+	[[nodiscard]] constexpr inline bool is_one_of()
+	{
+		return (... || (Lhs_ == static_cast<decltype(Lhs_)>(Rhs_)));
+	}
+
 	template<bool...Bools_>
 	using bool_sequence = std::integer_sequence<bool, Bools_...>;
 
@@ -55,6 +80,43 @@ namespace EmuCore::TMP
 	};
 	template<std::size_t Count_>
 	using make_false_bool_sequence = typename false_bool_sequence_maker<Count_>::type;
+
+	/// <summary>
+	/// <para> Creates a bool integer sequence with a chunk of contiguous `true` bools and a chunk of contiguous `false` bools. </para>
+	/// <para> By default, `true` bools come first and `false` bools come last; to invert this order, set `FalseFirst_` to true. </para>
+	/// </summary>
+	template<std::size_t TrueCount_, std::size_t FalseCount_, bool FalseFirst_ = false>
+	struct chunked_true_false_bool_sequence_maker
+	{
+	private:
+		template<bool TrueFirst_, typename TrueSeq_, typename FalseSeq_>
+		struct _instantiator
+		{
+			using type = std::integer_sequence<bool>;
+		};
+
+		template<bool...Trues_, bool...Falses_>
+		struct _instantiator<true, std::integer_sequence<bool, Trues_...>, std::integer_sequence<bool, Falses_...>>
+		{
+			using type = std::integer_sequence<bool, Trues_..., Falses_...>;
+		};
+
+		template<bool...Trues_, bool...Falses_>
+		struct _instantiator<false, std::integer_sequence<bool, Trues_...>, std::integer_sequence<bool, Falses_...>>
+		{
+			using type = std::integer_sequence<bool, Falses_..., Trues_...>;
+		};
+
+	public:
+		using type = typename _instantiator<!FalseFirst_, make_true_bool_sequence<TrueCount_>, make_false_bool_sequence<FalseCount_>>::type;
+	};
+
+	/// <summary>
+	/// <para> Creates a bool integer sequence with a chunk of contiguous `true` bools and a chunk of contiguous `false` bools. </para>
+	/// <para> By default, `true` bools come first and `false` bools come last; to invert this order, set `FalseFirst_` to true. </para>
+	/// </summary>
+	template<std::size_t TrueCount_, std::size_t FalseCount_, bool FalseFirst_ = false>
+	using make_chunked_true_false_bool_sequence = typename chunked_true_false_bool_sequence_maker<TrueCount_, FalseCount_, FalseFirst_>::type;
 
 	/// <summary>
 	/// <para> Helper to safely instantiate a Template_ from variadic Args_, cancelling instantiation if it is a failure. </para>
@@ -203,6 +265,32 @@ namespace EmuCore::TMP
 
 	template<auto...Values_>
 	static constexpr inline auto first_variadic_value_v = first_variadic_value<Values_...>::value;
+
+	/// <summary>
+	/// <para> Helper for variadic scenarios (such as when a series of indices is provided) where variadic behaviour is required but only the provided argument is required. </para>
+	/// <para> Forwards the provided `func_arg_`, and does nothing with the template argument `ToDiscard_`. </para>
+	/// <para> Example usage is constructing an array that starts as all the same value with a size that is determined from a variadic index count. </para>
+	/// </summary>
+	/// <param name="func_arg_">Argument to forward.</param>
+	/// <returns>Result of `std::forward`ing the input `func_arg_`.</returns>
+	template<auto ToDiscard_, class FuncArg_>
+	constexpr inline decltype(auto) discard_template_arg_forward_func_arg(FuncArg_&& func_arg_)
+	{
+		return std::forward<FuncArg_>(func_arg_);
+	}
+
+	/// <summary>
+	/// <para> Helper for variadic scenarios (such as when a series of indices is provided) where variadic behaviour is required but only the provided argument is required. </para>
+	/// <para> Forwards the provided `func_arg_`, and does nothing with the template argument `ToDiscard_`. </para>
+	/// <para> Example usage is constructing an array that starts as all the same value with a size that is determined from the number of types within a passed tuple of variadic size. </para>
+	/// </summary>
+	/// <param name="func_arg_">Argument to forward.</param>
+	/// <returns>Result of `std::forward`ing the input `func_arg_`.</returns>
+	template<class ToDiscard_, class FuncArg_>
+	constexpr inline decltype(auto) discard_template_arg_forward_func_arg(FuncArg_&& func_arg_)
+	{
+		return std::forward<FuncArg_>(func_arg_);
+	}
 #pragma endregion
 
 #pragma region VARIADIC_BOOLS
@@ -289,14 +377,37 @@ namespace EmuCore::TMP
 
 	template<typename T_, T_ Offset_, T_ Size_>
 	using make_offset_integer_sequence = typename offset_integer_sequence_maker<T_, Offset_, Size_>::type;
-
 	template<std::size_t Offset_, std::size_t Size_>
 	using make_offset_index_sequence = typename offset_integer_sequence_maker<std::size_t, Offset_, Size_>::type;
 
+	template<typename T_, std::size_t Size_>
+	struct zero_excluding_integer_sequence_maker
+	{
+	private:
+		static constexpr auto _get()
+		{
+			if constexpr (Size_ <= 1)
+			{
+				return std::integer_sequence<T_>();
+			}
+			else
+			{
+				return make_offset_index_sequence<1, Size_ - 1>();
+			}
+		}
+
+	public:
+		using type = decltype(_get());
+	};
+	template<typename T_, std::size_t Size_>
+	using make_integer_sequence_excluding_0 = typename zero_excluding_integer_sequence_maker<T_, Size_>::type;
+	template<std::size_t Size_>
+	using make_index_sequence_excluding_0 = typename zero_excluding_integer_sequence_maker<std::size_t, Size_>::type;
+
 	/// <summary>
 	///	<para> Type used to splice two integer sequences into a single one. Indices in the left-hand sequence will all appear first, then those in the right-hand sequence. </para>
-	/// <para> If an argument is not a std::intger_sequence, it will be interpreted as an empty std::integer_sequence of the correct type. </para>
-	/// <para> If both arguments are not a std::intger_sequence, type will be an empty std::integer_sequence of chars. </para>
+	/// <para> If an argument is not a std::integer_sequence, it will be interpreted as an empty std::integer_sequence of the correct type. </para>
+	/// <para> If both arguments are not a std::integer_sequence, type will be an empty std::integer_sequence of chars. </para>
 	/// <para> If both arguments are std::integer_sequences (as they should be), the value_type of the left-hand integer sequence will be used. </para>
 	/// </summary>
 	template<class LhsIntegerSequence_, class RhsIntegerSequence_>
@@ -331,6 +442,106 @@ namespace EmuCore::TMP
 	};
 	template<class Lhs_, class Rhs_>
 	using splice_index_sequences_t = typename splice_integer_sequences<Lhs_, Rhs_>::type;
+
+	/// <summary>
+	/// <para> Type used to slice one integer sequence into two. The first `LeftLength_` indices will be used to make the sequence `left`, and the remainder indices to make the sequence `right`. </para>
+	/// <para> If the argument is not a std::integer_sequence, both left and right will be interpreted as an empty std::integer_sequence of chars. </para>
+	/// </summary>
+	template<std::size_t LeftLength_, class IntegerSequence_>
+	struct slice_integer_sequence
+	{
+	private:
+		[[nodiscard]] static constexpr inline bool _is_int_sequence()
+		{
+			using _sequence_uq = typename std::remove_cvref<IntegerSequence_>::type;
+			return EmuCore::TMP::is_integer_sequence_v<_sequence_uq>;
+		}
+
+		[[nodiscard]] static constexpr inline std::size_t _num_ints()
+		{
+			if constexpr (_is_int_sequence())
+			{
+				using _sequence_uq = typename std::remove_cvref<IntegerSequence_>::type;
+				return _sequence_uq::size();
+			}
+			else
+			{
+				return 0;
+			}
+		}
+
+		static constexpr inline auto _determine_sequence_value_type()
+		{
+			if constexpr (_is_int_sequence())
+			{
+				using _sequence_uq = typename std::remove_cvref<IntegerSequence_>::type;
+				return typename _sequence_uq::value_type();
+			}
+			else
+			{
+				return char();
+			}
+		}
+
+		using _sequence_value_type = decltype(_determine_sequence_value_type());
+		template<_sequence_value_type...InInts_, _sequence_value_type...OutIndices_>
+		static constexpr inline auto _build
+		(
+			std::integer_sequence<_sequence_value_type, InInts_...> in_ints_,
+			std::index_sequence<OutIndices_...> out_index_sequence_
+		)
+		{
+			if constexpr (_is_int_sequence())
+			{
+				constexpr auto index_array = std::array<_sequence_value_type, sizeof...(InInts_)>{ InInts_... };
+				return std::integer_sequence<_sequence_value_type, index_array[OutIndices_]...>();
+			}
+		}
+
+		static constexpr inline auto _make_left()
+		{
+			if constexpr (_is_int_sequence())
+			{
+				if constexpr (LeftLength_ > 0)
+				{
+					constexpr std::size_t num_left = LeftLength_ <= _num_ints() ? LeftLength_ : _num_ints();
+					return _build(IntegerSequence_(), std::make_index_sequence<num_left>());
+				}
+				else
+				{
+					return std::integer_sequence<_sequence_value_type>();
+				}
+			}
+			else
+			{
+				return std::integer_sequence<_sequence_value_type>();
+			}
+		}
+
+		static constexpr inline auto _make_right()
+		{
+			if constexpr (_is_int_sequence())
+			{
+				if constexpr (LeftLength_ < _num_ints())
+				{
+					constexpr std::size_t num_right = _num_ints() - LeftLength_;
+					return _build(IntegerSequence_(), EmuCore::TMP::make_offset_index_sequence<LeftLength_, num_right>());
+				}
+				else
+				{
+					return std::integer_sequence<_sequence_value_type>();
+				}
+			}
+			else
+			{
+				return std::integer_sequence<_sequence_value_type>();
+			}
+		}
+
+	public:
+		using left = decltype(_make_left());
+		using right = decltype(_make_right());
+	};
 
 	/// <summary>
 	/// <para> Type extension of splice_index_sequences which may be used to splice a variadic number of integer sequences. </para>
@@ -698,6 +909,43 @@ namespace EmuCore::TMP
 	public:
 		static constexpr inline bool value = _get();
 	};
+
+	template<class OriginalSequence_>
+	struct inverted_integer_sequence_maker
+	{
+		using type = std::integer_sequence<int>;
+	};
+
+	template<typename T_, T_...Vals_>
+	struct inverted_integer_sequence_maker<std::integer_sequence<T_, Vals_...>>
+	{
+	private:
+		template<class ReverseIndexSequence_>
+		struct _instantiator
+		{
+			using type = std::integer_sequence<T_>;
+		};
+
+		template<std::size_t...ReverseIndices_>
+		struct _instantiator<std::index_sequence<ReverseIndices_...>>
+		{
+		private:
+			static constexpr auto _make_sequence()
+			{
+				constexpr std::array<T_, sizeof...(ReverseIndices_)> vals({ Vals_... });
+				return std::integer_sequence<T_, vals[ReverseIndices_]...>();
+			}
+
+		public:
+			using type = decltype(_make_sequence());
+		};
+
+	public:
+		using type = typename _instantiator<EmuCore::TMP::make_reverse_index_sequence<sizeof...(Vals_)>>::type;
+	};
+
+	template<class IntegerSequence_>
+	using make_inverted_integer_sequence = typename inverted_integer_sequence_maker<IntegerSequence_>::type;
 }
 
 #endif

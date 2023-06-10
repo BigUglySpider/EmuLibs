@@ -586,7 +586,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 	}
 
 	template<typename LhsT_, class Rhs_>
-	[[nodiscard]] constexpr inline void _multiply_assign_quaternion_by_scalar(EmuMath::Quaternion<LhsT_>& lhs_, Rhs_&& rhs_scalar_)
+	constexpr inline void _multiply_assign_quaternion_by_scalar(EmuMath::Quaternion<LhsT_>& lhs_, Rhs_&& rhs_scalar_)
 	{
 		if constexpr(_can_scalar_multiply<false, LhsT_, LhsT_, Rhs_, false, true>())
 		{
@@ -608,7 +608,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 	}
 
 	template<bool Assigning_, bool OutputVector_, bool Fused_, typename OutT_, class Lhs_, class Rhs_>
-	[[nodiscard]] static constexpr inline auto _multiply_quaternion_by_quaternion(Lhs_& lhs_, Rhs_&& rhs_quaternion_)
+	static constexpr inline auto _multiply_quaternion_by_quaternion(Lhs_& lhs_, Rhs_&& rhs_quaternion_)
 		-> typename std::conditional
 			<
 				Assigning_,
@@ -639,7 +639,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 			using sub_func = EmuCore::do_subtract<calc_fp, calc_fp>;
 			using mul_func = EmuCore::do_multiply<calc_fp, calc_fp>;
 
-			// Prepare x, y, z, w as first right-hand subtraction operand for respective components
+			// Prepare x, y, z, w as first right-hand subtraction operand for respective components 
 			calc_fp x = mul_func()(lhs_z, rhs_y);
 			calc_fp y = mul_func()(lhs_x, rhs_z);
 			calc_fp z = mul_func()(lhs_y, rhs_x);
@@ -733,7 +733,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 	}
 
 	template<typename LhsT_, typename RhsT_>
-	[[nodiscard]] constexpr inline void _add_assign_quaternions(EmuMath::Quaternion<LhsT_>& lhs_, const EmuMath::Quaternion<RhsT_>& rhs_)
+	constexpr inline void _add_assign_quaternions(EmuMath::Quaternion<LhsT_>& lhs_, const EmuMath::Quaternion<RhsT_>& rhs_)
 	{
 		if constexpr (_can_quaternion_add<true, LhsT_, LhsT_, RhsT_, false, true>())
 		{
@@ -785,7 +785,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 	}
 
 	template<typename LhsT_>
-	[[nodiscard]] constexpr inline void _negate_assign_quaternion(EmuMath::Quaternion<LhsT_>& lhs_)
+	constexpr inline void _negate_assign_quaternion(EmuMath::Quaternion<LhsT_>& lhs_)
 	{
 		if constexpr (_can_quaternion_negate<true, LhsT_, LhsT_, false, true>())
 		{
@@ -837,7 +837,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 	}
 
 	template<typename LhsT_, typename RhsT_>
-	[[nodiscard]] constexpr inline void _subtract_assign_quaternions(EmuMath::Quaternion<LhsT_>& lhs_, const EmuMath::Quaternion<RhsT_>& rhs_)
+	constexpr inline void _subtract_assign_quaternions(EmuMath::Quaternion<LhsT_>& lhs_, const EmuMath::Quaternion<RhsT_>& rhs_)
 	{
 		if constexpr (_can_quaternion_subtract<true, LhsT_, LhsT_, RhsT_, false, true>())
 		{
@@ -889,7 +889,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 	}
 
 	template<typename LhsT_, class Rhs_>
-	[[nodiscard]] constexpr inline void _divide_assign_quaternion(EmuMath::Quaternion<LhsT_>& lhs_, Rhs_&& rhs_scalar_)
+	constexpr inline void _divide_assign_quaternion(EmuMath::Quaternion<LhsT_>& lhs_, Rhs_&& rhs_scalar_)
 	{
 		if constexpr(_can_scalar_divide<false, LhsT_, LhsT_, Rhs_, false, true>())
 		{

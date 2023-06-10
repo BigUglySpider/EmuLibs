@@ -190,20 +190,6 @@ namespace EmuMath::Helpers::_quaternion_underlying
 			calc_fp sqy = mul_func()(y, y);
 			calc_fp sqz = mul_func()(z, z);
 			calc_fp sqw = mul_func()(w, w);
-		
-			// Z
-			//calc_fp out_z = atan2_func()
-			//(
-			//	mul_func()(two, add_func()(mul_func()(x, y), mul_func()(w, z))),
-			//	add_func()(sub_func()(sub_func()(sqx, sqy), sqz), sqw)
-			//);
-			//
-			//// X
-			//calc_fp out_x = atan2_func()
-			//(
-			//	mul_func()(two, add_func()(mul_func()(w, x), mul_func()(y, z))),
-			//	add_func()(sub_func()(sub_func()(sqw, sqx), sqy), sqz)
-			//);
 
 			// Set x and z to the `x` arguments for atan2
 			// --- x = sqw - sqx - sqy + sqz
@@ -251,22 +237,6 @@ namespace EmuMath::Helpers::_quaternion_underlying
 		}
 		else
 		{
-			// Z
-			//calc_fp out_z = mul_func()(two, mul_func()(y, z));
-			//out_z = atan2_func()
-			//(
-			//	sub_func()(out_z, mul_func()(two, mul_func()(x, w))),
-			//	add_func()(mul_func()(two, mul_func()(x, z)), mul_func()(two, mul_func()(y, w)))
-			//);
-			//
-			//// Negate Z (based on pi instead of 0) if yaw is negative
-			//bool neg_yaw = y < 0;
-			//out_z = add_func()
-			//(
-			//	mul_func()(calc_fp(neg_yaw), sub_func()(EmuCore::Pi::PI<calc_fp>, out_z)),
-			//	mul_func()(calc_fp(!neg_yaw), neg_yaw)
-			//);
-
 			// Initially set z to y*z, which is part of forming the atan2 `y` arg (2 * y * z) - (2 * x * w)
 			calc_fp out_z = mul_func()(y, z);
 			if constexpr (Fused_)

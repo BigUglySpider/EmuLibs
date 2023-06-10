@@ -51,46 +51,52 @@ namespace EmuSIMD
 		return _mm_cvtss_f32(vector_max_128(val_));
 	}
 
-	/// <summary> Multiplies lhs_mat_cm_ by rhs_mat_cm_ as though they are both contiguously column-major 2x2 matrices. </summary>
-	/// <param name="lhs_mat_cm_">SIMD vector representing a contiguously column-major 2x2 matrix which appears on the left of a matrix multiplication.</param>
-	/// <param name="rhs_mat_cm_">SIMD vector representing a contiguously column-major 2x2 matrix which appears on the right of a matrix multiplication.</param>
-	/// <returns>SIMD vector representing the result of multiplying the passed matrices, represented as a contiguously column-major 2x2 matrix.</returns>
-	[[nodiscard]] inline EmuSIMD::f32x4 matrix_2x2_multiply_cm(EmuSIMD::f32x4 lhs_mat_cm_, EmuSIMD::f32x4 rhs_mat_cm_)
+	/// <summary> Multiplies lhs_mat_cm_ by rhs_mat_cm_ as though they are both contiguously row-major 2x2 matrices. </summary>
+	/// <param name="lhs_mat_cm_">SIMD vector representing a contiguously row-major 2x2 matrix which appears on the left of a matrix multiplication.</param>
+	/// <param name="rhs_mat_cm_">SIMD vector representing a contiguously row-major 2x2 matrix which appears on the right of a matrix multiplication.</param>
+	/// <returns>SIMD vector representing the result of multiplying the passed matrices, represented as a contiguously row-major 2x2 matrix.</returns>
+	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
+	[[nodiscard]] inline auto matrix_2x2_multiply_rm(Register_ lhs_mat_cm_, Register_ rhs_mat_cm_)
+		-> typename EmuCore::TMP::remove_ref_cv<Register_>::type
 	{
-		return _mm_add_ps
+		return EmuSIMD::add<PerElementWidthIfInt_>
 		(
-			_mm_mul_ps(lhs_mat_cm_, EmuSIMD::shuffle<0, 0, 3, 3>(rhs_mat_cm_)),
-			_mm_mul_ps(EmuSIMD::shuffle<2, 3, 0, 1>(lhs_mat_cm_), EmuSIMD::shuffle<1, 1, 2, 2>(rhs_mat_cm_))
+			EmuSIMD::mul_all<PerElementWidthIfInt_>(lhs_mat_cm_, EmuSIMD::shuffle<0, 3, 0, 3>(rhs_mat_cm_)),
+			EmuSIMD::mul_all<PerElementWidthIfInt_>(EmuSIMD::shuffle<1, 0, 3, 2>(lhs_mat_cm_), EmuSIMD::shuffle<2, 1, 2, 1>(rhs_mat_cm_))
 		);
 	}
-	/// <summary> Multiplies the adjugate of lhs_mat_cm_ by rhs_mat_cm_ as though they are both contiguously column-major 2x2 matrices. </summary>
-	/// <param name="lhs_mat_cm_">SIMD vector representing a contiguously column-major 2x2 matrix whose adjugate appears on the left of a matrix multiplication.</param>
-	/// <param name="rhs_mat_cm_">SIMD vector representing a contiguously column-major 2x2 matrix which appears on the right of a matrix multiplication.</param>
+	/// <summary> Multiplies the adjugate of lhs_mat_cm_ by rhs_mat_cm_ as though they are both contiguously row-major 2x2 matrices. </summary>
+	/// <param name="lhs_mat_cm_">SIMD vector representing a contiguously row-major 2x2 matrix whose adjugate appears on the left of a matrix multiplication.</param>
+	/// <param name="rhs_mat_cm_">SIMD vector representing a contiguously row-major 2x2 matrix which appears on the right of a matrix multiplication.</param>
 	/// <returns>
 	///		SIMD vector representing the result of multiplying the adjugate of the passed lhs matrix by the passed rhs matrix, 
-	///		represented as a contiguously column-major 2x2 matrix.
+	///		represented as a contiguously row-major 2x2 matrix.
 	/// </returns>
-	[[nodiscard]] inline EmuSIMD::f32x4 matrix_2x2_multiply_adj_norm_cm(EmuSIMD::f32x4 lhs_mat_cm_, EmuSIMD::f32x4 rhs_mat_cm_)
+	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
+	[[nodiscard]] inline auto matrix_2x2_multiply_adj_norm_rm(Register_ lhs_mat_cm_, Register_ rhs_mat_cm_)
+		-> typename EmuCore::TMP::remove_ref_cv<Register_>::type
 	{
-		return _mm_sub_ps
+		return EmuSIMD::sub<PerElementWidthIfInt_>
 		(
-			_mm_mul_ps(EmuSIMD::shuffle<3, 0, 3, 0>(lhs_mat_cm_), rhs_mat_cm_),
-			_mm_mul_ps(EmuSIMD::shuffle<2, 1, 2, 1>(lhs_mat_cm_), EmuSIMD::shuffle<1, 0, 3, 2>(rhs_mat_cm_))
+			EmuSIMD::mul_all<PerElementWidthIfInt_>(EmuSIMD::shuffle<3, 3, 0, 0>(lhs_mat_cm_), rhs_mat_cm_),
+			EmuSIMD::mul_all<PerElementWidthIfInt_>(EmuSIMD::shuffle<1, 1, 2, 2>(lhs_mat_cm_), EmuSIMD::shuffle<2, 3, 0, 1>(rhs_mat_cm_))
 		);
 	}
-	/// <summary> Multiplies lhs_mat_cm_ by the adjugate of rhs_mat_cm_ as though they are both contiguously column-major 2x2 matrices. </summary>
-	/// <param name="lhs_mat_cm_">SIMD vector representing a contiguously column-major 2x2 matrix which appears on the left of a matrix multiplication.</param>
-	/// <param name="rhs_mat_cm_">SIMD vector representing a contiguously column-major 2x2 matrix whose adjugate appears on the right of a matrix multiplication.</param>
+	/// <summary> Multiplies lhs_mat_cm_ by the adjugate of rhs_mat_cm_ as though they are both contiguously row-major 2x2 matrices. </summary>
+	/// <param name="lhs_mat_cm_">SIMD vector representing a contiguously row-major 2x2 matrix which appears on the left of a matrix multiplication.</param>
+	/// <param name="rhs_mat_cm_">SIMD vector representing a contiguously row-major 2x2 matrix whose adjugate appears on the right of a matrix multiplication.</param>
 	/// <returns>
 	///		SIMD vector representing the result of multiplying the passed lhs matrix by the adjugate of the passed rhs matrix, 
-	///		represented as a contiguously column-major 2x2 matrix.
+	///		represented as a contiguously row-major 2x2 matrix.
 	/// </returns>
-	[[nodiscard]] inline EmuSIMD::f32x4 matrix_2x2_multiply_norm_adj_cm(EmuSIMD::f32x4 lhs_mat_cm_, EmuSIMD::f32x4 rhs_mat_cm_)
+	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
+	[[nodiscard]] inline auto matrix_2x2_multiply_norm_adj_rm(Register_ lhs_mat_cm_, Register_ rhs_mat_cm_)
+		-> typename EmuCore::TMP::remove_ref_cv<Register_>::type
 	{
-		return _mm_sub_ps
+		return EmuSIMD::sub<PerElementWidthIfInt_>
 		(
-			_mm_mul_ps(lhs_mat_cm_, EmuSIMD::shuffle<3, 3, 0, 0>(rhs_mat_cm_)),
-			_mm_mul_ps(EmuSIMD::shuffle<2, 3, 0, 1>(lhs_mat_cm_), EmuSIMD::shuffle<1, 1, 2, 2>(rhs_mat_cm_))
+			EmuSIMD::mul_all<PerElementWidthIfInt_>(lhs_mat_cm_, EmuSIMD::shuffle<3, 0, 3, 0>(rhs_mat_cm_)),
+			EmuSIMD::mul_all<PerElementWidthIfInt_>(EmuSIMD::shuffle<1, 0, 3, 2>(lhs_mat_cm_), EmuSIMD::shuffle<2, 1, 2, 1>(rhs_mat_cm_))
 		);
 	}
 }

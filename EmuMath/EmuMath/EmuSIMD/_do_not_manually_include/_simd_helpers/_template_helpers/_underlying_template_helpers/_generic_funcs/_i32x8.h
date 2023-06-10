@@ -1,6 +1,7 @@
 #ifndef EMU_SIMD_GENERIC_FUNCS_I32X8_H_INC_
 #define EMU_SIMD_GENERIC_FUNCS_I32X8_H_INC_ 1
 
+#include "_generic_declarations/_all_generic_declarations.h"
 #include "_common_generic_func_helpers.h"
 
 namespace EmuSIMD::Funcs
@@ -19,7 +20,8 @@ namespace EmuSIMD::Funcs
 		std::int32_t e0, std::int32_t e1, std::int32_t e2, std::int32_t e3, std::int32_t e4, std::int32_t e5, std::int32_t e6, std::int32_t e7
 	)
 	{
-		return _mm256_setr_epi32(e0, e1, e2, e3, e4, e5, e6, e7);
+		//return _mm256_setr_epi32(e0, e1, e2, e3, e4, e5, e6, e7);
+		return _mm256_set_epi32(e7, e6, e5, e4, e3, e2, e1, e0);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 set1_i32x8(std::int32_t all_)
@@ -28,6 +30,11 @@ namespace EmuSIMD::Funcs
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 load_i32x8(const std::int32_t* p_to_load_)
+	{
+		return _mm256_loadu_si256(reinterpret_cast<const __m256i*>(p_to_load_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 aligned_load_i32x8(const std::int32_t* p_to_load_)
 	{
 		return _mm256_load_si256(reinterpret_cast<const __m256i*>(p_to_load_));
 	}
@@ -42,7 +49,7 @@ namespace EmuSIMD::Funcs
 		constexpr std::int32_t element_mask = static_cast<std::int32_t>(0xFFFFFFFF);
 		return _mm256_set_epi32
 		(
-			(bit_mask_ & 0x01) * element_mask,
+			(bit_mask_  & 0x01)       * element_mask,
 			((bit_mask_ & 0x02) >> 1) * element_mask,
 			((bit_mask_ & 0x04) >> 2) * element_mask,
 			((bit_mask_ & 0x08) >> 3) * element_mask,
@@ -52,12 +59,76 @@ namespace EmuSIMD::Funcs
 			((bit_mask_ & 0x80) >> 7) * element_mask
 		);
 	}
+
+	template<std::uint8_t BitMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 setmasked_i32x8()
+	{
+		if constexpr(BitMask_ != 0)
+		{
+			return set_i32x8
+			(
+				std::integral_constant<std::int32_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<0, std::int32_t>(BitMask_)>::value,
+				std::integral_constant<std::int32_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<1, std::int32_t>(BitMask_)>::value,
+				std::integral_constant<std::int32_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<2, std::int32_t>(BitMask_)>::value,
+				std::integral_constant<std::int32_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<3, std::int32_t>(BitMask_)>::value,
+				std::integral_constant<std::int32_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<4, std::int32_t>(BitMask_)>::value,
+				std::integral_constant<std::int32_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<5, std::int32_t>(BitMask_)>::value,
+				std::integral_constant<std::int32_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<6, std::int32_t>(BitMask_)>::value,
+				std::integral_constant<std::int32_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<7, std::int32_t>(BitMask_)>::value
+			);
+		}
+		else
+		{
+			return setzero_i32x8();
+		}
+	}
+
+	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 set_index_mask_i32x8()
+	{
+		if constexpr(I0_ || I1_ || I2_ || I3_ || I4_ || I5_ || I6_ || I7_)
+		{
+			return setmasked_i32x8<EmuSIMD::Funcs::make_index_set_mask<I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>()>();
+		}
+		else
+		{
+			return setzero_i32x8();
+		}
+	}
+
+	template<bool Active_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 set_index_mask_i32x8()
+	{
+		if constexpr (Active_)
+		{
+			return setmasked_i32x8<EmuSIMD::Funcs::make_all_indices_set_mask<8, Active_>()>();
+		}
+		else
+		{
+			return setzero_i32x8();
+		}
+	}
 #pragma endregion
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_i32x8(std::int32_t* p_out_, i32x8_arg a_)
 	{
+		_mm256_storeu_si256(reinterpret_cast<__m256i*>(p_out_), a_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC void aligned_store_i32x8(std::int32_t* p_out_, i32x8_arg a_)
+	{
 		_mm256_store_si256(reinterpret_cast<__m256i*>(p_out_), a_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC std::int32_t get_first_i32x8(i32x8_arg a_)
+	{
+		return get_first_i32x4(cast_i32x8_i32x4(a_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC std::uint8_t movemask_i32x8(i32x8_arg a_)
+	{
+		return movemask_f32x8(cast_i32x8_f32x8(a_));
 	}
 #pragma endregion
 
@@ -74,7 +145,11 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_f32x16_i32x8(f32x16_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si256(_mm512_castps_si512(a_));
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_cast_lesser_width<i32x8>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_f64x2_i32x8(f64x2_arg a_)
@@ -89,7 +164,11 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_f64x8_i32x8(f64x8_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si256(_mm512_castpd_si512(a_));
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_cast_lesser_width<i32x8>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_i8x16_i32x8(i8x16_arg a_)
@@ -101,8 +180,13 @@ namespace EmuSIMD::Funcs
 	{
 		return _mm256_castsi128_si256(a_);
 	}
-
+	
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_i32x4_i32x8(i32x4_arg a_)
+	{
+		return _mm256_castsi128_si256(a_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_i32x8_i32x8(i32x4_arg a_)
 	{
 		return _mm256_castsi128_si256(a_);
 	}
@@ -134,22 +218,38 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_i8x64_i32x8(i8x64_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si256(a_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_cast_lesser_width<i32x8>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_i16x32_i32x8(i16x32_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si256(a_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_cast_lesser_width<i32x8>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_i32x16_i32x8(i32x16_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si256(a_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_cast_lesser_width<i32x8>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_i64x8_i32x8(i64x8_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si256(a_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_cast_lesser_width<i32x8>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_u8x16_i32x8(u8x16_arg a_)
@@ -194,22 +294,38 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_u8x64_i32x8(u8x64_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si256(a_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_cast_lesser_width<i32x8>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_u16x32_i32x8(u16x32_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si256(a_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_cast_lesser_width<i32x8>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_u32x16_i32x8(u32x16_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si256(a_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_cast_lesser_width<i32x8>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cast_u64x8_i32x8(u64x8_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si256(a_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_simd_cast_lesser_width<i32x8>(a_);
+#endif
 	}
 #pragma endregion
 
@@ -226,12 +342,12 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_f32x16_i32x8(f32x16_arg a_)
 	{
-		return _mm256_cvtps_epi32(_mm512_castps512_ps256(a_));
+		return cvt_f32x8_i32x8(cast_f32x16_f32x8(a_));
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_f64x2_i32x8(f64x2_arg a_)
 	{
-		return _mm256_castsi128_si256(_mm_cvtepi64_epi32(_mm_cvtpd_epi64(a_)));
+		return _mm256_castsi128_si256(_mm_cvtpd_epi32(a_));
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_f64x4_i32x8(f64x4_arg a_)
@@ -241,7 +357,11 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_f64x8_i32x8(f64x8_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_cvtpd_epi32(a_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_cvt<i32x8, std::int32_t, 32, true, 8, true, double>(a_, std::make_index_sequence<8>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_i8x16_i32x8(i8x16_arg a_)
@@ -261,7 +381,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_i64x2_i32x8(i64x2_arg a_)
 	{
-		return _mm256_castsi128_si256(_mm_cvtepi64_epi32(a_));
+		return EmuSIMD::_underlying_impl::emulate_cvt<i32x8, std::int32_t, 32, true, 2, true, std::int64_t>(a_, std::make_index_sequence<8>());
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_i8x32_i32x8(i8x32_arg a_)
@@ -281,27 +401,31 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_i64x4_i32x8(i64x4_arg a_)
 	{
-		return _mm256_castsi128_si256(_mm256_cvtepi64_epi32(a_));
+		return EmuSIMD::_underlying_impl::emulate_cvt<i32x8, std::int32_t, 32, true, 4, true, std::int64_t>(a_, std::make_index_sequence<8>());
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_i8x64_i32x8(i8x64_arg a_)
 	{
-		return _mm512_castsi512_si256(_mm512_cvtepi8_epi32(_mm512_castsi512_si128(a_)));
+		return cvt_i8x16_i32x8(cast_i8x64_i8x16(a_));
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_i16x32_i32x8(i16x32_arg a_)
 	{
-		return _mm512_castsi512_si256(_mm512_cvtepi16_epi32(_mm512_castsi512_si256(a_)));
+		return cvt_i16x8_i32x8(cast_i16x32_i16x8(a_));
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_i32x16_i32x8(i32x16_arg a_)
 	{
-		return _mm512_castsi512_si256(a_);
+		return cast_i32x16_i32x8(a_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_i64x8_i32x8(i64x8_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_cvtepi64_epi32(a_);
+#else
+		return EmuSIMD::_underlying_impl::emulate_cvt<i32x8, std::int32_t, 32, true, 8, true, std::int64_t>(a_, std::make_index_sequence<8>());
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_u8x16_i32x8(u8x16_arg a_)
@@ -321,7 +445,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_u64x2_i32x8(u64x2_arg a_)
 	{
-		return _mm256_castsi128_si256(_mm_cvtepi64_epi32(a_));
+		return EmuSIMD::_underlying_impl::emulate_cvt<i32x8, std::int32_t, 32, true, 2, false, std::uint64_t>(a_, std::make_index_sequence<8>());
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_u8x32_i32x8(u8x32_arg a_)
@@ -341,49 +465,31 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_u64x4_i32x8(u64x4_arg a_)
 	{
-		return _mm256_castsi128_si256(_mm256_cvtepi64_epi32(a_));
+		return EmuSIMD::_underlying_impl::emulate_cvt<i32x8, std::int32_t, 32, true, 4, false, std::uint64_t>(a_, std::make_index_sequence<8>());
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_u8x64_i32x8(u8x64_arg a_)
 	{
-		return _mm512_castsi512_si256(_mm512_cvtepu8_epi32(_mm512_castsi512_si128(a_)));
+		return cvt_u8x16_i32x8(cast_u8x64_u8x16(a_));
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_u16x32_i32x8(u16x32_arg a_)
 	{
-		return _mm512_castsi512_si256(_mm512_cvtepu16_epi32(_mm512_castsi512_si256(a_)));
+		return cvt_u16x8_i32x8(cast_u16x32_u16x8(a_));
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_u32x16_i32x8(u32x16_arg a_)
 	{
-		return _mm512_castsi512_si256(a_);
+		return cast_u32x16_i32x8(a_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cvt_u64x8_i32x8(u64x8_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_cvtepi64_epi32(a_);
-	}
-#pragma endregion
-
-#pragma region TEMPLATES
-	/// <summary>
-	/// <para> Template helper for performing a floating-point operation on an integral register. The floating-point operation is provided by Func_. </para>
-	/// <para>
-	///		The used floating-point register is the first with element width greater than or equal to the width of elements in the integer register. 
-	///		The full width of the registers will match fully. 
-	/// </para>
-	/// </summary>
-	/// <param name="func_">Floating-point function to execute.</param>
-	/// <param name="in_">Integral register to emulate the fp operation with.</param>
-	/// <returns>The results of the floating-point operation with the provided register elements.</returns>
-	template<class Func_>
-	EMU_SIMD_COMMON_FUNC_SPEC auto emulate_fp_i32x8(Func_ func_, EmuSIMD::i32x8_arg in_)
-		-> std::enable_if_t<std::is_invocable_r_v<EmuSIMD::f32x8, decltype(func_), EmuSIMD::f32x8>, EmuSIMD::i32x8>
-	{
-		return _mm256_cvtps_epi32
-		(
-			func_(_mm256_cvtepi32_ps(in_))
-		);
+#else
+		return EmuSIMD::_underlying_impl::emulate_cvt<i32x8, std::int32_t, 32, true, 8, false, std::uint64_t>(a_, std::make_index_sequence<8>());
+#endif
 	}
 #pragma endregion
 
@@ -420,6 +526,183 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region MOVES
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 movehl_i32x8(EmuSIMD::i32x8_arg lhs_, EmuSIMD::i32x8_arg rhs_)
+	{
+		return cast_f32x8_i32x8(movehl_f32x8(cast_i32x8_f32x8(lhs_), cast_i32x8_f32x8(rhs_)));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 movelh_i32x8(EmuSIMD::i32x8_arg lhs_, EmuSIMD::i32x8_arg rhs_)
+	{
+		return cast_f32x8_i32x8(movelh_f32x8(cast_i32x8_f32x8(lhs_), cast_i32x8_f32x8(rhs_)));
+	}
+#pragma endregion
+
+#pragma region BITWISE_ARITHMETIC
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 and_i32x8(EmuSIMD::i32x8_arg lhs_, EmuSIMD::i32x8_arg rhs_)
+	{
+#if EMU_SIMD_USE_256_REGISTERS
+		return _mm256_and_si256(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](i32x4_arg a_, i32x4_arg b_) { return EmuSIMD::Funcs::and_i32x4(a_, b_); }, lhs_, rhs_);
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 or_i32x8(EmuSIMD::i32x8_arg lhs_, EmuSIMD::i32x8_arg rhs_)
+	{
+#if EMU_SIMD_USE_256_REGISTERS
+		return _mm256_or_si256(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](i32x4_arg a_, i32x4_arg b_) { return EmuSIMD::Funcs::or_i32x4(a_, b_); }, lhs_, rhs_);
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 xor_i32x8(EmuSIMD::i32x8_arg lhs_, EmuSIMD::i32x8_arg rhs_)
+	{
+#if EMU_SIMD_USE_256_REGISTERS
+		return _mm256_xor_si256(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](i32x4_arg a_, i32x4_arg b_) { return EmuSIMD::Funcs::xor_i32x4(a_, b_); }, lhs_, rhs_);
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 andnot_i32x8(EmuSIMD::i32x8_arg not_lhs_, EmuSIMD::i32x8_arg rhs_)
+	{
+#if EMU_SIMD_USE_256_REGISTERS
+		return _mm256_andnot_si256(not_lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		return emulate_simd_basic([](i32x4_arg a_, i32x4_arg b_) { return EmuSIMD::Funcs::andnot_i32x4(a_, b_); }, not_lhs_, rhs_);
+#endif
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 shift_left_i32x8(EmuSIMD::i32x8_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 32)
+		{
+			return setzero_i32x8();
+		}
+		else
+		{
+#if EMU_SIMD_USE_256_REGISTERS
+			return _mm256_slli_epi32(lhs_, NumShifts_);
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			return emulate_simd_basic([](i32x4_arg a_) { return shift_left_i32x4<NumShifts_>(a_); }, lhs_);
+#endif
+		}
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 shift_right_arithmetic_i32x8(EmuSIMD::i32x8_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 32)
+		{
+			return setzero_i32x8();
+		}
+		else
+		{
+#if EMU_SIMD_USE_256_REGISTERS
+			return _mm256_srai_epi32(lhs_, NumShifts_);
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			return emulate_simd_basic([](i32x4_arg a_) { return shift_right_arithmetic_i32x4<NumShifts_>(a_); }, lhs_);
+#endif
+		}
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 shift_right_logical_i32x8(EmuSIMD::i32x8_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 32)
+		{
+			return setzero_i32x8();
+		}
+		else
+		{
+#if EMU_SIMD_USE_256_REGISTERS
+			return _mm256_srli_epi32(lhs_, NumShifts_);
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			return emulate_simd_basic([](i32x4_arg a_) { return shift_right_logical_i32x4<NumShifts_>(a_); }, lhs_);
+#endif
+		}
+	}
+#pragma endregion
+
+#pragma region BLENDS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 blendv_i32x8(EmuSIMD::i32x8_arg a_, EmuSIMD::i32x8_arg b_, EmuSIMD::i32x8_arg shuffle_mask_vec_)
+	{
+		return cast_f32x8_i32x8
+		(
+			blendv_f32x8
+			(
+				cast_i32x8_f32x8(a_),
+				cast_i32x8_f32x8(b_),
+				cast_i32x8_f32x8(shuffle_mask_vec_)
+			)
+		);
+	}
+#pragma endregion
+
+#pragma region MINMAX_FUNCS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 min_i32x8(EmuSIMD::i32x8_arg a_, EmuSIMD::i32x8_arg b_)
+	{
+		return _mm256_min_epi32(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 horizontal_min_i32x8(EmuSIMD::i32x8_arg a_)
+	{
+		i32x4 lane = min_i32x4(cast_i32x8_i32x4(a_), extract_i32x8_lane_i32x4<1>(a_));
+		return cast_i32x4_i32x8(horizontal_min_i32x4(lane));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 horizontal_min_fill_i32x8(EmuSIMD::i32x8_arg a_)
+	{
+		i32x4 lane = min_i32x4(cast_i32x8_i32x4(a_), extract_i32x8_lane_i32x4<1>(a_));
+		lane = horizontal_min_i32x4(lane);
+		return _mm256_inserti128_si256(cast_i32x4_i32x8(lane), lane, 1);
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_min_scalar_i32x8(EmuSIMD::i32x8_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		i32x4 lane = min_i32x4(cast_i32x8_i32x4(a_), extract_i32x8_lane_i32x4<1>(a_));
+		return horizontal_min_scalar_i32x4<Out_>(lane);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 max_i32x8(EmuSIMD::i32x8_arg a_, EmuSIMD::i32x8_arg b_)
+	{
+		return _mm256_max_epi32(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 horizontal_max_i32x8(EmuSIMD::i32x8_arg a_)
+	{
+		i32x4 lane = max_i32x4(cast_i32x8_i32x4(a_), extract_i32x8_lane_i32x4<1>(a_));
+		return cast_i32x4_i32x8(horizontal_max_i32x4(lane));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 horizontal_max_fill_i32x8(EmuSIMD::i32x8_arg a_)
+	{
+		i32x4 lane = max_i32x4(cast_i32x8_i32x4(a_), extract_i32x8_lane_i32x4<1>(a_));
+		lane = horizontal_max_i32x4(lane);
+		return _mm256_inserti128_si256(cast_i32x4_i32x8(lane), lane, 1);
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_max_scalar_i32x8(EmuSIMD::i32x8_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		i32x4 lane = max_i32x4(cast_i32x8_i32x4(a_), extract_i32x8_lane_i32x4<1>(a_));
+		return horizontal_max_scalar_i32x4<Out_>(lane);
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 mul_all_i32x8(EmuSIMD::i32x8_arg lhs_, EmuSIMD::i32x8_arg rhs_)
 	{
@@ -441,14 +724,15 @@ namespace EmuSIMD::Funcs
 		return _mm256_sub_epi32(lhs_, rhs_);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 mul_i32x8(EmuSIMD::i32x8_arg lhs_, EmuSIMD::i32x8_arg rhs_)
-	{
-		return _mm256_mul_epi32(lhs_, rhs_);
-	}
-
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 div_i32x8(EmuSIMD::i32x8_arg lhs_, EmuSIMD::i32x8_arg rhs_)
 	{
+#if EMU_CORE_X86_X64_SVML
 		return _mm256_div_epi32(lhs_, rhs_);
+#else
+		EmuSIMD::f32x8 result_f32 = cvt_i32x8_f32x8(lhs_);
+		result_f32 = div_f32x8(result_f32, cvt_i32x8_f32x8(rhs_));
+		return cvt_f32x8_i32x8(trunc_f32x8(result_f32));
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 addsub_i32x8(EmuSIMD::i32x8_arg lhs_, EmuSIMD::i32x8_arg rhs_)
@@ -512,15 +796,15 @@ namespace EmuSIMD::Funcs
 		return to_trunc_;
 	}
 
-	template<int RoundingFlag_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 round_i32x8(EmuSIMD::i32x8_arg to_round_)
-	{
-		return to_round_;
-	}
-
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 mod_i32x8(EmuSIMD::i32x8_arg lhs_, EmuSIMD::i32x8_arg rhs_)
 	{
+#if EMU_CORE_X86_X64_SVML
 		return _mm256_rem_epi32(lhs_, rhs_);
+#else
+		EmuSIMD::i32x8 to_subtract = div_i32x8(lhs_, rhs_);
+		to_subtract = mul_all_i32x8(to_subtract, rhs_);
+		return sub_i32x8(lhs_, to_subtract);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 abs_i32x8(EmuSIMD::i32x8_arg in_)
@@ -530,12 +814,12 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 sqrt_i32x8(EmuSIMD::i32x8_arg in_)
 	{
-		return emulate_fp_i32x8([](EmuSIMD::f32x8_arg in_fp_) { return _mm256_sqrt_ps(in_fp_); }, in_);
+		return emulate_fp_i32x8([](EmuSIMD::f32x8_arg in_fp_) { return sqrt_f32x8(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 rsqrt_i32x8(EmuSIMD::i32x8_arg in_)
 	{
-		return emulate_fp_i32x8([](EmuSIMD::f32x8_arg in_fp_) { return _mm256_rsqrt_ps(in_fp_); }, in_);
+		return emulate_fp_i32x8([](EmuSIMD::f32x8_arg in_fp_) { return rsqrt_f32x8(in_fp_); }, in_);
 	}
 #pragma endregion
 
@@ -554,32 +838,32 @@ namespace EmuSIMD::Funcs
 #pragma region TRIG
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 cos_i32x8(EmuSIMD::i32x8_arg in_)
 	{
-		return emulate_fp_i32x8([](EmuSIMD::f32x8_arg in_fp_) { return _mm256_cos_ps(in_fp_); }, in_);
+		return emulate_fp_i32x8([](EmuSIMD::f32x8_arg in_fp_) { return cos_f32x8(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 sin_i32x8(EmuSIMD::i32x8_arg in_)
 	{
-		return emulate_fp_i32x8([](EmuSIMD::f32x8_arg in_fp_) { return _mm256_sin_ps(in_fp_); }, in_);
+		return emulate_fp_i32x8([](EmuSIMD::f32x8_arg in_fp_) { return sin_f32x8(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 tan_i32x8(EmuSIMD::i32x8_arg in_)
 	{
-		return emulate_fp_i32x8([](EmuSIMD::f32x8_arg in_fp_) { return _mm256_tan_ps(in_fp_); }, in_);
+		return emulate_fp_i32x8([](EmuSIMD::f32x8_arg in_fp_) { return tan_f32x8(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 acos_i32x8(EmuSIMD::i32x8_arg in_)
 	{
-		return emulate_fp_i32x8([](EmuSIMD::f32x8_arg in_fp_) { return _mm256_acos_ps(in_fp_); }, in_);
+		return emulate_fp_i32x8([](EmuSIMD::f32x8_arg in_fp_) { return acos_f32x8(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 asin_i32x8(EmuSIMD::i32x8_arg in_)
 	{
-		return emulate_fp_i32x8([](EmuSIMD::f32x8_arg in_fp_) { return _mm256_asin_ps(in_fp_); }, in_);
+		return emulate_fp_i32x8([](EmuSIMD::f32x8_arg in_fp_) { return asin_f32x8(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 atan_i32x8(EmuSIMD::i32x8_arg in_)
 	{
-		return emulate_fp_i32x8([](EmuSIMD::f32x8_arg in_fp_) { return _mm256_atan_ps(in_fp_); }, in_);
+		return emulate_fp_i32x8([](EmuSIMD::f32x8_arg in_fp_) { return atan_f32x8(in_fp_); }, in_);
 	}
 #pragma endregion
 }

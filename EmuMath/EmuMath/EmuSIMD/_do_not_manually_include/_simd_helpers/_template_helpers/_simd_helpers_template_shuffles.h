@@ -2,107 +2,585 @@
 #define EMU_SIMD_HELPERS_SHUFFLES_H_INC_ 1
 
 #include "_underlying_template_helpers/_all_underlying_templates.h"
+#include "_underlying_template_helpers/_generic_funcs/_forward_declarations/_forward_template_gets.h"
+#include "_simd_helpers_template_gets.h"
 
 namespace EmuSIMD
 {
-	template<class Register_, std::size_t...Indices_>
-	struct shuffle_mask : public _underlying_simd_helpers::_shuffle_mask<Register_, Indices_...>
+	template<std::size_t...Indices_, EmuConcepts::KnownSIMD Register_>
+	[[nodiscard]] inline auto shuffle(Register_&& ab_)
+		-> typename std::remove_cvref<Register_>::type
 	{
-		static constexpr bool is_valid = _underlying_simd_helpers::is_valid_shuffle_mask_instance
-		<
-			_underlying_simd_helpers::_shuffle_mask<Register_, Indices_...>
-		>::value;
-	};
+		using permuter = _underlying_simd_helpers::_permuter<typename std::remove_cvref<Register_>::type, Indices_...>;
+		return permuter::execute(std::forward<Register_>(ab_));
+	}
 
-#pragma region SHUFFLE_MASK_ALIASES
-	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m128 = shuffle_mask<EmuSIMD::f32x4, I0_, I1_, I2_, I3_>;
+	template<std::size_t...Indices_, EmuConcepts::KnownSIMD RegisterA_, EmuConcepts::UnqualifiedMatch<RegisterA_> RegisterB_>
+	[[nodiscard]] inline auto shuffle(RegisterA_&& a_, RegisterB_&& b_)
+		-> typename std::remove_cvref<RegisterA_>::type
+	{
+		using shuffler = _underlying_simd_helpers::_shuffler<typename std::remove_cvref<RegisterA_>::type, typename std::remove_cvref<RegisterB_>::type, Indices_...>;
+		return shuffler::execute(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+	}
 
-	template<std::size_t I0_, std::size_t I1_>
-	using shuffle_mask_m128d = shuffle_mask<EmuSIMD::f64x2, I0_, I1_>;
+	template<std::uint64_t ShuffleMask_, std::size_t PerElementWidthIfGenericInt_, EmuConcepts::KnownSIMD Register_>
+	[[nodiscard]] inline auto shuffle_with_mask(Register_&& ab_)
+		-> typename std::remove_cvref<Register_>::type
+	{
+		using _register_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+		if constexpr (std::is_same_v<_register_uq, EmuSIMD::f32x4>)
+		{
+			return EmuSIMD::Funcs::permute_f32x4<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::f32x8>)
+		{
+			return EmuSIMD::Funcs::permute_f32x8<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::f32x16>)
+		{
+			return EmuSIMD::Funcs::permute_f32x16<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::f64x2>)
+		{
+			return EmuSIMD::Funcs::permute_f64x2<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::f64x4>)
+		{
+			return EmuSIMD::Funcs::permute_f64x4<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::f64x8>)
+		{
+			return EmuSIMD::Funcs::permute_f64x8<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i128_generic>)
+		{
+			if constexpr (PerElementWidthIfGenericInt_ == 8)
+			{
+				return EmuSIMD::Funcs::permute_i8x16<ShuffleMask_>(std::forward<Register_>(ab_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 16)
+			{
+				return EmuSIMD::Funcs::permute_i16x8<ShuffleMask_>(std::forward<Register_>(ab_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 32)
+			{
+				return EmuSIMD::Funcs::permute_i32x4<ShuffleMask_>(std::forward<Register_>(ab_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 64)
+			{
+				return EmuSIMD::Funcs::permute_i64x2<ShuffleMask_>(std::forward<Register_>(ab_));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, PerElementWidthIfGenericInt_>(),
+					"Invalid PerElementWidthIfGenericInt_ passed to `EmuSIMD::shuffle_with_mask` with a generic 128-bit integral register. Valid values are: 8, 16, 32, 64."
+				);
+			}
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i256_generic>)
+		{
+			if constexpr (PerElementWidthIfGenericInt_ == 8)
+			{
+				return EmuSIMD::Funcs::permute_i8x32<ShuffleMask_>(std::forward<Register_>(ab_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 16)
+			{
+				return EmuSIMD::Funcs::permute_i16x16<ShuffleMask_>(std::forward<Register_>(ab_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 32)
+			{
+				return EmuSIMD::Funcs::permute_i32x8<ShuffleMask_>(std::forward<Register_>(ab_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 64)
+			{
+				return EmuSIMD::Funcs::permute_i64x4<ShuffleMask_>(std::forward<Register_>(ab_));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, PerElementWidthIfGenericInt_>(),
+					"Invalid PerElementWidthIfGenericInt_ passed to `EmuSIMD::shuffle_with_mask` with a generic 256-bit integral register. Valid values are: 8, 16, 32, 64."
+				);
+			}
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i512_generic>)
+		{
+			if constexpr (PerElementWidthIfGenericInt_ == 8)
+			{
+				return EmuSIMD::Funcs::permute_i8x64<ShuffleMask_>(std::forward<Register_>(ab_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 16)
+			{
+				return EmuSIMD::Funcs::permute_i16x32<ShuffleMask_>(std::forward<Register_>(ab_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 32)
+			{
+				return EmuSIMD::Funcs::permute_i32x16<ShuffleMask_>(std::forward<Register_>(ab_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 64)
+			{
+				return EmuSIMD::Funcs::permute_i64x8<ShuffleMask_>(std::forward<Register_>(ab_));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, PerElementWidthIfGenericInt_>(),
+					"Invalid PerElementWidthIfGenericInt_ passed to `EmuSIMD::shuffle_with_mask` with a generic 512-bit integral register. Valid values are: 8, 16, 32, 64."
+				);
+			}
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i8x16>)
+		{
+			return EmuSIMD::Funcs::permute_i8x16<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i16x8>)
+		{
+			return EmuSIMD::Funcs::permute_i16x8<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i32x4>)
+		{
+			return EmuSIMD::Funcs::permute_i32x4<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i64x2>)
+		{
+			return EmuSIMD::Funcs::permute_i64x2<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i8x32>)
+		{
+			return EmuSIMD::Funcs::permute_i8x32<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i16x16>)
+		{
+			return EmuSIMD::Funcs::permute_i16x16<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i32x8>)
+		{
+			return EmuSIMD::Funcs::permute_i32x8<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i64x4>)
+		{
+			return EmuSIMD::Funcs::permute_i64x4<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::permute_i8x64<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::permute_i16x32<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::permute_i32x16<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::permute_i64x8<ShuffleMask_>(std::forward<Register_>(ab_));
+		}		
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u8x16>)
+		{
+			return EmuSIMD::Funcs::permute_u8x16<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u16x8>)
+		{
+			return EmuSIMD::Funcs::permute_u16x8<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u32x4>)
+		{
+			return EmuSIMD::Funcs::permute_u32x4<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u64x2>)
+		{
+			return EmuSIMD::Funcs::permute_u64x2<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u8x32>)
+		{
+			return EmuSIMD::Funcs::permute_u8x32<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u16x16>)
+		{
+			return EmuSIMD::Funcs::permute_u16x16<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u32x8>)
+		{
+			return EmuSIMD::Funcs::permute_u32x8<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u64x4>)
+		{
+			return EmuSIMD::Funcs::permute_u64x4<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::permute_u8x64<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::permute_u16x32<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::permute_u32x16<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::permute_u64x8<ShuffleMask_>(std::forward<Register_>(ab_));
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to use `EmuSIMD::shuffle_with_mask` with an unsupported input type.");
+		}
+	}
 
-	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m128i16 = shuffle_mask<EmuSIMD::i128_generic, I0_, I1_, I2_, I3_>;
+	template<std::uint64_t ShuffleMask_, std::size_t PerElementWidthIfGenericInt_, EmuConcepts::KnownSIMD RegisterA_, EmuConcepts::UnqualifiedMatch<RegisterA_> RegisterB_>
+	[[nodiscard]] inline auto shuffle_with_mask(RegisterA_&& a_, RegisterB_&& b_)
+		-> typename std::remove_cvref<RegisterA_>::type
+	{
+		using _register_uq = typename EmuCore::TMP::remove_ref_cv<RegisterA_>::type;
+		if constexpr (std::is_same_v<_register_uq, EmuSIMD::f32x4>)
+		{
+			return EmuSIMD::Funcs::shuffle_f32x4<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::f32x8>)
+		{
+			return EmuSIMD::Funcs::shuffle_f32x8<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::f32x16>)
+		{
+			return EmuSIMD::Funcs::shuffle_f32x16<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::f64x2>)
+		{
+			return EmuSIMD::Funcs::shuffle_f64x2<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::f64x4>)
+		{
+			return EmuSIMD::Funcs::shuffle_f64x4<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::f64x8>)
+		{
+			return EmuSIMD::Funcs::shuffle_f64x8<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i128_generic>)
+		{
+			if constexpr (PerElementWidthIfGenericInt_ == 8)
+			{
+				return EmuSIMD::Funcs::shuffle_i8x16<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 16)
+			{
+				return EmuSIMD::Funcs::shuffle_i16x8<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 32)
+			{
+				return EmuSIMD::Funcs::shuffle_i32x4<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 64)
+			{
+				return EmuSIMD::Funcs::shuffle_i64x2<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, PerElementWidthIfGenericInt_>(),
+					"Invalid PerElementWidthIfGenericInt_ passed to `EmuSIMD::shuffle_with_mask` with a generic 128-bit integral register. Valid values are: 8, 16, 32, 64."
+				);
+			}
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i256_generic>)
+		{
+			if constexpr (PerElementWidthIfGenericInt_ == 8)
+			{
+				return EmuSIMD::Funcs::shuffle_i8x32<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 16)
+			{
+				return EmuSIMD::Funcs::shuffle_i16x16<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 32)
+			{
+				return EmuSIMD::Funcs::shuffle_i32x8<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 64)
+			{
+				return EmuSIMD::Funcs::shuffle_i64x4<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, PerElementWidthIfGenericInt_>(),
+					"Invalid PerElementWidthIfGenericInt_ passed to `EmuSIMD::shuffle_with_mask` with a generic 256-bit integral register. Valid values are: 8, 16, 32, 64."
+				);
+			}
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i512_generic>)
+		{
+			if constexpr (PerElementWidthIfGenericInt_ == 8)
+			{
+				return EmuSIMD::Funcs::shuffle_i8x64<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 16)
+			{
+				return EmuSIMD::Funcs::shuffle_i16x32<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 32)
+			{
+				return EmuSIMD::Funcs::shuffle_i32x16<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+			}
+			else if constexpr (PerElementWidthIfGenericInt_ == 64)
+			{
+				return EmuSIMD::Funcs::shuffle_i64x8<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, PerElementWidthIfGenericInt_>(),
+					"Invalid PerElementWidthIfGenericInt_ passed to `EmuSIMD::shuffle_with_mask` with a generic 512-bit integral register. Valid values are: 8, 16, 32, 64."
+				);
+			}
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i8x16>)
+		{
+			return EmuSIMD::Funcs::shuffle_i8x16<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i16x8>)
+		{
+			return EmuSIMD::Funcs::shuffle_i16x8<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i32x4>)
+		{
+			return EmuSIMD::Funcs::shuffle_i32x4<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i64x2>)
+		{
+			return EmuSIMD::Funcs::shuffle_i64x2<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i8x32>)
+		{
+			return EmuSIMD::Funcs::shuffle_i8x32<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i16x16>)
+		{
+			return EmuSIMD::Funcs::shuffle_i16x16<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i32x8>)
+		{
+			return EmuSIMD::Funcs::shuffle_i32x8<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i64x4>)
+		{
+			return EmuSIMD::Funcs::shuffle_i64x4<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i8x64>)
+		{
+			return EmuSIMD::Funcs::shuffle_i8x64<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i16x32>)
+		{
+			return EmuSIMD::Funcs::shuffle_i16x32<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i32x16>)
+		{
+			return EmuSIMD::Funcs::shuffle_i32x16<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::i64x8>)
+		{
+			return EmuSIMD::Funcs::shuffle_i64x8<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}		
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u8x16>)
+		{
+			return EmuSIMD::Funcs::shuffle_u8x16<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u16x8>)
+		{
+			return EmuSIMD::Funcs::shuffle_u16x8<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u32x4>)
+		{
+			return EmuSIMD::Funcs::shuffle_u32x4<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u64x2>)
+		{
+			return EmuSIMD::Funcs::shuffle_u64x2<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u8x32>)
+		{
+			return EmuSIMD::Funcs::shuffle_u8x32<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u16x16>)
+		{
+			return EmuSIMD::Funcs::shuffle_u16x16<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u32x8>)
+		{
+			return EmuSIMD::Funcs::shuffle_u32x8<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u64x4>)
+		{
+			return EmuSIMD::Funcs::shuffle_u64x4<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u8x64>)
+		{
+			return EmuSIMD::Funcs::shuffle_u8x64<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u16x32>)
+		{
+			return EmuSIMD::Funcs::shuffle_u16x32<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u32x16>)
+		{
+			return EmuSIMD::Funcs::shuffle_u32x16<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else if constexpr (std::is_same_v<_register_uq, EmuSIMD::u64x8>)
+		{
+			return EmuSIMD::Funcs::shuffle_u64x8<ShuffleMask_>(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<RegisterA_, RegisterB_>(), "Attempted to use `EmuSIMD::shuffle_with_mask` with an unsupported input type.");
+		}
+	}
 
-	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m128i32 = shuffle_mask<EmuSIMD::i128_generic, I0_, I1_, I2_, I3_>;
+#pragma region FULL_WIDTH_SHUFFLES
+	/// <summary>
+	/// <para> Performs a full-width shuffle of the passed SIMD register's indices. </para>
+	/// <para> For 128-bit registers, this is the same as a normal shuffle. </para>
+	/// </summary>
+	/// <param name="a_">128-bit register to shuffle for the lo bytes of the output register.</param>
+	/// <param name="b_">128-bit register to shuffle for the hi bytes of the output register.</param>
+	/// <returns>Result of shuffling the passed Registers with the provided indices.</returns>
+	template<std::size_t...Indices_, EmuConcepts::KnownSIMD RegisterA_, EmuConcepts::UnqualifiedMatch<RegisterA_> RegisterB_>
+	requires (EmuSIMD::TMP::simd_register_width_v<RegisterA_> == 128)
+	[[nodiscard]] constexpr inline auto shuffle_full_width(RegisterA_&& a_, RegisterB_&& b_)
+		-> typename std::remove_cvref<RegisterA_>::type
+	{
+		using shuffler = _underlying_simd_helpers::_shuffler<typename std::remove_cvref<RegisterA_>::type, typename std::remove_cvref<RegisterB_>::type, Indices_...>;
+		return shuffler::execute(std::forward<RegisterA_>(a_), std::forward<RegisterB_>(b_));
+	}
 
-	template
-	<
-		std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_,
-		std::size_t I8_, std::size_t I9_, std::size_t I10_, std::size_t I11_, std::size_t I12_, std::size_t I13_, std::size_t I14_, std::size_t I15_
-	>
-	using shuffle_mask_m128i8 = shuffle_mask<EmuSIMD::i128_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>;
+	/// <summary>
+	/// <para> Performs a full-width shuffle of the passed SIMD register's indices. </para>
+	/// <para> For 128-bit registers, this is the same as a normal shuffle. </para>
+	/// </summary>
+	/// <param name="ab_">128-bit register to shuffle.</param>
+	/// <returns>Result of shuffling the passed Register with the provided indices.</returns>
+	template<std::size_t...Indices_, EmuConcepts::KnownSIMD Register_>
+	requires (EmuSIMD::TMP::simd_register_width_v<Register_> == 128)
+	[[nodiscard]] constexpr inline auto shuffle_full_width(Register_&& ab_)
+		-> typename std::remove_cvref<Register_>::type
+	{
+		using permuter = _underlying_simd_helpers::_permuter<typename std::remove_cvref<Register_>::type, Indices_...>;
+		return permuter::execute(std::forward<Register_>(ab_));
+	}
 
-	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m256 = shuffle_mask<EmuSIMD::f32x8, I0_, I1_, I2_, I3_>;
+	/// <summary>
+	/// <para> Performs a full-width shuffle of the passed SIMD register's indices, allowing shuffles between lanes unlike a normal shuffle. </para>
+	/// </summary>
+	/// <param name="a_">256-bit register to shuffle for the lo 128-bit lane of the output register.</param>
+	/// <param name="b_">256-bit register to shuffle for the hi 128-bit lane of the output register.</param>
+	/// <returns>Result of full-width-shuffling the passed Registers with the provided indices.</returns>
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, EmuConcepts::KnownSIMD RegisterA_, EmuConcepts::UnqualifiedMatch<RegisterA_> RegisterB_>
+	requires (EmuSIMD::TMP::simd_register_width_v<RegisterA_> == 256 && EmuSIMD::TMP::register_element_count_v<RegisterA_, 64> == 4)
+	[[nodiscard]] constexpr inline auto shuffle_full_width(RegisterA_&& a_, RegisterB_&& b_)
+		-> typename std::remove_cvref<RegisterA_>::type
+	{
+		using _register_uq = typename EmuCore::TMP::remove_ref_cv<RegisterA_>::type;
+		using _generic_register_type = EmuSIMD::f64x4;
+		using _generic_lane_register = typename EmuSIMD::TMP::half_width<_generic_register_type>::type;
+		_generic_register_type out;
 
-	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m256d = shuffle_mask<EmuSIMD::f64x4, I0_, I1_, I2_, I3_>;
+		constexpr std::size_t max_lo_index = 1;
+		constexpr std::size_t lowest_index = EmuCore::TMP::smallest_constant_v<std::size_t, I0_, I1_, I2_, I3_>;
+		if constexpr (lowest_index > max_lo_index)
+		{
+			// All hi indices, we can just shuffle hi lane
+			auto hi_a = EmuSIMD::extract_lane<1, _generic_lane_register>(std::forward<RegisterA_>(a_));
+			auto hi_b = EmuSIMD::extract_lane<1, _generic_lane_register>(std::forward<RegisterB_>(b_));
+			hi_b = EmuSIMD::shuffle<I2_ - 2, I3_ - 2>(hi_b);
 
-	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m256i16 = shuffle_mask<EmuSIMD::i256_generic, I0_, I1_, I2_, I3_>;
+			out = EmuSIMD::cast<_generic_register_type>(EmuSIMD::shuffle<I0_ - 2, I1_ - 2>(hi_a));
+			out = _mm256_insertf128_pd(out, hi_b, 1);
+		}
+		else
+		{
+			constexpr std::size_t highest_index = EmuCore::TMP::greatest_constant_v<std::size_t, I0_, I1_, I2_, I3_>;
+			if constexpr (highest_index <= max_lo_index)
+			{
+				// All lo indices, we can just shuffle lo lane
+				auto lo_a = EmuSIMD::cast<_generic_lane_register>(std::forward<RegisterA_>(a_));
+				auto lo_b = EmuSIMD::cast<_generic_lane_register>(std::forward<RegisterB_>(b_));
 
-	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m256i32 = shuffle_mask<EmuSIMD::i256_generic, I0_, I1_, I2_, I3_>;
+				out = EmuSIMD::cast<_generic_register_type>(EmuSIMD::shuffle<I0_, I1_>(lo_a));
+				lo_b = EmuSIMD::shuffle<I2_, I3_>(lo_b);
+				out = _mm256_insertf128_pd(out, lo_b, 1);
+			}
+			else // Mixed lanes, we need to actually try
+			{
+				// Lo
+				constexpr int i0_lane = (I0_ <= max_lo_index) ? 0 : 1;
+				constexpr int i1_lane = (I1_ <= max_lo_index) ? 0 : 1;
+				_generic_lane_register lane_0, lane_1;
+				if constexpr (i0_lane == i1_lane)
+				{
+					lane_0 = EmuSIMD::extract_lane<i0_lane, _generic_lane_register>(std::forward<RegisterA_>(a_));
+					lane_1 = lane_0;
+				}
+				else
+				{
+					lane_0 = EmuSIMD::extract_lane<i0_lane, _generic_lane_register>(std::forward<RegisterA_>(a_));
+					lane_1 = EmuSIMD::extract_lane<i1_lane, _generic_lane_register>(std::forward<RegisterA_>(a_));
+				}
+				out = EmuSIMD::cast<_generic_register_type>(EmuSIMD::shuffle<I0_ % 2, I1_ % 2>(lane_0, lane_1));
 
-	template
-	<
-		std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_,
-		std::size_t I8_, std::size_t I9_, std::size_t I10_, std::size_t I11_, std::size_t I12_, std::size_t I13_, std::size_t I14_, std::size_t I15_,
-		std::size_t I16_, std::size_t I17_, std::size_t I18_, std::size_t I19_, std::size_t I20_, std::size_t I21_, std::size_t I22_, std::size_t I23_,
-		std::size_t I24_, std::size_t I25_, std::size_t I26_, std::size_t I27_, std::size_t I28_, std::size_t I29_, std::size_t I30_, std::size_t I31_
-	>
-	using shuffle_mask_m256i8 = shuffle_mask
-	<
-		EmuSIMD::i256_generic,
-		I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_,
-		I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_
-	>;
+				// Hi
+				constexpr int i2_lane = (I2_ <= max_lo_index) ? 0 : 1;
+				constexpr int i3_lane = (I3_ <= max_lo_index) ? 0 : 1;
+				if constexpr (i2_lane == i3_lane)
+				{
+					lane_0 = EmuSIMD::extract_lane<i2_lane, _generic_lane_register>(std::forward<RegisterB_>(b_));
+					lane_1 = lane_0;
+				}
+				else
+				{
+					lane_0 = EmuSIMD::extract_lane<i2_lane, _generic_lane_register>(std::forward<RegisterB_>(b_));
+					lane_1 = EmuSIMD::extract_lane<i3_lane, _generic_lane_register>(std::forward<RegisterB_>(b_));
+				}
 
-	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m512 = shuffle_mask<EmuSIMD::f32x16, I0_, I1_, I2_, I3_>;
+				auto tmp_shuffle = EmuSIMD::cast<_generic_lane_register>(EmuSIMD::shuffle<I2_ % 2, I3_ % 2>(lane_0, lane_1));
+				out = _mm256_insertf128_pd(out, tmp_shuffle, 1);
+			}
+		}
 
-	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_>
-	using shuffle_mask_m512d = shuffle_mask<EmuSIMD::f64x8, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>;
+		if constexpr (std::is_same_v<_register_uq, _generic_register_type>)
+		{
+			return out;
+		}
+		else
+		{
+			return EmuSIMD::cast<typename std::remove_cvref<RegisterA_>::type>(out);
+		}
+	}
 
-	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m512i16 = shuffle_mask<EmuSIMD::i512_generic, I0_, I1_, I2_, I3_>;
-
-	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m512i32 = shuffle_mask<EmuSIMD::i512_generic, I0_, I1_, I2_, I3_>;
-
-	template
-	<
-		std::size_t I0_,  std::size_t I1_,  std::size_t I2_,  std::size_t I3_,  std::size_t I4_,  std::size_t I5_,  std::size_t I6_,  std::size_t I7_,
-		std::size_t I8_,  std::size_t I9_,  std::size_t I10_, std::size_t I11_, std::size_t I12_, std::size_t I13_, std::size_t I14_, std::size_t I15_,
-		std::size_t I16_, std::size_t I17_, std::size_t I18_, std::size_t I19_, std::size_t I20_, std::size_t I21_, std::size_t I22_, std::size_t I23_,
-		std::size_t I24_, std::size_t I25_, std::size_t I26_, std::size_t I27_, std::size_t I28_, std::size_t I29_, std::size_t I30_, std::size_t I31_,
-		std::size_t I32_, std::size_t I33_, std::size_t I34_, std::size_t I35_, std::size_t I36_, std::size_t I37_, std::size_t I38_, std::size_t I39_,
-		std::size_t I40_, std::size_t I41_, std::size_t I42_, std::size_t I43_, std::size_t I44_, std::size_t I45_, std::size_t I46_, std::size_t I47_,
-		std::size_t I48_, std::size_t I49_, std::size_t I50_, std::size_t I51_, std::size_t I52_, std::size_t I53_, std::size_t I54_, std::size_t I55_,
-		std::size_t I56_, std::size_t I57_, std::size_t I58_, std::size_t I59_, std::size_t I60_, std::size_t I61_, std::size_t I62_, std::size_t I63_
-	>
-	using shuffle_mask_m512i8 = shuffle_mask
-	<
-		EmuSIMD::i512_generic,
-		I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_,
-		I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_,
-		I32_, I33_, I34_, I35_, I36_, I37_, I38_, I39_, I40_, I41_, I42_, I43_, I44_, I45_, I46_, I47_,
-		I48_, I49_, I50_, I51_, I52_, I53_, I54_, I55_, I56_, I57_, I58_, I59_, I60_, I61_, I62_, I63_
-	>;
+	/// <summary>
+	/// <para> Performs a full-width shuffle of the passed SIMD register's indices, allowing shuffles between lanes unlike a normal shuffle. </para>
+	/// </summary>
+	/// <param name="ab_">256-bit register to shuffle.</param>
+	/// <returns>Result of full-width-shuffling the passed Register with the provided indices.</returns>
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, EmuConcepts::KnownSIMD Register_>
+	requires (EmuSIMD::TMP::simd_register_width_v<Register_> == 256 && EmuSIMD::TMP::register_element_count_v<Register_> == 4)
+	[[nodiscard]] constexpr inline auto shuffle_full_width(Register_&& ab_)
+		-> typename std::remove_cvref<Register_>::type
+	{
+		const auto& ab_ref = std::forward<Register_>(ab_);
+		return shuffle_full_width<I0_, I1_, I2_, I3_>(ab_ref, ab_ref);
+	}
 #pragma endregion
-
-	template<std::size_t...Indices_, class Register_>
-	[[nodiscard]] inline Register_ shuffle(Register_ ab_)
-	{
-		return _underlying_simd_helpers::_execute_shuffle<Indices_...>(ab_);
-	}
-	template<std::size_t...Indices_, class Register_>
-	[[nodiscard]] inline Register_ shuffle(Register_ a_, Register_ b_)
-	{
-		return _underlying_simd_helpers::_execute_shuffle<Indices_...>(a_, b_);
-	}
 }
 
 #endif

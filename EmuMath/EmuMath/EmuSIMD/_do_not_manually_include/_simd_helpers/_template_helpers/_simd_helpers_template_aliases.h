@@ -92,7 +92,7 @@ namespace EmuSIMD::TMP
 		<
 			std::is_integral_v<T_>,
 			integer_register_arg_type<Width_>,
-			EmuCore::TMP::dummy_type_wrapper<void>
+			EmuCore::TMP::dummy_type_wrapper<EmuCore::TMP::emu_tmp_err>
 		>::type;
 	};
 

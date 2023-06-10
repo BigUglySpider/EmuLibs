@@ -18,7 +18,7 @@ namespace EmuMath::TMP
 	struct is_emu_fast_vector<EmuMath::FastVector<Size_, T_, RegisterWidth_>>
 	{
 		static constexpr bool value = true;
-	};
+	};	
 }
 
 #endif

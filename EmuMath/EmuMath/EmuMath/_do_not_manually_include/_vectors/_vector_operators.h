@@ -221,7 +221,7 @@ namespace EmuMath::Helpers
 /// <param name="rhs_">Argument appearing on the right-hand side of addition as in `EmuMath::Helpers::vector_add_assign`.</param>
 /// <returns>Reference to the left-hand Vector.</returns>
 template<std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-[[nodiscard]] constexpr inline auto operator+=(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+constexpr inline auto operator+=(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	-> std::enable_if_t
 	<
 		EmuMath::Helpers::vector_valid_add_default_operator_args<LhsSize_, LhsT_, Rhs_>(),
@@ -239,7 +239,7 @@ template<std::size_t LhsSize_, typename LhsT_, typename Rhs_>
 /// <param name="rhs_">Argument appearing on the right-hand side of subtraction as in `EmuMath::Helpers::vector_subtract_assign`.</param>
 /// <returns>Reference to the left-hand Vector.</returns>
 template<std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-[[nodiscard]] constexpr inline auto operator-=(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+constexpr inline auto operator-=(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	-> std::enable_if_t
 	<
 		EmuMath::Helpers::vector_valid_subtract_default_operator_args<LhsSize_, LhsT_, Rhs_>(),
@@ -258,7 +258,7 @@ template<std::size_t LhsSize_, typename LhsT_, typename Rhs_>
 /// <param name="rhs_">Argument appearing on the right-hand side of addition as in `EmuMath::Helpers::vector_multiply_assign`.</param>
 /// <returns>Reference to the left-hand Vector.</returns>
 template<std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-[[nodiscard]] constexpr inline auto operator*=(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+constexpr inline auto operator*=(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	-> std::enable_if_t
 	<
 		EmuMath::Helpers::vector_valid_multiply_default_operator_args<LhsSize_, LhsT_, Rhs_>(),
@@ -276,7 +276,7 @@ template<std::size_t LhsSize_, typename LhsT_, typename Rhs_>
 /// <param name="rhs_">Argument appearing on the right-hand side of subtraction as in `EmuMath::Helpers::vector_divide_assign`.</param>
 /// <returns>Reference to the left-hand Vector.</returns>
 template<std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-[[nodiscard]] constexpr inline auto operator/=(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+constexpr inline auto operator/=(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	-> std::enable_if_t
 	<
 		EmuMath::Helpers::vector_valid_divide_default_operator_args<LhsSize_, LhsT_, Rhs_>(),
@@ -294,7 +294,7 @@ template<std::size_t LhsSize_, typename LhsT_, typename Rhs_>
 /// <param name="rhs_">Argument appearing on the right-hand side of subtraction as in `EmuMath::Helpers::vector_mod_assign`.</param>
 /// <returns>Reference to the left-hand Vector.</returns>
 template<std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-[[nodiscard]] constexpr inline auto operator%=(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+constexpr inline auto operator%=(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	-> std::enable_if_t
 	<
 		EmuMath::Helpers::vector_valid_mod_default_operator_args<LhsSize_, LhsT_, Rhs_>(),
@@ -311,7 +311,7 @@ template<std::size_t LhsSize_, typename LhsT_, typename Rhs_>
 /// <param name="vector_">EmuMath Vector to perform the pre-increment operation on as per `EmuMath::Helpers::vector_pre_increment`.</param>
 /// <returns>Reference to the left-hand Vector.</returns>
 template<std::size_t Size_, typename T_>
-[[nodiscard]] constexpr inline auto operator++(EmuMath::Vector<Size_, T_>& vector_)
+constexpr inline auto operator++(EmuMath::Vector<Size_, T_>& vector_)
 	-> std::enable_if_t
 	<
 		EmuMath::Helpers::vector_valid_pre_increment_default_operator_arg<Size_, T_>(),
@@ -327,7 +327,7 @@ template<std::size_t Size_, typename T_>
 /// <param name="vector_">EmuMath Vector to perform the post-increment operation on as per `EmuMath::Helpers::vector_post_increment`.</param>
 /// <returns>Copy to the left-hand Vector before the increment operation was performed.</returns>
 template<std::size_t Size_, typename T_>
-[[nodiscard]] constexpr inline auto operator++(EmuMath::Vector<Size_, T_>& vector_, int)
+constexpr inline auto operator++(EmuMath::Vector<Size_, T_>& vector_, int)
 	-> std::enable_if_t
 	<
 		EmuMath::Helpers::vector_valid_post_increment_default_operator_arg<Size_, T_>(),
@@ -343,7 +343,7 @@ template<std::size_t Size_, typename T_>
 /// <param name="vector_">EmuMath Vector to perform the pre-decrement operation on as per `EmuMath::Helpers::vector_pre_decrement`.</param>
 /// <returns>Reference to the left-hand Vector.</returns>
 template<std::size_t Size_, typename T_>
-[[nodiscard]] constexpr inline auto operator--(EmuMath::Vector<Size_, T_>& vector_)
+constexpr inline auto operator--(EmuMath::Vector<Size_, T_>& vector_)
 	-> std::enable_if_t
 	<
 		EmuMath::Helpers::vector_valid_pre_decrement_default_operator_arg<Size_, T_>(),
@@ -359,7 +359,7 @@ template<std::size_t Size_, typename T_>
 /// <param name="vector_">EmuMath Vector to perform the post-decrement operation on as per `EmuMath::Helpers::vector_post_decrement`.</param>
 /// <returns>Copy to the left-hand Vector before the decrement operation was performed.</returns>
 template<std::size_t Size_, typename T_>
-[[nodiscard]] constexpr inline auto operator--(EmuMath::Vector<Size_, T_>& vector_, int)
+constexpr inline auto operator--(EmuMath::Vector<Size_, T_>& vector_, int)
 	-> std::enable_if_t
 	<
 		EmuMath::Helpers::vector_valid_post_decrement_default_operator_arg<Size_, T_>(),

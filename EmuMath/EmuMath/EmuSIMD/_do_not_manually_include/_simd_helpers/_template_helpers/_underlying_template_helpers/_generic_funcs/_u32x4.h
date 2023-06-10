@@ -1,6 +1,7 @@
 #ifndef EMU_SIMD_GENERIC_FUNCS_U32X4_H_INC_
 #define EMU_SIMD_GENERIC_FUNCS_U32X4_H_INC_ 1
 
+#include "_generic_declarations/_all_generic_declarations.h"
 #include "_common_generic_func_helpers.h"
 
 namespace EmuSIMD::Funcs
@@ -13,7 +14,8 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 setr_u32x4(std::uint32_t e0, std::uint32_t e1, std::uint32_t e2, std::uint32_t e3)
 	{
-		return _mm_setr_epi32(e0, e1, e2, e3);
+		//return _mm_setr_epi32(e0, e1, e2, e3);
+		return _mm_set_epi32(e3, e2, e1, e0);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 set1_u32x4(std::uint32_t all_)
@@ -22,6 +24,11 @@ namespace EmuSIMD::Funcs
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 load_u32x4(const std::uint32_t* p_to_load_)
+	{
+		return _mm_loadu_si128(reinterpret_cast<const __m128i*>(p_to_load_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 aligned_load_u32x4(const std::uint32_t* p_to_load_)
 	{
 		return _mm_load_si128(reinterpret_cast<const __m128i*>(p_to_load_));
 	}
@@ -36,18 +43,78 @@ namespace EmuSIMD::Funcs
 		constexpr std::uint32_t element_mask = static_cast<std::uint32_t>(0xFFFFFFFF);
 		return _mm_set_epi32
 		(
-			(bit_mask_ & 0x01) * element_mask,
-			((bit_mask_ & 0x02) >> 1) * element_mask,
-			((bit_mask_ & 0x04) >> 2) * element_mask,
-			((bit_mask_ & 0x08) >> 3) * element_mask
+			static_cast<std::uint32_t>(bit_mask_  & 0x01)       * element_mask,
+			static_cast<std::uint32_t>((bit_mask_ & 0x02) >> 1) * element_mask,
+			static_cast<std::uint32_t>((bit_mask_ & 0x04) >> 2) * element_mask,
+			static_cast<std::uint32_t>((bit_mask_ & 0x08) >> 3) * element_mask
 		);
+	}
+
+	template<std::uint8_t BitMask_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 setmasked_u32x4()
+	{
+		if constexpr(BitMask_ != 0)
+		{
+			return set_u32x4
+			(
+				std::integral_constant<std::uint32_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<0, std::uint32_t>(BitMask_)>::value,
+				std::integral_constant<std::uint32_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<1, std::uint32_t>(BitMask_)>::value,
+				std::integral_constant<std::uint32_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<2, std::uint32_t>(BitMask_)>::value,
+				std::integral_constant<std::uint32_t, EmuCore::ArithmeticHelpers::make_from_masked_bit<3, std::uint32_t>(BitMask_)>::value
+			);
+		}
+		else
+		{
+			return setzero_u32x4();
+		}
+	}
+
+	template<bool I0_, bool I1_, bool I2_, bool I3_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 set_index_mask_u32x4()
+	{
+		if constexpr(I0_ || I1_ || I2_ || I3_)
+		{
+			return setmasked_u32x4<EmuSIMD::Funcs::make_index_set_mask<I0_, I1_, I2_, I3_>()>();
+		}
+		else
+		{
+			return setzero_u32x4();
+		}
+	}
+
+	template<bool Active_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 set_index_mask_u32x4()
+	{
+		if constexpr (Active_)
+		{
+			return setmasked_u32x4<EmuSIMD::Funcs::make_all_indices_set_mask<4, Active_>()>();
+		}
+		else
+		{
+			return setzero_u32x4();
+		}
 	}
 #pragma endregion
 
 #pragma region STORES
 	EMU_SIMD_COMMON_FUNC_SPEC void store_u32x4(std::uint32_t* p_out_, u32x4_arg a_)
 	{
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(p_out_), a_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC void aligned_store_u32x4(std::uint32_t* p_out_, u32x4_arg a_)
+	{
 		_mm_store_si128(reinterpret_cast<__m128i*>(p_out_), a_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC std::uint32_t get_first_u32x4(u32x4_arg a_)
+	{
+		return static_cast<std::uint32_t>(_mm_cvtsi128_si32(a_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC std::uint8_t movemask_u32x4(u32x4_arg a_)
+	{
+		return movemask_f32x4(cast_u32x4_f32x4(a_));
 	}
 #pragma endregion
 
@@ -64,7 +131,11 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cast_f32x16_u32x4(f32x16_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si128(_mm512_castps_si512(a_));
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<u32x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cast_f64x2_u32x4(f64x2_arg a_)
@@ -79,7 +150,11 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cast_f64x8_u32x4(f64x8_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si128(_mm512_castpd_si512(a_));
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<u32x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cast_i8x16_u32x4(i8x16_arg a_)
@@ -124,22 +199,38 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cast_i8x64_u32x4(i8x64_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si128(a_);
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<u32x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cast_i16x32_u32x4(i16x32_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si128(a_);
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<u32x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cast_i32x16_u32x4(i32x16_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si128(a_);
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<u32x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cast_i64x8_u32x4(i64x8_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si128(a_);
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<u32x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cast_u8x16_u32x4(u8x16_arg a_)
@@ -184,22 +275,38 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cast_u8x64_u32x4(u8x64_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si128(a_);
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<u32x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cast_u16x32_u32x4(u16x32_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si128(a_);
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<u32x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cast_u32x16_u32x4(u32x16_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si128(a_);
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<u32x4>(a_);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cast_u64x8_u32x4(u64x8_arg a_)
 	{
+#if EMU_SIMD_USE_512_REGISTERS
 		return _mm512_castsi512_si128(a_);
+#else
+		return _underlying_impl::emulate_simd_cast_lesser_width<u32x4>(a_);
+#endif
 	}
 #pragma endregion
 
@@ -216,7 +323,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_f32x16_u32x4(f32x16_arg a_)
 	{
-		return _mm_cvtps_epi32(_mm512_castps512_ps128(a_));
+		return cvt_f32x4_u32x4(cast_f32x16_f32x4(a_));
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_f64x2_u32x4(f64x2_arg a_)
@@ -231,7 +338,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_f64x8_u32x4(f64x8_arg a_)
 	{
-		return _mm256_cvtpd_epi32(_mm512_castpd512_pd256(a_));
+		return cvt_f64x4_u32x4(cast_f64x8_f64x4(a_));
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_i8x16_u32x4(i8x16_arg a_)
@@ -251,7 +358,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_i64x2_u32x4(i64x2_arg a_)
 	{
-		return _mm_cvtepi64_epi32(a_);
+		return EmuSIMD::_underlying_impl::emulate_cvt<u32x4, std::uint32_t, 32, false, 2, true, std::int64_t>(a_, std::make_index_sequence<4>());
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_i8x32_u32x4(i8x32_arg a_)
@@ -271,27 +378,27 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_i64x4_u32x4(i64x4_arg a_)
 	{
-		return _mm256_cvtepi64_epi32(a_);
+		return EmuSIMD::_underlying_impl::emulate_cvt<u32x4, std::uint32_t, 32, false, 4, true, std::int64_t>(a_, std::make_index_sequence<4>());
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_i8x64_u32x4(i8x64_arg a_)
 	{
-		return _mm_cvtepi8_epi32(_mm512_castsi512_si128(a_));
+		return cvt_i8x16_u32x4(cast_i8x64_i8x16(a_));
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_i16x32_u32x4(i16x32_arg a_)
 	{
-		return _mm_cvtepi16_epi32(_mm512_castsi512_si128(a_));
+		return cvt_i16x8_u32x4(cast_i16x32_i16x8(a_));
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_i32x16_u32x4(i32x16_arg a_)
 	{
-		return _mm512_castsi512_si128(a_);
+		return cast_i32x16_u32x4(a_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_i64x8_u32x4(i64x8_arg a_)
 	{
-		return _mm256_cvtepi64_epi32(_mm512_castsi512_si256(a_));
+		return cvt_i64x4_u32x4(cast_i64x8_i64x4(a_));
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_u8x16_u32x4(u8x16_arg a_)
@@ -311,7 +418,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_u64x2_u32x4(u64x2_arg a_)
 	{
-		return _mm_cvtepi64_epi32(a_);
+		return EmuSIMD::_underlying_impl::emulate_cvt<u32x4, std::uint32_t, 32, false, 2, false, std::uint64_t>(a_, std::make_index_sequence<4>());
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_u8x32_u32x4(u8x32_arg a_)
@@ -331,49 +438,27 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_u64x4_u32x4(u64x4_arg a_)
 	{
-		return _mm256_cvtepi64_epi32(a_);
+		return EmuSIMD::_underlying_impl::emulate_cvt<u32x4, std::uint32_t, 32, false, 4, false, std::uint64_t>(a_, std::make_index_sequence<4>());
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_u8x64_u32x4(u8x64_arg a_)
 	{
-		return _mm_cvtepi8_epi32(_mm512_castsi512_si128(a_));
+		return cvt_u8x16_u32x4(cast_u8x64_u8x16(a_));
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_u16x32_u32x4(u16x32_arg a_)
 	{
-		return _mm_cvtepi16_epi32(_mm512_castsi512_si128(a_));
+		return cvt_u16x8_u32x4(cast_u16x32_u16x8(a_));
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_u32x16_u32x4(u32x16_arg a_)
 	{
-		return _mm512_castsi512_si128(a_);
+		return cast_u32x16_u32x4(a_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cvt_u64x8_u32x4(u64x8_arg a_)
 	{
-		return _mm256_cvtepi64_epi32(_mm512_castsi512_si256(a_));
-	}
-#pragma endregion
-
-#pragma region TEMPLATES
-	/// <summary>
-	/// <para> Template helper for performing a floating-point operation on an integral register. The floating-point operation is provided by Func_. </para>
-	/// <para>
-	///		The used floating-point register is the first with element width greater than or equal to the width of elements in the integer register. 
-	///		The full width of the registers will match fully. 
-	/// </para>
-	/// </summary>
-	/// <param name="func_">Floating-point function to execute.</param>
-	/// <param name="in_">Integral register to emulate the fp operation with.</param>
-	/// <returns>The results of the floating-point operation with the provided register elements.</returns>
-	template<class Func_>
-	EMU_SIMD_COMMON_FUNC_SPEC auto emulate_fp_u32x4(Func_ func_, EmuSIMD::u32x4_arg in_)
-		-> std::enable_if_t<std::is_invocable_r_v<EmuSIMD::f32x4, decltype(func_), EmuSIMD::f32x4>, EmuSIMD::u32x4>
-	{
-		return _mm_cvtps_epu32
-		(
-			func_(_mm_cvtepu32_ps(in_))
-		);
+		return cvt_u64x4_u32x4(cast_u64x8_u64x4(a_));
 	}
 #pragma endregion
 
@@ -412,6 +497,187 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region MOVES
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 movehl_u32x4(EmuSIMD::u32x4_arg lhs_, EmuSIMD::u32x4_arg rhs_)
+	{
+		return cast_f32x4_u32x4(movehl_f32x4(cast_u32x4_f32x4(lhs_), cast_u32x4_f32x4(rhs_)));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 movelh_u32x4(EmuSIMD::u32x4_arg lhs_, EmuSIMD::u32x4_arg rhs_)
+	{
+		return cast_f32x4_u32x4(movelh_f32x4(cast_u32x4_f32x4(lhs_), cast_u32x4_f32x4(rhs_)));
+	}
+#pragma endregion
+
+#pragma region BITWISE_ARITHMETIC
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 and_u32x4(EmuSIMD::u32x4_arg lhs_, EmuSIMD::u32x4_arg rhs_)
+	{
+#if EMU_SIMD_USE_128_REGISTERS
+		return _mm_and_si128(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_bitwise_and<std::uint32_t>(), lhs_, rhs_, index_sequence());
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 or_u32x4(EmuSIMD::u32x4_arg lhs_, EmuSIMD::u32x4_arg rhs_)
+	{
+#if EMU_SIMD_USE_128_REGISTERS
+		return _mm_or_si128(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_bitwise_or<std::uint32_t>(), lhs_, rhs_, index_sequence());
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 xor_u32x4(EmuSIMD::u32x4_arg lhs_, EmuSIMD::u32x4_arg rhs_)
+	{
+#if EMU_SIMD_USE_128_REGISTERS
+		return _mm_xor_si128(lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_bitwise_xor<std::uint32_t>(), lhs_, rhs_, index_sequence());
+#endif
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 andnot_u32x4(EmuSIMD::u32x4_arg not_lhs_, EmuSIMD::u32x4_arg rhs_)
+	{
+#if EMU_SIMD_USE_128_REGISTERS
+		return _mm_andnot_si128(not_lhs_, rhs_);
+#else
+		using EmuSIMD::_underlying_impl::emulate_simd_basic;
+		using index_sequence = std::make_index_sequence<4>;
+		return emulate_simd_basic(EmuCore::do_bitwise_andnot<std::uint32_t>(), not_lhs_, rhs_, index_sequence());
+#endif
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 shift_left_u32x4(EmuSIMD::u32x4_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 32)
+		{
+			return setzero_u32x4();
+		}
+		else
+		{
+#if EMU_SIMD_USE_128_REGISTERS
+			return _mm_slli_epi32(lhs_, NumShifts_);
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			using index_sequence = std::make_index_sequence<4>;
+			auto func = [](const std::uint32_t& a_) { return (a_ << NumShifts_); };
+			return emulate_simd_basic(func, lhs_, index_sequence());
+#endif
+		}
+
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 shift_right_arithmetic_u32x4(EmuSIMD::u32x4_arg lhs_)
+	{
+		// No sign bit, so same as logical shift
+		return shift_right_logical_u32x4<NumShifts_>(lhs_);
+	}
+
+	template<std::int32_t NumShifts_>
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 shift_right_logical_u32x4(EmuSIMD::u32x4_arg lhs_)
+	{
+		if constexpr (NumShifts_ >= 32)
+		{
+			return setzero_u32x4();
+		}
+		else
+		{
+#if EMU_SIMD_USE_128_REGISTERS
+			return _mm_srli_epi32(lhs_, NumShifts_);
+#else
+			using EmuSIMD::_underlying_impl::emulate_simd_basic;
+			using index_sequence = std::make_index_sequence<4>;
+			auto func = [](const std::uint32_t& a_) { return (a_ >> NumShifts_); };
+			return emulate_simd_basic(func, lhs_, index_sequence());
+#endif
+		}
+	}
+#pragma endregion
+
+#pragma region BLENDS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 blendv_u32x4(EmuSIMD::u32x4_arg a_, EmuSIMD::u32x4_arg b_, EmuSIMD::u32x4_arg shuffle_mask_vec_)
+	{
+		return cast_f32x4_u32x4
+		(
+			blendv_f32x4
+			(
+				cast_u32x4_f32x4(a_),
+				cast_u32x4_f32x4(b_),
+				cast_u32x4_f32x4(shuffle_mask_vec_)
+			)
+		);
+	}
+#pragma endregion
+
+#pragma region MINMAX_FUNCS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 min_u32x4(EmuSIMD::u32x4_arg a_, EmuSIMD::u32x4_arg b_)
+	{
+		return _mm_min_epu32(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 horizontal_min_u32x4(EmuSIMD::u32x4_arg a_)
+	{
+		EmuSIMD::u32x4 result = movehl_u32x4(a_, a_);
+		result = min_u32x4(result, a_);
+		return min_u32x4
+		(
+			permute_u32x4<make_shuffle_mask_32<0, 1, 0, 1>()>(result),
+			result
+		);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 horizontal_min_fill_u32x4(EmuSIMD::u32x4_arg a_)
+	{
+		constexpr auto all_el0_mask = make_shuffle_mask_32<0, 0, 0, 0>();
+		return permute_u32x4<all_el0_mask>(horizontal_min_u32x4(a_));
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_min_scalar_u32x4(EmuSIMD::u32x4_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		return static_cast<typename std::remove_cvref<Out_>::type>(get_first_u32x4(horizontal_min_u32x4(a_)));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 max_u32x4(EmuSIMD::u32x4_arg a_, EmuSIMD::u32x4_arg b_)
+	{
+		return _mm_max_epu32(a_, b_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 horizontal_max_u32x4(EmuSIMD::u32x4_arg a_)
+	{
+		EmuSIMD::u32x4 result = movehl_u32x4(a_, a_);
+		result = max_u32x4(result, a_);
+		return max_u32x4
+		(
+			permute_u32x4<make_shuffle_mask_32<0, 1, 0, 1>()>(result),
+			result
+		);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 horizontal_max_fill_u32x4(EmuSIMD::u32x4_arg a_)
+	{
+		constexpr auto all_el0_mask = make_shuffle_mask_32<0, 0, 0, 0>();
+		return permute_u32x4<all_el0_mask>(horizontal_max_u32x4(a_));
+	}
+
+	template<typename Out_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto horizontal_max_scalar_u32x4(EmuSIMD::u32x4_arg a_)
+		-> typename std::remove_cvref<Out_>::type
+	{
+		return static_cast<typename std::remove_cvref<Out_>::type>(get_first_u32x4(horizontal_max_u32x4(a_)));
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 mul_all_u32x4(EmuSIMD::u32x4_arg lhs_, EmuSIMD::u32x4_arg rhs_)
 	{
@@ -433,14 +699,15 @@ namespace EmuSIMD::Funcs
 		return _mm_sub_epi32(lhs_, rhs_);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 mul_u32x4(EmuSIMD::u32x4_arg lhs_, EmuSIMD::u32x4_arg rhs_)
-	{
-		return _mm_mul_epu32(lhs_, rhs_);
-	}
-
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 div_u32x4(EmuSIMD::u32x4_arg lhs_, EmuSIMD::u32x4_arg rhs_)
 	{
+#if EMU_CORE_X86_X64_SVML
 		return _mm_div_epu32(lhs_, rhs_);
+#else
+		EmuSIMD::f32x4 result_f32 = cvt_u32x4_f32x4(lhs_);
+		result_f32 = div_f32x4(result_f32, cvt_u32x4_f32x4(rhs_));
+		return cvt_f32x4_u32x4(trunc_f32x4(result_f32));
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 addsub_u32x4(EmuSIMD::u32x4_arg lhs_, EmuSIMD::u32x4_arg rhs_)
@@ -504,15 +771,15 @@ namespace EmuSIMD::Funcs
 		return to_trunc_;
 	}
 
-	template<int RoundingFlag_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 round_u32x4(EmuSIMD::u32x4_arg to_round_)
-	{
-		return to_round_;
-	}
-
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 mod_u32x4(EmuSIMD::u32x4_arg lhs_, EmuSIMD::u32x4_arg rhs_)
 	{
+#if EMU_CORE_X86_X64_SVML
 		return _mm_rem_epu32(lhs_, rhs_);
+#else
+		EmuSIMD::i32x4 to_subtract = div_i32x4(lhs_, rhs_);
+		to_subtract = mul_all_i32x4(to_subtract, rhs_);
+		return sub_i32x4(lhs_, to_subtract);
+#endif
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 abs_u32x4(EmuSIMD::u32x4_arg in_)
@@ -522,12 +789,12 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 sqrt_u32x4(EmuSIMD::u32x4_arg in_)
 	{
-		return emulate_fp_u32x4([](EmuSIMD::f32x4_arg in_fp_) { return _mm_sqrt_ps(in_fp_); }, in_);
+		return emulate_fp_u32x4([](EmuSIMD::f32x4_arg in_fp_) { return sqrt_f32x4(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 rsqrt_u32x4(EmuSIMD::u32x4_arg in_)
 	{
-		return emulate_fp_u32x4([](EmuSIMD::f32x4_arg in_fp_) { return _mm_rsqrt_ps(in_fp_); }, in_);
+		return emulate_fp_u32x4([](EmuSIMD::f32x4_arg in_fp_) { return rsqrt_f32x4(in_fp_); }, in_);
 	}
 #pragma endregion
 
@@ -546,32 +813,32 @@ namespace EmuSIMD::Funcs
 #pragma region TRIG
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 cos_u32x4(EmuSIMD::u32x4_arg in_)
 	{
-		return emulate_fp_u32x4([](EmuSIMD::f32x4_arg in_fp_) { return _mm_cos_ps(in_fp_); }, in_);
+		return emulate_fp_u32x4([](EmuSIMD::f32x4_arg in_fp_) { return cos_f32x4(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 sin_u32x4(EmuSIMD::u32x4_arg in_)
 	{
-		return emulate_fp_u32x4([](EmuSIMD::f32x4_arg in_fp_) { return _mm_sin_ps(in_fp_); }, in_);
+		return emulate_fp_u32x4([](EmuSIMD::f32x4_arg in_fp_) { return sin_f32x4(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 tan_u32x4(EmuSIMD::u32x4_arg in_)
 	{
-		return emulate_fp_u32x4([](EmuSIMD::f32x4_arg in_fp_) { return _mm_tan_ps(in_fp_); }, in_);
+		return emulate_fp_u32x4([](EmuSIMD::f32x4_arg in_fp_) { return tan_f32x4(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 acos_u32x4(EmuSIMD::u32x4_arg in_)
 	{
-		return emulate_fp_u32x4([](EmuSIMD::f32x4_arg in_fp_) { return _mm_acos_ps(in_fp_); }, in_);
+		return emulate_fp_u32x4([](EmuSIMD::f32x4_arg in_fp_) { return acos_f32x4(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 asin_u32x4(EmuSIMD::u32x4_arg in_)
 	{
-		return emulate_fp_u32x4([](EmuSIMD::f32x4_arg in_fp_) { return _mm_asin_ps(in_fp_); }, in_);
+		return emulate_fp_u32x4([](EmuSIMD::f32x4_arg in_fp_) { return asin_f32x4(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x4 atan_u32x4(EmuSIMD::u32x4_arg in_)
 	{
-		return emulate_fp_u32x4([](EmuSIMD::f32x4_arg in_fp_) { return _mm_atan_ps(in_fp_); }, in_);
+		return emulate_fp_u32x4([](EmuSIMD::f32x4_arg in_fp_) { return atan_f32x4(in_fp_); }, in_);
 	}
 #pragma endregion
 }

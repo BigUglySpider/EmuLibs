@@ -83,25 +83,7 @@ namespace EmuSIMD
 		}
 	}
 
-	template<int PerElementWidthIfInt_= 32, class Register_>
-	[[nodiscard]] inline Register_ shift_left(Register_ lhs_, EmuSIMD::i128_generic num_shifts_)
-	{
-		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
-		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
-		{
-			return _underlying_simd_helpers::_shift_left<Register_, PerElementWidthIfInt_>(lhs_, num_shifts_);
-		}
-		else
-		{
-			static_assert
-			(
-				EmuCore::TMP::get_false<Register_>(),
-				"Attempted to use EmuSIMD::shift_left with a non-SIMD register type, or a SIMD register that is not supported."
-			);
-		}
-	}
-
-	template<int NumShifts_, int PerElementWidthIfInt_ = 32, class Register_>
+	template<std::int32_t NumShifts_, int PerElementWidthIfInt_ = 32, class Register_>
 	[[nodiscard]] inline Register_ shift_left(Register_ lhs_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -119,25 +101,7 @@ namespace EmuSIMD
 		}
 	}
 
-	template<int PerElementWidthIfInt_ = 32, class Register_>
-	[[nodiscard]] inline Register_ shift_right_arithmetic(Register_ lhs_, EmuSIMD::i128_generic num_shifts_)
-	{
-		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
-		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
-		{
-			return _underlying_simd_helpers::_shift_right_arithmetic<Register_, PerElementWidthIfInt_>(lhs_, num_shifts_);
-		}
-		else
-		{
-			static_assert
-			(
-				EmuCore::TMP::get_false<Register_>(),
-				"Attempted to use EmuSIMD::shift_right_arithmetic with a non-SIMD register type, or a SIMD register that is not supported."
-			);
-		}
-	}
-
-	template<int NumShifts_, int PerElementWidthIfInt_ = 32, class Register_>
+	template<std::int32_t NumShifts_, int PerElementWidthIfInt_ = 32, class Register_>
 	[[nodiscard]] inline Register_ shift_right_arithmetic(Register_ lhs_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
@@ -155,25 +119,7 @@ namespace EmuSIMD
 		}
 	}
 
-	template<int PerElementWidthIfInt_ = 32, class Register_>
-	[[nodiscard]] inline Register_ shift_right_logical(Register_ lhs_, EmuSIMD::i128_generic num_shifts_)
-	{
-		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
-		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
-		{
-			return _underlying_simd_helpers::_shift_right_logical<Register_, PerElementWidthIfInt_>(lhs_, num_shifts_);
-		}
-		else
-		{
-			static_assert
-			(
-				EmuCore::TMP::get_false<Register_>(),
-				"Attempted to use EmuSIMD::shift_right_logical with a non-SIMD register type, or a SIMD register that is not supported."
-			);
-		}
-	}
-
-	template<int NumShifts_, int PerElementWidthIfInt_ = 32, class Register_>
+	template<std::int32_t NumShifts_, int PerElementWidthIfInt_ = 32, class Register_>
 	[[nodiscard]] inline Register_ shift_right_logical(Register_ lhs_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;

@@ -280,8 +280,8 @@ namespace EmuMath::Helpers::_quaternion_underlying
 			>::type;
 
 			// Warning disabled as we are only ever moving separate indices, if any
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 			using sub_func = EmuCore::do_subtract<calc_fp, calc_fp>;
 			using lerp_func = typename std::conditional<Fused_, EmuCore::do_fused_lerp<calc_fp, calc_fp, calc_fp>, EmuCore::do_lerp<calc_fp, calc_fp, calc_fp>>::type;
 			using out_type = typename std::conditional<VectorOut_, typename out_quaternion::vector_type, out_quaternion>::type;
@@ -292,7 +292,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 				lerp_func()(static_cast<calc_fp>(std::forward<AZ_>(az_)), static_cast<calc_fp>(std::forward<BZ_>(bz_)), _get_generic_quaternion_z<calc_fp>(std::forward<ArgT_>(t_))),
 				lerp_func()(static_cast<calc_fp>(std::forward<AW_>(aw_)), static_cast<calc_fp>(std::forward<BW_>(bw_)), _get_generic_quaternion_w<calc_fp>(std::forward<ArgT_>(t_)))
 			);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 		else
 		{
@@ -385,8 +385,26 @@ namespace EmuMath::Helpers::_quaternion_underlying
 			using sub_func = EmuCore::do_subtract<calc_fp, calc_fp>;
 			calc_fp weighting_divisor = sin_func()(omega);
 			calc_fp t = static_cast<calc_fp>(std::forward<ArgT_>(t_));
-			calc_fp ta = div_func()(sin_func()(mul_func()(sub_func()(calc_fp(1), t), omega)), weighting_divisor);
-			calc_fp tb = div_func()(sin_func()(mul_func()(t, omega)), weighting_divisor);
+			calc_fp ta = div_func() // sin((1 - t) * omega) / weighting_divisor
+			(
+				sin_func()
+				(
+					mul_func()
+					(
+						sub_func()(calc_fp(1), t),
+						omega
+					)
+				),
+				weighting_divisor
+			);
+			calc_fp tb = div_func() // sin(t * omega) / weighting_divisor
+			(
+				sin_func()
+				(
+					mul_func()(t, omega)
+				),
+				weighting_divisor
+			);
 
 			// Perform interpolation
 			using out_type = typename std::conditional<VectorOut_, typename out_quaternion::vector_type, out_quaternion>::type;

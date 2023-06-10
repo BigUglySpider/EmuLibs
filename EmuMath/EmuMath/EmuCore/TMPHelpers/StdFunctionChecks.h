@@ -35,13 +35,17 @@ namespace EmuCore::TMP
 		template<bool Valid_>
 		struct _result_finder
 		{
-			using type = void;
-		};
+		private:
+			static constexpr auto _find_type()
+			{
+				if constexpr (Valid_)
+				{
+					return std::fma(std::declval<X_>(), std::declval<Y_>(), std::declval<Z_>());
+				}
+			}
 
-		template<>
-		struct _result_finder<true>
-		{
-			using type = decltype(std::fma(std::declval<X_>(), std::declval<Y_>(), std::declval<Z_>()));
+		public:
+			using type = decltype(_find_type());
 		};
 
 	public:

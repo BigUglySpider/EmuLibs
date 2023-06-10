@@ -3,6 +3,8 @@
 
 #include <type_traits>
 
+#include "CommonTMPHelpers.h"
+
 namespace EmuCore::TMP
 {
 	template<typename T_>
@@ -148,7 +150,7 @@ namespace EmuCore::TMP
 				<
 					NumBytes_ == sizeof(std::uint64_t),
 					std::uint64_t,
-					std::false_type
+					EmuCore::TMP::emu_tmp_err
 				>
 			>
 		>
@@ -171,7 +173,7 @@ namespace EmuCore::TMP
 				<
 					NumBytes_ == sizeof(std::int64_t),
 					std::int64_t,
-					std::false_type
+					EmuCore::TMP::emu_tmp_err
 				>
 			>
 		>
@@ -426,7 +428,7 @@ namespace EmuCore::TMP
 	/// <para> This can effectively be considered an `unmove` cast, treating lvalues as lvalues and casting rvalues to lvalues. </para>
 	/// <para>
 	///		WARNING: This is for casting pre-existing, named rvalues.
-	///		Passing a new rvalue (such as `my_type(5)) will result in output of a dangling reference. 
+	///		Passing a new rvalue (such as `my_type(5)`) will result in output of a dangling reference. 
 	/// </para>
 	/// </summary>
 	/// <param name="ref_">Reference to cast to an lvalue reference.</param>
@@ -436,6 +438,17 @@ namespace EmuCore::TMP
 	{
 		return ref_;
 	}
+
+	/// <summary>
+	/// <para> Casts a reference to an lvalue-reference. </para>
+	/// <para> This can effectively be considered an `unmove` cast, treating lvalues as lvalues and casting rvalues to lvalues. </para>
+	/// <para>
+	///		WARNING: This is for casting pre-existing, named rvalues.
+	///		Passing a new rvalue (such as `my_type(5)`) will result in output of a dangling reference. 
+	/// </para>
+	/// </summary>
+	/// <param name="ref_">Reference to cast to an lvalue reference.</param>
+	/// <returns>The passed ref_ cast to an lvalue reference.</returns>
 	template<typename T_>
 	[[nodiscard]] constexpr inline std::remove_reference_t<T_>& lval_ref_cast(std::remove_reference_t<T_>&& ref_)
 	{
@@ -547,6 +560,25 @@ namespace EmuCore::TMP
 	{
 		using type = T_;
 	};
+
+	/// <summary>
+	/// <para> Dereferences the input value if it is a pointer, or simply forwards it back if it is not. </para>
+	/// <para> Intended for cases where a value can be either a pointer or a reference. </para>
+	/// </summary>
+	/// <param name="value_">Pointer to dereference or reference to forward back.</param>
+	/// <returns>`value_` dereferenced if it is a pointer, or `value_` forwarded otherwise.</returns>
+	template<class T_>
+	[[nodiscard]] constexpr inline decltype(auto) do_dereference(T_&& value_) noexcept(!std::is_pointer_v<typename std::remove_cvref<T_>::type>)
+	{
+		if constexpr (std::is_pointer_v<typename std::remove_cvref<T_>::type>)
+		{
+			return *value_;
+		}
+		else
+		{
+			return std::forward<T_>(value_);
+		}
+	}
 }
 
 #endif

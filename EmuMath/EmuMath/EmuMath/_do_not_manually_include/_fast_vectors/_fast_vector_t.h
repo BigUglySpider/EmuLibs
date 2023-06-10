@@ -149,7 +149,7 @@ namespace EmuMath
 		struct _vector_get_index_for_load_result
 		{
 			using _vector_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
-			using _get_result = decltype(std::declval<_vector_uq>().AtTheoretical<FullWidthIndex_>());
+			using _get_result = decltype(std::declval<_vector_uq>().template AtTheoretical<FullWidthIndex_>());
 
 			using type = typename std::conditional
 			<
@@ -410,12 +410,18 @@ namespace EmuMath
 				);
 			}
 		}
+
+		template<std::size_t Unused_>
+		[[nodiscard]] static constexpr inline bool has_multi_move_constructor()
+		{
+			return Unused_ >= 0 && contains_multiple_registers;
+		}
 #pragma endregion
 
 #pragma region CONSTRUCTORS
 	public:
 		/// <summary>
-		/// <para> Default constructor for a Vector, which uses the default construction method of its underlying SIMD registers.. </para>
+		/// <para> Default constructor for a Vector, which uses the default construction method of its underlying SIMD registers. </para>
 		/// </summary>
 		constexpr inline FastVector() noexcept : data()
 		{
@@ -489,8 +495,8 @@ namespace EmuMath
 		/// <summary>
 		/// <para> Private constructor for creating a new instance of this FastVector type with a newly created data_type. Disabled if this Vector has 1 register. </para>
 		/// </summary>
-		template<typename = std::enable_if_t<contains_multiple_registers>>
-		explicit constexpr inline FastVector(data_type&& data_) : data(std::move(data_))
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<has_multi_move_constructor<Unused_>()>>
+		explicit constexpr inline FastVector(data_type&& data_) noexcept : data(std::move(data_))
 		{
 		}
 #pragma endregion
@@ -1685,43 +1691,10 @@ namespace EmuMath
 		}
 
 		/// <summary>
-		/// <para> Logically left-shifts all registers encapsulated by this Vector using the passed argument as the shifts for each register. </para>
-		/// </summary>
-		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
-		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		[[nodiscard]] constexpr inline this_type ShiftLeft(shift_register_type num_shifts_) const
-		{
-			if constexpr (contains_multiple_registers)
-			{
-				return this_type(_do_array_shift_left(data, num_shifts_, register_index_sequence()));
-			}
-			else
-			{
-				return this_type(EmuSIMD::shift_left<per_element_width>(data, num_shifts_));
-			}
-		}
-
-		/// <summary>
-		/// <para> Logically left-shifts all elements within this Vector using the passed scalar value as the number of shifts for each element. </para>
-		/// <para> 
-		///		This will create an intermediate for SIMD register interactions; 
-		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
-		///		make_all_same_register function.
-		/// </para>
-		/// <para> If num_shifts_ is a compile-time constant, it is recommended to use the form of this function which takes a NumShifts_ template argument instead. </para>
-		/// </summary>
-		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
-		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		[[nodiscard]] constexpr inline this_type ShiftLeft(std::size_t num_shifts_) const
-		{
-			return ShiftLeft(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
-		}
-
-		/// <summary>
 		/// <para> Logically left-shifts all elements within this Vector using the passed template scalar value as the number of shifts for each element. </para>
 		/// </summary>
 		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		template<std::size_t NumShifts_>
+		template<std::int32_t NumShifts_>
 		constexpr inline this_type ShiftLeft() const
 		{
 			if constexpr (contains_multiple_registers)
@@ -1735,43 +1708,10 @@ namespace EmuMath
 		}
 
 		/// <summary>
-		/// <para> Logically right-shifts all registers encapsulated by this Vector using the passed argument as the shifts for each register. </para>
-		/// </summary>
-		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
-		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		[[nodiscard]] constexpr inline this_type ShiftRight(shift_register_type num_shifts_) const
-		{
-			if constexpr (contains_multiple_registers)
-			{
-				return this_type(_do_array_shift_right_logical(data, num_shifts_, register_index_sequence()));
-			}
-			else
-			{
-				return this_type(EmuSIMD::shift_right_logical<per_element_width>(data, num_shifts_));
-			}
-		}
-
-		/// <summary>
-		/// <para> Logically right-shifts all elements within this Vector using the passed scalar value as the number of shifts for each element. </para>
-		/// <para> 
-		///		This will create an intermediate for SIMD register interactions; 
-		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
-		///		make_all_same_register function.
-		/// </para>
-		/// <para> If num_shifts_ is a compile-time constant, it is recommended to use the form of this function which takes a NumShifts_ template argument instead. </para>
-		/// </summary>
-		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
-		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		[[nodiscard]] constexpr inline this_type ShiftRight(std::size_t num_shifts_) const
-		{
-			return ShiftRight(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
-		}
-
-		/// <summary>
 		/// <para> Logically right-shifts all elements within this Vector using the passed template scalar value as the number of shifts for each element. </para>
 		/// </summary>
 		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		template<std::size_t NumShifts_>
+		template<std::int32_t NumShifts_>
 		constexpr inline this_type ShiftRight() const
 		{
 			if constexpr (contains_multiple_registers)
@@ -1785,46 +1725,11 @@ namespace EmuMath
 		}
 
 		/// <summary>
-		/// <para> Arithmetically right-shifts all registers encapsulated by this Vector using the passed argument as the shifts for each register. </para>
-		/// <para> Arithmetic shifts differentiate from logical shifts in that they preserve the sign bit. </para>
-		/// </summary>
-		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
-		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		[[nodiscard]] constexpr inline this_type ShiftRightArithmetic(shift_register_type num_shifts_) const
-		{
-			if constexpr (contains_multiple_registers)
-			{
-				return this_type(_do_array_shift_right_arithmetic(data, num_shifts_, register_index_sequence()));
-			}
-			else
-			{
-				return this_type(EmuSIMD::shift_right_arithmetic<per_element_width>(data, num_shifts_));
-			}
-		}
-
-		/// <summary>
-		/// <para> Arithmetically right-shifts all elements within this Vector using the passed scalar value as the number of shifts for each element. </para>
-		/// <para> Arithmetic shifts differentiate from logical shifts in that they preserve the sign bit. </para>
-		/// <para> 
-		///		This will create an intermediate for SIMD register interactions; 
-		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
-		///		make_all_same_register function.
-		/// </para>
-		/// <para> If num_shifts_ is a compile-time constant, it is recommended to use the form of this function which takes a NumShifts_ template argument instead. </para>
-		/// </summary>
-		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
-		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		[[nodiscard]] constexpr inline this_type ShiftRightArithmetic(std::size_t num_shifts_) const
-		{
-			return ShiftRightArithmetic(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
-		}
-
-		/// <summary>
 		/// <para> Arithmetically right-shifts all elements within this Vector using the passed template scalar value as the number of shifts for each element. </para>
 		/// <para> Arithmetic shifts differentiate from logical shifts in that they preserve the sign bit. </para>
 		/// </summary>
 		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
-		template<std::size_t NumShifts_>
+		template<std::int32_t NumShifts_>
 		constexpr inline this_type ShiftRightArithmetic() const
 		{
 			if constexpr (contains_multiple_registers)
@@ -3306,7 +3211,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool operator>(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() > rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() > rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool operator>(value_type rhs_magnitude_) const
@@ -3321,7 +3226,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool operator<(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() < rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() < rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool operator<(value_type rhs_magnitude_) const
@@ -3336,7 +3241,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool operator>=(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() >= rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() >= rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool operator>=(value_type rhs_magnitude_) const
@@ -3351,7 +3256,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool operator<=(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() <= rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() <= rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool operator<=(value_type rhs_magnitude_) const
@@ -3642,7 +3547,7 @@ namespace EmuMath
 				constexpr std::size_t num_output_indices = OutSize_ - WriteOffset_;
 				constexpr std::size_t out_partial_length = num_output_indices % elements_per_register;
 				constexpr std::size_t required_register_count = (num_output_indices / elements_per_register) + (out_partial_length != 0);
-				_store_to_non_uniform<required_register_count, out_partial_length>(out_.data<WriteOffset_>());
+				_store_to_non_uniform<required_register_count, out_partial_length>(out_.template data<WriteOffset_>());
 			}
 		}
 
@@ -3712,8 +3617,8 @@ namespace EmuMath
 				using cast_type = typename std::conditional<is_integral, std::int32_t, float>::type;
 				using cast_vector_type = EmuMath::FastVector<cast_size, cast_type, cast_register_width>;
 				cast_vector_type cast_a = Convert<cast_size, cast_type, cast_register_width>();
-				cast_vector_type cast_b = b_.Convert<cast_size, cast_type, cast_register_width>();
-				return cast_a.Cross3(cast_b).Convert<Size_, T_, RegisterWidth_>();
+				cast_vector_type cast_b = b_.template Convert<cast_size, cast_type, cast_register_width>();
+				return cast_a.Cross3(cast_b).template Convert<Size_, T_, RegisterWidth_>();
 			}
 		}
 
@@ -4231,11 +4136,11 @@ namespace EmuMath
 		{
 			if constexpr (per_element_byte_size <= 4)
 			{
-				return static_cast<Out_>(std::sqrtf(Dot2Scalar<float>(*this)));
+				return static_cast<Out_>(sqrtf(Dot2Scalar<float>(*this)));
 			}
 			else
 			{
-				return static_cast<Out_>(std::sqrt(Dot2Scalar<double>(*this)));
+				return static_cast<Out_>(sqrt(Dot2Scalar<double>(*this)));
 			}
 		}
 
@@ -4273,11 +4178,11 @@ namespace EmuMath
 		{
 			if constexpr (per_element_byte_size <= 4)
 			{
-				return static_cast<Out_>(std::sqrtf(Dot3Scalar<float>(*this)));
+				return static_cast<Out_>(sqrtf(Dot3Scalar<float>(*this)));
 			}
 			else
 			{
-				return static_cast<Out_>(std::sqrt(Dot3Scalar<double>(*this)));
+				return static_cast<Out_>(sqrt(Dot3Scalar<double>(*this)));
 			}
 		}
 
@@ -4432,7 +4337,7 @@ namespace EmuMath
 		template<typename Out_ = value_type>
 		[[nodiscard]] constexpr inline Out_ DistanceScalar(const this_type& target_) const
 		{
-			return target_.Subtract(*this).MagnitudeScalar<Out_>();
+			return target_.Subtract(*this).template MagnitudeScalar<Out_>();
 		}
 
 		/// <summary>
@@ -4476,7 +4381,7 @@ namespace EmuMath
 		template<typename Out_ = value_type>
 		[[nodiscard]] constexpr inline Out_ SquareDistanceScalar(const this_type& target_) const
 		{
-			return target_.Subtract(*this).SquareMagnitudeScalar<Out_>();
+			return target_.Subtract(*this).template SquareMagnitudeScalar<Out_>();
 		}
 
 		/// <summary>
@@ -5779,7 +5684,7 @@ namespace EmuMath
 				using calc_value_type = typename std::conditional<out_vector::is_floating_point, OutFP_, preferred_floating_point>::type;
 				using calc_vector_type = EmuMath::FastVector<Size_, calc_value_type, RegisterWidth_>;
 				calc_vector_type plane_normal = _calculate_normal_to_plane_3<calc_value_type>(plane_point_a_, plane_point_b_, plane_point_c_);
-				return calc_vector_type::_calculate_projection_to_plane<3, OutFP_>(this->Convert<calc_value_type>(), plane_normal);
+				return calc_vector_type::template _calculate_projection_to_plane<3, OutFP_>(this->Convert<calc_value_type>(), plane_normal);
 			}
 		}
 
@@ -6954,7 +6859,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool CmpGreater(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() > rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() > rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool CmpGreater(value_type rhs_magnitude_) const
@@ -6969,7 +6874,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool CmpLess(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() < rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() < rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool CmpLess(value_type rhs_magnitude_) const
@@ -6984,7 +6889,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool CmpGreaterEqual(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() >= rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() >= rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool CmpGreaterEqual(value_type rhs_magnitude_) const
@@ -6999,7 +6904,7 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] constexpr inline bool CmpLessEqual(const this_type& rhs_) const
 		{
-			return MagnitudeScalar<value_type>() <= rhs_.MagnitudeScalar<value_type>();
+			return MagnitudeScalar<value_type>() <= rhs_.template MagnitudeScalar<value_type>();
 		}
 
 		[[nodiscard]] constexpr inline bool CmpLessEqual(value_type rhs_magnitude_) const
@@ -7055,6 +6960,80 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region SHUFFLES
+	private:
+		template<std::size_t Index_, bool AllowHiddenIndices_>
+		[[nodiscard]] constexpr inline register_type _get_register_filled_from_index() const
+		{
+			constexpr std::size_t max_index = AllowHiddenIndices_ ? full_width_size : size;
+			if constexpr (Index_ < max_index)
+			{
+				if constexpr (num_registers == 1)
+				{
+					return EmuSIMD::set_all_to_index<Index_, per_element_width>(data);
+				}
+				else
+				{
+					constexpr std::size_t register_index = Index_ / elements_per_register;
+					constexpr std::size_t element_index_in_register = Index_ % elements_per_register;
+					return EmuSIMD::set_all_to_index<element_index_in_register, per_element_width>(data[register_index]);
+				}
+			}
+			else
+			{
+				if constexpr (AllowHiddenIndices_)
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Index_>(),
+						"Attempted to retrieve an index-filled register from an EmuMath FastVector (with `AllowHiddenInidces_ == true`), but the provided index exceeds the full-width number of indices within the Vector's underlying registers."
+					);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Index_>(),
+						"Attempted to retrieve an index-filled register from an EmuMath FastVector (with `AllowHiddenIndices_ == false`), but the provided index exceeds the number of encapsulated indices. To access a contained index which is not part of the encapsulated size, set the `AllowHiddenIndices_` template argument to `true`."
+					);
+				}				
+			}
+		}
+
+	public:
+		/// <summary>
+		/// <para> Creates a Vector of this length with all indices set to match the value at the given index. </para>
+		/// <para>
+		///		By default, this will trigger a static assertion if the index exceeds the encapsulated range. 
+		///		To allow indices in the contained registers that are not in the encapsulated range 
+		///		(e.g. element[3] of a 3D Vector of 32-bit values using 128-bit registers), set the second template argument 
+		///		`AllowHiddenIndices_` to `true`.
+		/// </para>
+		/// </summary>
+		/// <returns>FastVector of this type with all values set to match the given index within this Vector.</returns>
+		template<std::size_t Index_, bool AllowHiddenIndices_ = false>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<size, T_, RegisterWidth_> AllAsIndex() const
+		{
+			return EmuMath::FastVector<size, T_, RegisterWidth_>(_get_register_filled_from_index<Index_, AllowHiddenIndices_>());
+		}
+
+		/// <summary>
+		/// <para> Creates an instance of this Vector's underlying register with all values set to match the value at the given index. </para>
+		/// <para>
+		///		By default, this will trigger a static assertion if the index exceeds the encapsulated range. 
+		///		To allow indices in the contained registers that are not in the encapsulated range 
+		///		(e.g. element[3] of a 3D Vector of 32-bit values using 128-bit registers), set the second template argument 
+		///		`AllowHiddenIndices_` to `true`.
+		/// </para>
+		/// </summary>
+		/// <returns>Register of of this Vector's `register_type` with all values set to match the given index within this Vector.</returns>
+		template<std::size_t Index_, bool AllowHiddenIndices_ = false>
+		[[nodiscard]] constexpr inline register_type AllAsIndexRegister() const
+		{
+			return _get_register_filled_from_index<Index_, AllowHiddenIndices_>();
+		}
+#pragma endregion
+
 #pragma region VECTOR_DATA
 	public:
 		/// <summary>
@@ -7071,16 +7050,16 @@ namespace EmuMath
 #pragma region GENERAL_HELPERS
 	private:
 		template<std::size_t FullWidthIndex_, typename Vector_>
-		[[nodiscard]] static constexpr inline typename _vector_get_index_for_load_result<FullWidthIndex_, Vector_>::type _get_index_from_normal_vector(Vector_&& arg_)
+		[[nodiscard]] static constexpr inline decltype(auto) _get_index_from_normal_vector(Vector_&& arg_)
 		{
 			using vector_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
-			if constexpr (FullWidthIndex_ > vector_uq::size || std::is_lvalue_reference_v<Vector_>)
+			if constexpr (FullWidthIndex_ >= vector_uq::size || std::is_lvalue_reference_v<Vector_>)
 			{
-				return arg_.AtTheoretical<FullWidthIndex_>();
+				return std::forward<Vector_>(arg_).template AtTheoretical<FullWidthIndex_>();
 			}
 			else
 			{
-				return std::move(arg_.AtTheoretical<FullWidthIndex_>());
+				return std::move(std::forward<Vector_>(arg_).template at<FullWidthIndex_>());
 			}
 		}
 
@@ -7272,7 +7251,7 @@ namespace EmuMath
 			return data_type({ register_type(std::move(to_move_.data[Indices_]))... });
 		}
 
-		static constexpr inline data_type _do_move(this_type&& to_move_) noexcept
+		static constexpr inline decltype(auto) _do_move(this_type&& to_move_) noexcept
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -7280,7 +7259,7 @@ namespace EmuMath
 			}
 			else
 			{
-				return data_type(std::move(to_move_.data));
+				return std::move(to_move_.data);
 			}
 		}
 #pragma endregion
@@ -7323,7 +7302,7 @@ namespace EmuMath
 			return data_type({ _construct_register_discard_index<RegisterIndices_>(to_set_all_registers_to_)... });
 		}
 
-		static constexpr inline data_type _do_set_all_same_register(register_type to_set_all_registers_to_) noexcept
+		static constexpr inline data_type _do_set_all_same_register(register_arg_type to_set_all_registers_to_) noexcept
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -7403,17 +7382,22 @@ namespace EmuMath
 			if constexpr (all_indices_in_range && std::is_same_v<value_type, vector_stored_uq>)
 			{
 				constexpr std::size_t first_index = EmuCore::TMP::first_variadic_value_v<FullWidthIndices_...>;
-				return EmuSIMD::load<register_type>(vector_.data<first_index>());
+				return EmuSIMD::load<register_type>(vector_.template data<first_index>());
 			}
 			else
 			{
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 				return EmuSIMD::setr<register_type, per_element_byte_size>(_get_index_from_normal_vector<FullWidthIndices_>(std::forward<Vector_>(vector_))...);
+EMU_CORE_MSVC_POP_WARNING_STACK
 			}
 		}
 
 		template<class Vector_, std::size_t...RegisterIndices_>
 		static constexpr inline data_type _make_array_as_normal_vector_conversion(Vector_&& vector_, std::index_sequence<RegisterIndices_...> register_indices_)
 		{
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 			return data_type
 			({ 
 				_make_register_from_normal_vector
@@ -7422,6 +7406,7 @@ namespace EmuMath
 					EmuCore::TMP::make_offset_index_sequence<RegisterIndices_ * elements_per_register, elements_per_register>()
 				)...
 			});
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 
 		template<class Vector_>
@@ -8088,7 +8073,7 @@ namespace EmuMath
 		}
 
 		template<bool NormaliseAll_, class Vector_>
-		[[nodiscard]] static constexpr inline typename Vector_ _calculate_norm_2(const Vector_& vec_)
+		[[nodiscard]] static constexpr inline Vector_ _calculate_norm_2(const Vector_& vec_)
 		{
 			using vec_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
 			using vec_register_type = typename vec_uq::register_type;
@@ -8107,7 +8092,7 @@ namespace EmuMath
 		}
 
 		template<bool NormaliseAll_, class Vector_>
-		[[nodiscard]] static constexpr inline typename Vector_ _calculate_norm_3(const Vector_& vec_)
+		[[nodiscard]] static constexpr inline Vector_ _calculate_norm_3(const Vector_& vec_)
 		{
 			using vec_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
 			using vec_register_type = typename vec_uq::register_type;
@@ -8525,8 +8510,8 @@ namespace EmuMath
 			}
 		}
 
-		template<typename B_, typename T_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_lerp(const data_type& lhs_, B_&& b_, T_&& t_, std::index_sequence<RegisterIndices_...> indices_)
+		template<typename B_, typename Weighting_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_lerp(const data_type& lhs_, B_&& b_, Weighting_&& t_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			return data_type
 			({
@@ -8534,13 +8519,13 @@ namespace EmuMath
 				(
 					lhs_[RegisterIndices_],
 					_retrieve_register_from_arg<RegisterIndices_>(std::forward<B_>(b_)),
-					_retrieve_register_from_arg<RegisterIndices_>(std::forward<T_>(t_))
+					_retrieve_register_from_arg<RegisterIndices_>(std::forward<Weighting_>(t_))
 				)...
 			});
 		}
 
-		template<typename B_, typename T_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_fused_lerp(const data_type& lhs_, B_&& b_, T_&& t_, std::index_sequence<RegisterIndices_...> indices_)
+		template<typename B_, typename Weighting_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_fused_lerp(const data_type& lhs_, B_&& b_, Weighting_&& t_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			return data_type
 			({
@@ -8548,7 +8533,7 @@ namespace EmuMath
 				(
 					lhs_[RegisterIndices_],
 					_retrieve_register_from_arg<RegisterIndices_>(std::forward<B_>(b_)),
-					_retrieve_register_from_arg<RegisterIndices_>(std::forward<T_>(t_))
+					_retrieve_register_from_arg<RegisterIndices_>(std::forward<Weighting_>(t_))
 				)...
 			});
 		}
@@ -8779,7 +8764,7 @@ namespace EmuMath
 				}
 				else if constexpr (is_floating_point)
 				{
-					return this_type(_calculate_angle_cosine_2<OutRads_, fill_vector, AllowLossy_>(a_.data, b_.data)).Convert<OutFP_>();
+					return this_type(_calculate_angle_cosine_2<OutRads_, fill_vector, AllowLossy_>(a_.data, b_.data)).template Convert<OutFP_>();
 				}
 				else if constexpr (out_is_fp)
 				{
@@ -8787,8 +8772,8 @@ namespace EmuMath
 					(
 						out_vector::template _calculate_angle_cosine_2<OutRads_, fill_vector, AllowLossy_>
 						(
-							a_.Convert<OutFP_>().data,
-							b_.Convert<OutFP_>().data
+							a_.template Convert<OutFP_>().data,
+							b_.template Convert<OutFP_>().data
 						)
 					);
 				}
@@ -8799,8 +8784,8 @@ namespace EmuMath
 					(
 						fp_vector::template _calculate_angle_cosine_2<OutRads_, fill_vector, AllowLossy_>
 						(
-							a_.Convert<preferred_floating_point>().data,
-							b_.Convert<preferred_floating_point>().data
+							a_.template Convert<preferred_floating_point>().data,
+							b_.template Convert<preferred_floating_point>().data
 						)
 					).template Convert<OutFP_>();
 				}
@@ -8822,8 +8807,8 @@ namespace EmuMath
 					(
 						fp_vector::template _calculate_angle_cosine_2<OutRads_, fill_vector, AllowLossy_>
 						(
-							a_.Convert<calc_fp>().data,
-							b_.Convert<calc_fp>().data
+							a_.template Convert<calc_fp>().data,
+							b_.template Convert<calc_fp>().data
 						)
 					);
 				}
@@ -9285,7 +9270,7 @@ namespace EmuMath
 				return alt_vector.Subtract
 				(
 					calc_vector_type::template _calculate_projection_to_vector<CalcSize_, preferred_floating_point>(alt_vector, alt_plane_normal)
-				).Convert<Size_, OutFP_, RegisterWidth_>();
+				).template Convert<Size_, OutFP_, RegisterWidth_>();
 			}
 		}
 #pragma endregion
@@ -10313,8 +10298,8 @@ namespace EmuMath
 
 #pragma region NON_CONST_VECTOR_ARITHMETIC_HELPERS
 	private:
-		template<typename B_, typename T_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_lerp_assign(const data_type& lhs_, B_&& b_, T_&& t_, std::index_sequence<RegisterIndices_...> indices_)
+		template<typename B_, typename Weighting_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_lerp_assign(const data_type& lhs_, B_&& b_, Weighting_&& t_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			(
 				(
@@ -10322,14 +10307,14 @@ namespace EmuMath
 					(
 						lhs_[RegisterIndices_],
 						_retrieve_register_from_arg<RegisterIndices_>(std::forward<B_>(b_)),
-						_retrieve_register_from_arg<RegisterIndices_>(std::forward<T_>(t_))
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Weighting_>(t_))
 					)
 				), ...
 			);
 		}
 
-		template<typename B_, typename T_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_fused_lerp_assign(const data_type& lhs_, B_&& b_, T_&& t_, std::index_sequence<RegisterIndices_...> indices_)
+		template<typename B_, typename Weighting_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_fused_lerp_assign(const data_type& lhs_, B_&& b_, Weighting_&& t_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			(
 				(
@@ -10337,7 +10322,7 @@ namespace EmuMath
 					(
 						lhs_[RegisterIndices_],
 						_retrieve_register_from_arg<RegisterIndices_>(std::forward<B_>(b_)),
-						_retrieve_register_from_arg<RegisterIndices_>(std::forward<T_>(t_))
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Weighting_>(t_))
 					)
 				), ...
 			);

@@ -20,14 +20,14 @@ namespace EmuMath::Helpers
 		using get_right_uq = typename EmuCore::TMP::remove_ref_cv<get_right_result>::type;
 		using cmp = EmuCore::do_cmp_less_equal<get_left_uq, get_right_uq>;
 
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		return cmp()
 		(
 			std::forward<get_left_result>(rect_get_left(std::forward<Rect_>(rect_))),
 			std::forward<get_right_result>(rect_get_right(std::forward<Rect_>(rect_)))
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 	/// <summary>
@@ -44,14 +44,14 @@ namespace EmuMath::Helpers
 		using get_right_uq = typename EmuCore::TMP::remove_ref_cv<get_bottom_result>::type;
 		using cmp = EmuCore::do_cmp_less_equal<get_left_uq, get_right_uq>;
 
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		return cmp()
 		(
 			std::forward<get_top_result>(rect_get_top(std::forward<Rect_>(rect_))),
 			std::forward<get_bottom_result>(rect_get_bottom(std::forward<Rect_>(rect_)))
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 	/// <summary>
@@ -96,8 +96,8 @@ namespace EmuMath::Helpers
 		using cmp_less = typename std::conditional<IgnoreEqual_, EmuCore::do_cmp_less<void, void>, EmuCore::do_cmp_less_equal<void, void>>::type;
 		using cmp_greater = typename std::conditional<IgnoreEqual_, EmuCore::do_cmp_greater<void, void>, EmuCore::do_cmp_greater_equal<void, void>>::type;
 
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		return
 		(
 			cmp_less()(rect_get_left(std::forward<Rect_>(rect_)), x) &&
@@ -105,7 +105,7 @@ namespace EmuMath::Helpers
 			cmp_greater()(rect_get_right(std::forward<Rect_>(rect_)), x) &&
 			cmp_greater()(rect_get_bottom(std::forward<Rect_>(rect_)), y)
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 
@@ -119,15 +119,15 @@ namespace EmuMath::Helpers
 	template<bool IgnoreEqual_ = true, EmuConcepts::EmuVector PointVector_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline bool rect_contains_point(Rect_&& rect_, PointVector_&& point_vector_2d_)
 	{
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		return rect_contains_point<IgnoreEqual_>
 		(
 			std::forward<Rect_>(rect_),
 			std::forward<PointVector_>(point_vector_2d_).template AtTheoretical<0>(),
 			std::forward<PointVector_>(point_vector_2d_).template AtTheoretical<1>()
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 	/// <summary>
@@ -144,8 +144,8 @@ namespace EmuMath::Helpers
 		using cmp_less = typename std::conditional<IgnoreEqual_, EmuCore::do_cmp_less<void, void>, EmuCore::do_cmp_less_equal<void, void>>::type;
 		using cmp_greater = typename std::conditional<IgnoreEqual_, EmuCore::do_cmp_greater<void, void>, EmuCore::do_cmp_greater_equal<void, void>>::type;
 
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		return
 		(
 			cmp_less()(rect_get_left(std::forward<RectA_>(rect_a_)), rect_get_right(std::forward<RectB_>(rect_b_))) &&
@@ -153,7 +153,7 @@ namespace EmuMath::Helpers
 			cmp_less()(rect_get_top(std::forward<RectA_>(rect_a_)), rect_get_bottom(std::forward<RectB_>(rect_b_))) &&
 			cmp_greater()(rect_get_bottom(std::forward<RectA_>(rect_a_)), rect_get_top(std::forward<RectB_>(rect_b_)))
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 }
 
