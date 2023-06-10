@@ -306,7 +306,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::f32x4 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::f32x4 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -608,7 +608,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::f32x8 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::f32x8 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -910,7 +910,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::f32x8 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::f32x8 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 #pragma endregion
@@ -1214,7 +1214,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::f64x2 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::f64x2 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -1516,7 +1516,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::f64x4 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::f64x4 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -1818,7 +1818,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::f64x8 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::f64x8 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 #pragma endregion
@@ -2122,7 +2122,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i8x16 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i8x16 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -2424,7 +2424,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i8x32 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i8x32 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -2726,7 +2726,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i8x64 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i8x64 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 #pragma endregion
@@ -3030,7 +3030,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i16x8 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i16x8 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -3332,7 +3332,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i16x16 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i16x16 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -3634,7 +3634,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i16x32 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i16x32 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 #pragma endregion
@@ -3938,7 +3938,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i32x4 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i32x4 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -4240,7 +4240,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i32x8 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i32x8 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -4542,7 +4542,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i32x16 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i32x16 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 #pragma endregion
@@ -4846,7 +4846,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i64x2 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i64x2 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -5148,7 +5148,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i64x4 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i64x4 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -5450,7 +5450,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i64x8 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::i64x8 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 #pragma endregion
@@ -5754,7 +5754,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u8x16 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u8x16 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -6056,7 +6056,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u8x32 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u8x32 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -6358,7 +6358,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u8x64 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u8x64 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 #pragma endregion
@@ -6662,7 +6662,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u16x8 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u16x8 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -6964,7 +6964,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u16x16 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u16x16 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -7266,7 +7266,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u16x32 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u16x32 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 #pragma endregion
@@ -7570,7 +7570,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u32x4 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u32x4 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -7872,7 +7872,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u32x8 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u32x8 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -8174,7 +8174,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u32x16 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u32x16 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 #pragma endregion
@@ -8478,7 +8478,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u64x2 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u64x2 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -8780,7 +8780,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u64x4 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u64x4 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -9082,7 +9082,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u64x8 register via EmuSIMD helpers, but the provided register to convert to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to convert a EmuSIMD::u64x8 register via EmuSIMD helpers, but the provided register to convert to is not recognised as a supported SIMD register.");
 		}
 	}
 #pragma endregion

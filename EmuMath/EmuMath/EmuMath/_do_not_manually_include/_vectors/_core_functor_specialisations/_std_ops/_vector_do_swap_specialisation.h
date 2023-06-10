@@ -1,7 +1,7 @@
 #ifndef EMU_MATH_VECTOR_CORE_DO_SWAP_SPECIALISATION_H_INC_
 #define EMU_MATH_VECTOR_CORE_DO_SWAP_SPECIALISATION_H_INC_ 1
 
-#include "../_vector_t.h"
+#include "../../_vector_t.h"
 
 namespace EmuCore
 {

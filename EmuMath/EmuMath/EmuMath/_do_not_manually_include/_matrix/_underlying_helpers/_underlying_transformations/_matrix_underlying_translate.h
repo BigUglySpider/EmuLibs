@@ -121,8 +121,8 @@ namespace EmuMath::Helpers::_matrix_underlying
 
 			// 6287 silenced here as there is a warning for function calls due to potential side-effects
 			// --- In this context, side-effects are not expected. If there are any, it will be due to an ill-formed specialisation
-#pragma warning(push)
-#pragma warning(disable: 6287)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(6287)
 			return
 			(
 				... &&
@@ -133,7 +133,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 					decltype(std::declval<OutMatrix_>().template at<ColumnIndices_, RowIndices_>())
 				>()
 			);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 		else
 		{
@@ -158,8 +158,8 @@ namespace EmuMath::Helpers::_matrix_underlying
 			using out_value_uq = typename out_mat_uq::value_type_uq;
 			// 6287 silenced here as there is a warning for function calls due to potential side-effects
 			// --- In this context, side-effects are not expected. If there are any, it will be due to an ill-formed specialisation
-#pragma warning(push)
-#pragma warning(disable: 6287)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(6287)
 			return
 			(
 				... &&
@@ -170,7 +170,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 					decltype(std::declval<OutMatrix_>().template at<ColumnIndices_, RowIndices_>())
 				>()
 			);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 		else
 		{
@@ -268,8 +268,8 @@ namespace EmuMath::Helpers::_matrix_underlying
 		{
 			if constexpr(_matrix_translate_single_arg_is_valid<OutMatrix_, TranslateArg_, false>(column_index_sequence(), row_index_sequence()))
 			{
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 				return OutMatrix_
 				(
 					_matrix_translate_single_arg_get_for_index<ColumnIndices_, RowIndices_, OutMatrix_>
@@ -277,7 +277,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 						std::forward<TranslateArg_>(translate_args_)
 					)...
 				);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 			}
 			else
 			{
@@ -379,8 +379,8 @@ namespace EmuMath::Helpers::_matrix_underlying
 			{
 				using out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
 				using out_value_uq = typename out_mat_uq::value_type_uq;
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 				(
 					(
 						EmuCore::TMP::assign_direct_or_cast<out_value_uq>
@@ -390,7 +390,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 						)
 					), ...
 				);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 			}
 			else
 			{

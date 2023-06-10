@@ -114,7 +114,7 @@ namespace EmuMath::Helpers
 	constexpr inline void vector_abs_range(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		using Func_ = EmuCore::do_abs<typename EmuMath::Vector<InSize_, InT_>::value_type_uq>;
-		EMU_MATH_VECTOR_MUTATION_REF_RANGE(Func_, OutT_, OutSize_, InSize_, InT_, BeginIndex_, EndIndex_, BeginIndex_)(out_vector_, in_vector_, in_vector_);
+		EMU_MATH_VECTOR_MUTATION_REF_RANGE(Func_, OutSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_, BeginIndex_)(out_vector_, in_vector_, in_vector_);
 	}
 
 	/// <summary>

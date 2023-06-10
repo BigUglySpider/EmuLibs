@@ -4,6 +4,7 @@
 #include <chrono>
 #include <limits>
 #include <type_traits>
+#include <utility>
 #include "../TMPHelpers/TimeTMP.h"
 #include "../TMPHelpers/Values.h"
 
@@ -75,8 +76,8 @@ namespace EmuCore
 		}
 
 		Timer(this_type&& to_move_, bool start_timer_) noexcept :
-			begin(std::move<time_point>(to_move_.begin)),
-			end(std::move<time_point>(to_move_.end)),
+			begin(std::move(to_move_.begin)),
+			end(std::move(to_move_.end)),
 			has_started(start_timer_)
 		{
 		}

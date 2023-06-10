@@ -2,44 +2,14 @@
 #define EMU_SIMD_HELPERS_TEMPLATE_CVT_H_INC_ 1
 
 #include "_underlying_template_helpers/_all_underlying_templates.h"
+#include "_underlying_template_helpers/_generic_funcs/_forward_declarations/_forward_template_cvts.h"
 #include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD
 {
-	/// <summary>
-	/// <para> Returns the result of converting the passed SIMD register to the provided SIMD register type. </para>
-	/// <para> This will convert values. To instead only perform a bitwise case, use `cast`. </para>
-	/// <para>
-	///		InWidthPerElementIfInt_ is the amount of bits each element consumes if the input register is integral. 
-	///		It is not used if the input register is floating-point or is not a generic SIMD register. Defaults to 32.
-	/// </para>
-	/// <para>
-	///		InSignedIfInt_ is true if the input register is signed, otherwise it is considered unsigned. 
-	///		It is not used if the input register is floating-point or is not a generic SIMD register. Defaults to true.
-	/// </para>
-	/// <para>
-	///		OutWidthPerElement is the amount of bits each element consumes if the output register is integral. 
-	///		It is not used if the output register is floating-point or is not a generic SIMD register. Defaults to InWidthPerElementIfInt_.
-	/// </para>
-	/// <para>
-	///		OutSignedIfInt_ is true if the input output is signed, otherwise it is considered unsigned. 
-	///		It is not used if the output register is floating-point or is not a generic SIMD register. Defaults to InSignedIfInt_.
-	/// </para>
-	/// </summary>
-	/// <typeparam name="ToRegister_">Type of SIMD register to convert the input register to.</typeparam>
-	/// <typeparam name="FromRegister_">Type of SIMD register to perform the conversion on.</typeparam>
-	/// <param name="from_">SIMD register to perform the conversion on.</param>
-	/// <returns>Passed SIMD register converted to the provided type of SIMD register.</returns>
-	template
-	<
-		class ToRegister_,
-		std::size_t InWidthPerElementIfInt_ = 32,
-		bool InSignedIfInt_ = true,
-		std::size_t OutWidthPerElementIfInt_ = InWidthPerElementIfInt_,
-		bool OutSignedIfInt_ = InSignedIfInt_,
-		class FromRegister_
-	>
-	[[nodiscard]] inline ToRegister_ convert(FromRegister_&& from_)
+	template<EmuConcepts::KnownSIMD ToRegister_, std::size_t InWidthPerElementIfInt_, bool InSignedIfInt_, std::size_t OutWidthPerElementIfInt_, bool OutSignedIfInt_, EmuConcepts::KnownSIMD FromRegister_>
+	[[nodiscard]] inline auto convert(FromRegister_&& from_)
+		-> typename std::remove_cvref<ToRegister_>::type
 	{
 		using from_uq = EmuCore::TMP::remove_ref_cv_t<FromRegister_>;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<from_uq>)

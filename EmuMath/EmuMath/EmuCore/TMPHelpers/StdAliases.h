@@ -2,6 +2,7 @@
 #define EMU_CORE_STD_ALIASES_H_INC_ 1
 
 #include <bitset>
+#include <climits>
 
 namespace EmuCore
 {

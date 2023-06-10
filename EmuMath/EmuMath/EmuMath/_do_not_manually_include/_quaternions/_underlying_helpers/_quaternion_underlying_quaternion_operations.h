@@ -703,7 +703,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 
 #pragma region UNIT_FUNCS
 	template<bool Assigning_, bool VectorOut_, bool Fused_, bool IsConstexpr_, bool PreferMultiplies_, typename OutT_, typename InQuaternion_>
-	[[nodiscard]] constexpr inline auto _make_unit_impl(InQuaternion_& quaternion_) // Accepts any lval, but explicit const+typearg may be needed in calls
+	constexpr inline auto _make_unit_impl(InQuaternion_& quaternion_) // Accepts any lval, but explicit const+typearg may be needed in calls
 		-> typename std::conditional
 		<
 			Assigning_,
@@ -772,9 +772,9 @@ namespace EmuMath::Helpers::_quaternion_underlying
 	}
 
 	template<bool Fused_, bool IsConstexpr_, bool PreferMultiplies_, typename T_>
-	[[nodiscard]] constexpr inline void _assign_unit(EmuMath::Quaternion<T_>& quaternion_)
+	constexpr inline void _assign_unit(EmuMath::Quaternion<T_>& quaternion_)
 	{
-		return _make_unit_impl<true, false, Fused_, IsConstexpr_, PreferMultiplies_, T_, EmuMath::Quaternion<T_>>(quaternion_);
+		_make_unit_impl<true, false, Fused_, IsConstexpr_, PreferMultiplies_, T_, EmuMath::Quaternion<T_>>(quaternion_);
 	}
 #pragma endregion
 }

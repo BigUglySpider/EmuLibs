@@ -4,6 +4,7 @@
 #include "../TMPHelpers/OperatorChecks.h"
 #include "../TMPHelpers/TypeComparators.h"
 #include "../TMPHelpers/Values.h"
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -202,7 +203,7 @@ namespace EmuCore
 			}
 			else if constexpr(std::is_same_v<FloatingPointIn_, long double>)
 			{
-				return static_cast<FloatingPointOut_>(cosl(static_cast<long double>(val_)));
+				return static_cast<FloatingPointOut_>(cosl(val_));
 			}
 			else if constexpr(EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
@@ -241,7 +242,7 @@ namespace EmuCore
 			}
 			else if constexpr (std::is_same_v<FloatingPointIn_, long double>)
 			{
-				return static_cast<FloatingPointOut_>(acosl(static_cast<long double>(val_)));
+				return static_cast<FloatingPointOut_>(acosl(val_));
 			}
 			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
@@ -281,7 +282,7 @@ namespace EmuCore
 			}
 			else if constexpr (std::is_same_v<FloatingPointIn_, long double>)
 			{
-				return static_cast<FloatingPointOut_>(sinl(static_cast<long double>(val_)));
+				return static_cast<FloatingPointOut_>(sinl(val_));
 			}
 			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
@@ -320,7 +321,7 @@ namespace EmuCore
 			}
 			else if constexpr (std::is_same_v<FloatingPointIn_, long double>)
 			{
-				return static_cast<FloatingPointOut_>(asinl(static_cast<long double>(val_)));
+				return static_cast<FloatingPointOut_>(asinl(val_));
 			}
 			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
@@ -360,7 +361,7 @@ namespace EmuCore
 			}
 			else if constexpr (std::is_same_v<FloatingPointIn_, long double>)
 			{
-				return static_cast<FloatingPointOut_>(tanl(static_cast<long double>(val_)));
+				return static_cast<FloatingPointOut_>(tanl(val_));
 			}
 			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
@@ -399,7 +400,7 @@ namespace EmuCore
 			}
 			else if constexpr (std::is_same_v<FloatingPointIn_, long double>)
 			{
-				return static_cast<FloatingPointOut_>(atanl(static_cast<long double>(val_)));
+				return static_cast<FloatingPointOut_>(atanl(val_));
 			}
 			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
@@ -505,7 +506,7 @@ namespace EmuCore
 			}
 			else
 			{
-				return static_cast<FloatingPointOut_>(sqrtl(static_cast<long double>(val_)));
+				return static_cast<FloatingPointOut_>(sqrtl(val_));
 			}
 		}
 		else
@@ -529,7 +530,7 @@ namespace EmuCore
 			}
 			else
 			{
-				return static_cast<T_>(floorl(static_cast<long double>(val_)));
+				return static_cast<T_>(floorl(val_));
 			}
 		}
 		else
@@ -560,7 +561,7 @@ namespace EmuCore
 			}
 			else
 			{
-				return static_cast<T_>(ceill(static_cast<long double>(val_)));
+				return static_cast<T_>(ceill(val_));
 			}
 		}
 		else
@@ -591,7 +592,7 @@ namespace EmuCore
 			}
 			else
 			{
-				return static_cast<T_>(truncl(static_cast<long double>(val_)));
+				return static_cast<T_>(truncl(val_));
 			}
 		}
 		else

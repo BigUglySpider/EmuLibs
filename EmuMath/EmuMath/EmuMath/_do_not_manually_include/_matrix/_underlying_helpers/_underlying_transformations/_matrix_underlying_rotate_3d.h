@@ -171,8 +171,8 @@ namespace EmuMath::Helpers::_matrix_underlying
 			using out_value_uq = typename out_mat_uq::value_type_uq;
 			// 6287 silenced here as there is a warning for function calls due to potential side-effects
 			// --- In this context, side-effects are not expected. If there are any, it will be due to an ill-formed specialisation
-#pragma warning(push)
-#pragma warning(disable: 6287)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(6287)
 			return
 			(
 				... &&
@@ -183,7 +183,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 					decltype(std::declval<OutMatrix_>().template at<ColumnIndices_, RowIndices_>())
 				>()
 			);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 		else
 		{
@@ -204,8 +204,8 @@ namespace EmuMath::Helpers::_matrix_underlying
 			using out_value_uq = typename out_mat_uq::value_type_uq;
 			// 6287 silenced here as there is a warning for function calls due to potential side-effects
 			// --- In this context, side-effects are not expected. If there are any, it will be due to an ill-formed specialisation
-#pragma warning(push)
-#pragma warning(disable: 6287)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(6287)
 			return
 			(
 				... &&
@@ -216,7 +216,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 					decltype(std::declval<OutMatrix_>().template at<ColumnIndices_, RowIndices_>())
 				>()
 			);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 		else
 		{
@@ -237,8 +237,8 @@ namespace EmuMath::Helpers::_matrix_underlying
 			using out_value_uq = typename out_mat_uq::value_type_uq;
 			// 6287 silenced here as there is a warning for function calls due to potential side-effects
 			// --- In this context, side-effects are not expected. If there are any, it will be due to an ill-formed specialisation
-#pragma warning(push)
-#pragma warning(disable: 6287)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(6287)
 			return
 			(
 				... &&
@@ -249,7 +249,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 					decltype(std::declval<OutMatrix_>().template at<ColumnIndices_, RowIndices_>())
 				>()
 			);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 		else
 		{
@@ -626,7 +626,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_,
 		bool IsRads_, std::size_t AxisIndex_, std::size_t ConstexprIterations_, bool ConstexprMod_, bool StaticAssert_, class Angle_
 	>
-	[[nodiscard]] constexpr inline void _matrix_assign_rotate_3_in_axis(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Angle_&& angle_)
+	constexpr inline void _matrix_assign_rotate_3_in_axis(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Angle_&& angle_)
 	{
 		using out_matrix = EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>&;
 		using out_matrix_uq = EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>;
@@ -1068,14 +1068,14 @@ namespace EmuMath::Helpers::_matrix_underlying
 			>::type;
 			if constexpr (Fused_)
 			{
-				EmuMath::Quaternion<calc_fp> combined_quaternion = first_quaternion_.FusedMultiply<calc_fp>(second_quaternion_);
+				EmuMath::Quaternion<calc_fp> combined_quaternion = first_quaternion_.template FusedMultiply<calc_fp>(second_quaternion_);
 				_complete_quaternion_sequence<Fused_>(combined_quaternion, remaining_quaternions_...);
 				return _matrix_rotate_3_from_quaternion<OutMatrix_>(combined_quaternion);
 
 			}
 			else
 			{
-				EmuMath::Quaternion<calc_fp> combined_quaternion = first_quaternion_.Multiply<calc_fp>(second_quaternion_);
+				EmuMath::Quaternion<calc_fp> combined_quaternion = first_quaternion_.template Multiply<calc_fp>(second_quaternion_);
 				_complete_quaternion_sequence<Fused_>(combined_quaternion, remaining_quaternions_...);
 				return _matrix_rotate_3_from_quaternion<OutMatrix_>(combined_quaternion);
 			}
@@ -1108,11 +1108,11 @@ namespace EmuMath::Helpers::_matrix_underlying
 			>::type;
 			if constexpr (Fused_)
 			{
-				return _matrix_rotate_3_from_quaternion<OutMatrix_>(first_quaternion_.FusedMultiply<calc_fp>(second_quaternion_));
+				return _matrix_rotate_3_from_quaternion<OutMatrix_>(first_quaternion_.template FusedMultiply<calc_fp>(second_quaternion_));
 			}
 			else
 			{
-				return _matrix_rotate_3_from_quaternion<OutMatrix_>(first_quaternion_.Multiply<calc_fp>(second_quaternion_));
+				return _matrix_rotate_3_from_quaternion<OutMatrix_>(first_quaternion_.template Multiply<calc_fp>(second_quaternion_));
 			}
 		}
 		else

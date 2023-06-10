@@ -23,7 +23,7 @@ namespace EmuMath
 		using value_type_uq = typename vector_info::value_type_uq;
 		using preferred_floating_point = typename vector_info::preferred_floating_point;
 		using alternative_rep = typename vector_info::alternative_vector_rep;
-		friend typename alternative_rep;
+		friend alternative_rep;
 
 		/// <summary> STL-compliant random-access iterator for this Vector type. </summary>
 		using iterator = EmuMath::vector_iterator<this_type>;
@@ -885,10 +885,10 @@ namespace EmuMath
 			{
 				constexpr bool allow_move_between_depths_ = depth <= EmuCore::TMP::remove_ref_cv_t<Arg_>::depth;
 				// Disable Visual Studio warning about using moved-from object, as repeated moves are not allowed here due to the Vector depth requirement
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 				return data_storage_type({ _make_stored_type_from_arg<Indices_, ReadOffset_, allow_move_between_depths_>(std::forward<Arg_>(arg_))... });
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 			}
 			else
 			{
@@ -899,10 +899,10 @@ namespace EmuMath
 				else
 				{
 					// Disable Visual Studio warning about using moved-from object, as we aren't even moving here, but repeated forwarding draws a false positive
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 					return data_storage_type({ _make_stored_type_from_arg<Indices_, ReadOffset_, false>(std::forward<Arg_>(arg_))... });
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 				}
 			}
 		}
@@ -928,14 +928,7 @@ namespace EmuMath
 		template<std::size_t ReadOffset_, class...Args_>
 		[[nodiscard]] static constexpr inline data_storage_type _construct_all_from_one_arg_per_element(Args_&&...args_)
 		{
-			if constexpr (std::is_constructible_v<data_storage_type, decltype(std::forward<Args_>(args_))...>)
-			{
-				return data_storage_type({ std::forward<Args_>(args_)... });
-			}
-			else
-			{
-				return data_storage_type({ _forward_or_make_stored_type<ReadOffset_>(std::forward<Args_>(args_))... });
-			}
+			return data_storage_type({ EmuCore::TMP::construct_or_cast<stored_type>(std::forward<Args_>(args_))... });
 		}
 
 		template<std::size_t ReadOffset_, class...Args_>
@@ -964,7 +957,7 @@ namespace EmuMath
 				{
 					static_assert
 					(
-						EmuCore::TMP::get_false(),
+						EmuCore::TMP::get_false<ReadOffset_>(),
 						"Internal SFINAE Failure: Invalid variadic construction arguments for an EmuMath Vector have been provided as no possible branch for variadic construction with 1 argument was true."
 					);
 					return data_storage_type();
@@ -974,7 +967,7 @@ namespace EmuMath
 			{
 				static_assert
 				(
-					EmuCore::TMP::get_false(),
+					EmuCore::TMP::get_false<ReadOffset_>(),
 					"Internal SFINAE Failure: Invalid variadic construction arguments for an EmuMath Vector have been provided as no possible branch for variadic construction with a number of arguments not equal to 1 was true."
 				);
 				return data_storage_type();
@@ -6909,7 +6902,7 @@ namespace std
 			if constexpr (Index_ < EmuMath::Vector<Size_, T_>::size)
 			{
 				out_ *= MultiplierPrimeConstant_;
-				out_ += _element_hash()(vector_.at<Index_>());
+				out_ += _element_hash()(vector_.template at<Index_>());
 
 				if constexpr ((Index_ + 1) < EmuMath::Vector<Size_, T_>::size)
 				{

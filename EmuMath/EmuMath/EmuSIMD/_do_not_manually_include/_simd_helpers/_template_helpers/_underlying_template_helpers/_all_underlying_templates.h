@@ -6,7 +6,6 @@
 #include "_simd_helpers_underlying_basic_arithmetic.h"
 #include "_simd_helpers_underlying_bitwise.h"
 #include "_simd_helpers_underlying_blend.h"
-#include "_simd_helpers_underlying_blend_mask.h"
 #include "_simd_helpers_underlying_cast.h"
 #include "_simd_helpers_underlying_cmp.h"
 #include "_simd_helpers_underlying_cvt.h"
@@ -15,8 +14,8 @@
 #include "_simd_helpers_underlying_movemasks.h"
 #include "_simd_helpers_underlying_set.h"
 #include "_simd_helpers_underlying_shuffle.h"
-#include "_simd_helpers_underlying_shuffle_masks.h"
 #include "_simd_helpers_underlying_stream.h"
 #include "_simd_helpers_underlying_tmp.h"
+#include "_underlying_specialisations/_simd_helpers_all_underlying_specialisations.h"
 
 #endif

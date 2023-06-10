@@ -607,45 +607,12 @@ namespace EmuCore
 
 		static constexpr bool _any_fp = EmuCore::TMP::is_any_floating_point_v<_x_uq, _y_uq, _z_uq>;
 
-		template<bool AnyFp_>
-		struct _out_type_finder_template
-		{
-			// This will never be used due to specialisations
-			using type = void;
-			static constexpr bool is_valid = false;
-		};
-
-		template<>
-		struct _out_type_finder_template<false>
-		{
-		private:
-			using _x_mul_y_safe_result = EmuCore::TMP::safe_invoke_result<EmuCore::do_multiply<_x_uq, _y_uq>, const X_&, const Y_&>;
-			using _x_mul_y_result = typename _x_mul_y_safe_result::type;
-			using _x_mul_y_result_uq = typename EmuCore::TMP::remove_ref_cv<_x_mul_y_result>::type;
-			using _safe_result = EmuCore::TMP::safe_invoke_result<EmuCore::do_add<_x_mul_y_result_uq, _z_uq>, _x_mul_y_result, const Z_&>;
-
-		public:
-			using type = typename _safe_result::type;
-			static constexpr bool is_valid = _x_mul_y_safe_result::value && _safe_result::value;
-		};
-
-		template<>
-		struct _out_type_finder_template<true>
-		{
-		public:
-			using type = typename EmuCore::TMP::fma_result<const X_&, const Y_&, const Z_&>::type;
-			static constexpr bool is_valid = EmuCore::TMP::valid_fma_args_v<const X_&, const Y_&, const Z_&>;
-		};
-
-		using _out_type_finder = _out_type_finder_template<_any_fp>;
-
 	public:
 		constexpr do_fmadd()
 		{
 		}
 
-		template<typename = std::enable_if_t<_out_type_finder::is_valid>>
-		[[nodiscard]] constexpr inline typename _out_type_finder::type operator()(const X_& x_, const Y_& y_, const Z_& z_) const
+		[[nodiscard]] constexpr inline decltype(auto) operator()(const X_& x_, const Y_& y_, const Z_& z_) const
 		{
 			if constexpr (!_any_fp)
 			{
@@ -666,38 +633,18 @@ namespace EmuCore
 	template<>
 	struct do_fmadd<void, void, void>
 	{
-	private:
-		template<typename X_, typename Y_, typename Z_>
-		struct _result_with_args
-		{
-		private:
-			using _x_uq = EmuCore::TMP::remove_ref_cv_t<X_>;
-			using _y_uq = EmuCore::TMP::remove_ref_cv_t<Y_>;
-			using _z_uq = EmuCore::TMP::remove_ref_cv_t<Z_>;
-			using _to_invoke = EmuCore::do_fmadd<_x_uq, _y_uq, _z_uq>;
-			using _safe_invoke_result = EmuCore::TMP::safe_invoke_result<_to_invoke, const X_&, const Y_&, const Z_&>;
-
-		public:
-			using func_type = _to_invoke;
-			using type = typename _safe_invoke_result::type;
-			static constexpr bool is_valid = _safe_invoke_result::value;
-		};
-
 	public:
 		constexpr do_fmadd()
 		{
 		}
 
-		template
-		<
-			typename X_,
-			typename Y_,
-			typename Z_,
-			typename = std::enable_if_t<_result_with_args<X_, Y_, Z_>::is_valid>
-		>
-		constexpr inline typename _result_with_args<X_, Y_, Z_>::type operator()(const X_& x_, const Y_& y_, const Z_& z_) const
+		template<typename X_, typename Y_, typename Z_>
+		constexpr inline decltype(auto) operator()(const X_& x_, const Y_& y_, const Z_& z_) const
 		{
-			return typename _result_with_args<X_, Y_, Z_>::func_type()(x_, y_, z_);
+			using x_uq = typename EmuCore::TMP::remove_ref_cv_t<X_>;
+			using y_uq = typename EmuCore::TMP::remove_ref_cv_t<Y_>;
+			using z_uq = typename EmuCore::TMP::remove_ref_cv_t<Z_>;
+			return do_fmadd<x_uq, y_uq, z_uq>()(x_, y_, z_);
 		}
 	};
 
@@ -727,38 +674,18 @@ namespace EmuCore
 	template<>
 	struct do_fmsub<void, void, void>
 	{
-		private:
-		template<typename X_, typename Y_, typename Z_>
-		struct _result_with_args
-		{
-		private:
-			using _x_uq = EmuCore::TMP::remove_ref_cv_t<X_>;
-			using _y_uq = EmuCore::TMP::remove_ref_cv_t<Y_>;
-			using _z_uq = EmuCore::TMP::remove_ref_cv_t<Z_>;
-			using _to_invoke = EmuCore::do_fmsub<_x_uq, _y_uq, _z_uq>;
-			using _safe_invoke_result = EmuCore::TMP::safe_invoke_result<_to_invoke, const X_&, const Y_&, const Z_&>;
-
-		public:
-			using func_type = _to_invoke;
-			using type = typename _safe_invoke_result::type;
-			static constexpr bool is_valid = _safe_invoke_result::value;
-		};
-
 	public:
 		constexpr do_fmsub()
 		{
 		}
 
-		template
-		<
-			typename X_,
-			typename Y_,
-			typename Z_,
-			typename = std::enable_if_t<_result_with_args<X_, Y_, Z_>::is_valid>
-		>
-		constexpr inline typename _result_with_args<X_, Y_, Z_>::type operator()(const X_& x_, const Y_& y_, const Z_& z_) const
+		template<typename X_, typename Y_, typename Z_>
+		constexpr inline decltype(auto) operator()(const X_& x_, const Y_& y_, const Z_& z_) const
 		{
-			return typename _result_with_args<X_, Y_, Z_>::func_type()(x_, y_, z_);
+			using x_uq = typename EmuCore::TMP::remove_ref_cv_t<X_>;
+			using y_uq = typename EmuCore::TMP::remove_ref_cv_t<Y_>;
+			using z_uq = typename EmuCore::TMP::remove_ref_cv_t<Z_>;
+			return do_fmsub<x_uq, y_uq, z_uq>()(x_, y_, z_);
 		}
 	};
 #pragma endregion
@@ -1598,13 +1525,13 @@ namespace EmuCore
 		Div_ div_;
 		Mod_ mod_;
 
-		template<std::size_t NumIterations_>
+		template<std::size_t IterationCount_>
 		constexpr inline out_t _calculate_taylor_series(const out_t& in_) const
 		{
 			out_t out_ = out_t(1);
 			out_t pow_ = out_t(1);
 			out_t in_sqr_ = mul_(in_, in_);
-			_calculate_taylor_series<0, NumIterations_, 2>(in_sqr_, out_, pow_);
+			_calculate_taylor_series<0, IterationCount_, 2>(in_sqr_, out_, pow_);
 			return out_;
 		}
 		template<std::size_t Iteration_, std::size_t End_, std::size_t PowExponent_>
@@ -1632,10 +1559,10 @@ namespace EmuCore
 		constexpr do_cos_constexpr()
 		{
 		}
-		template<bool DoMod_ = true, typename T_>
+		template<bool Mod_ = DoMod_, typename T_>
 		constexpr inline std::invoke_result_t<do_cos_constexpr<T_, NumIterations_, DoMod_>, const T_&> operator()(const T_& val_) const
 		{
-			return do_cos_constexpr<T_, NumIterations_, DoMod_>()(val_);
+			return do_cos_constexpr<T_, NumIterations_, Mod_>()(val_);
 		}
 	};
 
@@ -1702,13 +1629,13 @@ namespace EmuCore
 		Div_ div_;
 		Mod_ mod_;
 
-		template<std::size_t NumIterations_>
+		template<std::size_t IterationCount_>
 		constexpr inline out_t _calculate_taylor_series(const out_t& in_) const
 		{
 			out_t out_ = in_;
 			out_t pow_ = in_;
 			out_t in_sqr_ = mul_(in_, in_);
-			_calculate_taylor_series<0, NumIterations_, 3>(in_sqr_, out_, pow_);
+			_calculate_taylor_series<0, IterationCount_, 3>(in_sqr_, out_, pow_);
 			return out_;
 		}
 		template<std::size_t Iteration_, std::size_t End_, std::size_t PowExponent_>
@@ -2027,7 +1954,7 @@ namespace EmuCore
 			// Approxiation adapted from NVIDIA reference @ https://developer.download.nvidia.com/cg/asin.html
 			out_t one = out_t(1);
 			bool is_neg = in_ < 0;
-			out_t abs_in = mul_(in_, static_cast<out_t>(!is_neg) + static_cast<out_t>(-1 * is_neg)); // abs_in = is_neg ? -in_ : in_
+			out_t abs_in = mul_(in_, static_cast<out_t>(!is_neg) + (static_cast<out_t>(-1) * is_neg)); // abs_in = is_neg ? -in_ : in_
 			out_t result = out_t(-0.0187293);
 			result = mul_(result, abs_in);
 			result = add_(result, out_t(0.0742610));
@@ -2102,7 +2029,7 @@ namespace EmuCore
 		{
 			// Approximation adapted from NVIDIA reference @ https://developer.download.nvidia.com/cg/acos.html
 			bool is_neg = EmuCore::do_cmp_less<out_t, out_t>()(in_, out_t(0));
-			out_t abs_in = mul_(in_, add_(static_cast<out_t>(!is_neg), static_cast<out_t>(-1 * is_neg))); // abs_in = is_neg ? -in_ : in_
+			out_t abs_in = mul_(in_, add_(static_cast<out_t>(!is_neg), (static_cast<out_t>(-1) * is_neg))); // abs_in = is_neg ? -in_ : in_
 			out_t result = out_t(-0.0187293);
 			result = mul_(result, abs_in);
 			result = add_(result, out_t(0.0742610));
@@ -2111,7 +2038,7 @@ namespace EmuCore
 			result = mul_(result, abs_in);
 			result = add_(result, out_t(1.5707288));
 			result = mul_(result, EmuCore::do_sqrt_constexpr<out_t>()(sub_(out_t(1), abs_in)));
-			result = result - 2 * is_neg * result;
+			result = result - out_t(2) * static_cast<out_t>(is_neg) * result;
 			return add_(result, mul_(is_neg, EmuCore::Pi::PI<out_t>));
 		}
 	};

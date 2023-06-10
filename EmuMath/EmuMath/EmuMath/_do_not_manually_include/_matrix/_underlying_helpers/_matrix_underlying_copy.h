@@ -300,8 +300,8 @@ namespace EmuMath::Helpers::_matrix_underlying
 	)
 	{
 		// Disable Visual Studio warning about using moved-from object, as we aren't accessing anything after it is moved
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		return OutMatrix_
 		(
 			_matrix_create_out_from_index<OutMatrix_, InMatrix_, FullColumnIndices_, FullRowIndices_>
@@ -309,7 +309,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 				std::forward<InMatrix_>(in_matrix_)
 			)...
 		);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 	template<class OutMatrix_, class InMatrix_, bool DoAssertions_, std::size_t ColumnIndex_, std::size_t RowIndex_>
@@ -619,8 +619,8 @@ namespace EmuMath::Helpers::_matrix_underlying
 		{
 			// Warning disabled as we are never moving the same element, but VS sees us passing a matrix containing at least 1 moved element
 			// --- This is with correct use, where this is always supplied a contiguous selection of indices. This is not designed for public use.
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 			(
 				_matrix_copy_index<OutMatrix_, InMatrix_, FullColumnIndices_, FullRowIndices_, FullColumnIndices_, FullRowIndices_>
 				(
@@ -628,7 +628,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 					std::forward<InMatrix_>(in_matrix_)
 				), ...
 			);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 		else
 		{

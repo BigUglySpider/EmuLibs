@@ -14,19 +14,26 @@ namespace EmuMath::Helpers::_matrix_underlying
 		std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_,
 		std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_
 	>
-	[[nodiscard]] constexpr inline typename auto _matrix_std_multiply_mat_mat_dp_mult
+	[[nodiscard]] constexpr inline auto _matrix_std_multiply_mat_mat_dp_mult
 	(
 		const EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_,
 		const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& rhs_matrix_
 	)
 	{
-		using lhs_get_result_uq = EmuCore::TMP::remove_ref_cv_t<decltype(lhs_matrix_.template at<DpIndex_, RowIndex_>())>;
-		using rhs_get_result_uq = EmuCore::TMP::remove_ref_cv_t<decltype(rhs_matrix_.template at<ColumnIndex_, DpIndex_>())>;
-		return EmuCore::do_multiply<lhs_get_result_uq, rhs_get_result_uq>()
-		(
-			lhs_matrix_.template at<DpIndex_, RowIndex_>(),
-			rhs_matrix_.template at<ColumnIndex_, DpIndex_>()
-		);
+		if constexpr(DpIndex_ < LhsNumColumns_ && DpIndex_ < RhsNumRows_)
+		{
+			using lhs_get_result_uq = EmuCore::TMP::remove_ref_cv_t<decltype(lhs_matrix_.template at<DpIndex_, RowIndex_>())>;
+			using rhs_get_result_uq = EmuCore::TMP::remove_ref_cv_t<decltype(rhs_matrix_.template at<ColumnIndex_, DpIndex_>())>;
+			return EmuCore::do_multiply<lhs_get_result_uq, rhs_get_result_uq>()
+			(
+				lhs_matrix_.template at<DpIndex_, RowIndex_>(),
+				rhs_matrix_.template at<ColumnIndex_, DpIndex_>()
+			);
+		}
+		else
+		{
+			return 0;
+		}
 	}
 
 	template
@@ -312,7 +319,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 	}
 
 	template<std::size_t Index_, class OutVector_, class LhsMatrix_, class RhsVector_, std::size_t...DpIndices_>
-	[[nodiscard]] constexpr inline typename decltype(auto) _matrix_std_multiply_mat_vector_dp_for_index
+	[[nodiscard]] constexpr inline decltype(auto) _matrix_std_multiply_mat_vector_dp_for_index
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const RhsVector_& rhs_vector_
@@ -338,7 +345,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 	}
 
 	template<std::size_t Index_, EmuConcepts::EmuVector OutVector_, EmuConcepts::EmuVector LhsVector_, EmuConcepts::EmuMatrix RhsMatrix_, std::size_t...DpIndices_>
-	[[nodiscard]] constexpr inline typename decltype(auto) _matrix_std_multiply_vector_mat_dp_for_index
+	[[nodiscard]] constexpr inline decltype(auto) _matrix_std_multiply_vector_mat_dp_for_index
 	(
 		const LhsVector_& lhs_vector_,
 		const RhsMatrix_& rhs_matrix_

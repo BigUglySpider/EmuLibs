@@ -547,13 +547,13 @@ namespace EmuMath
 				// We'll never access the same index twice, so silence false-positives
 				// --- This is a slight disadvantage since there are scenarios where different references to the same object may be moved,
 				// --- but silencing this has been chosen since VS is not showing any compromise
-#pragma warning(push)
-#pragma warning(disable: 26800)
+EMU_CORE_MSVC_PUSH_WARNING_STACK
+EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 				return matrix_vector_type
 				(
 					_get_conversion_construct_index_arg<ColumnIndices_, RowIndices_>(std::forward<ToConvert_>(to_convert_))...
 				);
-#pragma warning(pop)
+EMU_CORE_MSVC_POP_WARNING_STACK
 			}
 			else
 			{
@@ -775,7 +775,8 @@ namespace EmuMath
 		/// </para>
 		/// <para>
 		///		All listed outcomes are not used if a non-variadic constructor would make use of that argument, 
-		///		and are additionally subject to compatibility with this Matrix type's contained data. </para>
+		///		and are additionally subject to compatibility with this Matrix type's contained data.
+		/// </para>
 		/// <para> Where multiple potential outcomes are possible, the earliest listed will be prioritised. </para>
 		/// </summary>
 		/// <param name="args_">: Arguments for variadic construction, meeting at least 1 of the above constraints.</param>
@@ -1004,7 +1005,7 @@ namespace EmuMath
 			{
 				static_assert
 				(
-					EmuCore::TMP::get_false<stored_type>(),
+					EmuCore::TMP::get_false<std::size_t, Offset_>(),
 					"Attempted to access a contiguous data pointer for an EmuMath Matrix which contains references. As referenced data is not guaranteed to be contiguous, this behaviour is prohibited."
 				);
 			}
@@ -1014,6 +1015,41 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline const stored_type* data() const
 		{
 			return const_cast<this_type*>(this)->template data<Offset_>();
+		}
+
+		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
+		[[nodiscard]] constexpr inline stored_type* data()
+		{
+			if constexpr (ColumnIndex_ < num_columns)
+			{
+				if constexpr (RowIndex_ < num_rows)
+				{
+					constexpr std::size_t flattened_offset = get_flattened_index(ColumnIndex_, RowIndex_);
+					return _data.data() + flattened_offset;
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<ColumnIndex_>(),
+						"Attempted to access a contiguous data pointer for an EmuMath Matrix using a Column and Row offset, but the provided Row offset exceeds the Matrix's contained range."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<ColumnIndex_>(),
+					"Attempted to access a contiguous data pointer for an EmuMath Matrix using a Column and Row offset, but the provided Column offset exceeds the Matrix's contained range."
+				);
+			}
+		}
+
+		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
+		[[nodiscard]] constexpr inline stored_type* data() const
+		{
+			return const_cast<this_type*>(this)->template data<ColumnIndex_, RowIndex_>();
 		}
 
 		/// <summary>
@@ -2165,7 +2201,7 @@ namespace EmuMath
 		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
 		/// </para>
 		/// <para>
-		///		This is a basic, non-standard Matrix division. As a standard division is mathemtically undefined, there is no alternative. 
+		///		This is a basic, non-standard Matrix division. As a standard division is mathematically undefined, there is no alternative. 
 		///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying this Matrix by the inverse of rhs_.
 		/// </para>
 		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be divided. </para>
@@ -2203,7 +2239,7 @@ namespace EmuMath
 		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
 		/// </para>
 		/// <para>
-		///		This is a basic, non-standard Matrix division. As a standard division is mathemtically undefined, there is no alternative. 
+		///		This is a basic, non-standard Matrix division. As a standard division is mathematically undefined, there is no alternative. 
 		///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying lhs_matrix_ by the inverse of rhs_.
 		/// </para>
 		/// <para> Indices within the provided range will contain results of respective division operations. </para>
@@ -2263,7 +2299,7 @@ namespace EmuMath
 		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
 		/// </para>
 		/// <para>
-		///		This is a basic, non-standard Matrix division. As a standard division is mathemtically undefined, there is no alternative. 
+		///		This is a basic, non-standard Matrix division. As a standard division is mathematically undefined, there is no alternative. 
 		///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying this Matrix by the inverse of rhs_.
 		/// </para>
 		/// <para> Indices within the provided range will contain results of respective division operations. </para>
@@ -2310,7 +2346,7 @@ namespace EmuMath
 		/// <summary>
 		/// <para> Outputs the result of dividing this Matrix by the provided rhs_ argument via the provided out_matrix_. </para>
 		/// <para>
-		///		This is a basic, non-standard Matrix division. As a standard division is mathemtically undefined, there is no alternative. 
+		///		This is a basic, non-standard Matrix division. As a standard division is mathematically undefined, there is no alternative. 
 		///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying lhs_matrix_ by the inverse of rhs_.
 		/// </para>
 		/// <para> Indices within the provided range will contain results of respective division operations. </para>
@@ -5297,6 +5333,17 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::matrix_transpose<num_rows, num_columns, value_type_uq, OutColumnMajor_>(std::move(*this));
 		}
+#pragma endregion
+
+#pragma region INVERSE_FUNCS
+		/* TODO (All are square-matrix ONLY, although sub-funcs for Inverse (Laplace) can be implemented as shape-agnostic):
+		*	- Determinant
+		*   - Inverse (Laplace)
+		*      - Minors
+		*      - Cofactors
+		*      - Adjugate
+		*   - Inverse (Gauss-jordan)
+		*/
 #pragma endregion
 
 #pragma region SCALE_TRANSFORMATIONS

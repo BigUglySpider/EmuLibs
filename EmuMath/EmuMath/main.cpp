@@ -1,3 +1,11 @@
+// GCC ONLY IGNORES - TEMPORARY
+// GCC Diagnistics - Should be temporary, but no estimate on when
+#pragma warning(push)
+#pragma warning(disable: 4068)
+#pragma GCC diagnostic ignored "-Wignored-attributes"
+#pragma GCC diagnostic ignored "-Wpsabi"
+#pragma warning(pop)
+
 // Helpful Functors
 #include "EmuCore/Functors/Analytics.h"
 
@@ -21,12 +29,48 @@
 #include "EmuCore/Functors/StdOps.h"
 
 // Fast Vector
+#include "EmuMath/FastMatrix.h"
+#include "EmuMath/FastQuaternion.h"
 #include "EmuMath/FastVector.h"
 
 #include "EmuCore/ArithmeticHelpers/CommonAlgebra.h"
 
+#include "EmuCore/CommonPreprocessor/All.h"
+
+// Tuple stuff
+#include "EmuCore/TMPHelpers/RuntimeTupleTable.h"
+
+// Basic Arg Parser
+#include "EmuCore/CommonTypes/BasicArgParser.h"
+#include "EmuCore/Functors/Convertors.h"
+
 constexpr auto test_dot = EmuCore::dot<float>(1, 2, 6, 3, 7, 10);
 constexpr auto test_dot_2 = EmuCore::dot(5, 7);
+
+
+inline void universal_pause(const std::string& msg)
+{
+	std::string dummy;
+	printf("%s", msg.c_str());
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
+inline void universal_pause(const std::streamsize max_char_count, const std::string& msg)
+{
+	std::string dummy;
+	printf("%s", msg.c_str());
+	std::cin.ignore(max_char_count, '\n');
+}
+
+inline void universal_pause(const std::streamsize max_char_count)
+{
+	universal_pause(max_char_count, "Press Enter to continue...");
+}
+
+inline void universal_pause()
+{
+	universal_pause("Press Enter to continue...");
+}
 
 template<typename T_, std::size_t Size_>
 inline std::ostream& operator<<(std::ostream& str_, const std::array<T_, Size_>& arr_)
@@ -45,12 +89,37 @@ inline std::ostream& operator<<(std::ostream& str_, const std::array<T_, Size_>&
 	return str_;
 }
 
+template<std::size_t Size_, typename T_>
+inline void PrintIndexable(const T_& indexable)
+{
+	if constexpr (Size_ > 0)
+	{
+		std::cout << "{ " << indexable[0];
+		for (std::size_t i = 1; i < Size_; ++i)
+		{
+			std::cout << ", ";
+			std::cout << indexable[i];
+		}
+		std::cout << " }";
+	}
+	else
+	{
+		std::cout << "{ }";
+	}
+}
+
 template<class NoiseTable_>
 inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::string& out_name_ = "test_noise")
 {
 	using FP_ = typename NoiseTable_::value_type;
 	constexpr std::size_t num_dimensions = NoiseTable_::num_dimensions;
 	EmuMath::Vector<3, FP_> white_(255.0f, 255.0f, 255.0f);
+
+	std::string const required_directory = "./noise_output/";
+	if(!std::filesystem::exists(required_directory))
+	{
+		std::filesystem::create_directories(required_directory);
+	}
 
 	if constexpr (num_dimensions == 3)
 	{
@@ -60,7 +129,7 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::str
 			std::cout << "\nOutputting image layer #" << z << "...\n";
 
 			std::ostringstream name_;
-			name_ << "./" << out_name_ << "_" << z << ".ppm";
+			name_ << required_directory << out_name_ << "_" << z << ".ppm";
 			std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
 			out_ppm_ << "P6" << std::endl << resolution_.at<0>() << ' ' << resolution_.at<1>() << std::endl << "255" << std::endl;
 
@@ -69,7 +138,7 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::str
 				for (std::size_t x = 0; x < resolution_.at<0>(); ++x)
 				{
 					// Clamp is merely to cancel out fp-rounding errors
-					EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.at(x, y, z)).Clamp(0.0f, 255.0f));
+					EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.template at(x, y, z)).Clamp(0.0f, 255.0f));
 					out_ppm_ << (char)colour_byte_.at<0>() << (char)colour_byte_.at<1>() << (char)colour_byte_.at<2>();
 				}
 			}
@@ -82,16 +151,16 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::str
 		std::cout << "\nOutputting image...\n";
 
 		std::ostringstream name_;
-		name_ << "./2d_test_noise_.ppm";
+		name_ << required_directory << "2d_test_noise_.ppm";
 		std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
-		out_ppm_ << "P6" << std::endl << noise_table_.size<0>() << ' ' << noise_table_.size<1>() << std::endl << "255" << std::endl;
+		out_ppm_ << "P6" << std::endl << noise_table_.template size<0>() << ' ' << noise_table_.template size<1>() << std::endl << "255" << std::endl;
 
-		for (std::size_t y = 0, end_y = noise_table_.size<1>(); y < end_y; ++y)
+		for (std::size_t y = 0, end_y = noise_table_.template size<1>(); y < end_y; ++y)
 		{
-			for (std::size_t x = 0, end_x = noise_table_.size<0>(); x < end_x; ++x)
+			for (std::size_t x = 0, end_x = noise_table_.template size<0>(); x < end_x; ++x)
 			{
 				// Clamp is merely to cancel out fp-rounding errors
-				EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.at(x, y)).Clamp(0.0f, 255.0f));
+				EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.template at(x, y)).Clamp(0.0f, 255.0f));
 				out_ppm_ << (char)colour_byte_.at<0>() << (char)colour_byte_.at<1>() << (char)colour_byte_.at<2>();
 			}
 		}
@@ -109,6 +178,12 @@ inline void WriteNoiseTableToPPM
 )
 {
 	constexpr std::size_t num_dimensions = NoiseTable_::num_dimensions;
+	std::string const required_directory = "./noise_output/";
+	if(!std::filesystem::exists(required_directory))
+	{
+		std::filesystem::create_directories(required_directory);
+	}
+
 	if (noise_table_vector_.size() != 0)
 	{
 		if constexpr (num_dimensions == 3)
@@ -120,7 +195,7 @@ inline void WriteNoiseTableToPPM
 				std::cout << "\nOutputting image layer #" << z << "...\n";
 
 				std::ostringstream name_;
-				name_ << "./" << out_name_ << "_" << z << ".ppm";
+				name_ << required_directory << out_name_ << "_" << z << ".ppm";
 				std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
 				out_ppm_ << "P6" << std::endl << resolution_.at<0>() << ' ' << resolution_.at<1>() << std::endl << "255" << std::endl;
 
@@ -128,7 +203,7 @@ inline void WriteNoiseTableToPPM
 				{
 					for (std::size_t x = 0; x < resolution_.at<0>(); ++x)
 					{
-						EmuMath::ColourRGB<std::uint8_t> colour_byte_ = gradient_.GetColour<std::uint8_t>(noise_table_.at(x, y, z));
+						EmuMath::ColourRGB<std::uint8_t> colour_byte_ = gradient_.template GetColour<std::uint8_t>(noise_table_.at(x, y, z));
 						out_ppm_ << (char)colour_byte_.R() << (char)colour_byte_.G() << (char)colour_byte_.B();
 					}
 				}
@@ -143,7 +218,7 @@ inline void WriteNoiseTableToPPM
 			std::cout << "\nOutputting 2D noise image layer...\n";
 
 			std::ostringstream name_;
-			name_ << "./" << out_name_ << ".ppm";
+			name_ << required_directory << out_name_ << ".ppm";
 			std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
 			out_ppm_ << "P6" << std::endl << resolution_.at<0>() << ' ' << resolution_.at<1>() << std::endl << "255" << std::endl;
 
@@ -151,7 +226,7 @@ inline void WriteNoiseTableToPPM
 			{
 				for (std::size_t x = 0; x < resolution_.at<0>(); ++x)
 				{
-					EmuMath::ColourRGB<std::uint8_t> colour_byte_ = gradient_.GetColour<std::uint8_t>(noise_table_.at(x, y));
+					EmuMath::ColourRGB<std::uint8_t> colour_byte_ = gradient_.template GetColour<std::uint8_t>(noise_table_.at(x, y));
 					out_ppm_ << (char)colour_byte_.R() << (char)colour_byte_.G() << (char)colour_byte_.B();
 				}
 			}
@@ -160,11 +235,11 @@ inline void WriteNoiseTableToPPM
 		}
 		else
 		{
-			EmuMath::Vector<2, std::size_t> resolution_(noise_table_vector_[0].size<0>(), noise_table_vector_.size());
+			EmuMath::Vector<2, std::size_t> resolution_(noise_table_vector_[0].template size<0>(), noise_table_vector_.size());
 			std::cout << "\nOutputting 1D noise image layer from full vector...\n";
 
 			std::ostringstream name_;
-			name_ << "./" << out_name_ << ".ppm";
+			name_ << required_directory << out_name_ << ".ppm";
 			std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
 			out_ppm_ << "P6" << std::endl << resolution_.at<0>() << ' ' << resolution_.at<1>() << std::endl << "255" << std::endl;
 
@@ -173,7 +248,7 @@ inline void WriteNoiseTableToPPM
 				auto& noise_table_ = noise_table_vector_[y];
 				for (std::size_t x = 0; x < resolution_.at<0>(); ++x)
 				{
-					EmuMath::ColourRGB<std::uint8_t> colour_byte_ = gradient_.GetColour<std::uint8_t>(noise_table_.at(x));
+					EmuMath::ColourRGB<std::uint8_t> colour_byte_ = gradient_.template GetColour<std::uint8_t>(noise_table_.at(x));
 					out_ppm_ << (char)colour_byte_.R() << (char)colour_byte_.G() << (char)colour_byte_.B();
 				}
 			}
@@ -214,10 +289,374 @@ constexpr inline bool variadic_and_test(Args_&&...args_)
 	return (... && args_);
 }
 
-int main()
+template<typename T>
+struct test_func
 {
+	constexpr void operator()(T in_) const
+	{
+		std::cout << in_ << "\n";
+	}
+};
+
+template<>
+struct test_func<void>
+{
+	template<typename T>
+	constexpr void operator()(T&& in_) const
+	{
+		return test_func<T>()(std::forward<T>(in_));
+	}
+};
+
+struct boolifier
+{
+	template<typename T>
+	[[nodiscard]] constexpr inline bool operator()(T&& val) const
+	{
+		if constexpr (std::is_same_v<std::string, std::remove_cvref_t<T>>)
+		{
+			return std::forward<T>(val).length() > 5;
+		}
+		else if constexpr (std::is_same_v<bool, std::remove_cvref_t<T>>)
+		{
+			return val;
+		}
+		else
+		{
+			return val < 42;
+		}
+	}
+};
+
+struct get_string_array
+{
+	template<typename T>
+	[[nodiscard]] constexpr inline decltype(auto) operator()(T&& val) const
+	{
+		return val.get_string_array();
+	}
+};
+
+namespace std
+{
+	template<std::size_t Size_, typename T_>
+	std::string to_string(const EmuMath::Vector<Size_, T_>& vec)
+	{
+		std::ostringstream str;
+		EmuMath::Helpers::vector_stream_append(str, vec);
+		return str.str();
+	}
+}
+
+template<typename T>
+struct tester_of_array
+{
+	std::array<std::string, 10> data;
+	constexpr tester_of_array() : 
+		data()
+	{
+		for (std::size_t i = 0; i < 10; ++i)
+		{
+			data[i] = std::to_string(T(10) / T(i+1));
+		}
+	}
+
+	constexpr const std::array<std::string, 10>& get_string_array() const noexcept
+	{
+		return data;
+	}
+};
+
+template<class VecType_, std::size_t ElementWidth_, class Func_, typename Val_, std::size_t...Indices_>
+constexpr inline decltype(auto) setr_test_helper(Func_&& func_, std::index_sequence<Indices_...> indices_, const Val_& val_)
+{
+	return EmuSIMD::setr<VecType_, ElementWidth_>(std::forward<Func_>(func_)(val_ + Indices_)...);
+}
+
+int main(int argc, char** argv)
+{
+	using EmuCore::BasicArgParser;
+	auto basic_arg_parser = BasicArgParser<std::string>
+	(
+		argc,
+		argv,
+		"true",
+		BasicArgParser<std::string>::config_args_map_type
+		{
+			{ "is-finished", "maybe" },
+			{ "noise-x", "1024" },
+			{ "noise-y", "1024" },
+			{ "noise-z", "1" },
+			{ "noise-speed-test-count", "0" },
+			{ "do-test-harness", "false" }
+		},
+		BasicArgParser<std::string>::switch_to_full_name_map_type
+		{
+			{ 'c', "noise-speed-test-count" },
+			{ 't', "do-test-harness" },
+			{ 'x', "noise-x" },
+			{ 'y', "noise-y" },
+			{ 'z', "noise-z" }
+		}
+	);
+	basic_arg_parser.ApplyDefaults<false>();
+
+	{
+		std::ostringstream parser_str;
+		parser_str << "Input arguments: " << basic_arg_parser.StringifyAllParsedArgs() << '\n';
+		basic_arg_parser.AppendToStream<false>(parser_str) << "\nPress enter to continue with this config...";
+		universal_pause(parser_str.str());
+	}
+
+	{
+		auto rng = EmuMath::RngWrapper<false>(-2500.0, 2500.0);
+		auto a = EmuMath::FastMatrix<4, 4, float, true, 128>(rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal());
+		auto b = EmuMath::FastMatrix<4, 4, float, true, 128>(rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal());
+		std::cout << "\n---A:\n" << a;
+		std::cout << "\nMIN A:\n" << a.Min() << "\n\t" << a.MinScalar<float>() << "\n\t" << a.MinScalar<std::int64_t>() << "\n\t" << a.MinScalar();
+		std::cout << "\nMAX A:\n" << a.Max() << "\n\t" << a.MaxScalar<float>() << "\n\t" << a.MaxScalar<std::int64_t>() << "\n\t" << a.MaxScalar();
+		std::cout << "\n---B:\n" << b;
+		std::cout << "\nMIN B:\n" << b.Min() << "\n\t" << b.MinScalar<float>() << "\n\t" << b.MinScalar<std::int64_t>() << "\n\t" << b.MinScalar();
+		std::cout << "\nMAX B:\n" << b.Max() << "\n\t" << b.MaxScalar<float>() << "\n\t" << b.MaxScalar<std::int64_t>() << "\n\t" << b.MaxScalar();
+		std::cout << "\n---MIN(A, B):\n" << a.Min(b);
+		std::cout << "\n---MAX(B, A):\n" << b.Max(a);
+		std::cout << std::endl;
+
+		std::cout << "### lerp ###\n";
+		auto c = EmuMath::FastMatrix<16, 16, float, true, 512>(50.0f);
+		auto d = EmuMath::FastMatrix<16, 16, float, true, 512>(100.0f);
+		auto e = EmuMath::FastMatrix<16, 16, float, true, 512>(EmuSIMD::setr<EmuSIMD::f32x16, 32>(0.1f, 0.2f, 0.25f, 0.3f, 0.33f, 0.4f, 0.5f, 0.6f, 0.7f, 0.75f, 0.8f, 0.9f, 1.0f, 2.0f, 2.5f, -1.0f));
+		std::cout << "LERP\n" << c << "\n|\n" << d << "\n|\n" << e << "\n=\n" << c.Lerp(d, e) << "\nOR\n" << c.FusedLerp(d, e) << std::endl;
+
+		std::cout << "### clamp ###\n";
+		auto f = EmuMath::FastMatrix<4, 4, double, true, 256>(rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal());
+		auto g = EmuMath::FastMatrix<4, 4, double, true, 256>(-913.4);
+		auto h = EmuMath::FastMatrix<4, 4, double, true, 256>(1337.1337);
+		std::cout << "IN:\n" << f << "\n---\nA:\n" << g << "\n---\nB:\n" << h;
+		std::cout << "\n---\nCLAMP_MIN(IN, A):\n" << f.ClampMin(g);
+		std::cout << "\n---\nCLAMP_MIN(IN, B):\n" << f.ClampMin(h);
+		std::cout << "\n---\nCLAMP_MAX(IN, A):\n" << f.ClampMax(g);
+		std::cout << "\n---\nCLAMP_MAX(IN, B):\n" << f.ClampMax(h);
+		std::cout << "\n---\nCLAMP(IN, A, B):\n" << f.Clamp(g, h);
+		std::cout << "\n---\nCLAMP(IN, B, A):\n" << f.Clamp(h, g);
+		std::cout << std::endl;
+		universal_pause();
+	}
+
+	{
+		constexpr auto elems_u32 = std::array<std::uint32_t, 16>({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 });
+		constexpr auto elems_f32 = std::array<float, 16>({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16});
+		[[maybe_unused]] std::uint32_t dump_u32x16[16];
+		float dump_f32x16[16];
+		
+		constexpr auto shuffle_mask = EmuSIMD::Funcs::make_shuffle_mask_32<2, 1, 3, 0>();
+		{
+			std::cout << "128-bit\n";
+			auto a_reg = EmuSIMD::Funcs::load_f32x4(elems_f32.data());
+			auto b_reg = EmuSIMD::Funcs::setzero_f32x4();
+			auto a_emu = EmuSIMD::_underlying_impl::load_single_lane_simd_emulator<4, float>(elems_f32.data());
+			auto b_emu = EmuSIMD::_underlying_impl::set_single_lane_simd_emulator<4, float>();
+
+			auto c_reg = EmuSIMD::Funcs::shuffle_f32x4<shuffle_mask>(a_reg, b_reg);
+			auto c_emu = EmuSIMD::_underlying_impl::_emulate_single_lane_shuffle<shuffle_mask, 2>(a_emu, b_emu, std::make_index_sequence<4>());
+
+			EmuSIMD::Funcs::store_f32x4(dump_f32x16, c_reg);
+			PrintIndexable<4>(dump_f32x16);
+			std::cout << '\n';
+			EmuSIMD::_underlying_impl::emulate_simd_store(c_emu, dump_f32x16);
+			PrintIndexable<4>(dump_f32x16);
+			std::cout << '\n';
+		}
+
+		{
+			std::cout << "256-bit\n";
+			auto a_reg = EmuSIMD::Funcs::load_f32x8(elems_f32.data());
+			auto b_reg = EmuSIMD::Funcs::setzero_f32x8();
+			auto a_emu = EmuSIMD::_underlying_impl::load_dual_lane_simd_emulator<256, EmuSIMD::f32x4>(elems_f32.data());
+			auto b_emu = EmuSIMD::_underlying_impl::set_dual_lane_simd_emulator<256, EmuSIMD::f32x4>();
+			
+			auto c_reg = EmuSIMD::Funcs::shuffle_f32x8<shuffle_mask>(a_reg, b_reg);
+			auto c_emu = EmuSIMD::_underlying_impl::emulate_simd_basic([](const auto& a, const auto& b) { return EmuSIMD::Funcs::shuffle_f32x4<shuffle_mask>(a, b); }, a_emu, b_emu);
+			
+			EmuSIMD::Funcs::store_f32x8(dump_f32x16, c_reg);
+			PrintIndexable<8>(dump_f32x16);
+			std::cout << '\n';
+			EmuSIMD::_underlying_impl::emulate_simd_store(c_emu, dump_f32x16);
+			PrintIndexable<8>(dump_f32x16);
+			std::cout << '\n';
+		}
+
+		universal_pause();
+	}
+
+	{
+		EmuSIMD::f32x4 a = EmuSIMD::Funcs::setr_f32x4(1, 2, 3, 4);
+		EmuSIMD::f32x4 b = EmuSIMD::Funcs::setr_f32x4(5, 6, 7, 8);
+		EmuSIMD::f32x4 c = EmuSIMD::shuffle<2, 3, 2, 3>(a, b);
+
+		EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, c) << '\n';
+
+		universal_pause();
+	}
+
+	{
+		std::uint8_t flags = ((1 << 3) | (0 << 2) | (1 << 1) | (0 << 0));
+		using mask_gen = EmuSIMD::index_mask<EmuSIMD::f32x4, 1, 0, 1, 0>;
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::setmasked_f32x4(flags)) << '\n';
+		EmuSIMD::append_simd_vector_to_stream(std::cout, mask_gen::get()) << '\n';
+		universal_pause();
+	}
+
+	{
+		std::uint16_t test = 0x000F;
+		std::byte& msb = EmuCore::ArithmeticHelpers::get_most_significant_byte<std::byte&>(test);
+		std::cout << test << " | msb: " << std::bitset<8>((int)msb) << '\n';
+		msb |= std::byte(1);
+		std::cout << test << " | msb: " << std::bitset<8>((int)msb) << '\n';
+		msb |= std::byte(0b10000000);
+		std::cout << test << " | msb: " << std::bitset<8>((int)msb) << '\n';
+		
+		universal_pause();
+	}
+
+	{
+		using test_reg = EmuSIMD::f32x4;
+		test_reg a = EmuSIMD::set1<test_reg>(1);
+		test_reg b = EmuSIMD::set1<test_reg>(2);
+		test_reg from_func = EmuSIMD::Funcs::blend_f32x4<EmuSIMD::Funcs::make_blend_mask<1, 0, 1, 0>()>(a, b);
+		test_reg from_temp = EmuSIMD::blend<1, 0, 1, 0>(a, b);
+		EmuSIMD::append_simd_vector_to_stream(std::cout, from_func) << '\n';
+		EmuSIMD::append_simd_vector_to_stream(std::cout, from_temp) << '\n';
+		universal_pause();
+	}
+
+	// TODO: Continue with horizontal min/max (This is part of FastMatrix::Max()'s underlying implementation)
+	// --- Also need to sort out downgrading int conversions (e.g. 32- -> 16-bit)
+	{
+		using simd_type = EmuSIMD::i8x16;
+		constexpr std::size_t width = 8;
+		constexpr bool is_signed = true;
+		simd_type yo = EmuSIMD::setr<simd_type, width>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+		EmuSIMD::append_simd_vector_to_stream<width, is_signed>(std::cout, yo) << "\nMin: ";
+		EmuSIMD::append_simd_vector_to_stream<width, is_signed>(std::cout, EmuSIMD::Funcs::horizontal_min_i8x16(yo)) << "\nMax: ";
+		EmuSIMD::append_simd_vector_to_stream<width, is_signed>(std::cout, EmuSIMD::Funcs::horizontal_max_i8x16(yo)) << "\n";
+		universal_pause();
+	}
+
+	{
+		auto fast_mat_to_round = EmuMath::FastMatrix<4, 4, float, true, 128>(1.2, -2.2, 3.5, 4.0, 5.1, 6.7, 7.0, 8.0, 9, 10, 11.123456789f, 12, 13, 14, 15, 16.2f);
+		auto fast_mat_to_round_64 = EmuMath::FastMatrix<4, 4, double, true, 128>(1.2, -2.2, 3.5, 4.0, 5.1, 6.7, 7.0, 8.0, 9, 10, 11.123456789f, 12, 13, 14, 15, 16.2f);
+
+		std::cout << "Initial (f32x4):\n" << fast_mat_to_round << "\n";
+		std::cout << "Floored (f32x4):\n" << fast_mat_to_round.Floor() << "\n";
+		std::cout << "Ceiled (f32x4):\n" << fast_mat_to_round.Ceil() << "\n";
+		std::cout << "Trunced (f32x4):\n" << fast_mat_to_round.Trunc() << "\n";
+		std::cout << "Abs (f32x4):\n" << fast_mat_to_round.Abs() << "\n";
+		universal_pause();
+	}
+
+	{
+		__m128 a = EmuSIMD::setr<__m128, 32>(1, 2, 3, 4);
+		__m128 b = EmuSIMD::setr<__m128, 32>(5, 6, 7, 8);
+		__m128 res_old_ab = EmuSIMD::shuffle<0, 3, 2, 1>(a, b);
+		__m128 res_old_aa = EmuSIMD::shuffle<0, 3, 2, 1>(a, a);
+		__m128 res_new_ab = EmuSIMD::Funcs::shuffle_f32x4<EmuSIMD::Funcs::make_shuffle_mask_32<0, 3, 2, 1>()>(a, b);
+		__m128 res_new_aa = EmuSIMD::Funcs::shuffle_f32x4<EmuSIMD::Funcs::make_shuffle_mask_32<0, 3, 2, 1>()>(a, a);
+
+		std::cout << "Old ab: ";
+		EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, res_old_ab) << "\n";
+		std::cout << "Old aa: ";
+		EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, res_old_aa) << "\n";
+
+		std::cout << "New ab: ";
+		EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, res_new_ab) << "\n";
+		std::cout << "New aa: ";
+		EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, res_new_aa) << "\n";
+	}
+
+	{
+		constexpr auto blend_mask = EmuSIMD::Funcs::make_blend_mask<1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0>();
+		std::cout << std::bitset<sizeof(EmuSIMD::Funcs::blend_mask_type)* CHAR_BIT>(blend_mask) << "\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::blend_mask_to_vector<blend_mask, false, signed char>(std::make_index_sequence<16>(), [](auto&&...vals_) { return EmuSIMD::Funcs::set_i8x16(std::forward<decltype(vals_)>(vals_)...); })) << "\n";
+		__m128i a = EmuSIMD::set1<__m128i, 8>(50);
+		__m128i b = EmuSIMD::setr<__m128i, 8>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+		__m128i c = EmuSIMD::mul_all<8>(b, EmuSIMD::set1<__m128i, 8>(5));
+		std::cout << "---\n";
+
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, a) << " DIV\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, b) << " EQ:\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::div_i8x16(a, b)) << "\n";
+
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, a) << " MOD\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, b) << " EQ:\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::mod_i8x16(a, b)) << "\n";
+
+		__m256i a256_8 = EmuSIMD::setr<__m256i, 8>(120, 110, 100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 110, 100, 90, 80, 70, 60, 50, 40, 30);
+		__m256i b256_8 = EmuSIMD::setr<__m256i, 8>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32);
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, a256_8) << " DIV\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, b256_8) << " EQ:\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::div_i8x32(a256_8, b256_8)) << "\n";
+
+		std::cout << "---\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::permute_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15>()>(b)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::permute_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0>()>(b)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::permute_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15>()>(c)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::permute_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0>()>(c)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::shuffle_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7>()>(b, c)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream<8, true>(std::cout, EmuSIMD::Funcs::shuffle_i8x16<EmuSIMD::Funcs::make_shuffle_mask_8<7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0>()>(b, c)) << "\n";
+
+		std::cout << "---\n";
+		__m128 af = EmuSIMD::setr<__m128, 32>(1, 2, 3, 4);
+		__m128 bf = EmuSIMD::setr<__m128, 32>(5, 6, 7, 8);
+		constexpr auto blend_mask_f = EmuSIMD::Funcs::make_blend_mask<0, 1, 0, 1>();
+		constexpr auto all_one_f = EmuCore::ArithmeticHelpers::set_all_bits_one<float>();
+		auto maskvf = EmuSIMD::Funcs::blend_mask_to_vector<blend_mask_f, false, float>
+		(
+			std::make_index_sequence<4>(),
+			[](auto&&...args_) { return EmuSIMD::Funcs::set_f32x4(std::forward<decltype(args_)>(args_)...); }
+		);
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::blend_f32x4<blend_mask_f>(af, bf)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::blendv_f32x4(af, bf, maskvf)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::blendv_f32x4(af, bf, EmuSIMD::set<__m128, 32>(0, all_one_f, 0, all_one_f))) << "\n";
+
+		std::cout << "---\n";
+		EmuSIMD::f32x8 a256 = EmuSIMD::setr<EmuSIMD::f32x8, 32>(1, 2, 3, 4, 5, 6, 7, 8);
+		EmuSIMD::f32x8 b256 = EmuSIMD::setr<EmuSIMD::f32x8, 32>(9, 10, 11, 12, 13, 14, 15, 16);
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::movelh_f32x4(af, bf)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::movehl_f32x4(af, bf)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::movelh_f32x8(a256, b256)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::movehl_f32x8(a256, b256)) << "\n";
+
+		std::cout << "---\n";
+		EmuSIMD::f64x2 a64_128 = EmuSIMD::setr<EmuSIMD::f64x2, 64>(1, 2);
+		EmuSIMD::f64x2 b64_128 = EmuSIMD::setr<EmuSIMD::f64x2, 64>(3, 4);
+		EmuSIMD::f64x4 a64_256 = EmuSIMD::setr<EmuSIMD::f64x4, 64>(1, 2, 3, 4);
+		EmuSIMD::f64x4 b64_256 = EmuSIMD::setr<EmuSIMD::f64x4, 64>(5, 6, 7, 8);
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::movelh_f64x2(a64_128, b64_128)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::movehl_f64x2(a64_128, b64_128)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::movelh_f64x4(a64_256, b64_256)) << "\n";
+		EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::Funcs::movehl_f64x4(a64_256, b64_256)) << "\n";
+	}
+
 	srand(static_cast<unsigned int>(time(0)));
 	EmuCore::Timer<std::milli> timer_;
+
+	{
+		constexpr std::size_t vec_len = 2;
+		using vec_elem_type = double;
+		static constexpr std::size_t iterations = 240;
+		constexpr std::size_t width = sizeof(vec_elem_type) * 8;
+		using register_type = typename EmuSIMD::TMP::register_type<vec_elem_type, width* vec_len>::type;
+		using EmuCore::Pi;
+		auto func = [](auto val) { return Pi::DegsToRads<double>(val * 0.333333333333333); };
+		for (std::size_t i = 0; i < iterations; i += vec_len)
+		{
+			auto acos_res = setr_test_helper<register_type, width>(func, std::make_index_sequence<vec_len>(), i);
+			acos_res = EmuSIMD::Funcs::cos_f64x2(acos_res);
+			std::cout << "[" << i << "]: ";
+			EmuSIMD::append_simd_vector_to_stream<width, true>(std::cout, acos_res) << "\n";
+		}
+	}
 
 	//*
 #pragma region PRE_TEST_BODY
@@ -266,7 +705,6 @@ int main()
 	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(EmuMath::Matrix<2, 3, int, true>(7, 0, 2, 1, 4, 7), EmuMath::Matrix<4, 4, int, true>(12, 10, 6, 3, 15, 21, 13, -5, 19, 20, 21, -7, 1, 2, 3, 4)) << "\n\n";
 	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(EmuMath::Matrix<4, 4, int, false>(-3, 4, -4, 5, 3, 4, 5, 6, 10, 11, 12, 13, -255, -511, 31, 1337), EmuMath::Matrix<2, 3, int, false>(3, 12, 6, 8, 9, 10)) << "\n\n";
 
-
 	constexpr auto scale = EmuMath::Helpers::matrix_make_scale<float>(2, 5, 10);
 	constexpr auto scale_from_tuple = EmuMath::Helpers::matrix_make_scale<double>(std::make_tuple(8, -2.0L, 0.5f));
 	constexpr auto scale_from_vector = EmuMath::Helpers::matrix_make_scale<int>(EmuMath::Vector<3, float>(1.0f, 2.0f, 6.0f));
@@ -293,7 +731,6 @@ int main()
 	std::cout << scale_assign_matrix << "\n\n";
 	scale_assign_matrix.AssignScale(EmuMath::Vector<4, unsigned long long int>(1, 2, 3, 4));
 	std::cout << scale_assign_matrix << "\n\n";
-
 
 	std::cout << "MAKE_TRANSLATION TESTS\n";
 	constexpr auto translate = EmuMath::Helpers::matrix_make_translation<float>(2, 5, 10);
@@ -324,7 +761,6 @@ int main()
 	std::cout << translate_from_member << "\n\n";
 	std::cout << translate_tuple_from_member << "\n\n";
 	std::cout << translate_vector_from_member << "\n\n";
-
 
 	std::cout << "ASSIGN_TRANSLATION TESTS\n";
 	EmuMath::Matrix<4, 4, float, true> translate_assign_matrix(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160);
@@ -385,7 +821,6 @@ int main()
 	irregular_matrix.AssignRotation3DZConstexpr<12, true, false>(33);
 	std::cout << irregular_matrix << "\n\n";
 
-	system("pause");
 	std::cout << "\n\n\n\nQUATERNIONS\n";
 	constexpr auto rot_euler = EmuMath::Vector<3, float>
 	(
@@ -702,88 +1137,530 @@ int main()
 	runtime_trans *= translation;
 	std::cout << "After trans: " << runtime_trans << "\n ";
 
+	std::cout << "\n\n\nFast Matrix\n";
+	EmuMath::FastMatrix<4, 4, float> fast_mat_4x4f;
+	std::cout << fast_mat_4x4f << "\n\n";
+	
+	constexpr auto fast_mat_in_scalar_a = EmuMath::Helpers::matrix_ortho_vk<float, true>(0, 0, 1920, 1080, 0.001, 1000);
+	constexpr auto fast_mat_in_scalar_b = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+
+	constexpr bool tests_column_major = true;
+	constexpr auto fast5x4_in_a = EmuMath::Matrix<5, 4, float, tests_column_major>
+	(
+		1, 2, 3, 4, 5,
+		9, 10, 11, 12, 13,
+		17, 18, 19, 20, 21,
+		25, 26, 27, 28, 29
+	);
+	constexpr auto fast4x5_in_b = fast5x4_in_a.Transpose();
+
+	auto fast5x4_a = EmuMath::FastMatrix<4, 5, float, tests_column_major>
+	(
+		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast5x4_in_a.data<0, 0>()),
+		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast5x4_in_a.data<4, 0>()),
+		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast5x4_in_a.data<0, 1>()),
+		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast5x4_in_a.data<4, 1>()),
+		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast5x4_in_a.data<0, 2>()),
+		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast5x4_in_a.data<4, 2>()),
+		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast5x4_in_a.data<0, 3>()),
+		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast5x4_in_a.data<4, 3>())
+	);
+	auto fast4x5_b = EmuMath::FastMatrix<5, 4, float, tests_column_major>
+	(
+		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x5_in_b.data<0, 0>()),
+		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x5_in_b.data<0, 1>()),
+		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x5_in_b.data<0, 2>()),
+		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x5_in_b.data<0, 3>()),
+		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x5_in_b.data<0, 4>())
+	);
+	std::cout << fast5x4_a << "\nMUL\n" << fast4x5_b << "\n=\n" << fast5x4_a.Multiply(fast4x5_b) << "\n\n";
+	std::cout << "Scalar result:\n" << (fast5x4_in_a * fast4x5_in_b) << "\n\n";
+	std::cout << "REVERSED: " << fast5x4_a << "\nMUL\n" << fast4x5_b << "\n=\n" << fast4x5_b.Multiply(fast5x4_a) << "\n\n";
+	std::cout << "REVERSED: " << "Scalar result:\n" << (fast4x5_in_b * fast5x4_in_a) << "\n\n";
 
 
-	system("pause");
-	// // ##### SCALAR vs SIMD NOISE #####
-	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
-	//constexpr std::size_t test_noise_dimensions = 3;
-	//constexpr auto sample_count = EmuMath::make_vector<std::size_t>(1024, 1024, 1);
-	//constexpr bool use_fractal = true;
-	//using scalar_test_noise_processor = EmuMath::Functors::noise_sample_processor_perlin_normalise<test_noise_dimensions>;
-	//using fast_test_noise_processor = EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<test_noise_dimensions>;
-	//
-	//constexpr std::size_t num_iterations = 1;
-	//std::vector<EmuMath::NoiseTable<test_noise_dimensions, float>> noise_;
-	//std::vector<EmuMath::FastNoiseTable<test_noise_dimensions, 0>> fast_noise_;
-	//noise_.resize(num_iterations, decltype(noise_)::value_type());
-	//fast_noise_.resize(num_iterations, decltype(fast_noise_)::value_type());
-	//
-	//constexpr std::size_t noise_num_perms = 4096;
-	//constexpr EmuMath::Info::NoisePermutationShuffleMode noise_perm_shuffle_mode = EmuMath::Info::NoisePermutationShuffleMode::SEED_32;
-	//constexpr bool noise_perm_bool_input = true;
-	//constexpr EmuMath::Info::NoisePermutationInfo::seed_32_type noise_perm_seed_32 = 1337;
-	//constexpr EmuMath::Info::NoisePermutationInfo::seed_64_type noise_perm_seed_64 = 1337;
-	//
-	//system("pause");
-	//for (std::size_t i = 0; i < num_iterations; ++i)
-	//{
-	//	std::cout << "\nNOISE BATCH " << i << "\n";
-	//	timer_.Restart();
-	//	noise_[i].GenerateNoise<test_noise_type_flag, scalar_test_noise_processor>
-	//	(
-	//		decltype(noise_)::value_type::MakeOptions
-	//		(
-	//			sample_count,
-	//			EmuMath::Vector<test_noise_dimensions, float>(0.0f),
-	//			EmuMath::Vector<test_noise_dimensions, float>(1.0f / 1024.0f),
-	//			3.0f,
-	//			true,
-	//			use_fractal,
-	//			EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
-	//			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
-	//		)
-	//	);
-	//	timer_.Pause();
-	//	std::cout << "FINISHED SCALAR NOISE IN: " << timer_.GetMilli() << "ms\n";
-	//
-	//
-	//	timer_.Restart();
-	//	fast_noise_[i].GenerateNoise<test_noise_type_flag, fast_test_noise_processor>
-	//	(
-	//		decltype(fast_noise_)::value_type::make_options
-	//		(
-	//			sample_count,
-	//			EmuMath::Vector<test_noise_dimensions, float>(0.0f),
-	//			EmuMath::Vector<test_noise_dimensions, float>(1.0f / 1024.0f),
-	//			3.0f,
-	//			true,
-	//			use_fractal,
-	//			EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
-	//			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
-	//		)
-	//	);
-	//	timer_.Pause();
-	//	std::cout << "FINISHED FAST NOISE IN: " << timer_.GetMilli() << "ms\n";
-	//}
-	//
-	//EmuMath::Gradient<float> gradient_colours_;
-	//gradient_colours_.AddClampedColourAnchor(0.0f, EmuMath::Colours::Blue());
-	//gradient_colours_.AddClampedColourAnchor(0.35f, EmuMath::Colours::Blue());
-	//gradient_colours_.AddClampedColourAnchor(0.45f, EmuMath::Colours::White());
-	//gradient_colours_.AddClampedColourAnchor(0.5f, EmuMath::Colours::Black());
-	//gradient_colours_.AddClampedColourAnchor(0.65f, EmuMath::Colours::Yellow());
-	//gradient_colours_.AddClampedColourAnchor(0.85f, EmuMath::Colours::Green());
-	//gradient_colours_.AddClampedColourAnchor(1.0f, EmuMath::Colours::Red());
-	//
-	//EmuMath::Gradient<std::uint8_t> gradient_grayscale_;
-	//gradient_colours_.AddClampedColourAnchor(0.0f, EmuMath::Colours::Black<std::uint8_t>());
-	//gradient_colours_.AddClampedColourAnchor(1.0f, EmuMath::Colours::White<std::uint8_t>());
-	//
-	//auto& noise_gradient_ = gradient_colours_;
-	//
-	//WriteNoiseTableToPPM(noise_, noise_gradient_, "test_noise_scalar");
-	//WriteNoiseTableToPPM(fast_noise_, noise_gradient_, "test_noise_simd");
+
+
+
+
+	constexpr auto fast8x8_in_a = EmuMath::Matrix<8, 7, float, tests_column_major>
+	(
+		1, 2, 3, 4, 5, 6, 7, 8,
+		9, 10, 11, 12, 13, 14, 15, 16,
+		17, 18, 19, 20, 21, 22, 23, 24,
+		25, 26, 27, 28, 29, 30, 31, 32,
+		33, 34, 35, 36, 37, 38, 39, 40,
+		41, 42, 43, 44, 45, 46, 47, 48,
+		49, 50, 51, 52, 53, 54, 55, 56
+	);
+	constexpr auto fast8x8_in_b = fast8x8_in_a.Transpose();
+	
+	//auto fast8x8_a = EmuMath::FastMatrix<8, 7, float, tests_column_major>
+	//(
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<0, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<0, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<1, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<1, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<2, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<2, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<3, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<3, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<4, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<4, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<5, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<5, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<6, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<6, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<7, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<7, 4>())
+	//);
+	//auto fast8x8_b = EmuMath::FastMatrix<7, 8, float, tests_column_major>
+	//(
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<0, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<0, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<1, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<1, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<2, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<2, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<3, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<3, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<4, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<4, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<5, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<5, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<6, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<6, 4>())
+	//);
+	//auto fast8x8_a = EmuMath::Helpers::fast_matrix_load<EmuMath::FastMatrix<8, 7, float, tests_column_major>>(fast8x8_in_a);
+	//auto fast8x8_b = EmuMath::Helpers::fast_matrix_load<EmuMath::FastMatrix<7, 8, float, tests_column_major>>(fast8x8_in_b);
+	auto fast8x8_a = EmuMath::FastMatrix<8, 7, float, tests_column_major>(fast8x8_in_a);
+	auto fast8x8_b = EmuMath::FastMatrix<7, 8, float, tests_column_major>(fast8x8_in_b);
+
+	std::cout << fast8x8_a << "\nMUL\n" << fast8x8_b << "\n=\n" << (fast8x8_a * fast8x8_b) << "\n\n";
+	std::cout << "Scalar result:\n" << (fast8x8_in_a * fast8x8_in_b) << "\n\n";
+	std::cout << "REVERSED: " << fast8x8_a << "\nMUL\n" << fast8x8_b << "\n=\n" << (fast8x8_b * fast8x8_a) << "\n\n";
+	std::cout << "REVERSED: " << "Scalar result:\n" << (fast8x8_in_b * fast8x8_in_a) << "\n\n";
+
+
+
+
+
+
+
+
+
+
+
+
+	constexpr auto fast4x4_in_a = EmuMath::Matrix<4, 4, float, tests_column_major>
+	(
+		1, 2, 3, 4,
+		9, 10, 11, 12,
+		17, 18, 19, 20,
+		25, 26, 27, 28
+	);
+	constexpr auto fast4x4_in_b = fast4x4_in_a.Transpose();
+
+	//auto fast4x4_a = EmuMath::FastMatrix<4, 4, float, tests_column_major>
+	//(
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_a.data<0, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_a.data<1, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_a.data<2, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_a.data<3, 0>())
+	//);
+	//auto fast4x4_b = EmuMath::FastMatrix<4, 4, float, tests_column_major>
+	//(
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_b.data<0, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_b.data<1, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_b.data<2, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_b.data<3, 0>())
+	//);
+	auto fast4x4_a = EmuMath::FastMatrix<4, 4, float, tests_column_major>(fast4x4_in_a);
+	auto fast4x4_b = EmuMath::FastMatrix<4, 4, float, tests_column_major>(fast4x4_in_b);
+	std::cout << fast4x4_a << "\nMUL\n" << fast4x4_b << "\n=\n" << fast4x4_a.Multiply(fast4x4_b) << "\n\n";
+	std::cout << "Scalar result:\n" << (fast4x4_in_a * fast4x4_in_b) << "\n\n";
+	std::cout << "REVERSED: " << fast4x4_a << "\nMUL\n" << fast4x4_b << "\n=\n" << fast4x4_b.Multiply(fast4x4_a) << "\n\n";
+	std::cout << "REVERSED: " << "Scalar result:\n" << (fast4x4_in_b * fast4x4_in_a) << "\n\n";
+
+	std::cout << EmuMath::FastMatrix<4, 4, float, true>(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 101, 120, 130, 140, 150, 160) << "\n\n";
+	std::cout << EmuMath::FastMatrix<4, 4, float, false>(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 101, 120, 130, 140, 150, 160) << "\n\n";
+
+	EmuMath::Matrix<5, 5, float, false> basic_store_test(1337);
+	EmuMath::Helpers::fast_matrix_store(fast4x4_a, basic_store_test);
+	std::cout << "STORED SCALAR:\n" << basic_store_test << "\n\nFAST VER:\n" << fast4x4_a << "\n\n";
+	float test_out_floats[16] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+	std::cout << "Basic float array: ";
+	PrintIndexable<16>(test_out_floats);
+	std::cout << "\nAfter store: ";
+	EmuMath::FastMatrix<3, 3, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9).Store<true>(test_out_floats);
+	PrintIndexable<16>(test_out_floats);
+	std::cout << "\n\n";
+
+	std::cout << EmuMath::Helpers::fast_matrix_store
+	(
+		EmuMath::FastMatrix<4, 4, float, false>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+	) << "\n\n";
+
+	auto to_add_fast_a = EmuMath::FastMatrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	auto to_add_fast_b = EmuMath::FastMatrix<2, 4, float, true>(10, 20, 30, 40, 50, 60, 70, 80);
+	std::cout << to_add_fast_a << "\nPLUS\n" << to_add_fast_b << "\n=\n" << to_add_fast_a.Add(to_add_fast_b) << "\n\n";
+	std::cout << to_add_fast_a << "\nSUB\n" << to_add_fast_b << "\n=\n" << to_add_fast_a.Subtract(to_add_fast_b) << "\n\n";
+	std::cout << to_add_fast_a << "\nBASIC MUL\n" << to_add_fast_b << "\n=\n" << to_add_fast_a.BasicMultiply(to_add_fast_b) << "\n\n";
+	std::cout << to_add_fast_a << "\nBASIC DIV\n" << to_add_fast_b << "\n=\n" << to_add_fast_a.BasicDivide(to_add_fast_b) << "\n\n";
+	std::cout << to_add_fast_a << "\nBASIC MOD\n" << to_add_fast_b << "\n=\n" << to_add_fast_a.BasicMod(to_add_fast_b) << "\n\n";
+	std::cout << "BASIC FMADD(\n" << to_add_fast_a << ",\n\n" << to_add_fast_b << ",\n\n" << 10 << "\n)=\n" << to_add_fast_a.BasicFmadd(to_add_fast_b, 10) << "\n\n";
+	std::cout << "BASIC FMSUB(\n" << to_add_fast_a << ",\n\n" << to_add_fast_b << ",\n\n" << 10 << "\n)=\n" << to_add_fast_a.BasicFmsub(to_add_fast_b, 10) << "\n\n";
+
+	std::cout << "\n\n---\n\n";
+	float test_in_floats[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
+	std::cout << (to_add_fast_a *= EmuSIMD::setr<__m128>(10, 20, 30, 40)) << "\n\n";
+	std::cout << (to_add_fast_a *= EmuMath::FastVector<4, float>(test_in_floats)) << "\n\n";
+	std::cout << (to_add_fast_a *= EmuMath::FastVector<3, float>(test_in_floats)) << "\n\n";
+	std::cout << (to_add_fast_a *= 5) << "\n\n";
+
+	auto some_8x8_fast_mat = EmuMath::FastMatrix<8, 8, float, true, 256>
+	(
+		1, 2, 3, 4, 5, 6, 7, 8,
+		9, 10, 11, 12, 13, 14, 15, 16,
+		17, 18, 19, 20, 21, 22, 23, 24,
+		25, 26, 27, 28, 29, 30, 31, 32,
+		33, 34, 35, 36, 37, 38, 39, 40,
+		41, 42, 43, 44, 45, 46, 47, 48,
+		49, 50, 51, 52, 53, 54, 55, 56,
+		57, 58, 59, 60, 61, 62, 63, 64
+	);
+
+	std::cout << "\n---\n";
+	auto fast_mat_4x4_to_trans = EmuMath::FastMatrix<4, 4, float, true, 128>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << fast_mat_4x4_to_trans << "\n\nTRANS:\n" << fast_mat_4x4_to_trans.Transpose() << "\n\n";
+
+	EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, EmuSIMD::alternating_sign_mask<__m128, 32, false>()) << "\n";
+	EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, EmuSIMD::alternating_sign_mask<__m128, 32, true>()) << "\n";
+	EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, EmuSIMD::alternating_sign_mask_reverse<__m128, 32, false>()) << "\n";
+	EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, EmuSIMD::alternating_sign_mask_reverse<__m128, 32, true>()) << "\n";
+	EmuSIMD::append_simd_vector_to_stream<32, true>(std::cout, EmuSIMD::sign_mask<32, __m128, 0, 1, 1, 0>()) << "\n\n";
+
+	float test_out_det = 0.0f;
+	constexpr auto some_translation = (
+		EmuMath::Helpers::matrix_make_rotation_3d<float, true>(EmuMath::Quaternion<float>::from_euler_constexpr(-30, 45, 90)) *
+		EmuMath::Helpers::matrix_make_scale<4, 4, float, true>(25, 13, 9) *
+		EmuMath::Helpers::matrix_make_translation<4, 4, float, true>(-17, 6, 28)
+	);
+	//auto some_fast_translation = EmuMath::FastMatrix<4, 4, float, true>(some_translation);
+	auto some_fast_translation = EmuMath::FastMatrix<4, 4, float, true>
+	(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		1, 2, 3, 1
+	);
+	std::cout << some_fast_translation << "\n\n"
+		<< EmuMath::Helpers::fast_matrix_inverse(some_fast_translation, test_out_det) << "\n";
+	std::cout << "Det: " << test_out_det << "\n\n";
+
+	std::cout << EmuMath::Helpers::fast_matrix_identity<4, 4, float, true>() << "\n\n";
+	std::cout << EmuMath::Helpers::fast_matrix_identity<3, 4, float, true>() << "\n\n";
+	std::cout << EmuMath::Helpers::fast_matrix_identity<4, 3, float, true>() << "\n\n";
+	
+	std::cout << some_8x8_fast_mat << "\n\n";
+	EmuMath::Helpers::fast_matrix_assign_identity(some_8x8_fast_mat);
+	std::cout << some_8x8_fast_mat << "\n\n";
+	std::cout << EmuMath::Helpers::fast_matrix_identity<20, 20, std::int16_t, false, 256>() << "\n\n";
+
+	std::cout << EmuMath::Helpers::fast_matrix_make_translation<float, true>(1, 2, 3) << "\n\n";
+	std::cout << EmuMath::Helpers::fast_matrix_make_scale<float, true>(1, 2, 3, 4, 5, 6) << "\n\n";
+
+	auto quat_for_fast_test = EmuMath::Quaternion<float>::from_euler(25, -60, 90);
+	std::cout << EmuMath::Helpers::fast_matrix_make_rotation_3d<float>(quat_for_fast_test) << "\n\n";
+	std::cout << EmuMath::Helpers::matrix_make_rotation_3d<float>(quat_for_fast_test) << "\n\n";
+
+
+
+	std::cout << "\n\n---Fast Quaternion Tests---\n";
+	std::cout << EmuMath::FastQuaternion<float>() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>(1, 2, 3, 4) << "\n";
+	std::cout << EmuMath::FastQuaternion<float>(4, 3, 2, 1) << "\n";
+	std::cout << EmuMath::FastQuaternion<float>(EmuMath::FastQuaternion<float>(4, 3, 2, 1)) << "\n";
+	std::cout << EmuMath::FastQuaternion<float>(EmuMath::FastQuaternion<float>(4, 3, 2, 1).data) << "\n";
+	//std::cout << EmuMath::FastQuaternion<double>(EmuSIMD::set1<__m128d, 64>(1337), EmuSIMD::set1<__m128d, 64>(-1337)) << "\n";
+	std::cout << EmuMath::FastQuaternion<float>(EmuSIMD::set1<__m128, 64>(1337)) << "\n";
+
+	EmuMath::Quaternion<float> just_a_test_quaternion_to_store_to(-1, -1, -1, -1);
+	std::cout << just_a_test_quaternion_to_store_to << "\n";
+	EmuMath::FastQuaternion<float, 256>(1, 2, 3, 4).Store(just_a_test_quaternion_to_store_to);
+	std::cout << just_a_test_quaternion_to_store_to << "\n";
+
+	constexpr bool r = false;
+	constexpr bool n = false;
+	constexpr float eulx = -45.0f;
+	constexpr float euly = 93.0f;
+	constexpr float eulz = 0;
+	std::cout << EmuMath::FastQuaternion<float, 256>(EmuMath::Quaternion<float>::from_euler<r, n>(eulx, euly, eulz)) << " (Scalar f32)\n";
+	std::cout << EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<float>, r, n>(eulx, euly, eulz) << "(SIMD f32)\n";
+	std::cout << EmuMath::FastQuaternion<double, 256>(EmuMath::Quaternion<double>::from_euler<r, n>(eulx, euly, eulz)) << " (Scalar f64)\n";
+	std::cout << EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<double, 256>, r, n>(eulx, euly, eulz) << "(SIMD f64)\n";
+	std::cout << EmuMath::FastQuaternion<double, 128>(EmuMath::Quaternion<double>::from_euler<r, n>(eulx, euly, eulz)) << " (Scalar f64, 128)\n";
+	std::cout << EmuMath::Helpers::fast_quaternion_from_euler<EmuMath::FastQuaternion<double, 128>, r, n>(eulx, euly, eulz) << "(SIMD f64, 128)\n";
+
+	std::cout << "\n\n";
+	auto some_m256d = EmuSIMD::setr<__m256d>(10, 20, 30, 40);
+	auto some_other_m256d = EmuSIMD::setr<__m256d>(50, 60, 70, 80);
+	EmuSIMD::append_simd_vector_to_stream(std::cout, some_m256d) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::shuffle_full_width<0, 1, 2, 3>(some_m256d)) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::shuffle_full_width<3, 2, 1, 0>(some_m256d)) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::shuffle_full_width<2, 3, 1, 3>(some_m256d)) << "\n";
+
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::shuffle_full_width<0, 1, 2, 3>(some_m256d, some_other_m256d)) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::shuffle_full_width<3, 2, 1, 0>(some_m256d, some_other_m256d)) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::shuffle_full_width<2, 3, 1, 3>(some_m256d, some_other_m256d)) << "\n";
+
+	std::cout << "\nScalar result: " << EmuMath::Quaternion<float>::from_euler<false>(eulx, euly, eulz);
+	std::cout << "\n\nSame conversion w/different args tests @FastQuaternion, f32\n";
+	std::cout << "Scalars: " << EmuMath::FastQuaternion<float, 128>::from_euler<false>(eulx, euly, eulz) << "\n";
+	std::cout << "Scalar Vector: " << EmuMath::FastQuaternion<float, 128>::from_euler<false>(EmuMath::Vector<3, float>(eulx, euly, eulz)) << "\n";
+	std::cout << "Fast Vector: " << EmuMath::FastQuaternion<float, 128>::from_euler<false>(EmuMath::FastVector<3, float>(eulx, euly, eulz)) << "\n";
+	std::cout << "SIMD: " << EmuMath::FastQuaternion<float, 128>::from_euler<false>(EmuSIMD::setr<__m128>(eulx, euly, eulz, 0)) << "\n";
+	std::cout << "SIMD Arr: " 
+		<< EmuMath::FastQuaternion<float, 128>::from_euler<false>(std::array<__m128, 2>({ EmuSIMD::setr<__m128>(eulx, euly, eulz, 0), __m128() }))
+		<< "\n";
+
+	std::cout << "\n\nSame conversion w/different args tests @FastQuaternion, f64\n";
+	std::cout << "Scalars: " << EmuMath::FastQuaternion<double, 128>::from_euler<false>(eulx, euly, eulz) << "\n";
+	std::cout << "Scalar Vector: " << EmuMath::FastQuaternion<double, 128>::from_euler<false>(EmuMath::Vector<3, double>(eulx, euly, eulz)) << "\n";
+	std::cout << "Fast Vector: " << EmuMath::FastQuaternion<double, 128>::from_euler<false>(EmuMath::FastVector<3, double>(eulx, euly, eulz)) << "\n";
+	std::cout << "SIMD: Not allowed with 128-bit f64\n";
+	std::cout << "SIMD Arr: " 
+		<< EmuMath::FastQuaternion<double, 128>::from_euler<false>(std::array<__m128d, 2>({ EmuSIMD::setr<__m128d>(eulx, euly), EmuSIMD::setr<__m128d>(eulz, 0) }))
+		<< "\n";
+
+
+	std::cout << "\n\nFastQuat -> Euler (Scalar)\n";
+	std::cout << "Basic scalar (rads): " << EmuMath::Quaternion<float>::from_euler<false>(eulx, euly, eulz).ToEuler<true>() << "\n";
+	std::cout << "Basic scalar (degs): " << EmuMath::Quaternion<float>::from_euler<false>(eulx, euly, eulz).ToEuler<false>() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEulerScalar() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEulerScalar<false>() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEulerScalar<true, void, 20>() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEulerScalar<true, float, 20>() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEulerScalar<true, int>() << "\n";
+
+	std::cout << "\n\nFastQuat -> Euler (Fast)\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEuler() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEuler<false>() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEuler<true, 20>() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEuler<true, 20>() << "\n";
+	std::cout << EmuMath::FastQuaternion<float>::from_euler<false>(eulx, euly, eulz).ToEuler<true>() << "\n";
+
+	std::cout << "\n\nFastQuat * FastQuat\n";
+	constexpr auto zero_rot_quat_from_euler = EmuMath::Quaternion<float>::from_euler_constexpr<false>(0, 0, 0);
+	constexpr auto lhs_quat_test = EmuMath::Quaternion<float>::from_euler_constexpr<false>(eulx, euly, eulz);
+	constexpr auto rhs_quat_test = EmuMath::Quaternion<float>::from_euler_constexpr<false>(eulz, euly, eulx);
+	constexpr auto lhs_mul_rhs_quat_test = lhs_quat_test * rhs_quat_test;
+	auto lhs_quat_runtime = lhs_quat_test;
+	auto lhs_quat_fast_runtime_a = EmuMath::FastQuaternion<float>(lhs_quat_test);
+	auto lhs_quat_fast_runtime_b = EmuMath::FastQuaternion<double, 128>(lhs_quat_test);
+	auto lhs_quat_fast_runtime_c = EmuMath::FastQuaternion<double, 256>(lhs_quat_test);
+	std::cout << "Expected: " << lhs_mul_rhs_quat_test << "\n";
+	std::cout << "Fast Res: " << (EmuMath::FastQuaternion<float>(lhs_quat_test) * EmuMath::FastQuaternion<float>(rhs_quat_test)) << "\n";
+	std::cout << "Fast Res: " << (EmuMath::FastQuaternion<double, 256>(lhs_quat_test) * EmuMath::FastQuaternion<double, 256>(rhs_quat_test)) << "\n";
+	std::cout << "Fast Res: " << (EmuMath::FastQuaternion<double, 128>(lhs_quat_test) * EmuMath::FastQuaternion<double, 128>(rhs_quat_test)) << "\n";
+	std::cout << "---\nExpected: " << (lhs_quat_test * 10.5f) << "\n";
+	std::cout << "Fast Res: " << (EmuMath::FastQuaternion<float>(lhs_quat_test) * 10.5f) << "\n";
+	std::cout << "Fast Res: " << (EmuMath::FastQuaternion<double, 256>(lhs_quat_test) * 10.5f) << "\n";
+	std::cout << "Fast Res: " << (EmuMath::FastQuaternion<double, 128>(lhs_quat_test) * 10.5f) << "\n";
+	std::cout << "---\nExpected: " << (lhs_quat_test / 10.5f) << "\n";
+	std::cout << "Fast Res: " << (EmuMath::FastQuaternion<float>(lhs_quat_test) / 10.5f) << "\n";
+	std::cout << "Fast Res: " << (EmuMath::FastQuaternion<double, 256>(lhs_quat_test) / 10.5f) << "\n";
+	std::cout << "Fast Res: " << (EmuMath::FastQuaternion<double, 128>(lhs_quat_test) / 10.5f) << "\n";
+	std::cout << "---\nExpected: " << (lhs_quat_test + rhs_quat_test) << "\n";
+	std::cout << "Fast Res: " << (EmuMath::FastQuaternion<float>(lhs_quat_test) + EmuMath::FastQuaternion<float>(rhs_quat_test)) << "\n";
+	std::cout << "Fast Res: " << (EmuMath::FastQuaternion<double, 256>(lhs_quat_test) + EmuMath::FastQuaternion<double, 256>(rhs_quat_test)) << "\n";
+	std::cout << "Fast Res: " << (EmuMath::FastQuaternion<double, 128>(lhs_quat_test) + EmuMath::FastQuaternion<double, 128>(rhs_quat_test)) << "\n";
+	std::cout << "---\nExpected: " << (lhs_quat_test - rhs_quat_test) << "\n";
+	std::cout << "Fast Res: " << (EmuMath::FastQuaternion<float>(lhs_quat_test) - EmuMath::FastQuaternion<float>(rhs_quat_test)) << "\n";
+	std::cout << "Fast Res: " << (EmuMath::FastQuaternion<double, 256>(lhs_quat_test) - EmuMath::FastQuaternion<double, 256>(rhs_quat_test)) << "\n";
+	std::cout << "Fast Res: " << (EmuMath::FastQuaternion<double, 128>(lhs_quat_test) - EmuMath::FastQuaternion<double, 128>(rhs_quat_test)) << "\n";
+	std::cout << "---\nExpected: [\n\t" << (lhs_quat_runtime *= rhs_quat_test) << "\n";
+	std::cout << "\t" << (lhs_quat_runtime *= 10.5f) << "\n";
+	std::cout << "\t" << (lhs_quat_runtime /= 5.0f) << "\n";
+	std::cout << "\t" << (lhs_quat_runtime += lhs_quat_test) << "\n";
+	std::cout << "\t" << (lhs_quat_runtime -= rhs_quat_test) << "\n]\n";
+	std::cout << "---\nFast Res: [\n\t" << (lhs_quat_fast_runtime_a *= decltype(lhs_quat_fast_runtime_a)(rhs_quat_test)) << "\n";
+	std::cout << "\t" << (lhs_quat_fast_runtime_a *= 10.5f) << "\n";
+	std::cout << "\t" << (lhs_quat_fast_runtime_a /= 5.0f) << "\n";
+	std::cout << "\t" << (lhs_quat_fast_runtime_a += decltype(lhs_quat_fast_runtime_a)(lhs_quat_test)) << "\n";
+	std::cout << "\t" << (lhs_quat_fast_runtime_a -= decltype(lhs_quat_fast_runtime_a)(rhs_quat_test)) << "\n]\n";
+	std::cout << "---\nFast Res: [\n\t" << (lhs_quat_fast_runtime_b *= decltype(lhs_quat_fast_runtime_b)(rhs_quat_test)) << "\n";
+	std::cout << "\t" << (lhs_quat_fast_runtime_b *= 10.5f) << "\n";
+	std::cout << "\t" << (lhs_quat_fast_runtime_b /= 5.0f) << "\n";
+	std::cout << "\t" << (lhs_quat_fast_runtime_b += decltype(lhs_quat_fast_runtime_b)(lhs_quat_test)) << "\n";
+	std::cout << "\t" << (lhs_quat_fast_runtime_b -= decltype(lhs_quat_fast_runtime_b)(rhs_quat_test)) << "\n]\n";
+	std::cout << "---\nFast Res: [\n\t" << (lhs_quat_fast_runtime_c *= decltype(lhs_quat_fast_runtime_c)(rhs_quat_test)) << "\n";
+	std::cout << "\t" << (lhs_quat_fast_runtime_c *= 10.5f) << "\n";
+	std::cout << "\t" << (lhs_quat_fast_runtime_c /= 5.0f) << "\n";
+	std::cout << "\t" << (lhs_quat_fast_runtime_c += decltype(lhs_quat_fast_runtime_c)(lhs_quat_test)) << "\n";
+	std::cout << "\t" << (lhs_quat_fast_runtime_c -= decltype(lhs_quat_fast_runtime_c)(rhs_quat_test)) << "\n]\n";
+
+	std::cout << "\n\n\n---CMP TESTS---\n";
+	std::cout << (EmuMath::FastQuaternion<float>(1, 2, 3, 4) == EmuMath::FastQuaternion<float>(1, 2, 3, 4)) << "\n";
+	std::cout << (EmuMath::FastQuaternion<float>(1, 2, 3, 4) != EmuMath::FastQuaternion<float>(1, 2, 3, 4)) << "\n";
+	std::cout << EmuMath::FastQuaternion<float>(1, 2, 3, 4).CmpNear(EmuMath::FastQuaternion<float>(1, 2, 3, 4)) << "\n";
+	std::cout << (EmuMath::FastQuaternion<double>(1, 2, 3, 4) == EmuMath::FastQuaternion<double>(1, 2, 3, 4)) << "\n";
+	std::cout << (EmuMath::FastQuaternion<double>(1, 2, 3, 4) != EmuMath::FastQuaternion<double>(1, 2, 3, 4)) << "\n";
+	std::cout << EmuMath::FastQuaternion<double>(1, 2, 3, 4).CmpNear(EmuMath::FastQuaternion<double>(1, 2, 3, 4)) << "\n";
+	auto cmptesta = EmuMath::FastQuaternion<float, 256>(EmuSIMD::setr<__m256>(1, 2, 3, 4, 5, 6, 7, 8));
+	auto cmptestb = EmuMath::FastQuaternion<float, 256>(EmuSIMD::setr<__m256>(1, 2, 3, 4, 9, 10, 11, 12));
+	std::cout << (cmptesta == cmptestb) << "\n";
+	std::cout << (cmptesta != cmptestb) << "\n";
+	std::cout << cmptesta.CmpNear(cmptestb) << "\n";
+	std::cout << "---\n";
+	std::cout << (EmuMath::FastQuaternion<float>(1, 2, 3, 4) == EmuMath::FastQuaternion<float>(1, 2, 3, 217)) << "\n";
+	std::cout << (EmuMath::FastQuaternion<float>(1, 2, 3, 4) != EmuMath::FastQuaternion<float>(1, 2, 3, 217)) << "\n";
+	std::cout << EmuMath::FastQuaternion<float>(1, 2, 3, 4).CmpNear(EmuMath::FastQuaternion<float>(1, 2, 3, 217)) << "\n";
+	std::cout << (EmuMath::FastQuaternion<double>(1, 2, 3, 4) == EmuMath::FastQuaternion<double>(1, 2, 3, 217)) << "\n";
+	std::cout << (EmuMath::FastQuaternion<double>(1, 2, 3, 4) != EmuMath::FastQuaternion<double>(1, 2, 3, 217)) << "\n";
+	std::cout << EmuMath::FastQuaternion<double>(1, 2, 3, 4).CmpNear(EmuMath::FastQuaternion<double>(1, 2, 3, 217)) << "\n";
+	auto cmptestc = EmuMath::FastQuaternion<float, 256>(EmuSIMD::setr<__m256>(1, 2, 3, 4, 5, 6, 7, 8));
+	auto cmptestd = EmuMath::FastQuaternion<float, 256>(EmuSIMD::setr<__m256>(1, 2, 3, 217, 9, 10, 11, 12));
+	std::cout << (cmptestc == cmptestd) << "\n";
+	std::cout << (cmptestc != cmptestd) << "\n";
+	std::cout << cmptestc.CmpNear(cmptestd) << "\n";
+
+	//*
+	{
+		const std::size_t speed_test_count = basic_arg_parser.TryToInt<std::size_t>('c', 0);
+		if (speed_test_count > 0)
+		{
+			// ##### SCALAR vs SIMD NOISE #####
+			constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN; 
+			constexpr std::size_t test_noise_dimensions = 3;
+			constexpr auto z_depth = 1;
+			constexpr auto sample_count_16x16 = EmuMath::make_vector<std::size_t>(16, 16, z_depth);        // Tiny
+			constexpr auto sample_count_16x16x16 = EmuMath::make_vector<std::size_t>(16, 16, 16);          // Less-Tiny
+			constexpr auto sample_count_16x16x128 = EmuMath::make_vector<std::size_t>(16, 16, 128);        // Even-Less-Tiny
+			constexpr auto sample_count_1080p = EmuMath::make_vector<std::size_t>(1920, 1080, z_depth);	   // Small (file size)
+			constexpr auto sample_count_4k = EmuMath::make_vector<std::size_t>(3840, 2160, z_depth);	   // Average
+			constexpr auto sample_count_8k = EmuMath::make_vector<std::size_t>(7680, 4320, z_depth);	   // Large
+			constexpr auto sample_count_16k = EmuMath::make_vector<std::size_t>(15360, 8640, z_depth);	   // Quite hefty
+			constexpr auto sample_count_32k = EmuMath::make_vector<std::size_t>(30720, 17280, z_depth);    // Extremely large, be wary
+			
+			auto custom_sample_count = EmuMath::make_vector<std::size_t>
+			(
+				basic_arg_parser.ToInt<std::size_t>('x'),
+				basic_arg_parser.ToInt<std::size_t>('y'),
+				basic_arg_parser.ToInt<std::size_t>('z')
+			);
+			auto sample_count = custom_sample_count;
+			auto scaled_step = EmuMath::Vector<test_noise_dimensions, float>(1.0f) / sample_count;
+			constexpr auto custom_step = EmuMath::Vector<test_noise_dimensions, float>(1.0f / 1024.0f);
+			constexpr float used_freq = 3.0f;
+			constexpr bool use_fractal = true;
+			using scalar_test_noise_processor = EmuMath::Functors::noise_sample_processor_perlin_normalise<test_noise_dimensions>;
+			using fast_test_noise_processor = EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<test_noise_dimensions>;
+			
+			constexpr std::size_t num_iterations = 1;
+			std::vector<EmuMath::NoiseTable<test_noise_dimensions, float>> noise_;
+			std::vector<EmuMath::FastNoiseTable<test_noise_dimensions, 0>> fast_noise_128;
+			std::vector<EmuMath::FastNoiseTable<test_noise_dimensions, 0>> fast_noise_256;
+			noise_.resize(num_iterations, decltype(noise_)::value_type());
+			fast_noise_128.resize(num_iterations, decltype(fast_noise_128)::value_type());
+			fast_noise_256.resize(num_iterations, decltype(fast_noise_256)::value_type());
+			
+			constexpr std::size_t noise_num_perms = 4096;
+			constexpr EmuMath::Info::NoisePermutationShuffleMode noise_perm_shuffle_mode = EmuMath::Info::NoisePermutationShuffleMode::SEED_32;
+			constexpr bool noise_perm_bool_input = true;
+			constexpr EmuMath::Info::NoisePermutationInfo::seed_32_type noise_perm_seed_32 = 1337;
+			constexpr EmuMath::Info::NoisePermutationInfo::seed_64_type noise_perm_seed_64 = 1337;
+			
+			std::cout << "Noise Size: " << sample_count << '\n';
+			std::cout << "Iterations to perform: " << speed_test_count << '\n';
+			universal_pause("Press enter to start noise speed tests...");
+			timer_.Restart();
+			for(std::size_t test_iteration = 0; test_iteration < speed_test_count; ++test_iteration)
+			{
+				for (std::size_t i = 0; i < num_iterations; ++i)
+				{
+					noise_[i].GenerateNoise<test_noise_type_flag, scalar_test_noise_processor>
+					(
+						decltype(noise_)::value_type::MakeOptions
+						(
+							sample_count,
+							EmuMath::Vector<test_noise_dimensions, float>(0.0f),
+							custom_step,
+							used_freq,
+							true,
+							use_fractal,
+							EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
+							EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+						)
+					);
+				}
+				timer_.Pause();
+				std::cout << "FINISHED SCALAR NOISE IN: " << timer_.GetMilli() << "ms\n";
+	
+	
+				timer_.Restart();
+				for (std::size_t i = 0; i < num_iterations; ++i)
+				{
+					fast_noise_128[i].GenerateNoise<EmuSIMD::f32x4, test_noise_type_flag, fast_test_noise_processor>
+					(
+						decltype(fast_noise_128)::value_type::make_options
+						(
+							sample_count,
+							EmuMath::Vector<test_noise_dimensions, float>(0.0f),
+							custom_step,
+							used_freq,
+							true,
+							use_fractal,
+							EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
+							EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+						)
+					);
+				}
+				timer_.Pause();
+				std::cout << "FINISHED FAST NOISE (128) IN: " << timer_.GetMilli() << "ms\n";
+
+				timer_.Restart();
+				for (std::size_t i = 0; i < num_iterations; ++i)
+				{
+					fast_noise_256[i].GenerateNoise<EmuSIMD::f32x8, test_noise_type_flag, fast_test_noise_processor>
+					(
+						decltype(fast_noise_256)::value_type::make_options
+						(
+							sample_count,
+							EmuMath::Vector<test_noise_dimensions, float>(0.0f),
+							custom_step,
+							used_freq,
+							true,
+							use_fractal,
+							EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
+							EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+						)
+					);
+				}
+				timer_.Pause();
+				std::cout << "FINISHED FAST NOISE (256) IN: " << timer_.GetMilli() << "ms\n";
+			}
+	
+			EmuMath::Gradient<float> gradient_colours_;
+			gradient_colours_.AddClampedColourAnchor(0.0f, EmuMath::Colours::Blue());
+			gradient_colours_.AddClampedColourAnchor(0.35f, EmuMath::Colours::Blue());
+			gradient_colours_.AddClampedColourAnchor(0.45f, EmuMath::Colours::White());
+			gradient_colours_.AddClampedColourAnchor(0.5f, EmuMath::Colours::Black());
+			gradient_colours_.AddClampedColourAnchor(0.65f, EmuMath::Colours::Yellow());
+			gradient_colours_.AddClampedColourAnchor(0.85f, EmuMath::Colours::Green());
+			gradient_colours_.AddClampedColourAnchor(1.0f, EmuMath::Colours::Red());
+	
+			EmuMath::Gradient<std::uint8_t> gradient_grayscale_;
+			gradient_colours_.AddClampedColourAnchor(0.0f, EmuMath::Colours::Black<std::uint8_t>());
+			gradient_colours_.AddClampedColourAnchor(1.0f, EmuMath::Colours::White<std::uint8_t>());
+	
+			auto& noise_gradient_ = gradient_colours_;
+	
+			WriteNoiseTableToPPM(noise_, noise_gradient_, "test_noise_scalar");
+			WriteNoiseTableToPPM(fast_noise_128, noise_gradient_, "test_noise_simd_128");
+			WriteNoiseTableToPPM(fast_noise_256, noise_gradient_, "test_noise_simd_256");
+		}
+	}
 #pragma endregion
 	//*/
 
@@ -796,8 +1673,11 @@ int main()
 	// */
 
 #pragma region TEST_HARNESS_EXECUTION
-	system("pause");
-	EmuCore::TestingHelpers::PerformTests();
+	if (basic_arg_parser.TryToBool("do-test-harness"))
+	{
+		universal_pause();
+		EmuCore::TestingHelpers::PerformTests();
+	}
 #pragma endregion
 	//std::cout << result.Add(rand()) << " :)";
 	return 0;
