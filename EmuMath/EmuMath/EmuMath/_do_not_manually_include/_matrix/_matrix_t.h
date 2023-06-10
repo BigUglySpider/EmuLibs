@@ -775,7 +775,8 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		/// </para>
 		/// <para>
 		///		All listed outcomes are not used if a non-variadic constructor would make use of that argument, 
-		///		and are additionally subject to compatibility with this Matrix type's contained data. </para>
+		///		and are additionally subject to compatibility with this Matrix type's contained data.
+		/// </para>
 		/// <para> Where multiple potential outcomes are possible, the earliest listed will be prioritised. </para>
 		/// </summary>
 		/// <param name="args_">: Arguments for variadic construction, meeting at least 1 of the above constraints.</param>
@@ -2200,7 +2201,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
 		/// </para>
 		/// <para>
-		///		This is a basic, non-standard Matrix division. As a standard division is mathemtically undefined, there is no alternative. 
+		///		This is a basic, non-standard Matrix division. As a standard division is mathematically undefined, there is no alternative. 
 		///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying this Matrix by the inverse of rhs_.
 		/// </para>
 		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be divided. </para>
@@ -2238,7 +2239,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
 		/// </para>
 		/// <para>
-		///		This is a basic, non-standard Matrix division. As a standard division is mathemtically undefined, there is no alternative. 
+		///		This is a basic, non-standard Matrix division. As a standard division is mathematically undefined, there is no alternative. 
 		///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying lhs_matrix_ by the inverse of rhs_.
 		/// </para>
 		/// <para> Indices within the provided range will contain results of respective division operations. </para>
@@ -2298,7 +2299,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
 		/// </para>
 		/// <para>
-		///		This is a basic, non-standard Matrix division. As a standard division is mathemtically undefined, there is no alternative. 
+		///		This is a basic, non-standard Matrix division. As a standard division is mathematically undefined, there is no alternative. 
 		///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying this Matrix by the inverse of rhs_.
 		/// </para>
 		/// <para> Indices within the provided range will contain results of respective division operations. </para>
@@ -2345,7 +2346,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		/// <summary>
 		/// <para> Outputs the result of dividing this Matrix by the provided rhs_ argument via the provided out_matrix_. </para>
 		/// <para>
-		///		This is a basic, non-standard Matrix division. As a standard division is mathemtically undefined, there is no alternative. 
+		///		This is a basic, non-standard Matrix division. As a standard division is mathematically undefined, there is no alternative. 
 		///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying lhs_matrix_ by the inverse of rhs_.
 		/// </para>
 		/// <para> Indices within the provided range will contain results of respective division operations. </para>
@@ -5332,6 +5333,17 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		{
 			return EmuMath::Helpers::matrix_transpose<num_rows, num_columns, value_type_uq, OutColumnMajor_>(std::move(*this));
 		}
+#pragma endregion
+
+#pragma region INVERSE_FUNCS
+		/* TODO (All are square-matrix ONLY, although sub-funcs for Inverse (Laplace) can be implemented as shape-agnostic):
+		*	- Determinant
+		*   - Inverse (Laplace)
+		*      - Minors
+		*      - Cofactors
+		*      - Adjugate
+		*   - Inverse (Gauss-jordan)
+		*/
 #pragma endregion
 
 #pragma region SCALE_TRANSFORMATIONS
