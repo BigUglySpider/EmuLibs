@@ -5,7 +5,7 @@
 
 namespace EmuMath::Helpers
 {
-#pragma region ROUNDS
+#pragma region ABS
 	template<EmuConcepts::EmuFastMatrix FastMatrix_>
 	[[nodiscard]] constexpr inline auto fast_matrix_abs(FastMatrix_&& fast_matrix_)
 		-> typename std::remove_cvref<FastMatrix_>::type
@@ -18,7 +18,9 @@ namespace EmuMath::Helpers
 	{
 		_fast_matrix_underlying::_fast_matrix_abs<true>(in_out_fast_matrix_);
 	}
+#pragma endregion
 
+#pragma region MIN
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool IsColumnMajor_, std::size_t RegisterWidth_, class B_>
 	requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>, B_>)
 	[[nodiscard]] constexpr inline auto fast_matrix_min
@@ -67,7 +69,9 @@ namespace EmuMath::Helpers
 	{
 		return _fast_matrix_underlying::_fast_matrix_min_or_max<false, false, typename std::remove_cvref_t<FastMatrix_>::value_type>(std::forward<FastMatrix_>(fast_matrix_));
 	}
+#pragma endregion
 
+#pragma region MAX
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool IsColumnMajor_, std::size_t RegisterWidth_, class B_>
 	requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>, B_>)
 	[[nodiscard]] constexpr inline auto fast_matrix_max
@@ -116,12 +120,14 @@ namespace EmuMath::Helpers
 	{
 		return _fast_matrix_underlying::_fast_matrix_min_or_max<true, false, typename std::remove_cvref_t<FastMatrix_>::value_type>(std::forward<FastMatrix_>(fast_matrix_));
 	}
+#pragma endregion
 
+#pragma region LERP
 	template<EmuConcepts::EmuFastMatrix FastMatrix_, class B_, class Weighting_>
-	[[nodiscard]] constexpr inline auto fast_matrix_lerp(FastMatrix_&& fast_matrix_, B_&& b_, Weighting_&& t_)
+	[[nodiscard]] constexpr inline auto fast_matrix_lerp(FastMatrix_&& fast_matrix_a_, B_&& b_, Weighting_&& t_)
 		-> typename std::remove_cvref<FastMatrix_>::type
 	{
-		return _fast_matrix_underlying::_fast_matrix_lerp<false, false>(std::forward<FastMatrix_>(fast_matrix_), std::forward<B_>(b_), std::forward<Weighting_>(t_));
+		return _fast_matrix_underlying::_fast_matrix_lerp<false, false>(std::forward<FastMatrix_>(fast_matrix_a_), std::forward<B_>(b_), std::forward<Weighting_>(t_));
 	}
 
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool IsColumnMajor_, std::size_t RegisterWidth_, class B_, class Weighting_>
@@ -132,10 +138,10 @@ namespace EmuMath::Helpers
 	}
 
 	template<EmuConcepts::EmuFastMatrix FastMatrix_, class B_, class Weighting_>
-	[[nodiscard]] constexpr inline auto fast_matrix_fused_lerp(FastMatrix_&& fast_matrix_, B_&& b_, Weighting_&& t_)
+	[[nodiscard]] constexpr inline auto fast_matrix_fused_lerp(FastMatrix_&& fast_matrix_a_, B_&& b_, Weighting_&& t_)
 		-> typename std::remove_cvref<FastMatrix_>::type
 	{
-		return _fast_matrix_underlying::_fast_matrix_lerp<false, true>(std::forward<FastMatrix_>(fast_matrix_), std::forward<B_>(b_), std::forward<Weighting_>(t_));
+		return _fast_matrix_underlying::_fast_matrix_lerp<false, true>(std::forward<FastMatrix_>(fast_matrix_a_), std::forward<B_>(b_), std::forward<Weighting_>(t_));
 	}
 
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool IsColumnMajor_, std::size_t RegisterWidth_, class B_, class Weighting_>
@@ -143,6 +149,53 @@ namespace EmuMath::Helpers
 	constexpr inline void fast_matrix_fused_lerp_assign(EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& fast_matrix_a_, B_&& b_, Weighting_&& t_)
 	{
 		_fast_matrix_underlying::_fast_matrix_lerp<true, true>(fast_matrix_a_, std::forward<B_>(b_), std::forward<Weighting_>(t_));
+	}
+#pragma endregion
+
+#pragma region CLAMP
+	template<EmuConcepts::EmuFastMatrix FastMatrix_, class Min_>
+	requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<FastMatrix_, Min_>)
+	[[nodiscard]] constexpr inline auto fast_matrix_clamp_min(FastMatrix_&& fast_matrix_in_, Min_&& min_)
+		-> typename std::remove_cvref<FastMatrix_>::type
+	{
+		return _fast_matrix_underlying::_fast_matrix_clamp_min_or_max<false, false>(std::forward<FastMatrix_>(fast_matrix_in_), std::forward<Min_>(min_));
+	}
+
+	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool IsColumnMajor_, std::size_t RegisterWidth_, class Min_>
+	requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>, Min_>)
+	constexpr inline void fast_matrix_clamp_min_assign(EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& fast_matrix_in_out_, Min_&& min_)
+	{
+		_fast_matrix_underlying::_fast_matrix_clamp_min_or_max<false, true>(fast_matrix_in_out_, std::forward<Min_>(min_));
+	}
+
+	template<EmuConcepts::EmuFastMatrix FastMatrix_, class Max_>
+	requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<FastMatrix_, Max_>)
+	[[nodiscard]] constexpr inline auto fast_matrix_clamp_max(FastMatrix_&& fast_matrix_in_, Max_&& max_)
+		-> typename std::remove_cvref<FastMatrix_>::type
+	{
+		return _fast_matrix_underlying::_fast_matrix_clamp_min_or_max<true, false>(std::forward<FastMatrix_>(fast_matrix_in_), std::forward<Max_>(max_));
+	}
+
+	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool IsColumnMajor_, std::size_t RegisterWidth_, class Max_>
+	requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>, Max_>)
+	constexpr inline void fast_matrix_clamp_max_assign(EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& fast_matrix_in_out_, Max_&& max_)
+	{
+		_fast_matrix_underlying::_fast_matrix_clamp_min_or_max<true, true>(fast_matrix_in_out_, std::forward<Max_>(max_));
+	}
+
+	template<EmuConcepts::EmuFastMatrix FastMatrix_, class Min_, class Max_>
+	requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<FastMatrix_, Min_, Max_>)
+	[[nodiscard]] constexpr inline auto fast_matrix_clamp(FastMatrix_&& fast_matrix_in_, Min_&& min_, Max_&& max_)
+		-> typename std::remove_cvref<FastMatrix_>::type
+	{
+		return _fast_matrix_underlying::_fast_matrix_clamp<false>(std::forward<FastMatrix_>(fast_matrix_in_), std::forward<Min_>(min_), std::forward<Max_>(max_));
+	}
+
+	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool IsColumnMajor_, std::size_t RegisterWidth_, class Min_, class Max_>
+	requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>, Min_, Max_>)
+	constexpr inline void fast_matrix_clamp_assign(EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& fast_matrix_in_out_, Min_&& min_, Max_&& max_)
+	{
+		_fast_matrix_underlying::_fast_matrix_clamp<true>(fast_matrix_in_out_, std::forward<Min_>(min_), std::forward<Max_>(max_));
 	}
 #pragma endregion
 }

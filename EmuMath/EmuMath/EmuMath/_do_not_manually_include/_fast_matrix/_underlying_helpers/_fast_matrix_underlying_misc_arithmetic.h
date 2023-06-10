@@ -96,6 +96,71 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		);
 	}
 
+	template<bool IsMax_, bool Assigning_, EmuConcepts::EmuFastMatrix FastMatrixA_, class MinOrMax_>
+	[[nodiscard]] constexpr inline decltype(auto) _fast_matrix_clamp_min_or_max(FastMatrixA_&& in_matrix_, MinOrMax_&& min_or_max_)
+	{
+		using _fast_mat_uq = typename std::remove_cvref<FastMatrixA_>::type;
+		constexpr std::size_t per_element_width = _fast_mat_uq::per_element_width;
+		constexpr bool is_signed = _fast_mat_uq::is_signed;
+		using index_sequences = EmuMath::TMP::fast_matrix_full_register_sequences<_fast_mat_uq>;
+		using major_indices = typename index_sequences::major_index_sequence;
+		using register_indices = typename index_sequences::register_index_sequence;
+		return _fast_matrix_mutate_with_extra_args<Assigning_, false, false>
+		(
+			std::forward<FastMatrixA_>(in_matrix_),
+			[](auto&& in_register_, auto&& min_or_max_register_)
+			{
+				if constexpr (IsMax_)
+				{
+					return EmuSIMD::clamp_max<per_element_width, is_signed>
+					(
+						std::forward<decltype(in_register_)>(in_register_),
+						std::forward<decltype(min_or_max_register_)>(min_or_max_register_)
+					);
+				}
+				else
+				{
+					return EmuSIMD::clamp_min<per_element_width, is_signed>
+					(
+						std::forward<decltype(in_register_)>(in_register_),
+						std::forward<decltype(min_or_max_register_)>(min_or_max_register_)
+					);
+				}
+			},
+			major_indices(),
+			register_indices(),
+			std::forward<MinOrMax_>(min_or_max_)
+		);
+	}
+
+	template<bool Assigning_, EmuConcepts::EmuFastMatrix FastMatrixA_, class Min_, class Max_>
+	[[nodiscard]] constexpr inline decltype(auto) _fast_matrix_clamp(FastMatrixA_&& in_matrix_, Min_&& min_, Max_&& max_)
+	{
+		using _fast_mat_uq = typename std::remove_cvref<FastMatrixA_>::type;
+		constexpr std::size_t per_element_width = _fast_mat_uq::per_element_width;
+		constexpr bool is_signed = _fast_mat_uq::is_signed;
+		using index_sequences = EmuMath::TMP::fast_matrix_full_register_sequences<_fast_mat_uq>;
+		using major_indices = typename index_sequences::major_index_sequence;
+		using register_indices = typename index_sequences::register_index_sequence;
+		return _fast_matrix_mutate_with_extra_args<Assigning_, false, false>
+		(
+			std::forward<FastMatrixA_>(in_matrix_),
+			[](auto&& in_register_, auto&& min_register_, auto&& max_register_)
+			{
+				return EmuSIMD::clamp<per_element_width, is_signed>
+				(
+					std::forward<decltype(in_register_)>(in_register_),
+					std::forward<decltype(min_register_)>(min_register_),
+					std::forward<decltype(max_register_)>(max_register_)
+				);
+			},
+			major_indices(),
+			register_indices(),
+			std::forward<Min_>(min_),
+			std::forward<Max_>(max_)
+		);
+	}
+
 	// Logic is identical for Min/Max, just calling different functions, 
 	// so to keep things consistent (especially with potential future optimisations) we do both here and just select functions based on template arg IsMax_
 	// --- AltOutputType is used to select a scalar output type instead of the input Matrix

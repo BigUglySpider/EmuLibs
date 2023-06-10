@@ -424,6 +424,19 @@ int main(int argc, char** argv)
 		auto d = EmuMath::FastMatrix<16, 16, float, true, 512>(100.0f);
 		auto e = EmuMath::FastMatrix<16, 16, float, true, 512>(EmuSIMD::setr<EmuSIMD::f32x16, 32>(0.1f, 0.2f, 0.25f, 0.3f, 0.33f, 0.4f, 0.5f, 0.6f, 0.7f, 0.75f, 0.8f, 0.9f, 1.0f, 2.0f, 2.5f, -1.0f));
 		std::cout << "LERP\n" << c << "\n|\n" << d << "\n|\n" << e << "\n=\n" << c.Lerp(d, e) << "\nOR\n" << c.FusedLerp(d, e) << std::endl;
+
+		std::cout << "### clamp ###\n";
+		auto f = EmuMath::FastMatrix<4, 4, double, true, 256>(rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal());
+		auto g = EmuMath::FastMatrix<4, 4, double, true, 256>(-913.4);
+		auto h = EmuMath::FastMatrix<4, 4, double, true, 256>(1337.1337);
+		std::cout << "IN:\n" << f << "\n---\nA:\n" << g << "\n---\nB:\n" << h;
+		std::cout << "\n---\nCLAMP_MIN(IN, A):\n" << f.ClampMin(g);
+		std::cout << "\n---\nCLAMP_MIN(IN, B):\n" << f.ClampMin(h);
+		std::cout << "\n---\nCLAMP_MAX(IN, A):\n" << f.ClampMax(g);
+		std::cout << "\n---\nCLAMP_MAX(IN, B):\n" << f.ClampMax(h);
+		std::cout << "\n---\nCLAMP(IN, A, B):\n" << f.Clamp(g, h);
+		std::cout << "\n---\nCLAMP(IN, B, A):\n" << f.Clamp(h, g);
+		std::cout << std::endl;
 		universal_pause();
 	}
 

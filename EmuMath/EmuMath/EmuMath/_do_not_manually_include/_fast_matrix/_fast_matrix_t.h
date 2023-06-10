@@ -1399,7 +1399,7 @@ namespace EmuMath
 		}
 
 		template<class B_, class Weighting_>
-		requires EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_, Weighting_>
+		requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_, Weighting_>)
 		[[nodiscard]] constexpr inline auto Lerp(B_&& b_, Weighting_&& t_) const
 			-> EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>
 		{
@@ -1407,25 +1407,35 @@ namespace EmuMath
 		}
 
 		template<class B_, class Weighting_>
-		requires EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_, Weighting_>
+		requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_, Weighting_>)
 		[[nodiscard]] constexpr inline auto FusedLerp(B_&& b_, Weighting_&& t_) const
 			-> EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>
 		{
 			return EmuMath::Helpers::fast_matrix_fused_lerp(*this, std::forward<B_>(b_), std::forward<Weighting_>(t_));
 		}
 
-		template<class B_, class Weighting_>
-		requires EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_, Weighting_>
-		constexpr inline void LerpAssign(B_&& b_, Weighting_&& t_)
+		template<class Min_>
+		requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, Min_>)
+		[[nodiscard]] constexpr inline auto ClampMin(Min_&& min_) const
+			-> EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>
 		{
-			EmuMath::Helpers::fast_matrix_lerp_assign(*this, std::forward<B_>(b_), std::forward<Weighting_>(t_));
+			return EmuMath::Helpers::fast_matrix_clamp_min(*this, std::forward<Min_>(min_));
 		}
 
-		template<class B_, class Weighting_>
-		requires EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_, Weighting_>
-		constexpr inline void FusedLerpAssign(B_&& b_, Weighting_&& t_)
+		template<class Max_>
+		requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, Max_>)
+		[[nodiscard]] constexpr inline auto ClampMax(Max_&& max_) const
+			-> EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>
 		{
-			EmuMath::Helpers::fast_matrix_fused_lerp_assign(*this, std::forward<B_>(b_), std::forward<Weighting_>(t_));
+			return EmuMath::Helpers::fast_matrix_clamp_max(*this, std::forward<Max_>(max_));
+		}
+		
+		template<class Min_, class Max_>
+		requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, Min_, Max_>)
+		[[nodiscard]] constexpr inline auto Clamp(Min_&& min_, Max_&& max_) const
+			-> EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>
+		{
+			return EmuMath::Helpers::fast_matrix_clamp(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
 
 		constexpr inline void AbsAssign()
@@ -1452,15 +1462,42 @@ namespace EmuMath
 		{
 			EmuMath::Helpers::fast_matrix_max_assign(*this, b_);
 		}
-#pragma endregion
 
-		/*
-		* TODO:
-		*	- Lerp(b, t)
-		*	- ClampMin(min)
-		*	- ClampMax(max)
-		*	- Clamp(min, max)
-		*/
+		template<class B_, class Weighting_>
+		requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_, Weighting_>)
+		constexpr inline void LerpAssign(B_&& b_, Weighting_&& t_)
+		{
+			EmuMath::Helpers::fast_matrix_lerp_assign(*this, std::forward<B_>(b_), std::forward<Weighting_>(t_));
+		}
+
+		template<class B_, class Weighting_>
+		requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, B_, Weighting_>)
+		constexpr inline void FusedLerpAssign(B_&& b_, Weighting_&& t_)
+		{
+			EmuMath::Helpers::fast_matrix_fused_lerp_assign(*this, std::forward<B_>(b_), std::forward<Weighting_>(t_));
+		}		
+
+		template<class Min_>
+		requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, Min_>)
+		constexpr inline void ClampMinAssign(Min_&& min_)
+		{
+			EmuMath::Helpers::fast_matrix_clamp_min_assign(*this, std::forward<Min_>(min_));
+		}
+
+		template<class Max_>
+		requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, Max_>)
+		constexpr inline void ClampMaxAssign(Max_&& max_)
+		{
+			EmuMath::Helpers::fast_matrix_clamp_max_assign(*this, std::forward<Max_>(max_));
+		}
+		
+		template<class Min_, class Max_>
+		requires(EmuConcepts::EmuFastMatrixBasicOpCompatible<this_type, Min_, Max_>)
+		constexpr inline void ClampAssign(Min_&& min_, Max_&& max_)
+		{
+			EmuMath::Helpers::fast_matrix_clamp_assign(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
+		}
+#pragma endregion
 
 #pragma region DATA
 	public:
