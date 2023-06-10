@@ -428,7 +428,7 @@ namespace EmuCore::TMP
 	/// <para> This can effectively be considered an `unmove` cast, treating lvalues as lvalues and casting rvalues to lvalues. </para>
 	/// <para>
 	///		WARNING: This is for casting pre-existing, named rvalues.
-	///		Passing a new rvalue (such as `my_type(5)) will result in output of a dangling reference. 
+	///		Passing a new rvalue (such as `my_type(5)`) will result in output of a dangling reference. 
 	/// </para>
 	/// </summary>
 	/// <param name="ref_">Reference to cast to an lvalue reference.</param>
@@ -438,6 +438,17 @@ namespace EmuCore::TMP
 	{
 		return ref_;
 	}
+
+	/// <summary>
+	/// <para> Casts a reference to an lvalue-reference. </para>
+	/// <para> This can effectively be considered an `unmove` cast, treating lvalues as lvalues and casting rvalues to lvalues. </para>
+	/// <para>
+	///		WARNING: This is for casting pre-existing, named rvalues.
+	///		Passing a new rvalue (such as `my_type(5)`) will result in output of a dangling reference. 
+	/// </para>
+	/// </summary>
+	/// <param name="ref_">Reference to cast to an lvalue reference.</param>
+	/// <returns>The passed ref_ cast to an lvalue reference.</returns>
 	template<typename T_>
 	[[nodiscard]] constexpr inline std::remove_reference_t<T_>& lval_ref_cast(std::remove_reference_t<T_>&& ref_)
 	{

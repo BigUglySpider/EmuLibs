@@ -364,13 +364,16 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		std::index_sequence<RegisterIndices_...> register_indices_
 	)
 	{
+		auto& func_ref = EmuCore::TMP::lval_ref_cast<Func_>(std::forward<Func_>(func_));
+		EMU_CORE_MSVC_PUSH_WARNING_STACK
+		EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		if constexpr (Assigning_ || NoReturn_)
 		{
 			(
 				_fast_matrix_mutate_register<Assigning_, NoReturn_, MajorIndices_, RegisterIndices_>
 				(
 					std::forward<FastMatrix_>(matrix_),
-					std::forward<Func_>(func_)
+					func_ref
 				), ...
 			);
 		}
@@ -381,10 +384,11 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 				_fast_matrix_mutate_register<false, false, MajorIndices_, RegisterIndices_>
 				(
 					std::forward<FastMatrix_>(matrix_),
-					std::forward<Func_>(func_)
+					func_ref
 				)...
 			);
 		}
+		EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 	template<bool NotMask_, bool Assigning_, bool NoReturn_, std::size_t...MajorIndices_, std::size_t...RegisterIndices_, class Func_, EmuConcepts::EmuFastMatrix FastMatrix_, class MaskRegister_>
@@ -397,16 +401,19 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		std::index_sequence<RegisterIndices_...> register_indices_
 	)
 	{
+		auto& func_ref = EmuCore::TMP::lval_ref_cast<Func_>(std::forward<Func_>(func_));
+		EMU_CORE_MSVC_PUSH_WARNING_STACK
+		EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		if constexpr (Assigning_ || NoReturn_)
 		{
 			(
 				_fast_matrix_mutate_register_mask_major_ends<NotMask_, Assigning_, NoReturn_, MajorIndices_, RegisterIndices_>
 				(
 					std::forward<FastMatrix_>(matrix_),
-					std::forward<Func_>(func_),
+					func_ref,
 					mask_register_
 				), ...
-				);
+			);
 		}
 		else
 		{
@@ -415,11 +422,12 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 				_fast_matrix_mutate_register_mask_major_ends<NotMask_, false, false, MajorIndices_, RegisterIndices_>
 				(
 					std::forward<FastMatrix_>(matrix_),
-					std::forward<Func_>(func_),
+					func_ref,
 					mask_register_
 				)...
 			);
 		}
+		EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 	template<bool NotANDMask_, bool Assigning_, bool NoReturn_, std::size_t...MajorIndices_, std::size_t...RegisterIndices_, class Func_, EmuConcepts::EmuFastMatrix FastMatrix_, class ANDMaskRegister_, class ORMaskRegister_>
@@ -433,13 +441,16 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		std::index_sequence<RegisterIndices_...> register_indices_
 	)
 	{
+		auto& func_ref = EmuCore::TMP::lval_ref_cast<Func_>(std::forward<Func_>(func_));
+		EMU_CORE_MSVC_PUSH_WARNING_STACK
+		EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		if constexpr (Assigning_ || NoReturn_)
 		{
 			(
 				_fast_matrix_mutate_register_mask_major_ends<NotANDMask_, Assigning_, NoReturn_, MajorIndices_, RegisterIndices_>
 				(
 					std::forward<FastMatrix_>(matrix_),
-					std::forward<Func_>(func_),
+					func_ref,
 					and_mask_register_,
 					or_mask_register_
 				), ...
@@ -452,12 +463,13 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 				_fast_matrix_mutate_register_mask_major_ends<NotANDMask_, false, false, MajorIndices_, RegisterIndices_>
 				(
 					std::forward<FastMatrix_>(matrix_),
-					std::forward<Func_>(func_),
+					func_ref,
 					and_mask_register_,
 					or_mask_register_
 				)...
 			);
 		}
+		EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 	template<class TargetRegister_, std::size_t TargetElementWidth_, class Arg_>
@@ -487,6 +499,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		ExtraArgs_&&...extra_args_
 	)
 	{
+		EMU_CORE_MSVC_PUSH_WARNING_STACK
+		EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		if constexpr ((... || EmuConcepts::Arithmetic<ExtraArgs_>))
 		{
 			// Convert scalar args to registers before continuing
@@ -501,27 +515,30 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		}
 		else if constexpr (Assigning_ || NoReturn_)
 		{
+			auto& func_ref = EmuCore::TMP::lval_ref_cast<Func_>(std::forward<Func_>(func_));
 			(
 				_fast_matrix_mutate_register_with_extra_args<Assigning_, NoReturn_, AlertRegisterOutOfRange_, MajorIndices_, RegisterIndices_>
 				(
 					std::forward<FastMatrix_>(matrix_),
-					std::forward<Func_>(func_),
-					std::forward<ExtraArgs_>(extra_args_)...
+					func_ref,
+					EmuCore::TMP::lval_ref_cast<ExtraArgs_>(std::forward<ExtraArgs_>(extra_args_))...
 				), ...
 			);
 		}
 		else
 		{
+			auto& func_ref = EmuCore::TMP::lval_ref_cast<Func_>(std::forward<Func_>(func_));
 			return typename std::remove_cvref<FastMatrix_>::type
 			(
 				_fast_matrix_mutate_register_with_extra_args<false, false, AlertRegisterOutOfRange_, MajorIndices_, RegisterIndices_>
 				(
 					std::forward<FastMatrix_>(matrix_),
-					std::forward<Func_>(func_),
-					std::forward<ExtraArgs_>(extra_args_)...
+					func_ref,
+					EmuCore::TMP::lval_ref_cast<ExtraArgs_>(std::forward<ExtraArgs_>(extra_args_))...
 				)...
 			);
 		}
+		EMU_CORE_MSVC_POP_WARNING_STACK
 	}
 
 	template<bool Assigning_, bool NoReturn_, bool AlertRegisterOutOfRange_, class Func_, EmuConcepts::EmuFastMatrix FastMatrix_, class...ExtraArgs_>
