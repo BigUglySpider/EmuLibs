@@ -651,6 +651,69 @@ namespace EmuCore::TMP
 	template<std::size_t Offset_, std::size_t Size_>
 	using make_offset_reverse_index_sequence = typename reverse_index_sequence<Size_, Offset_>::type;
 
+	template<class IntSequence_, auto...ValuesToIgnore_>
+	struct make_int_sequence_excluding_values
+	{
+		using type = EmuCore::TMP::emu_tmp_err;
+	};
+	template<typename IntType_, IntType_...Values_>
+	struct make_int_sequence_excluding_values<std::integer_sequence<IntType_, Values_...>>
+	{
+		using type = std::integer_sequence<IntType_, Values_...>;
+	};
+	template<auto...ValuesToIgnore_, typename IntType_, IntType_...Values_>
+	struct make_int_sequence_excluding_values<std::integer_sequence<IntType_, Values_...>, ValuesToIgnore_...>
+	{
+	private:
+		static constexpr std::size_t num_values = sizeof...(Values_);
+		using _full_arr_type = std::array<IntType_, num_values>;
+
+		static constexpr bool _equal_to_any_ignored_value(IntType_ val_)
+		{
+			return (... || (val_ == ValuesToIgnore_));
+		}
+
+		static constexpr std::size_t _determine_used_size()
+		{
+			constexpr auto all_values = _full_arr_type({ Values_... });
+			std::size_t count = 0;
+			for (std::size_t i = 0; i < num_values; ++i)
+			{
+				count += static_cast<std::size_t>(!_equal_to_any_ignored_value(all_values[i]));
+			}
+			return count;
+		}
+
+		static constexpr std::size_t _used_size = _determine_used_size();
+		using _used_arr_type = std::array<IntType_, _used_size>;
+		using _used_index_sequence = std::make_index_sequence<_used_size>;
+
+		static constexpr _used_arr_type _make_used_array()
+		{
+			constexpr auto all_values = _full_arr_type({ Values_... });
+			_used_arr_type used_index_arr = _used_arr_type();
+			for (std::size_t input_index = 0, output_index = 0; input_index < num_values && output_index < _used_size; ++input_index)
+			{
+				if (!_equal_to_any_ignored_value(all_values[input_index]))
+				{
+					used_index_arr[output_index] = all_values[input_index];
+					++output_index;
+				}
+			}
+			return used_index_arr;
+		}
+
+		template<std::size_t...UsedIndices_>
+		static constexpr auto _make_sequence(std::index_sequence<UsedIndices_...> used_indices_)
+		{
+			constexpr _used_arr_type used_values = _make_used_array();
+			return std::integer_sequence<IntType_, used_values[UsedIndices_]...>();
+		}
+
+	public:
+		using type = decltype(_make_sequence(_used_index_sequence()));
+	};
+
 	/// <summary>
 	/// <para> Helper type to perform a comparison of all constants to determine the last to compare true. </para>
 	/// <para> The provided CmpTemplate_ will be instantiated with a single T_ argument, and used to perform each comparison. </para>

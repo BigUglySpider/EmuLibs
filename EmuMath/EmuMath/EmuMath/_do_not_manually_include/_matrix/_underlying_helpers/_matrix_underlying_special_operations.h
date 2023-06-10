@@ -192,6 +192,13 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		using indices = EmuMath::TMP::make_full_matrix_index_sequences<matrix_type>;
 		return _matrix_assign_identity(matrix_, typename indices::column_index_sequence(), typename indices::row_index_sequence());
 	}
+
+	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
+	constexpr inline auto _matrix_inverse_gauss_jordan(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+		-> EmuMath::Matrix<NumColumns_, NumRows_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq, ColumnMajor_>
+	{
+
+	}
 }
 
 #endif

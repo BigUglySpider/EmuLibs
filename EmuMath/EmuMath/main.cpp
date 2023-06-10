@@ -409,6 +409,11 @@ int main(int argc, char** argv)
 	}
 
 	{
+		constexpr EmuMath::Matrix<4, 4, double, true> example_mat(12, -26, 23.14, 26.61, 29, -17, 15, -26.61, 41, 0, 29, 512.61, 53, 1, 10041, -666);
+
+	}
+
+	{
 		auto rng = EmuMath::RngWrapper<false>(-2500.0, 2500.0);
 		auto a = EmuMath::FastMatrix<4, 4, float, true, 128>(rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal());
 		auto b = EmuMath::FastMatrix<4, 4, float, true, 128>(rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal(), rng.NextReal());
