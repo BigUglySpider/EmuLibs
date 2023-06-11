@@ -5336,14 +5336,130 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 #pragma endregion
 
 #pragma region INVERSE_FUNCS
-		/* TODO (All are square-matrix ONLY, although sub-funcs for Inverse (Laplace) can be implemented as shape-agnostic):
-		*	- Determinant
-		*   - Inverse (Laplace)
-		*      - Minors
-		*      - Cofactors
-		*      - Adjugate
-		*   - Inverse (Gauss-jordan)
-		*/
+		/// <summary>
+		/// <para> Calculates the inverse of this Matrix. </para>
+		/// <para> This function assumes that the Matrix will have an inverse; results for a Matrix with no inverse are undefined. </para>
+		/// <para>
+		///		May pass a custom Matrix type to output as. 
+		///		If omitted, the output type will be the same size and major-order as this Matrix, and use this Matrix's `preferred_floating_point` as its type.
+		/// </para>
+		/// <para> 
+		///		If `AllowReciprocalDivision_` is true, speed optimisations will be applied to multiply by reciprocals instead of dividing for most calculations, 
+		///		at the potential cost of accuracy.
+		/// </para>
+		/// <para> By default, `AllowReciprocalDivision_` is false. </para>
+		/// </summary>
+		/// <returns>Inverse of this Matrix.</returns>
+		template<bool AllowReciprocalDivision_ = false>
+		[[nodiscard]] constexpr inline auto Inverse() const
+			-> EmuMath::Matrix<num_columns, num_rows, preferred_floating_point, is_column_major>
+		{
+			return EmuMath::Helpers::matrix_inverse<EmuMath::Matrix<num_columns, num_rows, preferred_floating_point, is_column_major>, AllowReciprocalDivision_>
+			(
+				*this
+			);
+		}
+
+		template<EmuConcepts::EmuMatrix OutMatrix_, bool AllowReciprocalDivision_ = false>
+		[[nodiscard]] constexpr inline auto Inverse() const
+			-> typename std::remove_cvref<OutMatrix_>::type
+		{
+			return EmuMath::Helpers::matrix_inverse<typename std::remove_cvref<OutMatrix_>::type, AllowReciprocalDivision_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Calculates the inverse of this Matrix, and outputs the calculated determinant to the passed reference. </para>
+		/// <para> This function assumes that the Matrix will have an inverse; results for a Matrix with no inverse are undefined. </para>
+		/// <para>
+		///		May pass a custom Matrix type to output as. 
+		///		If omitted, the output type will be the same size and major-order as this Matrix, and use this Matrix's `preferred_floating_point` as its type.
+		/// </para>
+		/// <para> 
+		///		If `AllowReciprocalDivision_` is true, speed optimisations will be applied to multiply by reciprocals instead of dividing for most calculations, 
+		///		at the potential cost of accuracy.
+		/// </para>
+		/// <para> By default, `AllowReciprocalDivision_` is false. </para>
+		/// </summary>
+		/// <param name="out_determinant_">Non-const reference to output this Matrix's determinant to.</param>
+		/// <returns>Inverse of this Matrix.</returns>
+		template<bool AllowReciprocalDivision_ = false, typename OutDeterminant_>
+		requires(!std::is_const_v<OutDeterminant_>)
+		[[nodiscard]] constexpr inline auto Inverse(OutDeterminant_& out_determinant_) const
+			-> EmuMath::Matrix<num_columns, num_rows, preferred_floating_point, is_column_major>
+		{
+			return EmuMath::Helpers::matrix_inverse<EmuMath::Matrix<num_columns, num_rows, preferred_floating_point, is_column_major>, AllowReciprocalDivision_>
+			(
+				*this,
+				out_determinant_
+			);
+		}
+
+		template<EmuConcepts::EmuMatrix OutMatrix_, bool AllowReciprocalDivision_ = false, typename OutDeterminant_>
+		requires(!std::is_const_v<OutDeterminant_>)
+		[[nodiscard]] constexpr inline auto Inverse(OutDeterminant_& out_determinant_) const
+			-> typename std::remove_cvref<OutMatrix_>::type
+		{
+			return EmuMath::Helpers::matrix_inverse<typename std::remove_cvref<OutMatrix_>::type, AllowReciprocalDivision_>(*this, out_determinant_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the inverse of this Matrix, and outputs the result to it. </para>
+		/// <para> This function assumes that the Matrix will have an inverse; results for a Matrix with no inverse are undefined. </para>
+		/// <para> 
+		///		If `AllowReciprocalDivision_` is true, speed optimisations will be applied to multiply by reciprocals instead of dividing for most calculations, 
+		///		at the potential cost of accuracy.
+		/// </para>
+		/// <para> By default, `AllowReciprocalDivision_` is false. </para>
+		/// <para> This Matrix may be modified with data (not necessarily inverse data) used during calculation. If an exception is thrown, this seemingly garbage data is likely to persist. </para>
+		/// </summary>
+		template<bool AllowReciprocalDivision_ = false>
+		inline void InverseAssign()
+		{
+			EmuMath::Helpers::matrix_inverse_assign<AllowReciprocalDivision_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Calculates the inverse of this Matrix, and outputs the result to it. Also outputs the calculated determinant to the passed `out_determinant_` reference. </para>
+		/// <para> This function assumes that the Matrix will have an inverse; results for a Matrix with no inverse are undefined. </para>
+		/// <para> 
+		///		If `AllowReciprocalDivision_` is true, speed optimisations will be applied to multiply by reciprocals instead of dividing for most calculations, 
+		///		at the potential cost of accuracy.
+		/// </para>
+		/// <para> By default, `AllowReciprocalDivision_` is false. </para>
+		/// <para> This Matrix may be modified with data (not necessarily inverse data) used during calculation. If an exception is thrown, this seemingly garbage data is likely to persist. </para>
+		/// </summary>
+		/// <param name="out_determinant_">Non-const reference to output this Matrix's determinant to.</param>
+		template<bool AllowReciprocalDivision_ = false, typename OutDeterminant_>
+		requires(!std::is_const_v<OutDeterminant_>)
+		inline void InverseAssign(OutDeterminant_& out_determinant_)
+		{
+			EmuMath::Helpers::matrix_inverse_assign<AllowReciprocalDivision_>(*this, out_determinant_);
+		}
+#pragma endregion
+
+#pragma region DETERMINANT_FUNCS
+		/// <summary>
+		/// <para> Calculates the determinant of this Matrix. </para>
+		/// <para> May pass a custom type to output as. If omitted, the output type will be this Matrix's `preferred_floating_point`.</para>
+		/// <para> 
+		///		If `AllowReciprocalDivision_` is true, speed optimisations will be applied to multiply by reciprocals instead of dividing for most calculations, 
+		///		at the potential cost of accuracy.
+		/// </para>
+		/// <para> By default, `AllowReciprocalDivision_` is false. </para>
+		/// </summary>
+		/// <returns>Determinant of this Matrix.</returns>
+		template<typename OutDeterminant_, bool AllowReciprocalDivision_ = false>
+		[[nodiscard]] constexpr inline auto Determinant() const
+			-> typename std::remove_cvref<OutDeterminant_>::type
+		{
+			return EmuMath::Helpers::matrix_determinant<OutDeterminant_, AllowReciprocalDivision_>(*this);
+		}
+
+		template<bool AllowReciprocalDivision_ = false>
+		[[nodiscard]] constexpr inline preferred_floating_point Determinant() const
+		{
+			return EmuMath::Helpers::matrix_determinant<preferred_floating_point, AllowReciprocalDivision_>(*this);
+		}
 #pragma endregion
 
 #pragma region SCALE_TRANSFORMATIONS

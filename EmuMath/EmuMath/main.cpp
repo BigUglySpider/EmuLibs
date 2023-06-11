@@ -467,25 +467,30 @@ int main(int argc, char** argv)
 			41, 0,   29,    512.61,
 			53, 1,   10041, -666
 		);
-		constexpr auto inv_mat = EmuMath::Helpers::_matrix_underlying::_matrix_inverse_gauss_jordan<example_mat_type, true>(example_mat);
-		constexpr auto inv_inv_mat = EmuMath::Helpers::_matrix_underlying::_matrix_inverse_gauss_jordan<example_mat_type, true>(inv_mat);
-		constexpr auto inv_mat_from_div = EmuMath::Helpers::_matrix_underlying::_matrix_inverse_gauss_jordan<example_mat_type, false>(example_mat);
-		constexpr auto inv_inv_mat_from_div = EmuMath::Helpers::_matrix_underlying::_matrix_inverse_gauss_jordan<example_mat_type, false>(inv_mat_from_div);
+		constexpr auto inv_mat = example_mat.Inverse<true>();
+		constexpr auto inv_inv_mat = inv_mat.Inverse<true>();
+		constexpr auto inv_mat_from_div = example_mat.Inverse<false>();
+		constexpr auto inv_inv_mat_from_div = inv_mat_from_div.Inverse<false>();
+
+		constexpr auto example_mat_det = example_mat.Determinant<true>();
+		constexpr auto example_mat_det_div = example_mat.Determinant<false>();
+		constexpr auto example_mul_det = example_mat * (1 / example_mat_det);
 
 		auto runtime_mat = example_mat;
 		std::cout << "BASE (RECIPROCAL):\n" << runtime_mat;
-		EmuMath::Helpers::_matrix_underlying::_matrix_inverse_assign_gauss_jordan<true>(runtime_mat);
+		runtime_mat.InverseAssign<true>();
 		std::cout << "\n---\nINV (RECIPROCAL):\n" << runtime_mat;
-		EmuMath::Helpers::_matrix_underlying::_matrix_inverse_assign_gauss_jordan<true>(runtime_mat);
+		runtime_mat.InverseAssign<true>();
 		std::cout << "\n---\nINV INV (RECIPROCAL):\n" << runtime_mat;
 
 		runtime_mat = example_mat;
 		std::cout << "\n---\nBASE (DIV):\n" << runtime_mat;
-		EmuMath::Helpers::_matrix_underlying::_matrix_inverse_assign_gauss_jordan<false>(runtime_mat);
+		runtime_mat.InverseAssign<false>();
 		std::cout << "\n---\nINV (DIV):\n" << runtime_mat;
-		EmuMath::Helpers::_matrix_underlying::_matrix_inverse_assign_gauss_jordan<false>(runtime_mat);
+		runtime_mat.InverseAssign<false>();
 		std::cout << "\n---\nINV INV (DIV):\n" << runtime_mat;
 		std::cout << std::endl;
+
 		universal_pause();
 	}
 

@@ -17,13 +17,13 @@ namespace EmuMath::Helpers
 	template<bool AppendAsRows_ = true, std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
 	inline std::ostream& matrix_append_to_stream(std::ostream& str_, const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
 	{
-		return EmuMath::Helpers::_matrix_underlying::_matrix_append_to_stream<false, AppendAsRows_>(str_, matrix_);
+		return EmuMath::Helpers::_matrix_underlying::_append_matrix_to_stream<false, AppendAsRows_>(str_, matrix_);
 	}
 
 	template<bool AppendAsRows_ = true, std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
 	inline std::wostream& matrix_append_to_stream(std::wostream& wide_str_, const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
 	{
-		return EmuMath::Helpers::_matrix_underlying::_matrix_append_to_stream<true, AppendAsRows_>(wide_str_, matrix_);
+		return EmuMath::Helpers::_matrix_underlying::_append_matrix_to_stream<true, AppendAsRows_>(wide_str_, matrix_);
 	}
 }
 

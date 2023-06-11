@@ -668,7 +668,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 
 		// Eliminate rows and modify to set eliminated pivots to 1
 		using out_row_indices = std::make_index_sequence<num_rows>;
-		_calculate_matrix_inverse_gauss_jordan(out_, in_calc_, add_, mult_, div_, negate_, out_row_indices());
+		_calculate_matrix_inverse_gauss_jordan<AllowReciprocalDivision_>(out_, in_calc_, add_, mult_, div_, negate_, out_row_indices());
 		_calculate_matrix_inverse_gauss_jordan_make_pivots_equal_to_1<AllowReciprocalDivision_>(out_, in_calc_, mult_, div_, out_row_indices());
 
 		// Calculate determinant from result and output
