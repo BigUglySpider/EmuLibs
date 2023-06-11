@@ -80,63 +80,35 @@ namespace EmuCore::TMP
 	/// <summary> Underlying check used for all is_any_ values. Performs the passed check_ with each provided parameter until one is true or they are exhausted. </summary>
 	/// <typeparam name="First">The first type to perform the check on. Required.</typeparam>
 	/// <typeparam name="Others">All additional types to perform the check on. Optional.</typeparam>
-	template<template<class OutT_> class check_, class First, class...Others>
+	template<template<class OutT_> class check_, class...TypesToCheck_>
 	struct is_any_check
 	{
-		static constexpr bool value = check_<First>::value ? true : is_any_check<check_, Others...>::value;
-	};
-	/// <summary> Underlying check used for all is_any_ values. Contained value is set to the value of the passed check_ with the provided First parameter. </summary>
-	/// <typeparam name="First">Type to perform the check on.</typeparam>
-	template<template<class OutT_> class check_, class First>
-	struct is_any_check<check_, First>
-	{
-		static constexpr bool value = check_<First>::value;
+		static constexpr bool value = (... || check_<TypesToCheck_>::value);
 	};
 	/// <summary> Inverted variant of is_any_check, which in turn is the underlying check for all is_any_not_ values. </summary>
 	/// <typeparam name="First">The first type to perform the check on. Required.</typeparam>
 	/// <typeparam name="Others">All additional types to perform the check on. Optional.</typeparam>
-	template<template<class OutT_> class check_, class First, class...Others>
+	template<template<class OutT_> class check_, class First, class...TypesToCheck_>
 	struct is_any_not_check
 	{
-		static constexpr bool value = !check_<First>::value ? true : is_any_not_check<check_, Others...>::value;
-	};
-	/// <summary> Inverted variant of is_any_check, which in turn is the underlying check for all is_any_not_ values. </summary>
-	/// <typeparam name="First">Type to perform the check on.</typeparam>
-	template<template<class OutT_> class check_, class First>
-	struct is_any_not_check<check_, First>
-	{
-		static constexpr bool value = !check_<First>::value;
+		static constexpr bool value = (... || (!check_<TypesToCheck_>::value));
 	};
 
 	/// <summary> Underlying check used for all are_all_ values. Performs the passed check_ with each provided parameter until one is false or they are exhausted. </summary>
 	/// <typeparam name="First">The first type to perform the check on. Required.</typeparam>
 	/// <typeparam name="Others">All additional types to perform the check on. Optional.</typeparam>
-	template<template<class OutT_> class check_, class First, class...Others>
+	template<template<class OutT_> class check_, class...TypesToCheck_>
 	struct are_all_check
 	{
-		static constexpr bool value = check_<First>::value ? are_all_check<check_, Others...>::value : false;
-	};
-	/// <summary> Underlying check used for all are_all_ values. Contained value is set to the value of the passed check_ with the provided First parameter. </summary>
-	/// <typeparam name="First">Type to perform the check on.</typeparam>
-	template<template<class OutT_> class check_, class First>
-	struct are_all_check<check_, First>
-	{
-		static constexpr bool value = check_<First>::value;
+		static constexpr bool value = (... && check_<TypesToCheck_>::value);
 	};
 	/// <summary> Inverted variant of are_all_check, which in turn is the underlying check for all are_all_not_ values. </summary>
 	/// <typeparam name="First">The first type to perform the check on. Required.</typeparam>
 	/// <typeparam name="Others">All additional types to perform the check on. Optional.</typeparam>
-	template<template<class OutT_> class check_, class First, class...Others>
+	template<template<class OutT_> class check_, class...TypesToCheck_>
 	struct are_all_not_check
 	{
-		static constexpr bool value = !check_<First>::value ? is_any_not_check<check_, Others...>::value : false;
-	};
-	/// <summary> Inverted variant of are_all_check, which in turn is the underlying check for all are_all_not_ values. </summary>
-	/// <typeparam name="First">Type to perform the check on.</typeparam>
-	template<template<class OutT_> class check_, class First>
-	struct are_all_not_check<check_, First>
-	{
-		static constexpr bool value = !check_<First>::value;
+		static constexpr bool value = (... && (!check_<TypesToCheck_>::value));
 	};
 
 	/// <summary> Boolean indicating if any of the provided types are signed. </summary>
@@ -188,30 +160,16 @@ namespace EmuCore::TMP
 	/// <typeparam name="First_">First item to compare.</typeparam>
 	/// <typeparam name="ToCompareAgainst_">Item to compare all additional passed items against within comparison_.</typeparam>
 	/// <typeparam name="Others">All additional items to compare against after First_ until true or exhausted.</typeparam>
-	template<template<class X__, class Y__> class comparison_, class ToCompareAgainst_, class First_, class...Others>
+	template<template<class X__, class Y__> class comparison_, class ToCompareAgainst_, class...RhsTypes_>
 	struct is_any_comparison_true
 	{
-		static constexpr bool value = comparison_<ToCompareAgainst_, First_>::value ? true : is_any_comparison_true<comparison_, ToCompareAgainst_, Others...>::value;
-	};
-	/// <summary> Underlying check used for all is_any_[comparison] values. </summary>
-	/// <typeparam name="First_">First item to compare.</typeparam>
-	/// <typeparam name="ToCompareAgainst_">Item to compare all additional passed items against within comparison_.</typeparam>
-	template<template<class X__, class Y__> class comparison_, class ToCompareAgainst_, class First_>
-	struct is_any_comparison_true<comparison_, ToCompareAgainst_, First_>
-	{
-		static constexpr bool value = comparison_<ToCompareAgainst_, First_>::value;
+		static constexpr bool value = (... || comparison_<ToCompareAgainst_, RhsTypes_>::value);
 	};
 
-	template<template<class X__, class Y__> class comparison_, class ToCompareAgainst_, class First_, class...Others>
+	template<template<class X__, class Y__> class comparison_, class ToCompareAgainst_, class...RhsTypes_>
 	struct are_all_comparisons_true
 	{
-		static constexpr bool value = comparison_<ToCompareAgainst_, First_>::value ? are_all_comparisons_true<comparison_, ToCompareAgainst_, Others...>::value : false;
-	};
-
-	template<template<class X__, class Y__> class comparison_, class ToCompareAgainst_, class First_>
-	struct are_all_comparisons_true<comparison_, ToCompareAgainst_, First_>
-	{
-		static constexpr bool value = comparison_<ToCompareAgainst_, First_>::value;
+		static constexpr bool value = (... && comparison_<ToCompareAgainst_, RhsTypes_>::value);
 	};
 
 	/// <summary> Boolean indicating if any of the types passed after ToFind_ are the exact same type as ToFind_. </summary>

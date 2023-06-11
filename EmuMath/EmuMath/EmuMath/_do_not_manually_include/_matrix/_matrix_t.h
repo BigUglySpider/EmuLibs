@@ -1388,9 +1388,9 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 
 #pragma region ASSIGNMENT_OPERATORS
 	public:
-		constexpr inline this_type& operator=(const this_type& to_move_)
+		constexpr inline this_type& operator=(const this_type& to_copy_)
 		{
-			EmuMath::Helpers::matrix_copy(*this, std::forward<this_type>(to_move_));
+			EmuMath::Helpers::matrix_copy(*this, to_copy_);
 			return *this;
 		}
 

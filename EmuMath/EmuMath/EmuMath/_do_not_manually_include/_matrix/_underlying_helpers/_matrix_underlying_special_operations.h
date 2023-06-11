@@ -193,16 +193,11 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		return _matrix_assign_identity(matrix_, typename indices::column_index_sequence(), typename indices::row_index_sequence());
 	}
 
-#pragma region NAYUSTY
-	
+#pragma region GAUSS_JORDAN	
 	template<std::size_t Index_, typename Out_, class RowEchelonMatrix_, class Multiplier_>
 	constexpr inline void _calculate_determinant_from_row_echelon(Out_& out_, const RowEchelonMatrix_& row_echelon_, Multiplier_& mult_)
 	{
-		if constexpr (Index_ < RowEchelonMatrix_::num_rows)
-		{
-			out_ = mult_(out_, _matrix_get<Index_, Index_>(row_echelon_));
-			_calculate_determinant_from_row_echelon<Index_ + 1, Out_, RowEchelonMatrix_, Multiplier_>(out_, row_echelon_, mult_);
-		}
+		out_ = mult_(out_, _matrix_get<Index_, Index_>(row_echelon_));
 	}
 	template<typename Out_, class RowEchelonMatrix_, class Multiplier_, std::size_t...RowEchelonRowIndicesExcept0_>
 	constexpr inline Out_ _calculate_determinant_from_row_echelon(const RowEchelonMatrix_& row_echelon_, Multiplier_& mult_, std::index_sequence<RowEchelonRowIndicesExcept0_...> row_echelon_row_indices_except_0_)
@@ -241,14 +236,11 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		RowMult_ row_multiplier_
 	)
 	{
-		if constexpr (ColumnIndex_ < OutMatrix_::num_columns)
-		{
-			auto& in_element_ = _matrix_get<ColumnIndex_, RowIndex_>(in_calc_);
-			in_element_ = add_(in_element_, mult_(row_multiplier_, _matrix_get<ColumnIndex_, PivotIndex_>(in_calc_)));
+		auto& in_element_ = _matrix_get<ColumnIndex_, RowIndex_>(in_calc_);
+		in_element_ = add_(in_element_, mult_(row_multiplier_, _matrix_get<ColumnIndex_, PivotIndex_>(in_calc_)));
 
-			auto& out_element_ = _matrix_get<ColumnIndex_, RowIndex_>(out_);
-			out_element_ = add_(out_element_, mult_(row_multiplier_, _matrix_get<ColumnIndex_, PivotIndex_>(out_)));
-		}
+		auto& out_element_ = _matrix_get<ColumnIndex_, RowIndex_>(out_);
+		out_element_ = add_(out_element_, mult_(row_multiplier_, _matrix_get<ColumnIndex_, PivotIndex_>(out_)));
 	}
 
 	template<std::size_t RowIndex_, std::size_t PivotIndex_, class OutMatrix_, class InMatrix_, class Adder_, class Multiplier_, typename RowMult_, std::size_t...OutColumnIndices_>
@@ -274,18 +266,20 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		);
 	}
 
-	template<std::size_t PivotIndex_, class OutMatrix_, class InMatrix_, class Adder_, class Multiplier_, class Divider_, typename PivotNeg_, std::size_t...OutRowIndicesExceptPivot_>
+	template<std::size_t PivotIndex_, class OutMatrix_, class InMatrix_, class Adder_, class Multiplier_, class DivisionApplier_, typename PivotNeg_, std::size_t...OutRowIndicesExceptPivot_>
 	constexpr inline void _calculate_matrix_inverse_gauss_jordan_with_pivot
 	(
 		OutMatrix_& out_,
 		InMatrix_& in_calc_,
 		Adder_& add_,
 		Multiplier_& mult_,
-		Divider_& div_,
-		PivotNeg_ pivot_neg_,
+		DivisionApplier_& division_applier_,
+		PivotNeg_ pivot_neg_divisor_,
 		std::index_sequence<OutRowIndicesExceptPivot_...> out_row_indices_except_pivot_
 	)
 	{
+		// division_applier_ and pivot_neg_divisor_ may be multiplication-function and reciprocal pair or division-function and divisor pair, depending on if reciprocal division was allowed
+		// --- As such, we always want to have the pivot_neg_divisor_ on the right-hand side of operation, as we could either be multiplying or dividing to perform the division
 		(
 			_calculate_matrix_inverse_gauss_jordan_eliminate_row<OutRowIndicesExceptPivot_, PivotIndex_>
 			(
@@ -293,125 +287,407 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 				in_calc_,
 				add_,
 				mult_,
-				div_(_matrix_get<PivotIndex_, OutRowIndicesExceptPivot_>(in_calc_), pivot_neg_),
+				division_applier_(_matrix_get<PivotIndex_, OutRowIndicesExceptPivot_>(in_calc_), pivot_neg_divisor_),
 				std::make_index_sequence<OutMatrix_::num_columns>()
 			), ...
 		);
 	}
 
-	template<std::size_t RowIndex_, class OutMatrix_, class Multiplier_, typename PivotReciprocal_, std::size_t...OutColumnIndices_>
-	constexpr inline void _calculate_matrix_inverse_gauss_jordan_make_row_pivot_equal_to_1(OutMatrix_& out_, Multiplier_& mult_, PivotReciprocal_ pivot_reciprocal_, std::index_sequence<OutColumnIndices_...> out_column_indices_)
+	template<std::size_t RowIndex_, class OutMatrix_, class DivisionApplier_, typename PivotReciprocal_, std::size_t...OutColumnIndices_>
+	constexpr inline void _calculate_matrix_inverse_gauss_jordan_make_row_pivot_equal_to_1(OutMatrix_& out_, DivisionApplier_& division_applier_, PivotReciprocal_ pivot_divisor_, std::index_sequence<OutColumnIndices_...> out_column_indices_)
 	{
+		// division_applier_ and pivot_divisor_ may be multiplication-function and reciprocal pair or division-function and divisor pair, depending on if reciprocal division was allowed
+		// --- As such, we always want to have the pivot_divisor_ on the right-hand side of operation, as we could either be multiplying or dividing to perform the division
 		(
 			(
-				_matrix_get<OutColumnIndices_, RowIndex_>(out_) = mult_(_matrix_get<OutColumnIndices_, RowIndex_>(out_), pivot_reciprocal_)
+				_matrix_get<OutColumnIndices_, RowIndex_>(out_) = division_applier_(_matrix_get<OutColumnIndices_, RowIndex_>(out_), pivot_divisor_)
 			), ...
 		);
 	}
 
-	template<class OutMatrix_, class InMatrix_, class Multiplier_, class Divider_, std::size_t...OutRowIndices_>
+	template<bool UseReciprocalDivision_, class OutMatrix_, class InMatrix_, class Multiplier_, class Divider_, std::size_t...OutRowIndices_>
 	constexpr inline void _calculate_matrix_inverse_gauss_jordan_make_pivots_equal_to_1(OutMatrix_& out_, const InMatrix_& in_calc_, Multiplier_& mult_, Divider_& div_, std::index_sequence<OutRowIndices_...> out_row_indices_)
 	{
-		(
-			_calculate_matrix_inverse_gauss_jordan_make_row_pivot_equal_to_1<OutRowIndices_, OutMatrix_>
+		using out_column_indices = std::make_index_sequence<std::remove_cvref_t<OutMatrix_>::num_columns>;
+
+		if constexpr(UseReciprocalDivision_)
+		{
+			// Can optimise to divide once and use reciprocal multiplication for calculating the row
+			// --- Pass mult_ as the divsion applier, and pivot divisor will be the reciprocal of the pivot
 			(
-				out_,
-				mult_,
-				div_(typename OutMatrix_::value_type(1), _matrix_get<OutRowIndices_, OutRowIndices_>(in_calc_)),
-				std::make_index_sequence<OutMatrix_::num_columns>()
-			), ...
-		);
+				_calculate_matrix_inverse_gauss_jordan_make_row_pivot_equal_to_1<OutRowIndices_, OutMatrix_>
+				(
+					out_,
+					mult_,
+					div_(typename OutMatrix_::preferred_floating_point(1), _matrix_get<OutRowIndices_, OutRowIndices_>(in_calc_)),
+					out_column_indices()
+				), ...
+			);
+		}
+		else
+		{
+			// May not optimise for reciprocal division (e.g. loss of accuracy may be unwanted)
+			// --- Pass div_ as division applier, and pivot divisor is the pivot without modification
+			(
+				_calculate_matrix_inverse_gauss_jordan_make_row_pivot_equal_to_1<OutRowIndices_, OutMatrix_>
+				(
+					out_,
+					div_,
+					_matrix_get<OutRowIndices_, OutRowIndices_>(in_calc_),
+					out_column_indices()
+				), ...
+			);
+		}
 	}
 
-	template<class OutMatrix_, class InMatrix_, class Adder_, class Multiplier_, class Divider_, class Negator_, std::size_t...OutRowIndices_>
+	template<bool UseReciprocalDivision_, class OutMatrix_, class InMatrix_, class Adder_, class Multiplier_, class Divider_, class Negator_, std::size_t...OutRowIndices_>
 	constexpr inline void _calculate_matrix_inverse_gauss_jordan(OutMatrix_& out_, InMatrix_& in_calc_, Adder_& add_, Multiplier_& mult_, Divider_& div_, Negator_& negate_, std::index_sequence<OutRowIndices_...> out_row_indices_)
 	{
-		(
-			_calculate_matrix_inverse_gauss_jordan_with_pivot<OutRowIndices_>
+		if constexpr (UseReciprocalDivision_)
+		{
+			// Can optimise to divide once and use reciprocal multiplication for calculating the row
+			// --- Pass mult_ as the divsion applier, and negated pivot divisor will be the negated reciprocal of the pivot
 			(
-				out_,
-				in_calc_,
-				add_,
-				mult_,
-				div_,
-				negate_(_matrix_get<OutRowIndices_, OutRowIndices_>(in_calc_)),
-				typename EmuCore::TMP::make_int_sequence_excluding_values<std::index_sequence<OutRowIndices_...>, OutRowIndices_>::type()
-			), ...
-		);
+				_calculate_matrix_inverse_gauss_jordan_with_pivot<OutRowIndices_>
+				(
+					out_,
+					in_calc_,
+					add_,
+					mult_,
+					mult_,
+					negate_(div_(typename OutMatrix_::preferred_floating_point(1), _matrix_get<OutRowIndices_, OutRowIndices_>(in_calc_))),
+					typename EmuCore::TMP::make_int_sequence_excluding_values<std::index_sequence<OutRowIndices_...>, OutRowIndices_>::type()
+				), ...
+			);
+		}
+		else
+		{
+			// May not optimise for reciprocal division (e.g. loss of accuracy may be unwanted)
+			// --- Pass div_ as division applier, and pivot divisor is the pivot without modification
+			(
+				_calculate_matrix_inverse_gauss_jordan_with_pivot<OutRowIndices_>
+				(
+					out_,
+					in_calc_,
+					add_,
+					mult_,
+					div_,
+					negate_(_matrix_get<OutRowIndices_, OutRowIndices_>(in_calc_)),
+					typename EmuCore::TMP::make_int_sequence_excluding_values<std::index_sequence<OutRowIndices_...>, OutRowIndices_>::type()
+				), ...
+			);
+		}
 	}
 
-	template<class OutMatrix_, class InMatrix_, typename CalcType_>
-	[[nodiscard]] constexpr inline OutMatrix_ _calculate_matrix_inverse_gauss_jordan(const InMatrix_& in_)
+	template<bool AllowReciprocalDivision_, EmuConcepts::EmuMatrix InOutMatrix_>
+	constexpr inline void _matrix_inverse_assign_gauss_jordan(InOutMatrix_& in_out_)
 	{
-		using Adder_ = EmuCore::do_add<CalcType_, CalcType_>;
-		using Multiplier_ = EmuCore::do_multiply<CalcType_, CalcType_>;
-		using Divider_ = EmuCore::do_divide<CalcType_, CalcType_>;
-		using Negator_ = EmuCore::do_negate<CalcType_>;
+		if constexpr (!std::is_const_v<InOutMatrix_>)
+		{
+			// Common types and constants
+			using _inout_mat_uq = typename std::remove_cvref<InOutMatrix_>::type;
+			constexpr std::size_t num_columns = _inout_mat_uq::num_columns;
+			constexpr std::size_t num_rows = _inout_mat_uq::num_rows;
+			constexpr bool is_column_major = _inout_mat_uq::is_column_major;
 
-		EmuMath::Matrix<InMatrix_::num_columns, InMatrix_::num_rows, CalcType_, InMatrix_::is_column_major> in_calc_(in_);
-		auto out_ = EmuMath::Matrix<OutMatrix_::num_columns, OutMatrix_::num_rows, CalcType_, OutMatrix_::is_column_major>::identity();
+			using calc_type = typename EmuCore::TMP::largest_floating_point<typename _inout_mat_uq::preferred_floating_point, float>::type;
+			using _calc_mat = EmuMath::Matrix<num_columns, num_rows, void, is_column_major>;
+			using Adder_ = EmuCore::do_add<void, void>;
+			using Multiplier_ = EmuCore::do_multiply<void, void>;
+			using Divider_ = EmuCore::do_divide<void, void>;
+			using Negator_ = EmuCore::do_negate<void>;
+
+			// Prepare common data shared between funcs
+			// --- We output to the provided reference when everything is done, and allow the input to be mutated as the usual `in_calc_` type
+			Adder_ add_ = Adder_();
+			Multiplier_ mult_ = Multiplier_();
+			Divider_ div_ = Divider_();
+			Negator_ negate_ = Negator_();
+			auto result = EmuMath::Matrix<num_columns, num_rows, calc_type, is_column_major>::identity();
+
+			// Eliminate rows and modify to set eliminated pivots to 1
+			using out_row_indices = std::make_index_sequence<num_rows>;
+			_calculate_matrix_inverse_gauss_jordan<AllowReciprocalDivision_>(result, in_out_, add_, mult_, div_, negate_, out_row_indices());
+			_calculate_matrix_inverse_gauss_jordan_make_pivots_equal_to_1<AllowReciprocalDivision_>(result, in_out_, mult_, div_, out_row_indices());
+
+			// Assign inverse result to output reference w/move semantics
+			if constexpr (EmuCore::TMP::valid_assign_direct_or_cast<typename std::remove_cvref<InOutMatrix_>::type, decltype(std::move(result)), InOutMatrix_>())
+			{
+				EmuCore::TMP::assign_direct_or_cast<typename std::remove_cvref<InOutMatrix_>::type>(in_out_, std::move(result));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<InOutMatrix_>(),
+					"Unable to finalise direct inverse assignment to an EmuMath Matrix determinant as the output type cannot be constructed or converted to from the used calculation type."
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<InOutMatrix_>(),
+				"Error attempting to perform direct inverse assignment to an EmuMath Matrix: The input Matrix is const-qualified, and cannot be assigned to."
+			);
+		}
+	}
+
+	template<bool AllowReciprocalDivision_, EmuConcepts::EmuMatrix InOutMatrix_, typename OutDeterminant_>
+	constexpr inline void _matrix_inverse_assign_gauss_jordan(InOutMatrix_& in_out_, OutDeterminant_& out_determinant_)
+	{
+		if constexpr (!std::is_const_v<InOutMatrix_>)
+		{
+			// Common types and constants
+			using _inout_mat_uq = typename std::remove_cvref<InOutMatrix_>::type;
+			constexpr std::size_t num_columns = _inout_mat_uq::num_columns;
+			constexpr std::size_t num_rows = _inout_mat_uq::num_rows;
+			constexpr bool is_column_major = _inout_mat_uq::is_column_major;
+
+			using calc_type = typename EmuCore::TMP::largest_floating_point<typename _inout_mat_uq::preferred_floating_point, float>::type;
+			using _calc_mat = EmuMath::Matrix<num_columns, num_rows, void, is_column_major>;
+			using Adder_ = EmuCore::do_add<void, void>;
+			using Multiplier_ = EmuCore::do_multiply<void, void>;
+			using Divider_ = EmuCore::do_divide<void, void>;
+			using Negator_ = EmuCore::do_negate<void>;
+
+			// Prepare common data shared between funcs
+			// --- We output to the provided reference when everything is done, and allow the input to be mutated as the usual `in_calc_` type
+			Adder_ add_ = Adder_();
+			Multiplier_ mult_ = Multiplier_();
+			Divider_ div_ = Divider_();
+			Negator_ negate_ = Negator_();
+			auto result = EmuMath::Matrix<num_columns, num_rows, calc_type, is_column_major>::identity();
+
+			// Eliminate rows and modify to set eliminated pivots to 1
+			using out_row_indices = std::make_index_sequence<num_rows>;
+			_calculate_matrix_inverse_gauss_jordan<AllowReciprocalDivision_>(result, in_out_, add_, mult_, div_, negate_, out_row_indices());
+			_calculate_matrix_inverse_gauss_jordan_make_pivots_equal_to_1<AllowReciprocalDivision_>(result, in_out_, mult_, div_, out_row_indices());
+			
+			
+			// Calculate and output determinant to reference
+			if constexpr (EmuCore::TMP::valid_assign_direct_or_cast<typename std::remove_cvref<OutDeterminant_>::type, calc_type&&, OutDeterminant_>())
+			{
+				using out_row_indices_except_0 = EmuCore::TMP::make_index_sequence_excluding_0<num_rows>;
+				EmuCore::TMP::assign_direct_or_cast<typename std::remove_cvref<OutDeterminant_>::type>
+				(
+					out_determinant_,
+					_calculate_determinant_from_row_echelon<calc_type>(in_out_, mult_, out_row_indices_except_0())
+				);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<OutDeterminant_>(),
+					"Unable to output determinant calculated during inversion of an EmuMath Matrix as the output determinant type cannot be assigned to directly or via conversion from the used calculation type."
+				);
+			}
+
+			// Assign inverse result to output reference w/move semantics
+			if constexpr (EmuCore::TMP::valid_assign_direct_or_cast<typename std::remove_cvref<InOutMatrix_>::type, decltype(std::move(result)), InOutMatrix_>())
+			{
+				EmuCore::TMP::assign_direct_or_cast<typename std::remove_cvref<InOutMatrix_>::type>(in_out_, std::move(result));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<InOutMatrix_>(),
+					"Unable to finalise direct inverse assignment to an EmuMath Matrix determinant as the output type cannot be constructed or converted to from the used calculation type."
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<InOutMatrix_>(),
+				"Error attempting to perform direct inverse assignment to an EmuMath Matrix: The input Matrix is const-qualified, and cannot be assigned to."
+			);
+		}
+	}
+
+	template<class OutMatrix_, bool AllowReciprocalDivision_, EmuConcepts::EmuMatrix InMatrix_>
+	[[nodiscard]] constexpr inline auto _matrix_inverse_gauss_jordan(InMatrix_&& in_)
+		-> typename std::remove_cvref<OutMatrix_>::type
+	{
+		// Common types and constants
+		using _in_mat_uq = typename std::remove_cvref<InMatrix_>::type;
+		using _out_mat_uq = typename std::remove_cvref<OutMatrix_>::type;
+		using _in_fp = typename _in_mat_uq::preferred_floating_point;
+		using _out_fp = typename _out_mat_uq::preferred_floating_point;
+		using calc_type = typename EmuCore::TMP::largest_floating_point<_in_fp, _out_fp, float>::type;
+		constexpr std::size_t in_num_columns = _in_mat_uq::num_columns;
+		constexpr std::size_t in_num_rows = _in_mat_uq::num_rows;
+		constexpr bool in_column_major = _in_mat_uq::is_column_major;
+		constexpr std::size_t out_num_columns = _out_mat_uq::num_columns;
+		constexpr std::size_t out_num_rows = _out_mat_uq::num_rows;
+		constexpr bool out_column_major = _out_mat_uq::is_column_major;
+
+		using Adder_ = EmuCore::do_add<calc_type, calc_type>;
+		using Multiplier_ = EmuCore::do_multiply<calc_type, calc_type>;
+		using Divider_ = EmuCore::do_divide<calc_type, calc_type>;
+		using Negator_ = EmuCore::do_negate<calc_type>;
+		using out_row_indices = std::make_index_sequence<OutMatrix_::num_rows>;
+
+		// Prepare common data shared between funcs
+		auto in_calc_ = EmuMath::Matrix<in_num_columns, in_num_rows, calc_type, in_column_major>(std::forward<InMatrix_>(in_));
+		auto out_ = EmuMath::Matrix<out_num_columns, out_num_rows, calc_type, out_column_major>::identity();
 		Adder_ add_ = Adder_();
 		Multiplier_ mult_ = Multiplier_();
 		Divider_ div_ = Divider_();
 		Negator_ negate_ = Negator_();
 
-		using out_row_indices = std::make_index_sequence<OutMatrix_::num_rows>;
-		_calculate_matrix_inverse_gauss_jordan(out_, in_calc_, add_, mult_, div_, negate_, out_row_indices());
-		_calculate_matrix_inverse_gauss_jordan_make_pivots_equal_to_1(out_, in_calc_, mult_, div_, out_row_indices());
+		// Eliminate rows and modify to set eliminated pivots to 1
+		_calculate_matrix_inverse_gauss_jordan<AllowReciprocalDivision_>(out_, in_calc_, add_, mult_, div_, negate_, out_row_indices());
+		_calculate_matrix_inverse_gauss_jordan_make_pivots_equal_to_1<AllowReciprocalDivision_>(out_, in_calc_, mult_, div_, out_row_indices());
 
-		return out_;
+		// Output inverse
+		if constexpr (std::is_same_v<typename std::remove_cvref<decltype(out_)>::type, typename std::remove_cvref<OutMatrix_>::type>)
+		{
+			return out_;
+		}
+		else
+		{
+			if constexpr (EmuCore::TMP::valid_construct_or_cast<typename std::remove_cvref<OutMatrix_>::type, decltype(std::move(out_))>())
+			{
+				return EmuCore::TMP::construct_or_cast<typename std::remove_cvref<OutMatrix_>::type>(std::move(out_));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<OutMatrix_>(),
+					"Unable to finalise calculation of an EmuMath Matrix inversion operation as the output Matrix cannot be constructed or converted to from the Matrix used for calculation."
+				);
+			}
+		}
 	}
-	template<class OutMatrix_, class InMatrix_, typename CalcType_, typename OutDeterminant_>
-	[[nodiscard]] constexpr inline OutMatrix_ _calculate_matrix_inverse_gauss_jordan(const InMatrix_& in_, OutDeterminant_& out_determinant_)
-	{
-		using Adder_ = EmuCore::do_add<CalcType_, CalcType_>;
-		using Multiplier_ = EmuCore::do_multiply<CalcType_, CalcType_>;
-		using Divider_ = EmuCore::do_divide<CalcType_, CalcType_>;
-		using Negator_ = EmuCore::do_negate<CalcType_>;
 
-		EmuMath::Matrix<InMatrix_::num_columns, InMatrix_::num_rows, CalcType_, InMatrix_::is_column_major> in_calc_(in_);
-		EmuMath::Matrix<OutMatrix_::num_columns, OutMatrix_::num_rows, CalcType_, OutMatrix_::is_column_major> out_ = _make_identity_matrix<decltype(out_)>();
+	template<EmuConcepts::EmuMatrix OutMatrix_, bool AllowReciprocalDivision_, EmuConcepts::EmuMatrix InMatrix_, typename OutDeterminant_>
+	[[nodiscard]] constexpr inline auto _matrix_inverse_gauss_jordan(InMatrix_&& in_, OutDeterminant_& out_determinant_)
+		-> typename std::remove_cvref<OutMatrix_>::type
+	{
+		// Common types and constants
+		using _in_mat_uq = typename std::remove_cvref<InMatrix_>::type;
+		using _out_mat_uq = typename std::remove_cvref<OutMatrix_>::type;
+		using _in_fp = typename _in_mat_uq::preferred_floating_point;
+		using _out_fp = typename _out_mat_uq::preferred_floating_point;
+		using calc_type = typename EmuCore::TMP::largest_floating_point<_in_fp, _out_fp, float>::type;
+		constexpr std::size_t in_num_columns = _in_mat_uq::num_columns;
+		constexpr std::size_t in_num_rows = _in_mat_uq::num_rows;
+		constexpr bool in_column_major = _in_mat_uq::is_column_major;
+		constexpr std::size_t out_num_columns = _out_mat_uq::num_columns;
+		constexpr std::size_t out_num_rows = _out_mat_uq::num_rows;
+		constexpr bool out_column_major = _out_mat_uq::is_column_major;
+
+		using Adder_ = EmuCore::do_add<calc_type, calc_type>;
+		using Multiplier_ = EmuCore::do_multiply<calc_type, calc_type>;
+		using Divider_ = EmuCore::do_divide<calc_type, calc_type>;
+		using Negator_ = EmuCore::do_negate<calc_type>;
+		using out_row_indices = std::make_index_sequence<out_num_rows>;
+
+		// Prepare common data shared between funcs
+		auto in_calc_ = EmuMath::Matrix<in_num_columns, in_num_rows, calc_type, in_column_major>(std::forward<InMatrix_>(in_));
+		auto out_ = EmuMath::Matrix<out_num_columns, out_num_rows, calc_type, out_column_major>::identity();
 		Adder_ add_ = Adder_();
 		Multiplier_ mult_ = Multiplier_();
 		Divider_ div_ = Divider_();
 		Negator_ negate_ = Negator_();
 
-		using out_row_indices = std::make_index_sequence<OutMatrix_::num_rows>;
-		_calculate_matrix_inverse_gauss_jordan(out_, in_calc_, add_, mult_, div_, negate_, out_row_indices());
-		_calculate_matrix_inverse_gauss_jordan_make_pivots_equal_to_1(out_, in_calc_, mult_, div_, out_row_indices());
-		out_determinant_ = static_cast<OutDeterminant_>(_calculate_determinant_from_row_echelon<CalcType_>(in_calc_, mult_, EmuCore::TMP::make_index_sequence_excluding_0<OutMatrix_::num_rows>()));
+		// Eliminate rows and modify to set eliminated pivots to 1
+		_calculate_matrix_inverse_gauss_jordan<AllowReciprocalDivision_>(out_, in_calc_, add_, mult_, div_, negate_, out_row_indices());
+		_calculate_matrix_inverse_gauss_jordan_make_pivots_equal_to_1<AllowReciprocalDivision_>(out_, in_calc_, mult_, div_, out_row_indices());
 
-		return out_;
+		// Calculate and output determinant to reference
+		if constexpr (EmuCore::TMP::valid_assign_direct_or_cast<typename std::remove_cvref<OutDeterminant_>::type, calc_type&&, OutDeterminant_>())
+		{
+			using out_row_indices_except_0 = EmuCore::TMP::make_index_sequence_excluding_0<out_num_rows>;
+			EmuCore::TMP::assign_direct_or_cast<typename std::remove_cvref<OutDeterminant_>::type>
+			(
+				out_determinant_,
+				_calculate_determinant_from_row_echelon<calc_type>(in_calc_, mult_, out_row_indices_except_0())
+			);
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<OutDeterminant_>(),
+				"Unable to output determinant calculated during inversion of an EmuMath Matrix as the output determinant type cannot be assigned to directly or via conversion from the used calculation type."
+			);
+		}
+
+		// Output inverse
+		if constexpr (std::is_same_v<typename std::remove_cvref<decltype(out_)>::type, typename std::remove_cvref<OutMatrix_>::type>)
+		{
+			return out_;
+		}
+		else
+		{
+			if constexpr (EmuCore::TMP::valid_construct_or_cast<typename std::remove_cvref<OutMatrix_>::type, decltype(std::move(out_))>())
+			{
+				return EmuCore::TMP::construct_or_cast<typename std::remove_cvref<OutMatrix_>::type>(std::move(out_));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<OutMatrix_>(),
+					"Unable to finalise calculation of an EmuMath Matrix inversion operation as the output Matrix cannot be constructed or converted to from the Matrix used for calculation."
+				);
+			}
+		}
 	}
 
-	template<class OutScalar_, class InMatrix_, typename OutDeterminant_>
-	[[nodiscard]] constexpr inline auto _calculate_matrix_inverse_gauss_jordan(const InMatrix_& in_, OutDeterminant_& out_determinant_)
+	template<class OutScalar_, bool AllowReciprocalDivision_, EmuConcepts::EmuMatrix InMatrix_>
+	[[nodiscard]] constexpr inline auto _matrix_determinant_gauss_jordan(InMatrix_&& in_)
+		-> typename std::remove_cvref<OutScalar_>::type
 	{
+		// Common types and constants
 		using _in_mat_uq = typename std::remove_cvref<InMatrix_>::type;
 		constexpr std::size_t num_columns = _in_mat_uq::num_columns;
 		constexpr std::size_t num_rows = _in_mat_uq::num_rows;
 		constexpr bool is_column_major = _in_mat_uq::is_column_major;
 
-		using calc_type = typename EmuCore::TMP::largest_floating_point<typename std::remove_cvref<OutScalar_>::type, typename _in_mat_uq::preferred_floating_point>::type;
+		using calc_type = typename EmuCore::TMP::largest_floating_point<typename std::remove_cvref<OutScalar_>::type, typename _in_mat_uq::preferred_floating_point, float>::type;
 		using Adder_ = EmuCore::do_add<calc_type, calc_type>;
 		using Multiplier_ = EmuCore::do_multiply<calc_type, calc_type>;
 		using Divider_ = EmuCore::do_divide<calc_type, calc_type>;
 		using Negator_ = EmuCore::do_negate<calc_type>;
 
-		auto in_calc_ = EmuMath::Matrix<num_columns, num_rows, calc_type, is_column_major>(in_);
+		// Prepare common data shared between funcs
+		auto in_calc_ = EmuMath::Matrix<num_columns, num_rows, calc_type, is_column_major>(std::forward<InMatrix_>(in_));
 		auto out_ = EmuMath::Matrix<num_columns, num_rows, calc_type, is_column_major>::identity();
 		Adder_ add_ = Adder_();
 		Multiplier_ mult_ = Multiplier_();
 		Divider_ div_ = Divider_();
 		Negator_ negate_ = Negator_();
 
+		// Eliminate rows and modify to set eliminated pivots to 1
 		using out_row_indices = std::make_index_sequence<num_rows>;
 		_calculate_matrix_inverse_gauss_jordan(out_, in_calc_, add_, mult_, div_, negate_, out_row_indices());
-		_calculate_matrix_inverse_gauss_jordan_make_pivots_equal_to_1(out_, in_calc_, mult_, div_, out_row_indices());
-		return static_cast<typename std::remove_cvref<OutScalar_>::type>
-		(
-			_calculate_determinant_from_row_echelon<calc_type>(in_calc_, mult_, EmuCore::TMP::make_index_sequence_excluding_0<num_rows>())
-		);
+		_calculate_matrix_inverse_gauss_jordan_make_pivots_equal_to_1<AllowReciprocalDivision_>(out_, in_calc_, mult_, div_, out_row_indices());
+
+		// Calculate determinant from result and output
+		if constexpr (EmuCore::TMP::valid_construct_or_cast<typename std::remove_cvref<OutScalar_>::type, calc_type&&>())
+		{
+			using out_row_indices_except_0 = EmuCore::TMP::make_index_sequence_excluding_0<num_rows>;
+			return EmuCore::TMP::construct_or_cast<typename std::remove_cvref<OutScalar_>::type>
+			(
+				_calculate_determinant_from_row_echelon<calc_type>(in_calc_, mult_, out_row_indices_except_0())
+			);
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<OutScalar_>(),
+				"Unable to finalise calculation of an EmuMath Matrix determinant as the output type cannot be constructed or converted to from the used calculation type."
+			);
+		}
 	}
 #pragma endregion
 }

@@ -43,7 +43,7 @@ namespace EmuSIMD::Funcs
 		}
 		else
 		{
-			constexpr shuffle_mask_type lo_as_hi = ShuffleMask_ << 32;
+			constexpr shuffle_mask_type lo_as_hi = (ShuffleMask_ & shuffle_mask_type(0xFFFFFFFF)) << 32;
 			constexpr shuffle_mask_type lo_only = lo_as_hi >> 32;
 			return lo_as_hi | lo_only;
 		}
