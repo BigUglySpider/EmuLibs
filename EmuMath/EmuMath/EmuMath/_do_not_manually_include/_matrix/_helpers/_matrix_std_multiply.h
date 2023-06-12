@@ -159,12 +159,12 @@ namespace EmuMath::Helpers
 	/// <para> The Vector must meet constraint A or B: </para>
 	/// <para> A: The Vector's size is equal to the number of rows in the provided Matrix. </para>
 	/// <para> B: The Vector's size is equal to the number of rows in the provided Matrix - 1. In this case, the non-contained index will be treated as 1. </para>
-	/// <para> NOTE: OutColumnMajor_ is unused in this function. It is only present to allow a consistent interface for templates. </para>
+	/// <para> NOTE: UNUSEDOutColumnMajor_ is unused in this function. It is only present to allow a consistent interface for templates calling a std multiply on unknown types. </para>
 	/// </summary>
 	/// <param name="lhs_matrix_">: EmuMath Matrix to multiply a Vector via.</param>
 	/// <param name="rhs_vector_">: EmuMath Vector to multiply via the provided Matrix.</param>
 	/// <returns>EmuMath Vector resulting from a multiplication of the provided Matrix and Vector.</returns>
-	template<class OutT_, bool OutColumnMajor_, std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, std::size_t RhsSize_, typename RhsT_>
+	template<class OutT_, bool UNUSEDOutColumnMajor_, std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, std::size_t RhsSize_, typename RhsT_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<RhsSize_, OutT_> matrix_multiply
 	(
 		const EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_,
@@ -174,7 +174,7 @@ namespace EmuMath::Helpers
 		return _matrix_underlying::_matrix_std_multiply_mat_vector<OutT_>(lhs_matrix_, rhs_vector_);
 	}
 
-	template<bool OutColumnMajor_, std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, std::size_t RhsSize_, typename RhsT_>
+	template<bool UNUSEDOutColumnMajor_, std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, std::size_t RhsSize_, typename RhsT_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<RhsSize_, typename EmuMath::Vector<RhsSize_, RhsT_>::preferred_floating_point> matrix_multiply
 	(
 		const EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_,
