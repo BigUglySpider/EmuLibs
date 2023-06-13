@@ -322,6 +322,61 @@ namespace EmuMath::Helpers::_matrix_underlying
 	{
 		return matrix_.template Diagonal<OutSize_, OutT_, ColumnOffset_, RowOffset_>();
 	}
+
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, EmuConcepts::EmuMatrix TargetMatrix_, class Arg_>
+	[[nodiscard]] constexpr inline decltype(auto) _matrix_get_arg(Arg_&& arg_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Arg_>)
+		{
+			constexpr std::size_t num_columns = std::remove_cvref_t<Arg_>::num_columns;
+			constexpr std::size_t num_rows = std::remove_cvref_t<Arg_>::num_rows;
+			if constexpr ((ColumnIndex_ < num_columns) && (RowIndex_ < num_rows))
+			{
+				if constexpr (std::is_lvalue_reference_v<Arg_>)
+				{
+					return _matrix_get<ColumnIndex_, RowIndex_>(std::forward<Arg_>(arg_));
+				}
+				else
+				{
+					return std::move(_matrix_get<ColumnIndex_, RowIndex_>(std::forward<Arg_>(arg_)));
+				}
+			}
+			else
+			{
+				return std::remove_cvref_t<TargetMatrix_>::get_implied_zero();
+			}
+		}
+		else
+		{
+			return EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_));
+		}
+	}
+
+	template<class Arg_>
+	[[nodiscard]] constexpr inline std::size_t _matrix_arg_num_columns()
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Arg_>)
+		{
+			return std::remove_cvref_t<Arg_>::num_columns;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	template<class Arg_>
+	[[nodiscard]] constexpr inline std::size_t _matrix_arg_num_rows()
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Arg_>)
+		{
+			return std::remove_cvref_t<Arg_>::num_rows;
+		}
+		else
+		{
+			return 0;
+		}
+	}
 }
 
 #endif

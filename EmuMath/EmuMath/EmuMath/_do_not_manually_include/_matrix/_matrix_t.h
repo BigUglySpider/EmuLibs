@@ -3013,6 +3013,352 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 #pragma endregion
 
+#pragma region CUSTOM_CMP_FUNCS
+	public:
+		template<bool RequiresAllTrue_, bool IncludeNonContained_ = false, class Cmp_, class...Args_>
+		[[nodiscard]] constexpr inline bool Cmp(Cmp_&& cmp_, Args_&&...args_) const
+		{
+			return EmuMath::Helpers::matrix_cmp<RequiresAllTrue_, IncludeNonContained_>
+			(
+				std::forward<Cmp_>(cmp_),
+				*this,
+				std::forward<Args_>(args_)...
+			);
+		}
+		
+		template<bool RequiresAllTrue_, std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Cmp_, class...Args_>
+		[[nodiscard]] constexpr inline bool Cmp(Cmp_&& cmp_, Args_&&...args_) const
+		{
+			return EmuMath::Helpers::matrix_cmp<RequiresAllTrue_, BeginColumn_, EndColumn_, BeginRow_, EndRow_>
+			(
+				std::forward<Cmp_>(cmp_),
+				*this,
+				std::forward<Args_>(args_)...
+			);
+		}
+#pragma endregion
+
+#pragma region DEFAULT_CMP_FUNCS
+	public:
+		template<bool IncludeNonContained_ = false, EmuConcepts::EmuMatrix RhsMatrix_>
+		[[nodiscard]] constexpr inline bool CmpEqual(RhsMatrix_&& rhs_matrix_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_equal<IncludeNonContained_>(*this, std::forward<RhsMatrix_>(rhs_matrix_));
+		}
+
+		template<bool IncludeNonContained_ = false, EmuConcepts::EmuMatrix RhsMatrix_>
+		[[nodiscard]] constexpr inline bool CmpNotEqual(RhsMatrix_&& rhs_matrix_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_not_equal<IncludeNonContained_>(*this, std::forward<RhsMatrix_>(rhs_matrix_));
+		}
+
+		template<bool IncludeNonContained_ = false, EmuConcepts::EmuMatrix RhsMatrix_>
+		[[nodiscard]] constexpr inline bool CmpNear(RhsMatrix_&& rhs_matrix_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_near<IncludeNonContained_>(*this, std::forward<RhsMatrix_>(rhs_matrix_));
+		}
+
+		template<bool IncludeNonContained_ = false, EmuConcepts::EmuMatrix RhsMatrix_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpNear(RhsMatrix_&& rhs_matrix_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_near<IncludeNonContained_>(*this, std::forward<RhsMatrix_>(rhs_matrix_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<bool IncludeNonContained_ = false, EmuConcepts::EmuMatrix RhsMatrix_>
+		[[nodiscard]] constexpr inline bool CmpNotNear(RhsMatrix_&& rhs_matrix_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_not_near<IncludeNonContained_>(*this, std::forward<RhsMatrix_>(rhs_matrix_));
+		}
+
+		template<bool IncludeNonContained_ = false, EmuConcepts::EmuMatrix RhsMatrix_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpNotNear(RhsMatrix_&& rhs_matrix_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_not_near<IncludeNonContained_>(*this, std::forward<RhsMatrix_>(rhs_matrix_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, EmuConcepts::EmuMatrix RhsMatrix_>
+		[[nodiscard]] constexpr inline bool CmpEqual(RhsMatrix_&& rhs_matrix_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_equal<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<RhsMatrix_>(rhs_matrix_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, EmuConcepts::EmuMatrix RhsMatrix_>
+		[[nodiscard]] constexpr inline bool CmpNotEqual(RhsMatrix_&& rhs_matrix_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_not_equal<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<RhsMatrix_>(rhs_matrix_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, EmuConcepts::EmuMatrix RhsMatrix_>
+		[[nodiscard]] constexpr inline bool CmpNear(RhsMatrix_&& rhs_matrix_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_near<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<RhsMatrix_>(rhs_matrix_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, EmuConcepts::EmuMatrix RhsMatrix_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpNear(RhsMatrix_&& rhs_matrix_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_near<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<RhsMatrix_>(rhs_matrix_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, EmuConcepts::EmuMatrix RhsMatrix_>
+		[[nodiscard]] constexpr inline bool CmpNotNear(RhsMatrix_&& rhs_matrix_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_not_near<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<RhsMatrix_>(rhs_matrix_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, EmuConcepts::EmuMatrix RhsMatrix_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpNotNear(RhsMatrix_&& rhs_matrix_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_not_near<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<RhsMatrix_>(rhs_matrix_), std::forward<Epsilon_>(epsilon_));
+		}
+#pragma endregion
+
+#pragma region CMP_ANY_FUNCS
+	public:
+		template<bool IncludeNonContained_ = false, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyNotEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_not_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAnyNear(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyNotNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_not_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAnyNotNear(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_not_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAnyLess(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_less<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAnyGreater(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_greater<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAnyLessEqual(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_less_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAnyGreaterEqual(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_greater_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_equal<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyNotEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_not_equal<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_near<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAnyNear(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_near<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyNotNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_not_near<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAnyNotNear(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_not_near<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAnyGreater(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_greater<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAnyLess(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_less<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAnyGreaterEqual(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_greater_equal<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAnyLessEqual(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_any_less_equal<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+#pragma endregion
+
+#pragma region CMP_ALL_FUNCS
+	public:
+		template<bool IncludeNonContained_ = false, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllNotEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_not_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAllNear(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllNotNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_not_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAllNotNear(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_not_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAllLess(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_less<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAllGreater(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_greater<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAllLessEqual(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_less_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<bool IncludeNonContained_ = false, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAllGreaterEqual(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_greater_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_equal<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllNotEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_not_equal<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_near<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAllNear(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_near<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllNotNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_not_near<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAllNotNear(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_not_near<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAllGreater(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_greater<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAllLess(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_less<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAllGreaterEqual(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_greater_equal<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_, class Epsilon_>
+		[[nodiscard]] constexpr inline bool CmpAllLessEqual(Rhs_&& rhs_, Epsilon_&& epsilon_) const
+		{
+			return EmuMath::Helpers::matrix_cmp_all_less_equal<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(*this, std::forward<Rhs_>(rhs_), std::forward<Epsilon_>(epsilon_));
+		}
+#pragma endregion
+
 #pragma region ROUNDING_FUNCS
 		/// <summary> 
 		/// <para> Returns a version of this Matrix with all of its elements rounded toward negative infinity. </para>

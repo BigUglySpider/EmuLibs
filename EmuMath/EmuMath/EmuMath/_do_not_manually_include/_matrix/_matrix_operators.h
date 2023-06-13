@@ -351,9 +351,18 @@ template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bo
 #pragma endregion
 #endif
 
-// TODO
 #pragma region CMP_OPERATORS
+template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, EmuConcepts::EmuMatrix RhsMatrix_>
+[[nodiscard]] constexpr inline bool operator==(const EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, RhsMatrix_&& rhs_matrix_)
+{
+	return EmuMath::Helpers::matrix_cmp_equal<false>(lhs_matrix_, std::forward<RhsMatrix_>(rhs_matrix_));
+}
 
+template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, EmuConcepts::EmuMatrix RhsMatrix_>
+[[nodiscard]] constexpr inline bool operator!=(const EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, RhsMatrix_&& rhs_matrix_)
+{
+	return EmuMath::Helpers::matrix_cmp_not_equal<false>(lhs_matrix_, std::forward<RhsMatrix_>(rhs_matrix_));
+}
 #pragma endregion
 
 #endif
