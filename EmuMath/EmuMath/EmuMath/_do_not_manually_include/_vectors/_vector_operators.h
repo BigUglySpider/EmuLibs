@@ -54,6 +54,7 @@ template<std::size_t LhsSize_, typename LhsT_>
 /// <param name="rhs_">Argument appearing on the right-hand side of addition as in `EmuMath::Helpers::vector_multiply`.</param>
 /// <returns>EmuMath Vector of the left-hand size and `value_type_uq` containing the results of `EmuMath::Helpers::vector_multiply` with the given args.</returns>
 template<std::size_t LhsSize_, typename LhsT_, typename Rhs_>
+requires(!EmuMath::TMP::is_emu_matrix_v<Rhs_>)
 [[nodiscard]] constexpr inline auto operator*(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	-> EmuMath::Vector<LhsSize_, typename EmuMath::Vector<LhsSize_, LhsT_>::value_type_uq>
 {
@@ -126,6 +127,7 @@ constexpr inline auto operator-=(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, 
 /// <param name="rhs_">Argument appearing on the right-hand side of addition as in `EmuMath::Helpers::vector_multiply_assign`.</param>
 /// <returns>Reference to the left-hand Vector.</returns>
 template<std::size_t LhsSize_, typename LhsT_, typename Rhs_>
+requires(!EmuMath::TMP::is_emu_matrix_v<Rhs_>)
 constexpr inline auto operator*=(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	-> EmuMath::Vector<LhsSize_, LhsT_>&
 {
