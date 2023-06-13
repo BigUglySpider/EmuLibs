@@ -349,3 +349,7 @@ ASALocalRun/
 
 # testing ignores
 main.cpp
+
+# vs ignores
+**/.vscode
+**/.vscode/**
