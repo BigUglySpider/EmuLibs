@@ -4,6 +4,8 @@
 #include "_common_matrix_helper_includes.h"
 #include "_matrix_arithmetic_assign.h"
 #include "_matrix_basic_arithmetic.h"
+#include "_matrix_bitwise_arithmetic.h"
+#include "_matrix_bitwise_arithmetic_assign.h"
 #include "_matrix_cmp.h"
 #include "_matrix_copy.h"
 #include "_matrix_get.h"

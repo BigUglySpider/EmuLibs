@@ -216,8 +216,6 @@ requires(EmuMath::Helpers::matrix_valid_matrix_multiply_assign_arg_size<EmuMath:
 }
 #pragma endregion
 
-// TODO
-#if 0
 #pragma region CONST_BITWISE
 template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, class Rhs_>
 [[nodiscard]] constexpr inline auto operator&(const EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
@@ -281,8 +279,7 @@ template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bo
 {
 	return EmuMath::Helpers::matrix_bitwise_not<LhsNumColumns_, LhsNumRows_, typename EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>::value_type_uq, LhsColumnMajor_>
 	(
-		lhs_matrix_,
-		std::forward<Rhs_>(rhs_)
+		lhs_matrix_
 	);
 }
 #pragma endregion
@@ -349,7 +346,6 @@ template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bo
 	return lhs_matrix_;
 }
 #pragma endregion
-#endif
 
 #pragma region CMP_OPERATORS
 template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, EmuConcepts::EmuMatrix RhsMatrix_>

@@ -388,6 +388,14 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_underlying_helpers\_fast_quaternion_underlying_store.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_underlying_helpers\_fast_quaternion_underlying_to_euler.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_vectors\_fast_vector_t.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_bitwise_arithmetic\_matrix_bitwise_left_shift.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_bitwise_arithmetic\_matrix_bitwise_not.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_bitwise_arithmetic\_matrix_bitwise_right_shift.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_bitwise_arithmetic.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_bitwise_arithmetic\_matrix_and.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_bitwise_arithmetic\_matrix_or.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_bitwise_arithmetic\_matrix_xor.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_bitwise_arithmetic_assign.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_cmp.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_projections.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_projections\_vulkan\_matrix_orthos_vulkan.h" />

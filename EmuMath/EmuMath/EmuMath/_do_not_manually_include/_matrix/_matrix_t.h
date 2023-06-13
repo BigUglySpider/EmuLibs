@@ -6,10 +6,6 @@
 #include <tuple>
 #include <utility>
 
-// TODO:
-// --- ALL Comparisons
-// --- Bitwise operations
-
 namespace EmuMath
 {
 	/// <summary>
@@ -1609,22 +1605,21 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
 			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
 		>
-		constexpr inline void AddRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_)
+		constexpr inline void AddRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::matrix_add_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
 		/// <para>
-		///		Outputs the result of adding the provided lhs_matrix_ and rhs_ arguments as an EmuMath Matrix with the specified template arguments, 
-		///		with size/column-major arguments matching those of lhs_matrix_ if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		///		Outputs the result of adding the provided this Matrix and rhs_ arguments as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
 		/// </para>
 		/// <para> Indices within the provided range will contain results of respective addition operations. </para>
 		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be added. </para>
 		/// <para> If Rhs_ is none of the above: All index additions will use the rhs_ directly. </para>
 		/// </summary>
-		/// <param name="lhs_matrix_">: EmuMath Matrix appearing on the left-hand side of addition.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of addition.</param>
 		/// <returns>EmuMath Matrix containing the results of addition in respective indices within the provided range, and default-constructed elements elsewhere.</returns>
 		template
@@ -1711,7 +1706,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
 		/// </para>
 		/// <para> Indices within the provided range will contain results of respective subtraction operations. </para>
-		/// <para> Indices outside of the provided range will be copies of the respective indices in lhs_matrix_. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices in this Matrix. </para>
 		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be subtracted. </para>
 		/// <para> If Rhs_ is none of the above: All index subtractions will use the rhs_ directly. </para>
 		/// </summary>
@@ -1877,7 +1872,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		///		Range-based standard variants as this function is used are not available.
 		/// </para>
 		/// <para> Indices within the provided range will contain results of respective multiplication operations. </para>
-		/// <para> Indices outside of the provided range will be copies of the respective indices in lhs_matrix_. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices in this Matrix. </para>
 		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be multiplied. </para>
 		/// <para> If Rhs_ is none of the above: All index multiplications will use the rhs_ directly. </para>
 		/// </summary>
@@ -2049,10 +2044,10 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		/// </para>
 		/// <para>
 		///		This is a basic, non-standard Matrix division. As a standard division is mathematically undefined, there is no alternative. 
-		///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying lhs_matrix_ by the inverse of rhs_.
+		///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying this Matrix by the inverse of rhs_.
 		/// </para>
 		/// <para> Indices within the provided range will contain results of respective division operations. </para>
-		/// <para> Indices outside of the provided range will be copies of the respective indices in lhs_matrix_. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices in this Matrix. </para>
 		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be divided. </para>
 		/// <para> If Rhs_ is none of the above: All index divisions will use the rhs_ directly. </para>
 		/// </summary>
@@ -2156,7 +2151,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		/// <para> Outputs the result of dividing this Matrix by the provided rhs_ argument via the provided out_matrix_. </para>
 		/// <para>
 		///		This is a basic, non-standard Matrix division. As a standard division is mathematically undefined, there is no alternative. 
-		///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying lhs_matrix_ by the inverse of rhs_.
+		///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying this Matrix by the inverse of rhs_.
 		/// </para>
 		/// <para> Indices within the provided range will contain results of respective division operations. </para>
 		/// <para> Indices outside of the provided range will not be modified. </para>
@@ -2217,7 +2212,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		/// </para>
 		/// <para> This is a basic, non-standard Matrix modulo-division. As a standard modulo-division is mathemtically undefined, there is no alternative. </para>
 		/// <para> Indices within the provided range will contain results of respective modulo-division operations. </para>
-		/// <para> Indices outside of the provided range will be copies of the respective indices in lhs_matrix_. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices in this Matrix. </para>
 		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be modulo-divided. </para>
 		/// <para> If Rhs_ is none of the above: All index modulo-divisions will use the rhs_ directly. </para>
 		/// </summary>
@@ -3010,6 +3005,977 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		{
 			EmuMath::Helpers::matrix_square_assign<ColumnMajorOrder_>(*this);
 			return *this;
+		}
+#pragma endregion
+
+#pragma region CONST_BITWISE_ARITHMETIC_FUNCS
+	public:
+		/// <summary>
+		/// <para>
+		///		Outputs the result of bitwise ANDing the provided rhs_ argument with this Matrix, as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be ANDed. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of bitwise operations.</param>
+		/// <returns>EmuMath Matrix containing the results of bitwise operations in respective indices.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> And(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_and<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> And(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_and<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> And(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_and<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<class Rhs_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void And(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::matrix_bitwise_and(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of bitwise ANDing the provided rhs_ argument with this Matrix, as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective bitwise operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices in this Matrix. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be ANDed. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of bitwise operations.</param>
+		/// <returns>EmuMath Matrix containing the results of bitwise operations in respective indices within the provided range, and copied respective elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> AndRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_and_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> AndRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_and_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> AndRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_and_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void AndRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::matrix_bitwise_and_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of bitwise ANDing the provided this Matrix and rhs_ arguments as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective bitwise operations. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be ANDed. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of bitwise operations.</param>
+		/// <returns>EmuMath Matrix containing the results of bitwise operations in respective indices within the provided range, and default-constructed elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> AndRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_and_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> AndRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_and_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> AndRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_and_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void AndRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_and_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+		
+		/// <summary>
+		/// <para>
+		///		Outputs the result of bitwise ORing the provided rhs_ argument with this Matrix, as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be ORed. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of bitwise operations.</param>
+		/// <returns>EmuMath Matrix containing the results of bitwise operations in respective indices.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Or(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_or<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Or(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_or<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Or(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_or<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<class Rhs_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Or(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::matrix_bitwise_or(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of bitwise ORing the provided rhs_ argument with this Matrix, as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective bitwise operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices in this Matrix. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be ORed. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of bitwise operations.</param>
+		/// <returns>EmuMath Matrix containing the results of bitwise operations in respective indices within the provided range, and copied respective elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> OrRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_or_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> OrRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_or_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> OrRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_or_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void OrRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::matrix_bitwise_or_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of bitwise ORing the provided this Matrix and rhs_ arguments as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective bitwise operations. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be ORed. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of bitwise operations.</param>
+		/// <returns>EmuMath Matrix containing the results of bitwise operations in respective indices within the provided range, and default-constructed elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> OrRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_or_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> OrRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_or_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> OrRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_or_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void OrRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_or_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+		
+		/// <summary>
+		/// <para>
+		///		Outputs the result of bitwise XORing the provided rhs_ argument with this Matrix, as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be XORed. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of bitwise operations.</param>
+		/// <returns>EmuMath Matrix containing the results of bitwise operations in respective indices.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Xor(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_xor<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Xor(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_xor<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Xor(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_xor<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<class Rhs_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Xor(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::matrix_bitwise_xor(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of bitwise XORing the provided rhs_ argument with this Matrix, as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective bitwise operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices in this Matrix. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be XORed. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of bitwise operations.</param>
+		/// <returns>EmuMath Matrix containing the results of bitwise operations in respective indices within the provided range, and copied respective elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> XorRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_xor_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> XorRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_xor_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> XorRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_xor_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void XorRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::matrix_bitwise_xor_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of bitwise XORing the provided this Matrix and rhs_ arguments as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective bitwise operations. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be XORed. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of bitwise operations.</param>
+		/// <returns>EmuMath Matrix containing the results of bitwise operations in respective indices within the provided range, and default-constructed elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> XorRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_xor_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> XorRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_xor_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> XorRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_xor_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void XorRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_bitwise_xor_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of left-shifting this Matrix via the provided rhs_, as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be used for shifting operations. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of shifting operations.</param>
+		/// <returns>EmuMath Matrix containing the results of shifting operations in respective indices.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ShiftLeft(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_left<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ShiftLeft(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_left<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ShiftLeft(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_left<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<class Rhs_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void ShiftLeft(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::matrix_shift_left(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of left-shifting this Matrix via the provided rhs_, as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective shifting operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices in this Matrix. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be used for shifting operations. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of shifting operations.</param>
+		/// <returns>EmuMath Matrix containing the results of shifting operations in respective indices within the provided range, and copied respective elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ShiftLeftRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_left_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ShiftLeftRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_left_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ShiftLeftRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_left_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void ShiftLeftRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::matrix_shift_left_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of left-shifting this Matrix via the provided rhs_, as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective shifting operations. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be used for shifting operations. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of shifting operations.</param>
+		/// <returns>EmuMath Matrix containing the results of shifting operations in respective indices within the provided range, and default-constructed elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ShiftLeftRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_left_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ShiftLeftRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_left_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ShiftLeftRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_left_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void ShiftLeftRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_left_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of right-shifting this Matrix via the provided rhs_, as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be used for shifting operations. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of shifting operations.</param>
+		/// <returns>EmuMath Matrix containing the results of shifting operations in respective indices.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ShiftRight(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_right<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ShiftRight(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_right<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ShiftRight(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_right<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<class Rhs_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void ShiftRight(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::matrix_shift_right(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of right-shifting this Matrix via the provided rhs_, as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective shifting operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices in this Matrix. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be used for shifting operations. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of shifting operations.</param>
+		/// <returns>EmuMath Matrix containing the results of shifting operations in respective indices within the provided range, and copied respective elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ShiftRightRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_right_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ShiftRightRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_right_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ShiftRightRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_right_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void ShiftRightRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::matrix_shift_right_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of right-shifting this Matrix via the provided rhs_, as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective shifting operations. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be used for shifting operations. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of shifting operations.</param>
+		/// <returns>EmuMath Matrix containing the results of shifting operations in respective indices within the provided range, and default-constructed elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ShiftRightRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_right_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ShiftRightRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_right_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ShiftRightRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_right_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void ShiftRightRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_shift_right_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary> 
+		/// <para> Returns a version of this Matrix with all of its elements converted to their bitwise NOT. </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements converted to their bitwise NOT.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Not() const
+		{
+			return EmuMath::Helpers::matrix_bitwise_not<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Not() const
+		{
+			return EmuMath::Helpers::matrix_bitwise_not<num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Not() const
+		{
+			return EmuMath::Helpers::matrix_bitwise_not<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Not(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_bitwise_not(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements converted to their bitwise NOT. </para>
+		/// <para> Indices within the provided range will contain results of respective NOT operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices within this Matrix. </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements converted to their bitwise NOT.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> NotRange() const
+		{
+			return EmuMath::Helpers::matrix_bitwise_not_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> NotRange() const
+		{
+			return EmuMath::Helpers::matrix_bitwise_not_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> NotRange() const
+		{
+			return EmuMath::Helpers::matrix_bitwise_not_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void NotRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_bitwise_not_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements converted to their bitwise NOT. </para>
+		/// <para> Indices within the provided range will contain results of respective NOT operations. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements converted to their bitwise NOT.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> NotRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_bitwise_not_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> NotRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_bitwise_not_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> NotRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_bitwise_not_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with all of its elements converted to their bitwise NOT via the provided out_matrix_. </para>
+		/// <para> Indices within the provided range will contain results of respective NOT operations. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void NotRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_bitwise_not_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+#pragma endregion
+
+#pragma region BITWISE_ARITHMETIC_ASSIGN_FUNCS
+	public:
+		/// <summary>
+		/// <para> Performs a bitwise AND-assign on this Matrix with the provided rhs_ argument. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be ANDed. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right of bitwise operations.</param>
+		template<bool ColumnMajorOrder_ = is_column_major, class Rhs_>
+		constexpr inline void AndAssign(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::matrix_bitwise_and_assign<ColumnMajorOrder_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a bitwise AND-assign on this Matrix with the provided rhs_ argument. </para>
+		/// <para> Operations will only be performed for indices within the provided range. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be ANDed. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right of bitwise operations.</param>
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool ColumnMajorOrder_ = is_column_major, class Rhs_>
+		constexpr inline void AndAssignRange(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::matrix_bitwise_and_assign_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, ColumnMajorOrder_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		
+		/// <summary>
+		/// <para> Performs a bitwise OR-assign on this Matrix with the provided rhs_ argument. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be ORed. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right of bitwise operations.</param>
+		template<bool ColumnMajorOrder_ = is_column_major, class Rhs_>
+		constexpr inline void OrAssign(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::matrix_bitwise_or_assign<ColumnMajorOrder_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a bitwise OR-assign on this Matrix with the provided rhs_ argument. </para>
+		/// <para> Operations will only be performed for indices within the provided range. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be ORed. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right of bitwise operations.</param>
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool ColumnMajorOrder_ = is_column_major, class Rhs_>
+		constexpr inline void OrAssignRange(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::matrix_bitwise_or_assign_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, ColumnMajorOrder_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a bitwise XOR-assign on this Matrix with the provided rhs_ argument. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be XORed. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right of bitwise operations.</param>
+		template<bool ColumnMajorOrder_ = is_column_major, class Rhs_>
+		constexpr inline void XorAssign(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::matrix_bitwise_xor_assign<ColumnMajorOrder_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a bitwise XOR-assign on this Matrix with the provided rhs_ argument. </para>
+		/// <para> Operations will only be performed for indices within the provided range. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be XORed. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right of bitwise operations.</param>
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool ColumnMajorOrder_ = is_column_major, class Rhs_>
+		constexpr inline void XorAssignRange(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::matrix_bitwise_xor_assign_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, ColumnMajorOrder_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a left-shift-assign on this Matrix with the provided rhs_ argument. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be used in shift operations. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right of shifting operations.</param>
+		template<bool ColumnMajorOrder_ = is_column_major, class Rhs_>
+		constexpr inline void ShiftLeftAssign(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::matrix_shift_left_assign<ColumnMajorOrder_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a left-shift-assign on this Matrix with the provided rhs_ argument. </para>
+		/// <para> Operations will only be performed for indices within the provided range. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be used in shift operations. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right of shifting operations.</param>
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool ColumnMajorOrder_ = is_column_major, class Rhs_>
+		constexpr inline void ShiftLeftAssignRange(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::matrix_shift_left_assign_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, ColumnMajorOrder_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a right-shift-assign on this Matrix with the provided rhs_ argument. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be used in shift operations. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right of shifting operations.</param>
+		template<bool ColumnMajorOrder_ = is_column_major, class Rhs_>
+		constexpr inline void ShiftRightAssign(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::matrix_shift_right_assign<ColumnMajorOrder_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a right-shift-assign on this Matrix with the provided rhs_ argument. </para>
+		/// <para> Operations will only be performed for indices within the provided range. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be used in shift operations. </para>
+		/// <para> If Rhs_ is none of the above: All index operations will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right of shifting operations.</param>
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool ColumnMajorOrder_ = is_column_major, class Rhs_>
+		constexpr inline void ShiftRightAssignRange(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::matrix_shift_right_assign_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, ColumnMajorOrder_>(*this, std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
