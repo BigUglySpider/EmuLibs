@@ -1,6 +1,8 @@
 # EmuMath Dedicated Docs
 EmuMath now has a [dedicated documentation page](https://biguglyspider.github.io/math)! You should use this for all up-to-date information regarding EmuMath.
 
+Bear in mind, it's still under construction, so a lot is still missing!
+
 ## EmuMath
 A collection of different mathematical types and functionalities with a focus on making use of template metaprogramming.
 
