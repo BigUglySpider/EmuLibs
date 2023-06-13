@@ -1,7 +1,7 @@
 #ifndef EMU_SIMD_HELPERS_TEMPLATE_MOVEMASK_H_INC_
 #define EMU_SIMD_HELPERS_TEMPLATE_MOVEMASK_H_INC_ 1
 
-#include "_underlying_template_helpers/_simd_helpers_underlying_movemasks.h"
+#include "_underlying_template_helpers/_all_underlying_templates.h"
 
 namespace EmuSIMD
 {
@@ -32,7 +32,7 @@ namespace EmuSIMD
 		static_assert
 		(
 			_is_valid(),
-			"Attempted to form a SIMD movemask via EmuSIMD::make_movemask, but the provided number of IndexBits_ was not supported by the provided register. If the provided register is a floating-point register, the number of index bits provided must be equal to 1 or the number of elements within the register. If the provided register is an integral register, the number of index bits provided must be equal to 1, register_width/8, register_width/16, register_width/32, or register_width/64 (where register_width is the bit-width of the register, e.g. 128 for __m128 registers)."
+			"Attempted to form a SIMD movemask via EmuSIMD::make_movemask, but the provided number of IndexBits_ was not supported by the provided register. If the provided register is a floating-point register, the number of index bits provided must be equal to 1 or the number of elements within the register. If the provided register is an integral register, the number of index bits provided must be equal to 1, register_width/8, register_width/16, register_width/32, or register_width/64 (where register_width is the bit-width of the register, e.g. 128 for EmuSIMD::f32x4 registers)."
 		);
 
 

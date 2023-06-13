@@ -1,9 +1,12 @@
 #ifndef EMU_CORE_TMP_HELPERS_TYPE_COMPARATORS_H_INC_
 #define EMU_CORE_TMP_HELPERS_TYPE_COMPARATORS_H_INC_ 1
 
+#include <climits>
 #include <tuple>
 #include <type_traits>
+#include "TypeConvertors.h"
 #include "OperatorChecks.h"
+#include "Values.h"
 
 namespace EmuCore::TMP
 {
@@ -77,63 +80,35 @@ namespace EmuCore::TMP
 	/// <summary> Underlying check used for all is_any_ values. Performs the passed check_ with each provided parameter until one is true or they are exhausted. </summary>
 	/// <typeparam name="First">The first type to perform the check on. Required.</typeparam>
 	/// <typeparam name="Others">All additional types to perform the check on. Optional.</typeparam>
-	template<template<class OutT_> class check_, class First, class...Others>
+	template<template<class OutT_> class check_, class...TypesToCheck_>
 	struct is_any_check
 	{
-		static constexpr bool value = check_<First>::value ? true : is_any_check<check_, Others...>::value;
-	};
-	/// <summary> Underlying check used for all is_any_ values. Contained value is set to the value of the passed check_ with the provided First parameter. </summary>
-	/// <typeparam name="First">Type to perform the check on.</typeparam>
-	template<template<class OutT_> class check_, class First>
-	struct is_any_check<check_, First>
-	{
-		static constexpr bool value = check_<First>::value;
+		static constexpr bool value = (... || check_<TypesToCheck_>::value);
 	};
 	/// <summary> Inverted variant of is_any_check, which in turn is the underlying check for all is_any_not_ values. </summary>
 	/// <typeparam name="First">The first type to perform the check on. Required.</typeparam>
 	/// <typeparam name="Others">All additional types to perform the check on. Optional.</typeparam>
-	template<template<class OutT_> class check_, class First, class...Others>
+	template<template<class OutT_> class check_, class First, class...TypesToCheck_>
 	struct is_any_not_check
 	{
-		static constexpr bool value = !check_<First>::value ? true : is_any_not_check<check_, Others...>::value;
-	};
-	/// <summary> Inverted variant of is_any_check, which in turn is the underlying check for all is_any_not_ values. </summary>
-	/// <typeparam name="First">Type to perform the check on.</typeparam>
-	template<template<class OutT_> class check_, class First>
-	struct is_any_not_check<check_, First>
-	{
-		static constexpr bool value = !check_<First>::value;
+		static constexpr bool value = (... || (!check_<TypesToCheck_>::value));
 	};
 
 	/// <summary> Underlying check used for all are_all_ values. Performs the passed check_ with each provided parameter until one is false or they are exhausted. </summary>
 	/// <typeparam name="First">The first type to perform the check on. Required.</typeparam>
 	/// <typeparam name="Others">All additional types to perform the check on. Optional.</typeparam>
-	template<template<class OutT_> class check_, class First, class...Others>
+	template<template<class OutT_> class check_, class...TypesToCheck_>
 	struct are_all_check
 	{
-		static constexpr bool value = check_<First>::value ? are_all_check<check_, Others...>::value : false;
-	};
-	/// <summary> Underlying check used for all are_all_ values. Contained value is set to the value of the passed check_ with the provided First parameter. </summary>
-	/// <typeparam name="First">Type to perform the check on.</typeparam>
-	template<template<class OutT_> class check_, class First>
-	struct are_all_check<check_, First>
-	{
-		static constexpr bool value = check_<First>::value;
+		static constexpr bool value = (... && check_<TypesToCheck_>::value);
 	};
 	/// <summary> Inverted variant of are_all_check, which in turn is the underlying check for all are_all_not_ values. </summary>
 	/// <typeparam name="First">The first type to perform the check on. Required.</typeparam>
 	/// <typeparam name="Others">All additional types to perform the check on. Optional.</typeparam>
-	template<template<class OutT_> class check_, class First, class...Others>
+	template<template<class OutT_> class check_, class...TypesToCheck_>
 	struct are_all_not_check
 	{
-		static constexpr bool value = !check_<First>::value ? is_any_not_check<check_, Others...>::value : false;
-	};
-	/// <summary> Inverted variant of are_all_check, which in turn is the underlying check for all are_all_not_ values. </summary>
-	/// <typeparam name="First">Type to perform the check on.</typeparam>
-	template<template<class OutT_> class check_, class First>
-	struct are_all_not_check<check_, First>
-	{
-		static constexpr bool value = !check_<First>::value;
+		static constexpr bool value = (... && (!check_<TypesToCheck_>::value));
 	};
 
 	/// <summary> Boolean indicating if any of the provided types are signed. </summary>
@@ -185,33 +160,19 @@ namespace EmuCore::TMP
 	/// <typeparam name="First_">First item to compare.</typeparam>
 	/// <typeparam name="ToCompareAgainst_">Item to compare all additional passed items against within comparison_.</typeparam>
 	/// <typeparam name="Others">All additional items to compare against after First_ until true or exhausted.</typeparam>
-	template<template<class X__, class Y__> class comparison_, class ToCompareAgainst_, class First_, class...Others>
+	template<template<class X__, class Y__> class comparison_, class ToCompareAgainst_, class...RhsTypes_>
 	struct is_any_comparison_true
 	{
-		static constexpr bool value = comparison_<ToCompareAgainst_, First_>::value ? true : is_any_comparison_true<comparison_, ToCompareAgainst_, Others...>::value;
-	};
-	/// <summary> Underlying check used for all is_any_[comparison] values. </summary>
-	/// <typeparam name="First_">First item to compare.</typeparam>
-	/// <typeparam name="ToCompareAgainst_">Item to compare all additional passed items against within comparison_.</typeparam>
-	template<template<class X__, class Y__> class comparison_, class ToCompareAgainst_, class First_>
-	struct is_any_comparison_true<comparison_, ToCompareAgainst_, First_>
-	{
-		static constexpr bool value = comparison_<ToCompareAgainst_, First_>::value;
+		static constexpr bool value = (... || comparison_<ToCompareAgainst_, RhsTypes_>::value);
 	};
 
-	template<template<class X__, class Y__> class comparison_, class ToCompareAgainst_, class First_, class...Others>
+	template<template<class X__, class Y__> class comparison_, class ToCompareAgainst_, class...RhsTypes_>
 	struct are_all_comparisons_true
 	{
-		static constexpr bool value = comparison_<ToCompareAgainst_, First_>::value ? are_all_comparisons_true<comparison_, ToCompareAgainst_, Others...>::value : false;
+		static constexpr bool value = (... && comparison_<ToCompareAgainst_, RhsTypes_>::value);
 	};
 
-	template<template<class X__, class Y__> class comparison_, class ToCompareAgainst_, class First_>
-	struct are_all_comparisons_true<comparison_, ToCompareAgainst_, First_>
-	{
-		static constexpr bool value = comparison_<ToCompareAgainst_, First_>::value;
-	};
-
-	/// <summary> Boolean indicating if any of the types passed types after ToFind_ are the same type as it. </summary>
+	/// <summary> Boolean indicating if any of the types passed after ToFind_ are the exact same type as ToFind_. </summary>
 	/// <typeparam name="ToFind_">Type to try to find.</typeparam>
 	/// <typeparam name="First_">First type to compare to ToFind_.</typeparam>
 	/// <typeparam name="Others">All types to compare after First_ until true or exhausted.</typeparam>
@@ -219,10 +180,15 @@ namespace EmuCore::TMP
 	static constexpr bool is_any_same_v = is_any_comparison_true<std::is_same, ToFind_, First_, Others...>::value;
 
 	/// <summary> Determines if the passed type T is an instance of the template class ToFind_. Only works for templates which only take typeparams. </summary>
-	template<class T, template<class...> class ToFind_>
+	template<class T_, template<class...> class ToFind_>
 	struct is_instance_of_typeparams_only
 	{
-		static constexpr bool value = false;
+		static constexpr bool value = std::conditional_t
+		<
+			std::is_same_v<T_, EmuCore::TMP::remove_ref_cv_t<T_>>,
+			std::false_type,
+			is_instance_of_typeparams_only<EmuCore::TMP::remove_ref_cv_t<T_>, ToFind_>
+		>::value;
 	};
 	/// <summary> Determines if the passed type T is an instance of the template class ToFind_. Only works for templates which only take typeparams. </summary>
 	template<class...T, template<class...> class ToFind_>
@@ -394,7 +360,7 @@ namespace EmuCore::TMP
 	{
 	};
 	template<class T_>
-	struct has_static_get<T_, std::void_t<decltype(T_::get)>> : std::true_type
+	struct has_static_get<T_, std::void_t<decltype(EmuCore::TMP::remove_ref_cv_t<T_>::get())>> : std::true_type
 	{
 	};
 
@@ -427,6 +393,186 @@ namespace EmuCore::TMP
 	};
 	template<template<class...> class Template_, class...TypeArgs_>
 	static constexpr bool valid_template_args_v = valid_template_args<Template_, TypeArgs_...>::value;
+
+	/// <summary>
+	/// <para> Base component for performing a semi-recursive type check with an arbitrary number of type arguments. </para>
+	/// <para> Checks will ignore reference and constant qualification, and any type T will be treated as `EmuCore::TMP::remove_ref_cv&lt;T_&gt;::type`. </para>
+	/// <para> Pointers are still applied and will not be removed. </para>
+	/// <para> Where all args are their unqualified state already, `value` will be `DefaultStaticValueType_::value`. </para>
+	/// <para> Where any arg is ref/cv qualified, `value` will be `Template_&lt;EmuCore::TMP::remove_ref_cv&lt;Args_...&gt;::type...&gt;::value` </para>
+	/// <para>
+	///		This is intended as a base-class for type checks which recursively call back to themselves and have a trivial, non-conditional default value 
+	///		(e.g. a default template whose default value is always `false`), but where ref/cv qualification is wanted to be ignored.
+	/// </para>
+	/// <para>For a recursive check on any arbitrary template without a default value, use `type_check_ignore_ref_cv`.</para>
+	/// </summary>
+	template<template<class...TemplateArgs_> class Template_, class DefaultStaticValueType_, class...Args_>
+	struct type_check_ignore_ref_cv_base
+	{
+	private:
+		static constexpr inline decltype(auto) _get()
+		{
+			if constexpr ((... && std::is_same_v<Args_, typename EmuCore::TMP::remove_ref_cv<Args_>::type>))
+			{
+				if constexpr (has_static_value<DefaultStaticValueType_>::value)
+				{
+					return DefaultStaticValueType_::value;
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<DefaultStaticValueType_>(),
+						"Attempted to create a semi-recursive, ref-cv-ignoring type check via `EmuCore::TMP::type_check_ignore_ref_cv_base`, but the provided `DefaultStaticValueType_` does not have a static `value` member."
+					);
+					return "ERROR: Bad DefaultStaticValueType_";
+				}
+			}
+			else
+			{
+				if constexpr (valid_template_args_v<Template_, typename EmuCore::TMP::remove_ref_cv<Args_>::type...>)
+				{
+					using _finalised_template_for_value = Template_<typename EmuCore::TMP::remove_ref_cv<Args_>::type... >;
+					if constexpr (has_static_value<_finalised_template_for_value>::value)
+					{
+						return _finalised_template_for_value::value;
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<_finalised_template_for_value>(),
+							"Attempted to create a semi-recursive, ref-cv-ignoring type check via `EmuCore::TMP::type_check_ignore_ref_cv_base`, but the instantiated template with ref/cv removed type arguments does not have a static `value`."
+						);
+						return "ERROR: Template instance from ref/cv-removed Args_ has no static `value`";
+					} 
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Args_...>(),
+						"Attempted to create a semi-recursive, ref-cv-ignoring type check via `EmuCore::TMP::type_check_ignore_ref_cv_base`, but the provided `Args_` with ref/cv qualification removed are not valid for instantiating the provided `Template_`."
+					);
+					return "ERROR: Bad Args_";
+				}
+			}
+
+			if constexpr (valid_template_args_v<Template_, Args_...>)
+			{
+				if constexpr (has_static_value<DefaultStaticValueType_>::value)
+				{
+					return std::conditional_t
+					<
+						(... && std::is_same_v<Args_, typename EmuCore::TMP::remove_ref_cv<Args_>::type>),
+						DefaultStaticValueType_,
+						Template_<typename EmuCore::TMP::remove_ref_cv<Args_>::type...>
+					>::value;
+				}
+			}
+		}
+
+	public:
+		static constexpr auto value = _get();
+	};
+
+	/// <summary>
+	/// <para> Template for performing a semi-recursive type check with an arbitrary number of type arguments. </para>
+	/// <para> Checks will ignore reference and constant qualification, and any type T will be treated as `EmuCore::TMP::remove_ref_cv&lt;T_&gt;::type`. </para>
+	/// <para> Pointers are still applied and will not be removed. </para>
+	/// <para> Where all args are their unqualified state already, `value` will be `Template_&lt;Args_...&gt;::value`. </para>
+	/// <para> Where any arg is ref/cv qualified, `value` will be `Template_&lt;EmuCore::TMP::remove_ref_cv&lt;Args_...&gt;::type...&gt;::value` </para>
+	/// <para>For a recursive check with a default value if already unqualified, use `type_check_ignore_ref_cv_base`.</para>
+	/// </summary>
+	template<template<class...TemplateArgs_> class Template_, class...Args_>
+	struct type_check_ignore_ref_cv
+	{
+	private:
+		static constexpr inline decltype(auto) _get()
+		{
+			if constexpr (valid_template_args_v<Template_, typename EmuCore::TMP::remove_ref_cv<Args_>::type...>)
+			{
+				using _finalised_template_for_value = Template_<typename EmuCore::TMP::remove_ref_cv<Args_>::type...>;
+				if constexpr (has_static_value<_finalised_template_for_value>::value)
+				{
+					return _finalised_template_for_value::value;
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<_finalised_template_for_value>(),
+						"Attempted to create a semi-recursive, ref-cv-ignoring type check via `EmuCore::TMP::type_check_ignore_ref_cv`, but the instantiated template with ref/cv removed type arguments does not have a static `value`."
+					);
+					return "ERROR: Template instance from ref/cv-removed Args_ has no static `value`";
+				} 
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Args_...>(),
+					"Attempted to create a semi-recursive, ref-cv-ignoring type check via `EmuCore::TMP::type_check_ignore_ref_cv`, but the provided `Args_` are not valid for instantiating the provided `Template_` when its ref/cv qualifiers are removed."
+				);
+				return "ERROR: Bad Args_";
+			}
+		}
+
+	public:
+		static constexpr auto value = _get();
+	};
+
+	template<class T_>
+	struct is_integer_sequence
+	{
+		static constexpr bool value = false;
+	};
+	template<class T_, T_...Vals_>
+	struct is_integer_sequence<std::integer_sequence<T_, Vals_...>>
+	{
+		static constexpr bool value = true;
+	};
+	template<class T_>
+	static constexpr bool is_integer_sequence_v = is_integer_sequence<T_>::value;
+
+	template<class T_>
+	struct is_index_sequence
+	{
+		static constexpr bool value = false;
+	};
+	template<std::size_t...Vals_>
+	struct is_index_sequence<std::index_sequence<Vals_...>>
+	{
+		static constexpr bool value = true;
+	};
+	template<class T_>
+	static constexpr bool is_index_sequence_v = is_index_sequence<T_>::value;
+	
+	/// <summary>
+	/// <para> Type to check if the passed type `T_` is a std::array instance. </para>
+	/// <para>
+	///		May optionally check for an array containing a specific type `Contains_`. 
+	///		If `Contains_` is `void`, the result `value` will be `true` for any `std::array` instance regardless of contained type.
+	/// </para>
+	/// </summary>
+	template<class T_, typename Contains_ = void>
+	struct is_std_array : public EmuCore::TMP::type_check_ignore_ref_cv_base<is_std_array, std::false_type, T_, Contains_>
+	{
+	};
+
+	template<std::size_t Size_, typename T_, typename Contains_>
+	struct is_std_array<std::array<T_, Size_>, Contains_>
+	{
+		static constexpr bool value = std::conditional_t
+		<
+			std::is_void_v<Contains_>,
+			std::true_type,
+			std::is_same<T_, Contains_>
+		>::value;
+	};
+
+	template<class T_, typename Contains_ = void>
+	static constexpr bool is_std_array_v = is_std_array<T_, Contains_>::value;
 }
 
 #endif

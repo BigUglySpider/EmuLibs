@@ -214,7 +214,7 @@ namespace EmuMath::Helpers
 		template<std::size_t Index_>
 		[[nodiscard]] constexpr inline value_type at() const
 		{
-			return colour.at<Index_>();
+			return colour.template at<Index_>();
 		}
 
 		/// <summary> 
@@ -340,12 +340,12 @@ namespace EmuMath::Helpers
 		template<bool IncludeAlpha_, typename rhs_contained_type, bool RhsContainsAlpha_>
 		[[nodiscard]] constexpr inline bool operator==(const EmuMath::Colour<rhs_contained_type, RhsContainsAlpha_>& rhs_) const
 		{
-			return colour.operator==<IncludeAlpha_, rhs_contained_type, RhsContainsAlpha_>(rhs_);
+			return colour.template operator==<IncludeAlpha_, rhs_contained_type, RhsContainsAlpha_>(rhs_);
 		}
 		template<typename rhs_contained_type, bool RhsContainsAlpha_>
 		[[nodiscard]] constexpr inline bool operator==(const EmuMath::Colour<rhs_contained_type, RhsContainsAlpha_>& rhs_) const
 		{
-			return colour.operator==<rhs_contained_type, RhsContainsAlpha_>(rhs_);
+			return colour.template operator==<rhs_contained_type, RhsContainsAlpha_>(rhs_);
 		}
 		template<bool IncludeAlpha_, typename rhs_contained_type, bool RhsContainsAlpha_, class RhsValidationFunc_>
 		[[nodiscard]] constexpr inline bool operator==
@@ -353,7 +353,7 @@ namespace EmuMath::Helpers
 			const EmuMath::Helpers::_colour_validation_layer<rhs_contained_type, RhsContainsAlpha_, RhsValidationFunc_>& rhs_
 		) const
 		{
-			return colour.operator==<IncludeAlpha_>(rhs_.Get());
+			return colour.template operator==<IncludeAlpha_>(rhs_.Get());
 		}
 		template<typename rhs_contained_type, bool RhsContainsAlpha_, class RhsValidationFunc_>
 		[[nodiscard]] constexpr inline bool operator==
@@ -367,7 +367,7 @@ namespace EmuMath::Helpers
 		template<bool IncludeAlpha_, typename rhs_contained_type, bool RhsContainsAlpha_>
 		[[nodiscard]] constexpr inline bool operator!=(const EmuMath::Colour<rhs_contained_type, RhsContainsAlpha_>& rhs_) const
 		{
-			return colour.operator!=<IncludeAlpha_>(rhs_);
+			return colour.template operator!=<IncludeAlpha_>(rhs_);
 		}
 		template<typename rhs_contained_type, bool RhsContainsAlpha_>
 		[[nodiscard]] constexpr inline bool operator!=(const EmuMath::Colour<rhs_contained_type, RhsContainsAlpha_>& rhs_) const
@@ -380,7 +380,7 @@ namespace EmuMath::Helpers
 			const EmuMath::Helpers::_colour_validation_layer<rhs_contained_type, RhsContainsAlpha_, RhsValidationFunc_>& rhs_
 		) const
 		{
-			return colour.operator!=<IncludeAlpha_>(rhs_.Get());
+			return colour.template operator!=<IncludeAlpha_>(rhs_.Get());
 		}
 		template<typename rhs_contained_type, bool RhsContainsAlpha_, class RhsValidationFunc_>
 		[[nodiscard]] constexpr inline bool operator!=
@@ -394,31 +394,31 @@ namespace EmuMath::Helpers
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		[[nodiscard]] constexpr inline this_type operator+(const Rhs_& rhs_) const
 		{
-			return this_type(colour.operator+<IncludeAlpha_>(_get_rhs(rhs_)));
+			return this_type(colour.template operator+<IncludeAlpha_>(_get_rhs(rhs_)));
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		[[nodiscard]] constexpr inline this_type operator-(const Rhs_& rhs_) const
 		{
-			return this_type(colour.operator-<IncludeAlpha_>(_get_rhs(rhs_)));
+			return this_type(colour.template operator-<IncludeAlpha_>(_get_rhs(rhs_)));
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		[[nodiscard]] constexpr inline this_type operator*(const Rhs_& rhs_) const
 		{
-			return this_type(colour.operator*<IncludeAlpha_>(_get_rhs(rhs_)));
+			return this_type(colour.template operator*<IncludeAlpha_>(_get_rhs(rhs_)));
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		[[nodiscard]] constexpr inline this_type operator/(const Rhs_& rhs_) const
 		{
-			return this_type(colour.operator/<IncludeAlpha_>(_get_rhs(rhs_)));
+			return this_type(colour.template operator/<IncludeAlpha_>(_get_rhs(rhs_)));
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		[[nodiscard]] constexpr inline this_type operator%(const Rhs_& rhs_) const
 		{
-			return this_type(colour.operator%<IncludeAlpha_>(_get_rhs(rhs_)));
+			return this_type(colour.template operator%<IncludeAlpha_>(_get_rhs(rhs_)));
 		}
 #pragma endregion
 
@@ -454,35 +454,35 @@ namespace EmuMath::Helpers
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		constexpr inline this_type& operator+=(const Rhs_& rhs_)
 		{
-			validate_func()(colour.operator+=<IncludeAlpha_>(_get_rhs(rhs_)));
+			validate_func()(colour.template operator+=<IncludeAlpha_>(_get_rhs(rhs_)));
 			return *this;
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		constexpr inline this_type& operator-=(const Rhs_& rhs_)
 		{
-			validate_func()(colour.operator-=<IncludeAlpha_>(_get_rhs(rhs_)));
+			validate_func()(colour.template operator-=<IncludeAlpha_>(_get_rhs(rhs_)));
 			return *this;
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		constexpr inline this_type& operator*=(const Rhs_& rhs_)
 		{
-			validate_func()(colour.operator*=<IncludeAlpha_>(_get_rhs(rhs_)));
+			validate_func()(colour.template operator*=<IncludeAlpha_>(_get_rhs(rhs_)));
 			return *this;
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		constexpr inline this_type& operator/=(const Rhs_& rhs_)
 		{
-			validate_func()(colour.operator/=<IncludeAlpha_>(_get_rhs(rhs_)));
+			validate_func()(colour.template operator/=<IncludeAlpha_>(_get_rhs(rhs_)));
 			return *this;
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		constexpr inline this_type& operator%=(const Rhs_& rhs_)
 		{
-			validate_func()(colour.operator%=<IncludeAlpha_>(_get_rhs(rhs_)));
+			validate_func()(colour.template operator%=<IncludeAlpha_>(_get_rhs(rhs_)));
 			return *this;
 		}
 #pragma endregion
@@ -503,7 +503,7 @@ namespace EmuMath::Helpers
 		{
 			return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>
 			(
-				colour.Add<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+				colour.template Add<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
 			);
 		}
 		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
@@ -511,7 +511,7 @@ namespace EmuMath::Helpers
 		{
 			return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>
 			(
-				colour.Add<value_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+				colour.template Add<value_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
 			);
 		}
 
@@ -530,7 +530,7 @@ namespace EmuMath::Helpers
 		{
 			return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>
 			(
-				colour.Subtract<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+				colour.template Subtract<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
 			);
 		}
 		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
@@ -538,7 +538,7 @@ namespace EmuMath::Helpers
 		{
 			return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>
 			(
-				colour.Subtract<value_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+				colour.template Subtract<value_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
 			);
 		}
 
@@ -560,7 +560,7 @@ namespace EmuMath::Helpers
 		{
 			return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>
 			(
-				colour.Multiply<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+				colour.template Multiply<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
 			);
 		}
 		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
@@ -568,7 +568,7 @@ namespace EmuMath::Helpers
 		{
 			return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>
 			(
-				colour.Multiply<value_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+				colour.template Multiply<value_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
 			);
 		}
 
@@ -590,7 +590,7 @@ namespace EmuMath::Helpers
 		{
 			return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>
 			(
-				colour.Divide<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+				colour.template Divide<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
 			);
 		}
 		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
@@ -598,7 +598,7 @@ namespace EmuMath::Helpers
 		{
 			return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>
 			(
-				colour.Divide<value_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+				colour.template Divide<value_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
 			);
 		}
 
@@ -620,7 +620,7 @@ namespace EmuMath::Helpers
 		{
 			return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>
 			(
-				colour.Mod<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+				colour.template Mod<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
 			);
 		}
 		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
@@ -628,7 +628,7 @@ namespace EmuMath::Helpers
 		{
 			return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>
 			(
-				colour.Mod<value_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+				colour.template Mod<value_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
 			);
 		}
 
@@ -649,7 +649,7 @@ namespace EmuMath::Helpers
 		{
 			return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>
 			(
-				colour.Lerp<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(b_), _get_rhs(t_))
+				colour.template Lerp<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(b_), _get_rhs(t_))
 			);
 		}
 		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class ColourB_, class T_>
@@ -657,7 +657,7 @@ namespace EmuMath::Helpers
 		{
 			return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>
 			(
-				colour.Lerp<OutContainsAlpha_, IncludeAlpha_>(_get_rhs(b_), _get_rhs(t_))
+				colour.template Lerp<OutContainsAlpha_, IncludeAlpha_>(_get_rhs(b_), _get_rhs(t_))
 			);
 		}
 #pragma endregion
@@ -681,7 +681,7 @@ namespace EmuMath::Helpers
 		template<typename out_contained_type, bool OutContainsAlpha_ = contains_alpha>
 		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> AsUnvalidated() const
 		{
-			return colour.As<out_contained_type, OutContainsAlpha_>();
+			return colour.template As<out_contained_type, OutContainsAlpha_>();
 		}
 
 		/// <summary> Provides read-only access to this Colour's channels as an EmuMath Vector. </summary>
@@ -725,7 +725,7 @@ namespace EmuMath::Helpers
 		template<bool IncludeAlpha_ = false>
 		[[nodiscard]] constexpr inline this_type Inverse() const
 		{
-			return this_type(colour.Inverse<IncludeAlpha_>(), 0);
+			return this_type(colour.template Inverse<IncludeAlpha_>(), 0);
 		}
 
 		/// <summary>
@@ -740,7 +740,7 @@ namespace EmuMath::Helpers
 		constexpr inline void Invert()
 		{
 			// If the colour is already valid, inversion will not make it invalid
-			colour.Invert();
+			colour.template Invert<IncludeAlpha_>();
 		}
 
 		/// <summary> 
@@ -826,7 +826,7 @@ namespace EmuMath::Helpers
 		template<bool IncludeAlpha_ = false>
 		[[nodiscard]] constexpr inline value_type Min() const
 		{
-			return colour.Min<IncludeAlpha_>();
+			return colour.template Min<IncludeAlpha_>();
 		}
 
 		/// <summary> Finds the highest-valued channel within this Colour. Excludes Alpha by default, but may include it if provided a `true` template argument. </summary>
@@ -834,7 +834,7 @@ namespace EmuMath::Helpers
 		template<bool IncludeAlpha_ = false>
 		[[nodiscard]] constexpr inline value_type Max() const
 		{
-			return colour.Max<IncludeAlpha_>();
+			return colour.template Max<IncludeAlpha_>();
 		}
 
 		/// <summary> Returns a copy of this colour converted to greyscale using a basic average of its RGB channels. </summary>
@@ -847,11 +847,11 @@ namespace EmuMath::Helpers
 			// --- As such, we skip validation whenever possible.
 			if constexpr (std::is_same_v<out_contained_type, value_type> && OutContainsAlpha_ == contains_alpha)
 			{
-				return this_type(colour.GreyscaleBasic<out_contained_type, OutContainsAlpha_>(), 0);
+				return this_type(colour.template GreyscaleBasic<out_contained_type, OutContainsAlpha_>(), 0);
 			}
 			else
 			{
-				return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>(colour.GreyscaleBasic<out_contained_type, OutContainsAlpha_>());
+				return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>(colour.template GreyscaleBasic<out_contained_type, OutContainsAlpha_>());
 			}
 		}
 		template<bool OutContainsAlpha_>
@@ -859,11 +859,11 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (OutContainsAlpha_ == contains_alpha)
 			{
-				return this_type(colour.GreyscaleBasic<OutContainsAlpha_>(), 0);
+				return this_type(colour.template GreyscaleBasic<OutContainsAlpha_>(), 0);
 			}
 			else
 			{
-				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour.GreyscaleBasic<OutContainsAlpha_>());
+				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour.template GreyscaleBasic<OutContainsAlpha_>());
 			}
 		}
 
@@ -874,11 +874,11 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (std::is_same_v<out_contained_type, value_type> && OutContainsAlpha_ == contains_alpha)
 			{
-				return this_type(colour.GreyscaleLuminance<out_contained_type, OutContainsAlpha_>(), 0);
+				return this_type(colour.template GreyscaleLuminance<out_contained_type, OutContainsAlpha_>(), 0);
 			}
 			else
 			{
-				return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>(colour.GreyscaleLuminance<out_contained_type, OutContainsAlpha_>());
+				return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>(colour.template GreyscaleLuminance<out_contained_type, OutContainsAlpha_>());
 			}
 		}
 		template<bool OutContainsAlpha_>
@@ -886,11 +886,11 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (OutContainsAlpha_ == contains_alpha)
 			{
-				return this_type(colour.GreyscaleLuminance<OutContainsAlpha_>(), 0);
+				return this_type(colour.template GreyscaleLuminance<OutContainsAlpha_>(), 0);
 			}
 			else
 			{
-				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour.GreyscaleLuminance<OutContainsAlpha_>());
+				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour.template GreyscaleLuminance<OutContainsAlpha_>());
 			}
 		}
 
@@ -901,11 +901,11 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (std::is_same_v<out_contained_type, value_type> && OutContainsAlpha_ == contains_alpha)
 			{
-				return this_type(colour.GreyscaleDesaturate<out_contained_type, OutContainsAlpha_>(), 0);
+				return this_type(colour.template GreyscaleDesaturate<out_contained_type, OutContainsAlpha_>(), 0);
 			}
 			else
 			{
-				return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>(colour.GreyscaleDesaturate<out_contained_type, OutContainsAlpha_>());
+				return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>(colour.template GreyscaleDesaturate<out_contained_type, OutContainsAlpha_>());
 			}
 		}
 		template<bool OutContainsAlpha_>
@@ -913,11 +913,11 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (OutContainsAlpha_ == contains_alpha)
 			{
-				return this_type(colour.GreyscaleDesaturate<OutContainsAlpha_>(), 0);
+				return this_type(colour.template GreyscaleDesaturate<OutContainsAlpha_>(), 0);
 			}
 			else
 			{
-				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour.GreyscaleDesaturate<OutContainsAlpha_>());
+				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour.template GreyscaleDesaturate<OutContainsAlpha_>());
 			}
 		}
 
@@ -928,11 +928,11 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (std::is_same_v<out_contained_type, value_type> && OutContainsAlpha_ == contains_alpha)
 			{
-				return this_type(colour.GreyscaleMin<out_contained_type, OutContainsAlpha_>(), 0);
+				return this_type(colour.template GreyscaleMin<out_contained_type, OutContainsAlpha_>(), 0);
 			}
 			else
 			{
-				return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>(colour.GreyscaleMin<out_contained_type, OutContainsAlpha_>());
+				return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>(colour.template GreyscaleMin<out_contained_type, OutContainsAlpha_>());
 			}
 		}
 		template<bool OutContainsAlpha_>
@@ -940,11 +940,11 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (OutContainsAlpha_ == contains_alpha)
 			{
-				return this_type(colour.GreyscaleMin<OutContainsAlpha_>(), 0);
+				return this_type(colour.template GreyscaleMin<OutContainsAlpha_>(), 0);
 			}
 			else
 			{
-				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour.GreyscaleMin<OutContainsAlpha_>());
+				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour.template GreyscaleMin<OutContainsAlpha_>());
 			}
 		}
 
@@ -955,11 +955,11 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (std::is_same_v<out_contained_type, value_type> && OutContainsAlpha_ == contains_alpha)
 			{
-				return this_type(colour.GreyscaleMax<out_contained_type, OutContainsAlpha_>(), 0);
+				return this_type(colour.template GreyscaleMax<out_contained_type, OutContainsAlpha_>(), 0);
 			}
 			else
 			{
-				return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>(colour.GreyscaleMax<out_contained_type, OutContainsAlpha_>());
+				return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>(colour.template GreyscaleMax<out_contained_type, OutContainsAlpha_>());
 			}
 		}
 		template<bool OutContainsAlpha_>
@@ -967,11 +967,11 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (OutContainsAlpha_ == contains_alpha)
 			{
-				return this_type(colour.GreyscaleMax<OutContainsAlpha_>(), 0);
+				return this_type(colour.template GreyscaleMax<OutContainsAlpha_>(), 0);
 			}
 			else
 			{
-				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour.GreyscaleMax<OutContainsAlpha_>());
+				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour.template GreyscaleMax<OutContainsAlpha_>());
 			}
 		}
 #pragma endregion

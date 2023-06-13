@@ -1,14 +1,14 @@
-#ifndef EMU_MATH_vector_COMMON_HELPERS_H_INC_
-#define EMU_MATH_vector_COMMON_HELPERS_H_INC_ 1
+#ifndef EMU_MATH_VECTOR_COMMON_HELPERS_H_INC_
+#define EMU_MATH_VECTOR_COMMON_HELPERS_H_INC_ 1
 
 #include "../_underlying_helpers/_vector_cast_underlying.h"
 #include "../_underlying_helpers/_vector_cmp_underlying.h"
 #include "../_underlying_helpers/_vector_copy_underlying.h"
 #include "../_underlying_helpers/_vector_get_underlying.h"
 #include "../_underlying_helpers/_vector_info.h"
+#include "../_underlying_helpers/_vector_iterator_underlying.h"
 #include "../_underlying_helpers/_vector_misc_arithmetic_underlying.h"
 #include "../_underlying_helpers/_vector_mutation_underlying.h"
-#include "../_underlying_helpers/_vector_set_underlying.h"
 #include "../_underlying_helpers/_vector_special_operations_underlying.h"
 #include "../_underlying_helpers/_vector_stream_append_underlying.h"
 #include "../_underlying_helpers/_vector_tmp.h"

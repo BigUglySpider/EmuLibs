@@ -64,7 +64,11 @@ namespace EmuMath
 		template<typename Out_>
 		[[nodiscard]] static inline Out_ ValueFromInt(const int_type in_int_)
 		{
-			if constexpr (std::is_integral_v<Out_> && std::is_signed_v<Out_> && sizeof(Out_) >= sizeof(int_type))
+			if constexpr (std::is_same_v<Out_, int_type>)
+			{
+				return in_int_;
+			}
+			else if constexpr (std::is_integral_v<Out_> && std::is_signed_v<Out_> && sizeof(Out_) >= sizeof(int_type))
 			{
 				return static_cast<Out_>(in_int_);
 			}
@@ -91,11 +95,6 @@ namespace EmuMath
 					return static_cast<Out_>(in_int_);
 				}
 			}
-		}
-		template<>
-		[[nodiscard]] static inline int_type ValueFromInt<int_type>(const int_type in_int_)
-		{
-			return in_int_;
 		}
 #pragma endregion
 

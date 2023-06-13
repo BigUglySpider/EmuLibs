@@ -2,6 +2,7 @@
 #define EMU_CORE_TMP_TUPLES_H_INC_ 1
 
 #include <tuple>
+#include <utility>
 
 namespace EmuCore::TMP
 {
@@ -37,27 +38,48 @@ namespace EmuCore::TMP
 	struct tuple_n
 	{
 	private:
-		template<std::size_t N__>
-		struct create_tuple_n
+		[[nodiscard]] static constexpr inline auto _type_finder()
 		{
-			using left = typename create_tuple_n<N__ / 2>::type;
-			using right = typename create_tuple_n<N__ / 2 + N__ % 2>::type;
-			using type = typename join_tuples<left, right>::type;
-		};
-		template<>
-		struct create_tuple_n<0>
-		{
-			using type = std::tuple<>;
-		};
-		template<>
-		struct create_tuple_n<1>
-		{
-			using type = std::tuple<T_>;
-		};
+			if constexpr (N_ == 0)
+			{
+				return std::tuple<>();
+			}
+			else if constexpr (N_ == 1)
+			{
+				return std::tuple<T_>();
+			}
+			else
+			{
+				constexpr std::size_t half_n = N_ / 2;
+				using left = typename tuple_n<half_n, T_>::type;
+				using right = typename tuple_n<half_n + N_ % 2, T_>::type;
+				return typename join_tuples<left, right>::type();
+			}
+		}
 
 	public:
-		using type = typename create_tuple_n<N_>::type;
+		using type = decltype(_type_finder());
 	};
+	template<std::size_t N_, typename T_>
+	using tuple_n_t = typename tuple_n<N_, T_>::type;
+
+	template<std::size_t Index_, class...Elements_>
+	[[nodiscard]] constexpr inline decltype(auto) forward_tuple_index(std::tuple<Elements_...>& tuple_) noexcept
+	{
+		static_assert(Index_ < sizeof...(Elements_), "Invalid call to EmuCore::TMP::forward_tuple_index: The provided Index_ exceeds the highest valid index of the tuple.");
+		using std::get;
+		using _get_result = decltype(get<Index_>(tuple_));
+		return std::forward<_get_result>(get<Index_>(tuple_));
+	}
+
+	template<std::size_t Index_, class...Elements_>
+	[[nodiscard]] constexpr inline decltype(auto) forward_tuple_index(const std::tuple<Elements_...>& tuple_) noexcept
+	{
+		static_assert(Index_ < sizeof...(Elements_), "Invalid call to EmuCore::TMP::forward_tuple_index: The provided Index_ exceeds the highest valid index of the tuple.");
+		using std::get;
+		using _get_result = decltype(get<Index_>(tuple_));
+		return std::forward<_get_result>(get<Index_>(tuple_));
+	}
 }
 
 #endif

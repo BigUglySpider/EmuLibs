@@ -3,12 +3,15 @@
 
 #include "../ArithmeticHelpers/CommonMath.h"
 #include "../TMPHelpers/OperatorChecks.h"
+#include "../TMPHelpers/StdFunctionChecks.h"
 #include "../TMPHelpers/TypeComparators.h"
 #include "../TMPHelpers/TypeConvertors.h"
 #include "../TMPHelpers/Values.h"
 #include "../TMPHelpers/VariadicHelpers.h"
 #include <cstddef>
 #include <functional>
+
+#include <iostream>
 
 namespace EmuCore
 {
@@ -591,6 +594,98 @@ namespace EmuCore
 		[[nodiscard]] constexpr inline std::invoke_result_t<do_negate<T_>, const T_&> operator()(const T_& val_) const
 		{
 			return do_negate<T_>()(val_);
+		}
+	};
+
+	template<class X_, class Y_ = X_, class Z_ = X_>
+	struct do_fmadd
+	{
+	private:
+		using _x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
+		using _y_uq = typename EmuCore::TMP::remove_ref_cv<Y_>::type;
+		using _z_uq = typename EmuCore::TMP::remove_ref_cv<Z_>::type;
+
+		static constexpr bool _any_fp = EmuCore::TMP::is_any_floating_point_v<_x_uq, _y_uq, _z_uq>;
+
+	public:
+		constexpr do_fmadd()
+		{
+		}
+
+		[[nodiscard]] constexpr inline decltype(auto) operator()(const X_& x_, const Y_& y_, const Z_& z_) const
+		{
+			if constexpr (!_any_fp)
+			{
+				// No need for fused arithmetic since this is only to prevent floating-point rounds before an add, and we have no FP vals
+				using mul_xy = EmuCore::do_multiply<_x_uq, _y_uq>;
+				using mul_xy_result = std::invoke_result_t<mul_xy, const X_&, const Y_&>;
+				using add_xy_z = EmuCore::do_add<mul_xy_result, _z_uq>;
+				return add_xy_z()(mul_xy()(x_, y_), z_);
+			}
+			else
+			{
+				using std::fma;
+				return fma(x_, y_, z_);
+			}
+		}
+	};
+
+	template<>
+	struct do_fmadd<void, void, void>
+	{
+	public:
+		constexpr do_fmadd()
+		{
+		}
+
+		template<typename X_, typename Y_, typename Z_>
+		constexpr inline decltype(auto) operator()(const X_& x_, const Y_& y_, const Z_& z_) const
+		{
+			using x_uq = typename EmuCore::TMP::remove_ref_cv_t<X_>;
+			using y_uq = typename EmuCore::TMP::remove_ref_cv_t<Y_>;
+			using z_uq = typename EmuCore::TMP::remove_ref_cv_t<Z_>;
+			return do_fmadd<x_uq, y_uq, z_uq>()(x_, y_, z_);
+		}
+	};
+
+	template<class X_, class Y_ = X_, class Z_ = X_>
+	struct do_fmsub
+	{
+	private:
+		static constexpr bool _z_may_be_negated = EmuCore::TMP::has_unary_minus_operator_v<const Z_&>;
+		using _z_negate_result = typename EmuCore::TMP::unary_minus_operator_result<const Z_&>::type;
+		static_assert(_z_may_be_negated, "Attempted to use an EmuCore::do_fmsub functor instance, but the provided Z_ argument cannot be negated. As fmsub is emulated through fmadd, const Z_& must be possible to negate via the unary operator-.");
+
+		using _x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
+		using _y_uq = typename EmuCore::TMP::remove_ref_cv<Y_>::type;
+		using _neg_z_uq = typename EmuCore::TMP::remove_ref_cv<_z_negate_result>::type;
+
+		using _fmadd = do_fmadd<_x_uq, _y_uq, _neg_z_uq>;
+		using _safe_fmadd_invoke_result = EmuCore::TMP::safe_invoke_result<_fmadd, const X_&, const Y_&, _z_negate_result>;
+
+	public:
+		template<typename = std::enable_if_t<_z_may_be_negated && _safe_fmadd_invoke_result::value>>
+		[[nodiscard]] constexpr inline typename _safe_fmadd_invoke_result::type operator()(const X_& x_, const Y_& y_, const Z_& z_) const
+		{
+			return _fmadd()(x_, y_, -z_);
+		}
+	};
+
+	template<>
+	struct do_fmsub<void, void, void>
+	{
+	public:
+		constexpr do_fmsub()
+		{
+		}
+
+		template<typename X_, typename Y_, typename Z_>
+		constexpr inline decltype(auto) operator()(const X_& x_, const Y_& y_, const Z_& z_) const
+		{
+			using x_uq = typename EmuCore::TMP::remove_ref_cv_t<X_>;
+			using y_uq = typename EmuCore::TMP::remove_ref_cv_t<Y_>;
+			using z_uq = typename EmuCore::TMP::remove_ref_cv_t<Z_>;
+			return do_fmsub<x_uq, y_uq, z_uq>()(x_, y_, z_);
 		}
 	};
 #pragma endregion
@@ -1334,6 +1429,36 @@ namespace EmuCore
 			return do_atan<T_>()(t_);
 		}
 	};
+
+	/// <summary>
+	/// <para> Template atan2 functor, used to perform the atan(y, x) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_atan2_constexpr` template. </para>
+	/// </summary>
+	template<typename T_>
+	struct do_atan2
+	{
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
+		constexpr do_atan2()
+		{
+		}
+		[[nodiscard]] constexpr inline out_t operator()(const T_& y_, const T_& x_) const
+		{
+			return EmuCore::DoMatchingAtan2<out_t, T_>(y_, x_);
+		}
+	};
+	template<>
+	struct do_atan2<void>
+	{
+		constexpr do_atan2()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_atan2<T_>, const T_&, const T_&> operator()(const T_& y_, const T_& x_) const
+		{
+			return do_atan2<T_>()(y_, x_);
+		}
+	};
 #pragma endregion
 
 #pragma region CONSTEXPR_TRIG_ARITHMETIC_FUNCTORS
@@ -1400,13 +1525,13 @@ namespace EmuCore
 		Div_ div_;
 		Mod_ mod_;
 
-		template<std::size_t NumIterations_>
+		template<std::size_t IterationCount_>
 		constexpr inline out_t _calculate_taylor_series(const out_t& in_) const
 		{
 			out_t out_ = out_t(1);
 			out_t pow_ = out_t(1);
 			out_t in_sqr_ = mul_(in_, in_);
-			_calculate_taylor_series<0, NumIterations_, 2>(in_sqr_, out_, pow_);
+			_calculate_taylor_series<0, IterationCount_, 2>(in_sqr_, out_, pow_);
 			return out_;
 		}
 		template<std::size_t Iteration_, std::size_t End_, std::size_t PowExponent_>
@@ -1434,10 +1559,10 @@ namespace EmuCore
 		constexpr do_cos_constexpr()
 		{
 		}
-		template<bool DoMod_ = true, typename T_>
+		template<bool Mod_ = DoMod_, typename T_>
 		constexpr inline std::invoke_result_t<do_cos_constexpr<T_, NumIterations_, DoMod_>, const T_&> operator()(const T_& val_) const
 		{
-			return do_cos_constexpr<T_, NumIterations_, DoMod_>()(val_);
+			return do_cos_constexpr<T_, NumIterations_, Mod_>()(val_);
 		}
 	};
 
@@ -1504,13 +1629,13 @@ namespace EmuCore
 		Div_ div_;
 		Mod_ mod_;
 
-		template<std::size_t NumIterations_>
+		template<std::size_t IterationCount_>
 		constexpr inline out_t _calculate_taylor_series(const out_t& in_) const
 		{
 			out_t out_ = in_;
 			out_t pow_ = in_;
 			out_t in_sqr_ = mul_(in_, in_);
-			_calculate_taylor_series<0, NumIterations_, 3>(in_sqr_, out_, pow_);
+			_calculate_taylor_series<0, IterationCount_, 3>(in_sqr_, out_, pow_);
 			return out_;
 		}
 		template<std::size_t Iteration_, std::size_t End_, std::size_t PowExponent_>
@@ -1544,7 +1669,6 @@ namespace EmuCore
 			return do_sin_constexpr<T_, NumIterations_, DoMod_>()(val_);
 		}
 	};
-
 	/// <summary>
 	/// <para> Template sin functor, used to perform the sin(value) function on a value of type T_. </para>
 	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
@@ -1622,6 +1746,316 @@ namespace EmuCore
 	};
 #pragma endregion
 
+#pragma region CONSTEXPR_INVERSE_TRIG_FUNCTORS
+	/// <summary>
+	/// <para> Template arctangent functor, used to perform the atan(y / x) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this provides a guarantee to perform a constexpr implementation of atan2 if possible. 
+	///		Specialisations are expected to follow this guarantee.
+	/// </para>
+	/// </summary>
+	template<typename T_>
+	struct do_atan2_constexpr
+	{
+	public:
+		using out_t = std::conditional_t
+		<
+			std::is_arithmetic_v<T_>,
+			EmuCore::TMP::first_floating_point_t<T_, float>,
+			T_
+		>;
+
+	private:
+		using add_func = EmuCore::do_add<out_t, out_t>;
+		using sub_func = EmuCore::do_subtract<out_t, out_t>;
+		using mul_func = EmuCore::do_multiply<out_t, out_t>;
+		using div_func = EmuCore::do_divide<out_t, out_t>;
+
+	public:
+		constexpr do_atan2_constexpr()
+		{
+		}
+		constexpr inline out_t operator()(T_ y_, T_ x_) const
+		{
+			// Approxiation adapted from NVIDIA reference @ https://developer.download.nvidia.com/cg/atan2.html
+			out_t abs_x = static_cast<out_t>(x_);
+			out_t abs_y = static_cast<out_t>(y_);
+			bool x_neg = EmuCore::do_cmp_less<out_t, out_t>()(abs_x, out_t(0));
+			bool y_neg = EmuCore::do_cmp_less<out_t, out_t>()(abs_y, out_t(0));
+			abs_x = _abs(abs_x, x_neg);
+			abs_y = _abs(abs_y, y_neg);
+			bool abs_y_greater = abs_y > abs_x;
+
+			out_t t3 = abs_x;
+			out_t t1 = abs_y;
+			out_t t0 = _min_or_max<true>(abs_x, abs_y);	// t0 = max(abs_x, abs_y)
+			t1 = _min_or_max<false>(abs_x, abs_y);	// t1 = min(abs_x, abs_y)
+			t3 = div_func()(out_t(1), t0);
+			t3 = mul_func()(t1, t3);
+
+			out_t t4 = mul_func()(t3, t3);
+			t0 = out_t(-0.013480470);
+			t0 = add_func()(mul_func()(t0, t4), out_t(0.057477314));
+			t0 = sub_func()(mul_func()(t0, t4), out_t(0.121239071));
+			t0 = add_func()(mul_func()(t0, t4), out_t(0.195635925));
+			t0 = sub_func()(mul_func()(t0, t4), out_t(0.332994597));
+			t0 = add_func()(mul_func()(t0, t4), out_t(0.999995630));
+			t3 = mul_func()(t0, t3);
+
+			t3 = add_func() // t3 = abs_y_greater ? ((pi / 2) - t3) : t3
+			(
+				mul_func()(static_cast<out_t>(abs_y_greater), sub_func()(EmuCore::Pi::HALF_PI<out_t>, t3)),
+				mul_func()(static_cast<out_t>(!abs_y_greater), t3)
+			);
+			t3 = add_func() // t3 = x_neg ? (pi - t3) : t3
+			(
+				mul_func()(static_cast<out_t>(x_neg), sub_func()(EmuCore::Pi::PI<out_t>, t3)),
+				mul_func()(static_cast<out_t>(!x_neg), t3)
+			);
+			return _abs(t3, y_neg);
+		}
+
+	private:
+		[[nodiscard]] static constexpr inline auto _abs(const out_t& in_, bool is_negative_)
+		{
+			// Branchless absolute operation
+			return mul_func()
+			(
+				in_,
+				add_func()
+				(
+					out_t(!is_negative_),
+					mul_func()(out_t(-1), out_t(is_negative_))
+				)
+			);
+		}
+
+		template<bool IsMax_>
+		[[nodiscard]] static constexpr inline decltype(auto) _min_or_max(const out_t& a_, const out_t& b_)
+		{
+			// Branchless min/max operation, typically faster (if not matching speed) on test hardware
+			using comparator = typename std::conditional<IsMax_, EmuCore::do_cmp_greater<out_t, out_t>, EmuCore::do_cmp_less<out_t, out_t>>::type;
+			bool cmp_result = comparator()(a_, b_);
+			return add_func()
+			(
+				mul_func()(static_cast<out_t>(cmp_result), a_),
+				mul_func()(static_cast<out_t>(!cmp_result), b_)
+			);
+		}
+	};
+
+	template<>
+	struct do_atan2_constexpr<void>
+	{
+		constexpr do_atan2_constexpr()
+		{
+		}
+		template<typename T_>
+		constexpr inline std::invoke_result_t<do_atan2_constexpr<T_>, const T_&, const T_&> operator()(const T_& y_, const T_& x_) const
+		{
+			return do_atan2_constexpr<T_>()(y_, x_);
+		}
+	};
+
+
+	/// <summary>
+	/// <para> Template arctangent functor, used to perform the atan(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this provides a guarantee to perform a constexpr implementation of atan if possible. 
+	///		Specialisations are expected to follow this guarantee.
+	/// </para>
+	/// </summary>
+	template<typename T_>
+	struct do_atan_constexpr
+	{
+		using out_t = std::conditional_t
+		<
+			std::is_arithmetic_v<T_>,
+			EmuCore::TMP::first_floating_point_t<T_, float>,
+			T_
+		>;
+		using atan2_func = EmuCore::do_atan2_constexpr<out_t>;
+
+		constexpr do_atan_constexpr()
+		{
+		}
+		constexpr inline out_t operator()(T_ val_) const
+		{
+			if constexpr (std::is_same_v<T_, out_t>)
+			{
+				return atan2_func()(val_, out_t(1));
+			}
+			else
+			{
+				return atan2_func()(static_cast<out_t>(val_), out_t(1));
+			}
+		}
+	};
+
+	template<>
+	struct do_atan_constexpr<void>
+	{
+		constexpr do_atan_constexpr()
+		{
+		}
+		template<typename T_>
+		constexpr inline std::invoke_result_t<do_atan_constexpr<T_>, const T_&> operator()(const T_& val_) const
+		{
+			return do_atan_constexpr<T_>()(val_);
+		}
+	};
+
+	/// <summary>
+	/// <para> Template arcsin functor, used to perform the asin(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this provides a guarantee to perform a constexpr implementation of asin if possible. 
+	///		Specialisations are expected to follow this guarantee.
+	/// </para>
+	/// </summary>
+	template<typename T_>
+	struct do_asin_constexpr
+	{
+		using out_t = std::conditional_t
+		<
+			std::is_arithmetic_v<T_>,
+			EmuCore::TMP::first_floating_point_t<T_, float>,
+			T_
+		>;
+
+		constexpr do_asin_constexpr() : add_(), mul_(), sub_()
+		{
+		}
+		constexpr inline out_t operator()(T_ val_) const
+		{
+			if constexpr (std::is_same_v<T_, out_t>)
+			{
+				return _calculate_asin(val_);
+			}
+			else
+			{
+				out_t val_as_out_t_ = static_cast<out_t>(val_);
+				return _calculate_asin(val_as_out_t_);
+			}
+		}
+
+	private:
+		using Add_ = EmuCore::do_add<out_t, out_t>;
+		using Mul_ = EmuCore::do_multiply<out_t, out_t>;
+		using Sub_ = EmuCore::do_subtract<out_t, out_t>;
+		Add_ add_;
+		Mul_ mul_;
+		Sub_ sub_;
+
+		constexpr inline out_t _calculate_asin(const out_t& in_) const
+		{
+			// Approxiation adapted from NVIDIA reference @ https://developer.download.nvidia.com/cg/asin.html
+			out_t one = out_t(1);
+			bool is_neg = in_ < 0;
+			out_t abs_in = mul_(in_, static_cast<out_t>(!is_neg) + (static_cast<out_t>(-1) * is_neg)); // abs_in = is_neg ? -in_ : in_
+			out_t result = out_t(-0.0187293);
+			result = mul_(result, abs_in);
+			result = add_(result, out_t(0.0742610));
+			result = mul_(result, abs_in);
+			result = sub_(result, out_t(0.2121144));
+			result = mul_(result, abs_in);
+			result = add_(result, out_t(1.5707288));
+			result = sub_(EmuCore::Pi::HALF_PI<out_t>, mul_(EmuCore::do_sqrt_constexpr<out_t>()(sub_(one, abs_in)), result));
+			return sub_(result, mul_(out_t(2), mul_(is_neg, result)));
+		}
+	};
+	template<>
+	struct do_asin_constexpr<void>
+	{
+		constexpr do_asin_constexpr()
+		{
+		}
+		template<typename T_>
+		constexpr inline std::invoke_result_t<do_asin_constexpr<T_>, const T_&> operator()(const T_& val_) const
+		{
+			return do_asin_constexpr<T_>()(val_);
+		}
+	};
+
+	/// <summary>
+	/// <para> Template arccosine functor, used to perform the acos(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this provides a guarantee to perform a constexpr implementation of acos if possible. 
+	///		Specialisations are expected to follow this guarantee.
+	/// </para>
+	/// </summary>
+	template<typename T_>
+	struct do_acos_constexpr
+	{
+		using out_t = std::conditional_t
+		<
+			std::is_arithmetic_v<T_>,
+			EmuCore::TMP::first_floating_point_t<T_, float>,
+			T_
+		>;
+
+		constexpr do_acos_constexpr() : add_(), sub_(), mul_(), div_()
+		{
+		}
+		constexpr inline out_t operator()(T_ val_) const
+		{
+			constexpr out_t pi_div_2 = EmuCore::Pi::PI<out_t> / 2;
+
+			if constexpr (std::is_same_v<T_, out_t>)
+			{
+				return _calculate_acos(val_);
+			}
+			else
+			{
+				out_t val_as_out_t_ = static_cast<out_t>(val_);
+				return _calculate_acos(val_as_out_t_);
+			}
+		}
+
+	private:
+		using Add_ = EmuCore::do_add<out_t, out_t>;
+		using Sub_ = EmuCore::do_subtract<out_t, out_t>;
+		using Mul_ = EmuCore::do_multiply<out_t, out_t>;
+		using Div_ = EmuCore::do_divide<out_t, out_t>;
+		Add_ add_;
+		Sub_ sub_;
+		Mul_ mul_;
+		Div_ div_;
+
+		constexpr inline out_t _calculate_acos(const out_t& in_) const
+		{
+			// Approximation adapted from NVIDIA reference @ https://developer.download.nvidia.com/cg/acos.html
+			bool is_neg = EmuCore::do_cmp_less<out_t, out_t>()(in_, out_t(0));
+			out_t abs_in = mul_(in_, add_(static_cast<out_t>(!is_neg), (static_cast<out_t>(-1) * is_neg))); // abs_in = is_neg ? -in_ : in_
+			out_t result = out_t(-0.0187293);
+			result = mul_(result, abs_in);
+			result = add_(result, out_t(0.0742610));
+			result = mul_(result, abs_in);
+			result = sub_(result, out_t(0.2121144));
+			result = mul_(result, abs_in);
+			result = add_(result, out_t(1.5707288));
+			result = mul_(result, EmuCore::do_sqrt_constexpr<out_t>()(sub_(out_t(1), abs_in)));
+			result = result - out_t(2) * static_cast<out_t>(is_neg) * result;
+			return add_(result, mul_(is_neg, EmuCore::Pi::PI<out_t>));
+		}
+	};
+	template<>
+	struct do_acos_constexpr<void>
+	{
+		constexpr do_acos_constexpr()
+		{
+		}
+		template<typename T_>
+		constexpr inline std::invoke_result_t<do_acos_constexpr<T_>, const T_&> operator()(const T_& val_) const
+		{
+			return do_acos_constexpr<T_>()(val_);
+		}
+	};
+#pragma endregion
+
 #pragma region MISC_ARITHMETIC_FUNCTORS
 	/// <summary>
 	/// <para> Functor which may be used to perform linear interpolations. </para>
@@ -1670,6 +2104,46 @@ namespace EmuCore
 		[[nodiscard]] constexpr inline std::invoke_result_t<do_lerp<A_, B_, T_>, const A_&, const B_&, const T_&> operator()(const A_& a_, const B_& b_, const T_& t_) const
 		{
 			return do_lerp<A_, B_, T_>()(a_, b_, t_);
+		}
+	};	
+
+	/// <summary>
+	/// <para> Functor which may be used to perform linear interpolations, while also taking advantage of fused instructions where possible. </para>
+	/// <para> Takes 3 type arguments, however only one or two may be passed. B_ will be the same type as A_ if omitted. T_ will be float if omitted. </para>
+	/// <para> Types should be considered for the equation FMADD(t, b - a, a). </para>
+	/// <para> do_lerp&lt;void&gt;, do_lerp&lt;void, void&gt;, and do_lerp&lt;void, void, void&gt; are reserved for a generic specialisation of do_lerp. </para>
+	/// </summary>
+	/// <typeparam name="A_">Type used to represent a in the equation FMADD(t, b - a, a).</typeparam>
+	/// <typeparam name="B_">Type used to represent b in the equation FMADD(t, b - a, a).</typeparam>
+	/// <typeparam name="T_">Type used to represent t in the equation FMADD(t, b - a, a).</typeparam>
+	template<class A_, class B_ = A_, class T_ = float>
+	struct do_fused_lerp
+	{
+		constexpr do_fused_lerp()
+		{
+		}
+		[[nodiscard]] constexpr inline auto operator()(const A_& a_, const B_& b_, const T_& t_) const
+		{
+			using sub_func = EmuCore::do_subtract<B_, A_>;
+			using sub_result = typename std::invoke_result<sub_func, const B_&, const A_&>::type;
+			using fmadd_func = EmuCore::do_fmadd<T_, sub_result, A_>;
+			return fmadd_func()(t_, sub_func()(b_, a_), a_);
+		}
+	};
+	/// <summary>
+	/// <para> Reserved generic specialisation of do_fused_lerp. </para>
+	/// <para> Determines the specialisation to make use of when the function operator() is called, based on the 3 arguments when called. </para>
+	/// </summary>
+	template<>
+	struct do_fused_lerp<void, void, void>
+	{
+		constexpr do_fused_lerp()
+		{
+		}
+		template<class A_, class B_, class T_>
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_fused_lerp<A_, B_, T_>, const A_&, const B_&, const T_&> operator()(const A_& a_, const B_& b_, const T_& t_) const
+		{
+			return do_fused_lerp<A_, B_, T_>()(a_, b_, t_);
 		}
 	};
 

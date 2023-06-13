@@ -3,6 +3,8 @@
 
 #include <type_traits>
 
+#include "CommonTMPHelpers.h"
+
 namespace EmuCore::TMP
 {
 	template<typename T_>
@@ -148,7 +150,7 @@ namespace EmuCore::TMP
 				<
 					NumBytes_ == sizeof(std::uint64_t),
 					std::uint64_t,
-					std::false_type
+					EmuCore::TMP::emu_tmp_err
 				>
 			>
 		>
@@ -171,7 +173,7 @@ namespace EmuCore::TMP
 				<
 					NumBytes_ == sizeof(std::int64_t),
 					std::int64_t,
-					std::false_type
+					EmuCore::TMP::emu_tmp_err
 				>
 			>
 		>
@@ -324,7 +326,7 @@ namespace EmuCore::TMP
 	{
 		using type = typename Template_<Ts_...>::value_type;
 	};
-	template<template<std::size_t Size__, typename Ts__> class Template_, std::size_t Size_, typename...Ts_>
+	template<template<std::size_t InSize_, typename Ts__> class Template_, std::size_t Size_, typename...Ts_>
 	struct get_value_type<Template_<Size_, Ts_...>>
 	{
 		using type = typename Template_<Size_, Ts_...>::value_type;
@@ -334,12 +336,12 @@ namespace EmuCore::TMP
 	{
 		using type = typename Template_<SizeX_, SizeY_, Ts_...>::value_type;
 	};
-	template<template<typename T__, std::size_t Size__> class Template_, typename T_, std::size_t Size_>
+	template<template<typename U_, std::size_t InSize_> class Template_, typename T_, std::size_t Size_>
 	struct get_value_type<Template_<T_, Size_>>
 	{
 		using type = typename Template_<T_, Size_>::value_type;
 	};
-	template<template<typename T__, std::size_t SizeX__, std::size_t SizeY__> class Template_, typename T_, std::size_t SizeX_, std::size_t SizeY_>
+	template<template<typename U_, std::size_t SizeX__, std::size_t SizeY__> class Template_, typename T_, std::size_t SizeX_, std::size_t SizeY_>
 	struct get_value_type<Template_<T_, SizeX_, SizeY_>>
 	{
 		using type = typename Template_<T_, SizeX_, SizeY_>::value_type;
@@ -426,20 +428,52 @@ namespace EmuCore::TMP
 	/// <para> This can effectively be considered an `unmove` cast, treating lvalues as lvalues and casting rvalues to lvalues. </para>
 	/// <para>
 	///		WARNING: This is for casting pre-existing, named rvalues.
-	///		Passing a new rvalue (such as `my_type(5)) will result in output of a dangling reference. 
+	///		Passing a new rvalue (such as `my_type(5)`) will result in output of a dangling reference. 
 	/// </para>
 	/// </summary>
 	/// <param name="ref_">Reference to cast to an lvalue reference.</param>
 	/// <returns>The passed ref_ cast to an lvalue reference.</returns>
 	template<typename T_>
-	[[nodiscard]] constexpr inline std::add_lvalue_reference_t<T_> lval_ref_cast(std::remove_reference_t<T_>& ref_)
+	[[nodiscard]] constexpr inline std::remove_reference_t<T_>& lval_ref_cast(std::remove_reference_t<T_>& ref_)
+	{
+		return ref_;
+	}
+
+	/// <summary>
+	/// <para> Casts a reference to an lvalue-reference. </para>
+	/// <para> This can effectively be considered an `unmove` cast, treating lvalues as lvalues and casting rvalues to lvalues. </para>
+	/// <para>
+	///		WARNING: This is for casting pre-existing, named rvalues.
+	///		Passing a new rvalue (such as `my_type(5)`) will result in output of a dangling reference. 
+	/// </para>
+	/// </summary>
+	/// <param name="ref_">Reference to cast to an lvalue reference.</param>
+	/// <returns>The passed ref_ cast to an lvalue reference.</returns>
+	template<typename T_>
+	[[nodiscard]] constexpr inline std::remove_reference_t<T_>& lval_ref_cast(std::remove_reference_t<T_>&& ref_)
+	{
+		return static_cast<std::remove_reference_t<T_>&>(ref_);
+	}
+
+	/// <summary>
+	/// <para> Casts a reference to a const-qualified lvalue-reference. </para>
+	/// <para> This can effectively be considered an `unmove` cast, treating lvalues as lvalues and casting rvalues to lvalues. </para>
+	/// <para>
+	///		WARNING: This is for casting pre-existing, named rvalues.
+	///		Passing a new rvalue (such as `my_type(5)) will result in output of a dangling reference. 
+	/// </para>
+	/// </summary>
+	/// <param name="ref_">Reference to cast to an lvalue reference.</param>
+	/// <returns>The passed ref_ cast to a const-qualified lvalue reference.</returns>
+	template<typename T_>
+	[[nodiscard]] constexpr inline const std::remove_reference_t<T_>& const_lval_ref_cast(std::remove_reference_t<T_>& ref_)
 	{
 		return ref_;
 	}
 	template<typename T_>
-	[[nodiscard]] constexpr inline std::add_lvalue_reference_t<T_> lval_ref_cast(std::remove_reference_t<T_>&& ref_)
+	[[nodiscard]] constexpr inline const std::remove_reference_t<T_>& const_lval_ref_cast(std::remove_reference_t<T_>&& ref_)
 	{
-		return static_cast<std::add_lvalue_reference_t<T_>>(ref_);
+		return static_cast<std::remove_reference_t<T_>&>(ref_);
 	}
 
 	/// <summary> Type used to alias type T_ as its internal type alias. Mainly for use in conditions such as `std::conditional_t&lt;bool, x, y&gt;::type`. </summary>
@@ -491,6 +525,60 @@ namespace EmuCore::TMP
 
 	template<typename T_>
 	using floating_point_equivalent_t = typename floating_point_equivalent<T_>::type;
+
+	/// <summary> Determines the type that results from a call to std::forward on a declval of type T_. </summary>
+	template<typename T_>
+	struct forward_result
+	{
+		using type = decltype(std::forward<T_>(std::declval<T_>()));
+	};
+	template<typename T_>
+	using forward_result_t = typename forward_result<T_>::type;
+
+	/// <summary>
+	/// <para> Helper for determining the type argument of a template where the type is known to be a template, but the template instantiation itself is not available. </para>
+	/// <para> This will only work with single-argument templates. </para>
+	/// <para> When passed a non-template type or a type with non-type parameters and/or more than 1 argument will result in a `type` of `void`. </para>
+	/// <para> When passed a template instantiation of that takes just a single argument, `type` will be the type passed to instantiate the template. </para>
+	/// </summary>
+	template<typename T_>
+	struct type_argument
+	{
+	private:
+		using _t_uq = typename EmuCore::TMP::remove_ref_cv<T_>::type;
+
+	public:
+		using type = typename std::conditional_t
+		<
+			std::is_same_v<_t_uq, T_>,
+			EmuCore::TMP::dummy_type_wrapper<void>,
+			type_argument<_t_uq>
+		>::type;
+	};
+	template<template<class Arg_> class Template_, typename T_>
+	struct type_argument<Template_<T_>>
+	{
+		using type = T_;
+	};
+
+	/// <summary>
+	/// <para> Dereferences the input value if it is a pointer, or simply forwards it back if it is not. </para>
+	/// <para> Intended for cases where a value can be either a pointer or a reference. </para>
+	/// </summary>
+	/// <param name="value_">Pointer to dereference or reference to forward back.</param>
+	/// <returns>`value_` dereferenced if it is a pointer, or `value_` forwarded otherwise.</returns>
+	template<class T_>
+	[[nodiscard]] constexpr inline decltype(auto) do_dereference(T_&& value_) noexcept(!std::is_pointer_v<typename std::remove_cvref<T_>::type>)
+	{
+		if constexpr (std::is_pointer_v<typename std::remove_cvref<T_>::type>)
+		{
+			return *value_;
+		}
+		else
+		{
+			return std::forward<T_>(value_);
+		}
+	}
 }
 
 #endif

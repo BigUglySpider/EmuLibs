@@ -150,201 +150,6 @@ namespace EmuCore::TMP
 	};
 
 	/// <summary>
-	/// <para> Type for converting a provided Val_ to a string in the provided Base_, represented using the provided Char_ type. </para>
-	/// <para> Conversion may be performed at compile time. To guarantee this, assign a newly constructed item of this type to a constexpr value. </para>
-	/// <para>
-	///		Upper_ is only used by bases higher than 10, and determines if alphabetical characters appear in upper or lower case. 
-	///		For example, when converting 30 to a base16 string, output will be 1E if Upper_ is true, or 1e if Upper_ is false.
-	/// </para>
-	/// </summary>
-	template<auto Val_, std::size_t Base_ = 10, typename Char_ = char, bool Upper_ = true>
-	struct constexpr_to_str
-	{
-	private:
-		static_assert
-		(
-			Base_ >= 2 && Base_ <= 36,
-			"Invalid Base_ argument provided to EmuCore::TMP::constexpr_to_str. Only bases in the inclusive range 2:36 may be used."
-		);
-
-		using _val_type = decltype(Val_);
-
-		// As digit list uses purely numeric and alphabetic ASCII chars, we just store as such since UTF-encoding uses the same values in this range
-		[[nodiscard]] static constexpr inline const char* _make_digit_list()
-		{
-			if constexpr (Upper_)
-			{
-				return "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-			}
-			else
-			{
-				return "0123456789abcdefghijklmnopqrstuvwxyz";
-			}
-		}
-		static constexpr const char* const _digit_list = _make_digit_list();
-
-		// Type to easily construct the correct character literal for CharType_.
-		template<typename CharType_>
-		[[nodiscard]] constexpr inline CharType_ _make_minus()
-		{
-			return CharType_('-');
-		}
-		template<>
-		[[nodiscard]] constexpr inline char _make_minus<char>()
-		{
-			return '-';
-		}
-		template<>
-		[[nodiscard]] constexpr inline unsigned char _make_minus<unsigned char>()
-		{
-			return '-';
-		}
-		template<>
-		[[nodiscard]] constexpr inline char16_t _make_minus<char16_t>()
-		{
-			return u'-';
-		}
-		template<>
-		[[nodiscard]] constexpr inline char32_t _make_minus<char32_t>()
-		{
-			return U'-';
-		}
-		template<>
-		[[nodiscard]] constexpr inline wchar_t _make_minus<wchar_t>()
-		{
-			return L'-';
-		}
-
-		constexpr inline void _invalid_val_type_assertion()
-		{
-			static_assert
-			(
-				EmuCore::TMP::get_false<_val_type>(),
-				"Attempted to perform a constexpr_to_str operation, but the provided Val_ type is not supported for the operation. Only integral types are currently supported."
-			);
-		}
-
-		[[nodiscard]] static constexpr inline _val_type _zero_val()
-		{
-			if constexpr (std::is_constructible_v<_val_type, decltype(0)>)
-			{
-				return _val_type(0);
-			}
-			else if constexpr (std::is_constructible_v<_val_type, decltype(0.0f)>)
-			{
-				return _val_type(0.0f);
-			}
-			else
-			{
-				return _val_type();
-			}
-		}
-
-		[[nodiscard]] static constexpr inline _val_type _abs_val()
-		{
-			if constexpr (Val_ < _val_type(0))
-			{
-				return -Val_;
-			}
-			else
-			{
-				return Val_;
-			}
-		}
-
-		[[nodiscard]] static constexpr inline std::size_t _buffer_size()
-		{
-			// 2 guaranteed chars if Val_ < 0 (-, and terminator), otherwise just 1 guaranteed char (terminator)
-			constexpr std::size_t additional_char_count_ = (Val_ < 0) ? 2 : 1;
-			std::size_t char_count_ = additional_char_count_;
-
-			if constexpr (std::is_integral_v<_val_type>)
-			{
-				constexpr _val_type zero_ = _zero_val();
-			
-				if constexpr (Val_ != 0)
-				{
-					for (_val_type val_ = _abs_val(); val_ != zero_; val_ /= Base_)
-					{
-						++char_count_;
-					}
-				}
-				else
-				{
-					++char_count_;
-				}
-			}
-			else
-			{
-				_invalid_val_type_assertion();
-			}
-
-			return char_count_;
-		}
-
-		constexpr inline void _set()
-		{
-			// Build the string from end-begin, starting with the null-terminator
-			std::size_t index_ = _buffer_size() - 1;
-			_buffer[index_] = Char_(0);
-
-			if constexpr (std::is_integral_v<_val_type>)
-			{
-				constexpr _val_type zero_ = _zero_val();
-				
-				if constexpr (Val_ != zero_)
-				{
-					for (_val_type val_ = _abs_val(); val_ != zero_; val_ /= Base_)
-					{
-						_buffer[--index_] = Char_(_digit_list[std::size_t(val_) % Base_]);
-					}
-					if constexpr (Val_ < 0)
-					{
-						_buffer[--index_] = _make_minus<Char_>();
-					}
-				}
-				else
-				{
-					_buffer[--index_] = _digit_list[0];
-				}
-			}
-			else
-			{
-				_invalid_val_type_assertion();
-			}
-		}
-
-		std::array<Char_, _buffer_size()> _buffer;
-
-	public:
-		constexpr inline constexpr_to_str() : _buffer({ 0 })
-		{
-			_set();
-		}
-
-		constexpr inline operator const Char_* () const
-		{
-			return get();
-		}
-
-		constexpr inline operator std::basic_string<Char_> () const
-		{
-			return get_basic_str();
-		}
-
-		constexpr inline const Char_* get() const
-		{
-			return _buffer.data();
-		}
-
-		constexpr inline std::basic_string<Char_> get_basic_str() const
-		{
-			constexpr std::size_t _buffer_size_without_terminator = _buffer_size() - 1;
-			return std::basic_string<Char_>(get(), _buffer_size_without_terminator);
-		}
-	};
-
-	/// <summary>
 	/// <para> Function which may be used to form a constant of type T_ using the provided Constant_ argument. </para>
 	/// <para> 
 	///		If Constant_ is an arithmetic type, and T_ cannot be formed from it, 
@@ -499,6 +304,115 @@ namespace EmuCore::TMP
 			}
 		}
 	};
+
+	template<class Out_, class In_>
+	[[nodiscard]] constexpr inline Out_ construct_or_cast(In_&& in_)
+	{
+		using forward_result_type = decltype(std::forward<In_>(in_));
+		if constexpr (std::is_constructible_v<Out_, forward_result_type>)
+		{
+			return Out_(std::forward<In_>(in_));
+		}
+		else if constexpr (EmuCore::TMP::is_static_castable_v<forward_result_type, Out_>)
+		{
+			return static_cast<Out_>(std::forward<In_>(in_));
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<In_>(),
+				"Attempted to construct-or-cast an Out_ value from a provided In_ value via EmuCore::TMP::construct_or_cast, but the provided In_ type could not be used to construct or static_cast to the desired output type after forwarding."
+			);
+		}
+	}
+
+	template<class Out_, class In_>
+	[[nodiscard]] constexpr inline bool valid_construct_or_cast()
+	{
+		using forward_result_type = decltype(std::forward<In_>(std::declval<In_>()));
+		return 
+		(
+			std::is_constructible_v<Out_, forward_result_type> ||
+			EmuCore::TMP::is_static_castable_v<forward_result_type, Out_>
+		);
+	}
+
+	/// <summary>
+	/// <para> Assigns the provided out_ reference via forwarding in_, or creates a CastType_ from in_ if direct assignment is decided against and assigns out_ via that. </para>
+	/// <para> 
+	///		Direct Assignment: Occurs when out_ is assignable via forwarding in_, 
+	///		and their unqualified types are either the same, or at least 1 of them is not an arithmetic type. 
+	///		This is to force an explicit cast when using differing arithmetic types, so no implicit conversions are performed.
+	/// </para>
+	/// <para>
+	///		Cast Assignment: Occurs when Direct Assignment is NOT allowed to occur, and out_ is assignable via a newly created CastType_.
+	/// </para>
+	/// </summary>
+	/// <param name="out_">: Reference to assign to.</param>
+	/// <param name="in_">: Value to assign out_ via if Direct Assignment may occur, or used to create a CastType_ if Cast Assignment is performed.</param>
+	template<class CastType_, class In_, class Out_>
+	constexpr inline void assign_direct_or_cast(Out_& out_, In_&& in_)
+	{
+		using in_uq = EmuCore::TMP::remove_ref_cv_t<In_>;
+		using out_uq = EmuCore::TMP::remove_ref_cv_t<Out_>;
+		using in_forward_result = decltype(std::forward<In_>(in_));
+		constexpr bool both_arithmetic_ = std::is_arithmetic_v<in_uq> && std::is_arithmetic_v<out_uq>;
+		constexpr bool same_type_ = std::is_same_v<in_uq, out_uq>;
+		constexpr bool allow_direct_assign_if_possible_ = (!both_arithmetic_ || same_type_);
+
+		if constexpr (std::is_assignable_v<Out_&, in_forward_result> && allow_direct_assign_if_possible_)
+		{
+			out_ = std::forward<In_>(in_);
+		}
+		else if constexpr(std::is_assignable_v<Out_&, CastType_>)
+		{
+			if constexpr (valid_construct_or_cast<CastType_, In_>())
+			{
+				out_ = construct_or_cast<CastType_, In_>(std::forward<In_>(in_));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<In_>(),
+					"Attempted to assign either directly or via a cast depending on constraints based on the passed types, but the provided In_ type could not be used to directly assign to the output value, and it could not be used to construct or static_cast to the provided CastType_."
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<In_, CastType_>(),
+				"Attempted to assign either directly or via a cast depending on constraints based on the passed types, but the provided In_ type could not be used to directly assign to the output value, and the CastType_ also could not be used to assign to the output value."
+			);
+		}
+	}
+
+	template<class CastType_, class In_, class Out_>
+	[[nodiscard]] constexpr inline bool valid_assign_direct_or_cast()
+	{
+		using in_uq = EmuCore::TMP::remove_ref_cv_t<In_>;
+		using out_uq = EmuCore::TMP::remove_ref_cv_t<Out_>;
+		using in_forward_result = decltype(std::forward<In_>(std::declval<In_>()));
+		constexpr bool both_arithmetic_ = std::is_arithmetic_v<in_uq> && std::is_arithmetic_v<out_uq>;
+		constexpr bool same_type_ = std::is_same_v<in_uq, out_uq>;
+		constexpr bool allow_direct_assign_if_possible_ = (!both_arithmetic_ || same_type_);
+
+		if constexpr (std::is_assignable_v<Out_&, in_forward_result> && allow_direct_assign_if_possible_)
+		{
+			return true;
+		}
+		else if constexpr(std::is_assignable_v<Out_&, CastType_>)
+		{
+			return valid_construct_or_cast<CastType_, In_>();
+		}
+		else
+		{
+			return false;
+		}
+	}
 }
 
 #endif

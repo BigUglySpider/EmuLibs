@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_vector_MISC_ARITHMETIC_H_INC_
-#define EMU_MATH_vector_MISC_ARITHMETIC_H_INC_ 1
+#ifndef EMU_MATH_VECTOR_MISC_ARITHMETIC_H_INC_
+#define EMU_MATH_VECTOR_MISC_ARITHMETIC_H_INC_ 1
 
 #include "_common_vector_helpers.h"
 #include "../../../../EmuCore/Functors/Arithmetic.h"
@@ -8,8 +8,10 @@
 // CONTAINS:
 // --- abs
 // --- lerp
-// --- min
-// --- max
+// --- min (self)
+// --- min (a, b)
+// --- max (self)
+// --- max (a, b)
 // --- clamp_min
 // --- clamp_max
 // --- clamp
@@ -112,7 +114,7 @@ namespace EmuMath::Helpers
 	constexpr inline void vector_abs_range(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		using Func_ = EmuCore::do_abs<typename EmuMath::Vector<InSize_, InT_>::value_type_uq>;
-		EMU_MATH_VECTOR_MUTATION_REF_RANGE(Func_, OutT_, OutSize_, InSize_, InT_, BeginIndex_, EndIndex_, BeginIndex_)(out_vector_, in_vector_, in_vector_);
+		EMU_MATH_VECTOR_MUTATION_REF_RANGE(Func_, OutSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_, BeginIndex_)(out_vector_, in_vector_, in_vector_);
 	}
 
 	/// <summary>
@@ -241,7 +243,7 @@ namespace EmuMath::Helpers
 	/// <param name="b_">Scalar or EmuMath Vector used as the target point of interpolations. b in the equation `a + ((b - a) * t)`.</param>
 	/// <param name="t_">Scalar or EmuMath Vector used as the weighting of interpolations. t in the equation `a + ((b - a) * t)`.</param>
 	template<std::size_t OutSize_, typename OutT_, std::size_t ASize_, typename AT_, class B_, class T_>
-	[[nodiscard]] constexpr inline void vector_lerp(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<ASize_, AT_>& vector_a_, B_&& b_, T_&& t_)
+	constexpr inline void vector_lerp(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<ASize_, AT_>& vector_a_, B_&& b_, T_&& t_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE(EmuCore::do_lerp, OutSize_, OutT_)(out_vector_, vector_a_, std::forward<B_>(b_), std::forward<T_>(t_));
 	}
@@ -335,7 +337,7 @@ namespace EmuMath::Helpers
 	/// <param name="b_">Scalar or EmuMath Vector used as the target point of interpolations. b in the equation `a + ((b - a) * t)`.</param>
 	/// <param name="t_">Scalar or EmuMath Vector used as the weighting of interpolations. t in the equation `a + ((b - a) * t)`.</param>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ASize_, typename AT_, typename B_, typename T_, std::size_t OutSize_, typename OutT_>
-	[[nodiscard]] constexpr inline void vector_lerp_range
+	constexpr inline void vector_lerp_range
 	(
 		EmuMath::Vector<OutSize_, OutT_>& out_vector_,
 		const EmuMath::Vector<ASize_, AT_>& vector_a_,
@@ -449,7 +451,7 @@ namespace EmuMath::Helpers
 	/// <param name="b_">Scalar or EmuMath Vector used as the target point of interpolations. b in the equation `a + ((b - a) * t)`.</param>
 	/// <param name="t_">Scalar or EmuMath Vector used as the weighting of interpolations. t in the equation `a + ((b - a) * t)`.</param>
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t LerpBegin_, typename AT_, std::size_t ASize_, typename B_, typename T_, std::size_t OutSize_, typename OutT_>
-	[[nodiscard]] constexpr inline void vector_lerp_range_no_copy
+	constexpr inline void vector_lerp_range_no_copy
 	(
 		EmuMath::Vector<OutSize_, OutT_>& out_vector_,
 		const EmuMath::Vector<ASize_, AT_>& vector_a_,
@@ -658,7 +660,7 @@ namespace EmuMath::Helpers
 
 	/// <summary>
 	/// <para> Outputs a Vector with indices in the provided index range containing the lowest values of indices of vector_a_ and b_, starting from index MinBegin_. </para>
-	/// <para> Indices outside of the provided range will be default-constructed. </para>
+	/// <para> Indices outside of the provided range will be defaulted. </para>
 	/// <para> If B_ is an EmuMath Vector: Respective indices will be compared. Otherwise, all indices in vector_a_ will be compared with b_ directly. </para>
 	/// <para> OutBegin_: Inclusive index at which to start writing min values to the output Vector. </para>
 	/// <para> OutEnd_: Exclusive index at which to stop writing min values to the output Vector. </para>
@@ -924,7 +926,7 @@ namespace EmuMath::Helpers
 
 	/// <summary>
 	/// <para> Outputs a Vector with indices in the provided index range containing the greatest values of indices of vector_a_ and b_, starting from index MinBegin_. </para>
-	/// <para> Indices outside of the provided range will be default-constructed. </para>
+	/// <para> Indices outside of the provided range will be defaulted. </para>
 	/// <para> If B_ is an EmuMath Vector: Respective indices will be compared. Otherwise, all indices in vector_a_ will be compared with b_ directly. </para>
 	/// <para> OutBegin_: Inclusive index at which to start writing min values to the output Vector. </para>
 	/// <para> OutEnd_: Exclusive index at which to stop writing min values to the output Vector. </para>

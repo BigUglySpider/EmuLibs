@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_vector_ROUNDS_H_INC_
-#define EMU_MATH_vector_ROUNDS_H_INC_ 1
+#ifndef EMU_MATH_VECTOR_ROUNDS_H_INC_
+#define EMU_MATH_VECTOR_ROUNDS_H_INC_ 1
 
 #include "_common_vector_helpers.h"
 #include "../../../../EmuCore/Functors/Arithmetic.h"
@@ -111,7 +111,7 @@ namespace EmuMath::Helpers
 	constexpr inline void vector_floor_range(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		using Func_ = EmuCore::do_floor<typename EmuMath::Vector<InSize_, InT_>::value_type_uq>;
-		EMU_MATH_VECTOR_MUTATION_REF_RANGE(Func_, OutT_, OutSize_, InSize_, InT_, BeginIndex_, EndIndex_, BeginIndex_)(out_vector_, in_vector_, in_vector_);
+		EMU_MATH_VECTOR_MUTATION_REF_RANGE(Func_, OutSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_, BeginIndex_)(out_vector_, in_vector_, in_vector_);
 	}
 
 	/// <summary>
@@ -280,7 +280,7 @@ namespace EmuMath::Helpers
 	constexpr inline void vector_ceil_range(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		using Func_ = EmuCore::do_ceil<typename EmuMath::Vector<InSize_, InT_>::value_type_uq>;
-		EMU_MATH_VECTOR_MUTATION_REF_RANGE(Func_, OutT_, OutSize_, InSize_, InT_, BeginIndex_, EndIndex_, BeginIndex_)(out_vector_, in_vector_, in_vector_);
+		EMU_MATH_VECTOR_MUTATION_REF_RANGE(Func_, OutSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_, BeginIndex_)(out_vector_, in_vector_, in_vector_);
 	}
 
 	/// <summary>
@@ -449,7 +449,7 @@ namespace EmuMath::Helpers
 	constexpr inline void vector_trunc_range(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		using Func_ = EmuCore::do_trunc<typename EmuMath::Vector<InSize_, InT_>::value_type_uq>;
-		EMU_MATH_VECTOR_MUTATION_REF_RANGE(Func_, OutT_, OutSize_, InSize_, InT_, BeginIndex_, EndIndex_, BeginIndex_)(out_vector_, in_vector_, in_vector_);
+		EMU_MATH_VECTOR_MUTATION_REF_RANGE(Func_, OutSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_, BeginIndex_)(out_vector_, in_vector_, in_vector_);
 	}
 
 	/// <summary>
