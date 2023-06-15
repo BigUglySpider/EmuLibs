@@ -346,3 +346,10 @@ ASALocalRun/
 **/tmp
 **/ignore
 **/ignore/**
+
+# testing ignores
+main.cpp
+
+# vs ignores
+**/.vscode
+**/.vscode/**
