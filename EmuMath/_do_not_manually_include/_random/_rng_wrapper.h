@@ -1,6 +1,7 @@
 #ifndef EMU_MATH_RNG_WRAPPER_H_INC_
 #define EMU_MATH_RNG_WRAPPER_H_INC_ 1
 
+#include "../../../EmuCore/CommonConcepts/Arithmetic.h"
 #include "../../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include <chrono>
 #include <limits>
@@ -189,22 +190,40 @@ namespace EmuMath
 		/// </summary>
 		/// <typeparam name="OutInt_">Type to output, defaulting to this wrapper's int_type. Must be integral.</typeparam>
 		/// <returns>Next value from this wrapper's engine using a uniform int distribution.</returns>
-		template<typename OutInt_ = int_type, typename RequiresIntOutput_ = std::enable_if_t<std::is_integral_v<OutInt_>>>
+		template<EmuConcepts::Integer OutInt_ = int_type>
 		[[nodiscard]] inline OutInt_ NextInt()
 		{
-			std::uniform_int_distribution<OutInt_> dist_(ValueFromInt<OutInt_>(min_int), ValueFromInt<OutInt_>(max_int));
-			return dist_(rng);
+			if constexpr (sizeof(OutInt_) == 1)
+			{
+				// bytes not allowed, so we want a larger width to cast to a byte
+				using _next_size = typename EmuCore::TMP::next_size_up<typename std::remove_cvref<OutInt_>::type>::type;
+				return static_cast<OutInt_>(NextInt<_next_size>());
+			}
+			else
+			{
+				std::uniform_int_distribution<OutInt_> dist_(ValueFromInt<OutInt_>(min_int), ValueFromInt<OutInt_>(max_int));
+				return dist_(rng);
+			}
 		}
 		/// <summary>
 		/// <para> Produces the next output from this wrapper's engine as the provided OutInt_, using a custom min-max range which ignores that set for this wrapper. </para>
 		/// </summary>
 		/// <typeparam name="OutInt_">Type to output, defaulting to this wrapper's int_type. Must be integral.</typeparam>
 		/// <returns>Next value from this wrapper's engine using a uniform int distribution.</returns>
-		template<typename OutInt_ = int_type, typename RequiresIntOutput_ = std::enable_if_t<std::is_integral_v<OutInt_>>>
+		template<EmuConcepts::Integer OutInt_ = int_type>
 		[[nodiscard]] inline OutInt_ NextInt(OutInt_ custom_min_, OutInt_ custom_max_)
 		{
-			std::uniform_int_distribution<OutInt_> dist_(custom_min_, custom_max_);
-			return dist_(rng);
+			if constexpr (sizeof(OutInt_) == 1)
+			{
+				// bytes not allowed, so we want a larger width to cast to a byte
+				using _next_size = typename EmuCore::TMP::next_size_up<typename std::remove_cvref<OutInt_>::type>::type;
+				return static_cast<OutInt_>(NextInt<_next_size>());
+			}
+			else
+			{
+				std::uniform_int_distribution<OutInt_> dist_(custom_min_, custom_max_);
+				return dist_(rng);
+			}
 		}
 
 		/// <summary>
@@ -212,7 +231,7 @@ namespace EmuMath
 		/// </summary>
 		/// <typeparam name="OutFP_">Type to output, defaulting to this wrapper's int_type. Must be a floating point type.</typeparam>
 		/// <returns>Next value from this wrapper's engine using a uniform real distribution.</returns>
-		template<typename OutFP_ = double, typename RequiresFloatingPointOutput_ = std::enable_if_t<std::is_floating_point_v<OutFP_>>>
+		template<EmuConcepts::FloatingPoint OutFP_ = double>
 		[[nodiscard]] inline OutFP_ NextReal()
 		{
 			std::uniform_real_distribution<OutFP_> dist_(static_cast<OutFP_>(min_float), static_cast<OutFP_>(max_float));
@@ -223,7 +242,7 @@ namespace EmuMath
 		/// </summary>
 		/// <typeparam name="OutFP_">Type to output, defaulting to this wrapper's int_type. Must be a floating point type.</typeparam>
 		/// <returns>Next value from this wrapper's engine using a uniform real distribution.</returns>
-		template<typename OutFP_ = double, typename RequiresFloatingPointOutput_ = std::enable_if_t<std::is_floating_point_v<OutFP_>>>
+		template<EmuConcepts::FloatingPoint OutFP_ = double>
 		[[nodiscard]] inline OutFP_ NextReal(OutFP_ custom_min_, OutFP_ custom_max_)
 		{
 			std::uniform_real_distribution<OutFP_> dist_(custom_min_, custom_max_);
