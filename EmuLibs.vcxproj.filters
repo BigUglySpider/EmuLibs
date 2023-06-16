@@ -1181,5 +1181,11 @@
     <ClInclude Include="EmuCore\TMPHelpers\VariadicHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuCore\Collections\RingBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuCore\Functors\PrintIterable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

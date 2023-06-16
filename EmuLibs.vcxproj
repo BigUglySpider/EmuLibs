@@ -27,6 +27,7 @@
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonAlgebra.h" />
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonMath.h" />
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonValues.h" />
+    <ClInclude Include="EmuCore\Collections\RingBuffer.h" />
     <ClInclude Include="EmuCore\CommonConcepts\Arithmetic.h" />
     <ClInclude Include="EmuCore\CommonConcepts\Characters.h" />
     <ClInclude Include="EmuCore\CommonConcepts\CommonRequirements.h" />
@@ -51,6 +52,7 @@
     <ClInclude Include="EmuCore\Functors\Comparators.h" />
     <ClInclude Include="EmuCore\Functors\Convertors.h" />
     <ClInclude Include="EmuCore\Functors\MiscMath.h" />
+    <ClInclude Include="EmuCore\Functors\PrintIterable.h" />
     <ClInclude Include="EmuCore\Functors\StdOps.h" />
     <ClInclude Include="EmuCore\TestingHelpers\LoopingTestHarness.h" />
     <ClInclude Include="EmuCore\TMPHelpers\CommonTMPHelpers.h" />
