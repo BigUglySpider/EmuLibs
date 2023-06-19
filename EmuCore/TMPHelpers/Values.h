@@ -5,6 +5,7 @@
 #include <limits>
 #include <string>
 #include "OperatorChecks.h"
+#include "TypeConvertors.h"
 
 namespace EmuCore::TMP
 {
