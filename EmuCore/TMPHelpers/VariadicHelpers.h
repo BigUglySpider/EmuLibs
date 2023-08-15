@@ -4,6 +4,7 @@
 #include "TypeComparators.h"
 #include "TypeConvertors.h"
 #include "../Functors/Comparators.h"
+#include <array>
 #include <utility>
 
 namespace EmuCore::TMP
@@ -1009,6 +1010,48 @@ namespace EmuCore::TMP
 
 	template<class IntegerSequence_>
 	using make_inverted_integer_sequence = typename inverted_integer_sequence_maker<IntegerSequence_>::type;
+
+
+	/// <summary>
+	/// <para> Helper to construct a std::array containing type T_ a number of times equal to the number of input arguments. </para>
+	/// <para> If all arguments cannot be used to construct directly, they will be used to construct intermediate instances of type T_ to construct the array with. </para>
+	/// <param name="per_index_args_">Arguments to construct the array via. Each argument represents a single index.</param>
+	/// <returns>std::array containing type T_, with a count equal to the number of arguments passed to `per_index_args_`, with each index constructed via the respective input argument.</returns>
+	/// </summary>
+	template<class T_, class...PerIndexArgs_>
+	requires
+	(
+		(std::is_constructible_v<std::array<T_, sizeof...(PerIndexArgs_)>, PerIndexArgs_...>) &&
+		(... && std::is_constructible_v<T_, PerIndexArgs_>)
+	)
+	[[nodiscard]] constexpr inline auto make_std_array(PerIndexArgs_&&...per_index_args_)
+		-> std::array<T_, sizeof...(PerIndexArgs_)>
+	{
+		return std::array<T_, sizeof...(PerIndexArgs_)>{T_(std::forward<PerIndexArgs_>(per_index_args_))...};
+	}
+
+	/// <summary>
+	/// <para> Helper to construct a std::array containing a type deduced by common arguments. </para>
+	/// <para> All arguments must be of the same type with const/volatile/reference state ignored. </para>
+	/// <para> If arguments of different types are being passed, use `make_std_array` instead. </para>
+	/// <para> If all arguments cannot be used to construct directly, they will be used to construct intermediate instances of type T_ to construct the array with. </para>
+	/// <param name="per_index_args_">Arguments to construct the array via. Each argument represents a single index.</param>
+	/// <returns>std::array containing the common type deduced by removing const/volatile/reference state from all input arguments, with a count equal to the number of arguments passed to `per_index_args_`, with each index constructed via the respective input argument.</returns>
+	/// </summary>
+	template<class...PerIndexArgs_>
+	requires
+	(
+		(... && std::is_same_v<typename std::remove_cvref<typename first_variadic_arg<PerIndexArgs_...>::type>::type, typename std::remove_cvref<PerIndexArgs_>::type>) &&
+		(... && std::is_constructible_v<typename std::remove_cvref<typename first_variadic_arg<PerIndexArgs_...>::type>::type, PerIndexArgs_>)
+	)
+	[[nodiscard]] constexpr inline auto make_auto_std_array(PerIndexArgs_&&...per_index_args_)
+		-> std::array<typename std::remove_cvref<typename first_variadic_arg<PerIndexArgs_...>::type>::type, sizeof...(PerIndexArgs_)>
+	{
+		return std::array<typename std::remove_cvref<typename first_variadic_arg<PerIndexArgs_...>::type>::type, sizeof...(PerIndexArgs_)>
+		{
+			std::forward<PerIndexArgs_>(per_index_args_)...
+		};
+	}
 }
 
 #endif
