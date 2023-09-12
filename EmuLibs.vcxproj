@@ -189,6 +189,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_misc_arithmetic\_matrix_min.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_misc_arithmetic\_matrix_trunc.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_misc_arithmetic\_matrix_trunc_constexpr.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_projections\_vulkan\_matrix_look_at_vulkan.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_projections\_vulkan\_matrix_orthos_vulkan.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_projections\_vulkan\_matrix_perspectives_vulkan.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_transformations\_matrix_rotate.h" />
@@ -208,6 +209,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix_underlying_special_operations.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix_underlying_stream_append.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix_underlying_transformations.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_underlying_projections\_matrix_underlying_look_at.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_underlying_projections\_matrix_underlying_ortho.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_underlying_projections\_matrix_underlying_perspective.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_underlying_transformations\_common_matrix_transformation_helpers.h" />
