@@ -109,8 +109,8 @@ namespace EmuCore::TMP
         constexpr inline RuntimeTupleTable() noexcept : _func_table(_make_underlying_func_table(_index_sequence()))
         {
         }
-        constexpr inline RuntimeTupleTable(const this_type&) = delete;
-        constexpr inline RuntimeTupleTable(this_type&&) = delete;
+        constexpr inline RuntimeTupleTable(const this_type&) = default;
+        constexpr inline RuntimeTupleTable(this_type&&) = default;
 
         constexpr inline this_type& operator=(const this_type&) = delete;
         constexpr inline this_type& operator=(this_type&&) = delete;
