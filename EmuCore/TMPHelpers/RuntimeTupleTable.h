@@ -57,7 +57,7 @@ namespace EmuCore::TMP
         /// <para> The type returned when the passed function is called with the 0th element of the passed tuple as an argument. </para>
         /// <para> This is the expected return type from any invocation of Func_ with any element of the target tuple. </para>
         /// </summary>
-        using func_return_type = decltype(std::declval<Func_>()(std::declval<_tuple_element_0_type>()));
+        using func_return_type = decltype(std::declval<Func_>()(std::declval<_tuple_element_0_type&>()));
         /// <summary> The type returned by the arbitrating function used to allow runtime-selected-index calls. Typically identical to func_return_type, but specialisations may choose to approach this differently. </summary>
         using arbitrating_func_return_type = func_return_type;
         /// <summary> Type of the arbitrating function used to allow runtime-selected-index calls. This is returned when accessing via the 1D subscript operator. </summary>
