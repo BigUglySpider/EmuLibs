@@ -39,6 +39,7 @@
     <ClInclude Include="EmuCore\CommonTypes\BasicArgParser.h" />
     <ClInclude Include="EmuCore\CommonTypes\ComparisonEnum.h" />
     <ClInclude Include="EmuCore\CommonTypes\DeferrableReferenceWrapper.h" />
+    <ClInclude Include="EmuCore\CommonTypes\Singleton.h" />
     <ClInclude Include="EmuCore\CommonTypes\Stopwatch.h" />
     <ClInclude Include="EmuCore\CommonTypes\Timer.h" />
     <ClInclude Include="EmuCore\Events\Event.h" />
