@@ -3,6 +3,7 @@
 
 #include "../CommonConcepts/Arithmetic.h"
 #include "../CommonConcepts/CommonRequirements.h"
+#include "../CommonPreprocessor/Warning.h"
 #include "../Functors/Convertors.h"
 #include "../TMPHelpers/OperatorChecks.h"
 #include "../TMPHelpers/TypeComparators.h"
