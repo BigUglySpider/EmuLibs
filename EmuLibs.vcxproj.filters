@@ -1196,5 +1196,8 @@
     <ClInclude Include="EmuCore\CommonTypes\Singleton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuThreads\BasicThreadPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
