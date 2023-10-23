@@ -216,7 +216,7 @@ namespace EmuCore::TMP
         /// <param name="func_">Function to be invoked.</param>
         /// <param name="index_">Index of the tuple element to use as the argument to `func_`.</param>
         /// <returns>Result of the invocation of `func_`.</returns>
-        constexpr inline func_return_type ExecuteNoBoundsCheck(const std::size_t index_, tuple_type& tuple_, Func_ func_) const noexcept
+        constexpr inline func_return_type ExecuteNoBoundsCheck(const std::size_t index_, tuple_type& tuple_, Func_ func_) const
         {
             return _func_table[index_](tuple_, std::forward<Func_>(func_));
         }
@@ -230,7 +230,7 @@ namespace EmuCore::TMP
         /// <param name="index_">Index of the tuple element to use as the argument to the function.</param>
         /// <returns>Result of the invocation of a default-constructed Func_.</returns>
         template<std::size_t Unused_ = 0, typename = std::enable_if_t<_can_default_construct_func<Unused_>()>>
-        constexpr inline func_return_type ExecuteNoBoundsCheck(const std::size_t index_, tuple_type& tuple_) const noexcept
+        constexpr inline func_return_type ExecuteNoBoundsCheck(const std::size_t index_, tuple_type& tuple_) const
         {
             return _func_table[index_](tuple_, Func_());
         }
