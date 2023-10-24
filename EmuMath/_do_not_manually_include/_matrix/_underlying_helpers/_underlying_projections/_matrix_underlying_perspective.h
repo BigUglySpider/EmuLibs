@@ -5,36 +5,43 @@
 
 namespace EmuMath::Helpers::_matrix_underlying
 {
+	// NOTE: REVERSE_DEPTH REFERS TO A LEFT-HAND COORD SYSTEM
+	// --- TODO: USE ONLY LEFT-HAND FOR CONSISTENCY IN EMU ENGINE
 #pragma region GENERATION_COMPONENTS_VK_REVERSE_DEPTH
-	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class OutMatrix_, typename CalcFP_, typename AspectRatio_>
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class OutMatrix_, typename CalcFP_>
 	[[nodiscard]] constexpr inline decltype(auto) _make_perspective_arg_vk_reverse_depth
 	(
-		AspectRatio_&& aspect_ratio_,
-		const CalcFP_& out_22_,
+		const CalcFP_& aspect_ratio_,
+		const CalcFP_& near_,
 		const CalcFP_& far_,
 		const CalcFP_& focal_length_
 	)
 	{
 		if constexpr (ColumnIndex_ == 0 && RowIndex_ == 0)
 		{
-			return EmuCore::do_divide<CalcFP_, CalcFP_>()(focal_length_, static_cast<CalcFP_>(std::forward<AspectRatio_>(aspect_ratio_)));
+			//return EmuCore::do_divide<CalcFP_, CalcFP_>()(focal_length_, static_cast<CalcFP_>(std::forward<AspectRatio_>(aspect_ratio_)));
+			return EmuCore::do_divide<CalcFP_, CalcFP_>()(CalcFP_(1), EmuCore::do_multiply<CalcFP_, CalcFP_>()(aspect_ratio_, focal_length_));
 		}
 		else if constexpr (ColumnIndex_ == 1 && RowIndex_ == 1)
 		{
-			return EmuCore::do_negate<CalcFP_>()(focal_length_);
+			return -EmuCore::do_divide<CalcFP_, CalcFP_>()(CalcFP_(1), focal_length_);
 		}
 		else if constexpr (ColumnIndex_ == 2 && RowIndex_ == 2)
 		{
-			return out_22_;
+			return EmuCore::do_divide<CalcFP_, CalcFP_>()(far_, EmuCore::do_subtract<CalcFP_, CalcFP_>()(far_, near_));
 		}
 		else if constexpr (ColumnIndex_ == 2 && RowIndex_ == 3)
 		{
 			using out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
-			return typename out_mat_uq::value_type_uq(-1);
+			return typename out_mat_uq::value_type_uq(1);
 		}
 		else if constexpr (ColumnIndex_ == 3 && RowIndex_ == 2)
 		{
-			return EmuCore::do_multiply<CalcFP_, CalcFP_>()(far_, out_22_);
+			return EmuCore::do_divide<CalcFP_, CalcFP_>()
+			(
+				EmuCore::do_negate<CalcFP_>()(EmuCore::do_multiply<CalcFP_, CalcFP_>()(near_, far_)),
+				EmuCore::do_subtract<CalcFP_, CalcFP_>()(far_, near_)
+			);
 		}
 		else
 		{
@@ -62,9 +69,9 @@ namespace EmuMath::Helpers::_matrix_underlying
 		using out_fp = typename out_uq::preferred_floating_point;
 		using calc_fp = typename EmuCore::TMP::largest_floating_point<out_fp, far_uq, near_uq, aspect_ratio_uq, focal_length_uq>::type;
 
-		calc_fp out_22 = static_cast<calc_fp>(std::forward<Near_>(near_)); // near / (far - near); output for c2r2
+		calc_fp aspect_ratio = static_cast<calc_fp>(aspect_ratio_);
+		calc_fp near = static_cast<calc_fp>(near_);
 		calc_fp far = static_cast<calc_fp>(std::forward<Far_>(far_));
-		out_22 = EmuCore::do_divide<calc_fp, calc_fp>()(out_22, EmuCore::do_subtract<calc_fp, calc_fp>()(far, out_22));
 		calc_fp focal_length = static_cast<calc_fp>(std::forward<FocalLength_>(focal_length_));
 
 EMU_CORE_MSVC_PUSH_WARNING_STACK
@@ -73,8 +80,8 @@ EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
 		(
 			_make_perspective_arg_vk_reverse_depth<ColumnIndices_, RowIndices_, OutMatrix_, calc_fp>
 			(
-				std::forward<AspectRatio_>(aspect_ratio_),
-				out_22,
+				aspect_ratio,
+				near,
 				far,
 				focal_length 
 			)...
@@ -106,7 +113,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		}
 		using tan_func = typename std::conditional<IsConstexpr_, EmuCore::do_tan_constexpr<calc_fp>, EmuCore::do_tan<calc_fp>>::type;
 		using div_func = EmuCore::do_divide<calc_fp, calc_fp>;
-		focal_length = div_func()(calc_fp(1), tan_func()(div_func()(focal_length, calc_fp(2))));
+		focal_length = tan_func()(div_func()(focal_length, calc_fp(2)));
 
 
 		using out_indices = EmuMath::TMP::make_full_matrix_index_sequences<out_mat_uq>;
@@ -114,9 +121,9 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		using row_index_sequence = typename out_indices::row_index_sequence;
 		return _construct_perspective_matrix_vk_reverse_depth<OutMatrix_>
 		(
-			std::forward<AspectRatio_>(aspect_ratio_),
-			std::forward<Near_>(near_),
-			std::forward<Far_>(far_),
+			aspect_ratio_,
+			near_,
+			far_,
 			focal_length,
 			column_index_sequence(),
 			row_index_sequence()
