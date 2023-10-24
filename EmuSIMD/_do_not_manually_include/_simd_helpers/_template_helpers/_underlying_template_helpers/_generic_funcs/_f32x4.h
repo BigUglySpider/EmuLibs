@@ -1158,7 +1158,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_128_REGISTERS
 		EmuSIMD::f32x4 res = div_f32x4(lhs_, rhs_);
 		res = trunc_f32x4(res);
-		return fmadd_f32x4(res, rhs_, lhs_);
+		return fnmadd_f32x4(res, rhs_, lhs_);
 #else
 		using EmuSIMD::_underlying_impl::emulate_simd_basic;
 		using index_sequence = std::make_index_sequence<4>;

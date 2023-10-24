@@ -1134,7 +1134,7 @@ namespace EmuSIMD::Funcs
 #if EMU_SIMD_USE_512_REGISTERS
 		EmuSIMD::f32x16 res = div_f32x16(lhs_, rhs_);
 		res = trunc_f32x16(res);
-		return fmadd_f32x16(res, rhs_, lhs_);
+		return fnmadd_f32x16(res, rhs_, lhs_);
 #else
 		return EmuSIMD::_underlying_impl::emulate_simd_basic([](f32x8_arg lhs, f32x8_arg rhs) { return mod_f32x8(lhs, rhs); }, lhs_, rhs_);
 #endif

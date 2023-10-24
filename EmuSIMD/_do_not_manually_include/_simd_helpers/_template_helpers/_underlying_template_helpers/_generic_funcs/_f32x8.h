@@ -795,7 +795,7 @@ namespace EmuSIMD::Funcs
 	{
 		EmuSIMD::f32x8 res = div_f32x8(lhs_, rhs_);
 		res = trunc_f32x8(res);
-		return fmadd_f32x8(res, rhs_, lhs_);
+		return fnmadd_f32x8(res, rhs_, lhs_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 abs_f32x8(EmuSIMD::f32x8_arg in_)
