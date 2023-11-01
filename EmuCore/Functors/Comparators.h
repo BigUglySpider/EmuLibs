@@ -3,6 +3,7 @@
 
 #include <functional>
 #include "../TMPHelpers/OperatorChecks.h"
+#include "../TMPHelpers/Values.h"
 
 namespace EmuCore
 {
