@@ -576,24 +576,24 @@ namespace EmuCore::TMP
 	using variadic_splice_integer_sequences_t = typename variadic_splice_integer_sequences<IntegerSequences_...>::type;
 
 	/// <summary> Type used to form an index sequence containing only the specified Index_ the specified Count_ of times. </summary>
-	template<typename T_, T_ Index_, std::size_t Count_>
+	template<typename T_, T_ Value_, std::size_t Count_>
 	struct duplicated_integer_sequence
 	{
 		using type = typename splice_integer_sequences
 		<
-			std::index_sequence<Index_>,
-			typename duplicated_integer_sequence<T_, Index_, Count_ - 1>::type
+			std::integer_sequence<T_, Value_>,
+			typename duplicated_integer_sequence<T_, Value_, Count_ - 1>::type
 		>::type;
 	};
-	template<typename T_, T_ Index_>
-	struct duplicated_integer_sequence<T_, Index_, 0>
+	template<typename T_, T_ Value_>
+	struct duplicated_integer_sequence<T_, Value_, 0>
 	{
-		using type = std::index_sequence<>;
+		using type = std::integer_sequence<T_>;
 	};
-	template<typename T_, T_ Index_>
-	struct duplicated_integer_sequence<T_, Index_, 1>
+	template<typename T_, T_ Value_>
+	struct duplicated_integer_sequence<T_, Value_, 1>
 	{
-		using type = std::integer_sequence<T_, Index_>;
+		using type = std::integer_sequence<T_, Value_>;
 	};
 	template<std::size_t Index_, std::size_t Count_>
 	using make_duplicated_index_sequence = typename duplicated_integer_sequence<std::size_t, Index_, Count_>::type;
