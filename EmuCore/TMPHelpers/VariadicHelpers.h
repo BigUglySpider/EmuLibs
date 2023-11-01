@@ -1019,11 +1019,7 @@ namespace EmuCore::TMP
 	/// <returns>std::array containing type T_, with a count equal to the number of arguments passed to `per_index_args_`, with each index constructed via the respective input argument.</returns>
 	/// </summary>
 	template<class T_, class...PerIndexArgs_>
-	requires
-	(
-		(std::is_constructible_v<std::array<T_, sizeof...(PerIndexArgs_)>, PerIndexArgs_...>) &&
-		(... && std::is_constructible_v<T_, PerIndexArgs_>)
-	)
+	requires((... && std::is_constructible_v<T_, PerIndexArgs_>))
 	[[nodiscard]] constexpr inline auto make_std_array(PerIndexArgs_&&...per_index_args_)
 		-> std::array<T_, sizeof...(PerIndexArgs_)>
 	{
