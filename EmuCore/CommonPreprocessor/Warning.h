@@ -58,6 +58,9 @@
 	/// <summary> Helper macro to safely disable a warning specific to MSVC, regardless of actual compiler. </summary>
 	#define EMU_CORE_MSVC_DISABLE_WARNING(warning_code) 
 
+	#define EMU_CORE_MSVC_BEGIN_NO_WARNINGS 
+	#define EMU_CORE_MSVC_END_NO_WARNINGS 
+
 	// Generic warning macros
 
 	/// <summary> Helper macro to safely push the warning stack, regardless of actual compiler. </summary>
@@ -66,6 +69,11 @@
 	#define EMU_CORE_POP_WARNING_STACK 
 	/// <summary> Helper macro to safely disable a warning by its ID, regardless of actual compiler. </summary>
 	#define EMU_CORE_DISABLE_WARNING(warning_code) 
+
+	/// <summary> Helper macro to safely disable warnings. Should be paired with EMU_CORE_END_NO_WARNINGS after it. </summary>
+	#define EMU_CORE_BEGIN_NO_WARNINGS 
+	/// <summary> Helper macro to safely end a span of disabled warnings. Should be paired with EMU_CORE_BEGIN_NO_WARNINGS before it. </summary>
+	#define EMU_CORE_END_NO_WARNINGS 
 
 	// Warnings
 
