@@ -673,9 +673,16 @@ namespace EmuCore::ArithmeticHelpers
 			{
 				return typename std::remove_cvref<T_>::type(0x80000000);
 			}
-			else if constexpr (num_bytes == 4)
+			else if constexpr (num_bytes == 8)
 			{
 				return typename std::remove_cvref<T_>::type(0x8000000000000000);
+			}
+			else
+			{
+				auto output_bytes = std::array<unsigned char, num_bytes>();
+				constexpr std::size_t most_significant_index = is_little_endian() ? (num_bytes - 1) : 0;
+				output_bytes[most_significant_index] = 0x80;
+				return std::bit_cast<typename std::remove_cvref<T_>::type>(output_bytes);
 			}
 		}
 		else if constexpr (std::is_floating_point_v<typename std::remove_cvref<T_>::type>)
