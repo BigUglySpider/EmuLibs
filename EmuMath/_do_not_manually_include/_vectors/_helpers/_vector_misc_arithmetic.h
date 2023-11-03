@@ -573,7 +573,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_a_">: EmuMath Vector appearing as the first argument in comparisons.</param>
 	/// <param name="b_">: Scalar or EmuMath Vector appearing as the second argument in comparisons.</param>
 	template<std::size_t OutSize_, typename OutT_, typename TA_, typename B_, std::size_t SizeA_>
-	constexpr inline void vector_min(EmuMath::Vector<OutSize_, OutT_&> out_vector_, const EmuMath::Vector<SizeA_, TA_>& vector_a_, B_&& b_)
+	constexpr inline void vector_min(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<SizeA_, TA_>& vector_a_, B_&& b_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE_APPEND_OUT(EmuCore::do_min, false, OutSize_, OutT_)(out_vector_, vector_a_, std::forward<B_>(b_));
 	}
@@ -839,7 +839,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_a_">: EmuMath Vector appearing as the first argument in comparisons.</param>
 	/// <param name="b_">: Scalar or EmuMath Vector appearing as the second argument in comparisons.</param>
 	template<std::size_t OutSize_, typename OutT_, typename TA_, typename B_, std::size_t SizeA_>
-	constexpr inline void vector_max(EmuMath::Vector<OutSize_, OutT_&> out_vector_, const EmuMath::Vector<SizeA_, TA_>& vector_a_, B_&& b_)
+	constexpr inline void vector_max(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<SizeA_, TA_>& vector_a_, B_&& b_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE_APPEND_OUT(EmuCore::do_max, false, OutSize_, OutT_)(out_vector_, vector_a_, std::forward<B_>(b_));
 	}
@@ -1049,7 +1049,7 @@ namespace EmuMath::Helpers
 	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
 	/// <param name="min_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a minimum of.</param>
 	template<std::size_t OutSize_, typename OutT_, typename InT_, typename Min_, std::size_t InSize_>
-	constexpr inline void vector_clamp_min(EmuMath::Vector<OutSize_, OutT_&> out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_, Min_&& min_)
+	constexpr inline void vector_clamp_min(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_, Min_&& min_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, OutSize_, OutT_)(out_vector_, in_vector_, std::forward<Min_>(min_));
 	}
@@ -1121,7 +1121,7 @@ namespace EmuMath::Helpers
 	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
 	/// <param name="min_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a minimum of.</param>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_, typename InT_, typename Min_, std::size_t InSize_>
-	constexpr inline void vector_clamp_min_range(EmuMath::Vector<OutSize_, OutT_&> out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_, Min_&& min_)
+	constexpr inline void vector_clamp_min_range(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_, Min_&& min_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, OutSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_)
 		(
@@ -1202,7 +1202,7 @@ namespace EmuMath::Helpers
 	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
 	/// <param name="min_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a minimum of.</param>
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, std::size_t OutSize_, typename OutT_, typename InT_, typename Min_, std::size_t InSize_>
-	constexpr inline void vector_clamp_min_range_no_copy(EmuMath::Vector<OutSize_, OutT_&> out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_, Min_&& min_)
+	constexpr inline void vector_clamp_min_range_no_copy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_, Min_&& min_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, OutSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_)
 		(
@@ -1257,7 +1257,7 @@ namespace EmuMath::Helpers
 	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
 	/// <param name="max_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a maximum of.</param>
 	template<std::size_t OutSize_, typename OutT_, typename InT_, typename Max_, std::size_t InSize_>
-	constexpr inline void vector_clamp_max(EmuMath::Vector<OutSize_, OutT_&> out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_, Max_&& max_)
+	constexpr inline void vector_clamp_max(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_, Max_&& max_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_max, false, OutSize_, OutT_)(out_vector_, in_vector_, std::forward<Max_>(max_));
 	}
@@ -1329,7 +1329,7 @@ namespace EmuMath::Helpers
 	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
 	/// <param name="max_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a maximum of.</param>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_, typename InT_, typename Max_, std::size_t InSize_>
-	constexpr inline void vector_clamp_max_range(EmuMath::Vector<OutSize_, OutT_&> out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_, Max_&& max_)
+	constexpr inline void vector_clamp_max_range(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_, Max_&& max_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_max, false, OutSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_)
 		(
@@ -1410,7 +1410,7 @@ namespace EmuMath::Helpers
 	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
 	/// <param name="max_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a maximum of.</param>
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, std::size_t OutSize_, typename OutT_, typename InT_, typename Max_, std::size_t InSize_>
-	constexpr inline void vector_clamp_max_range_no_copy(EmuMath::Vector<OutSize_, OutT_&> out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_, Max_&& max_)
+	constexpr inline void vector_clamp_max_range_no_copy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_, Max_&& max_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, OutSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_)
 		(
@@ -1469,7 +1469,7 @@ namespace EmuMath::Helpers
 	/// <param name="min_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a minimum of.</param>
 	/// <param name="max_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a maximum of.</param>
 	template<std::size_t OutSize_, typename OutT_, typename InT_, typename Min_, typename Max_, std::size_t InSize_>
-	constexpr inline void vector_clamp(EmuMath::Vector<OutSize_, OutT_&> out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
+	constexpr inline void vector_clamp(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE_APPEND_OUT(EmuCore::do_clamp, false, OutSize_, OutT_)(out_vector_, in_vector_, std::forward<Min_>(min_), std::forward<Max_>(max_));
 	}
@@ -1549,7 +1549,7 @@ namespace EmuMath::Helpers
 	/// <param name="min_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a minimum of.</param>
 	/// <param name="max_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a maximum of.</param>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_, typename InT_, typename Min_, typename Max_, std::size_t InSize_>
-	constexpr inline void vector_clamp_range(EmuMath::Vector<OutSize_, OutT_&> out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
+	constexpr inline void vector_clamp_range(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp, false, OutSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_)
 		(
@@ -1641,7 +1641,7 @@ namespace EmuMath::Helpers
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, std::size_t OutSize_, typename OutT_, typename InT_, typename Min_, typename Max_, std::size_t InSize_>
 	constexpr inline void vector_clamp_range_no_copy
 	(
-		EmuMath::Vector<OutSize_, OutT_&> out_vector_,
+		EmuMath::Vector<OutSize_, OutT_>& out_vector_,
 		const EmuMath::Vector<InSize_, InT_>& in_vector_,
 		Min_&& min_,
 		Max_&& max_
