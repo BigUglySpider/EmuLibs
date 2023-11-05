@@ -1,6 +1,7 @@
 #ifndef EMU_CORE_COMMON_CONCEPTS_COMMON_REQUIREMENTS_H_INC_
 #define EMU_CORE_COMMON_CONCEPTS_COMMON_REQUIREMENTS_H_INC_ 1
 
+#include <concepts>
 #include <type_traits>
 
 namespace EmuCore::Concepts
