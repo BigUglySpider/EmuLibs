@@ -1199,5 +1199,8 @@
     <ClInclude Include="EmuThreads\BasicThreadPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuCore\TMPHelpers\UniqueVoid.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
