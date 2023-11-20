@@ -179,11 +179,12 @@ requires(!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>())
 [[nodiscard]] constexpr inline auto operator*=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
 	-> EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>&
 {
-	return EmuMath::Helpers::matrix_multiply_basic_assign<LhsColumnMajor_>
+	EmuMath::Helpers::matrix_multiply_basic_assign<LhsColumnMajor_>
 	(
 		lhs_matrix_,
 		std::forward<Rhs_>(rhs_)
 	);
+	return lhs_matrix_;
 }
 
 // ADAPTIVE ARITHMETIC OPERATOR*=: SPECIALISED VECTOR MULTIPLY
@@ -192,11 +193,12 @@ requires(EmuMath::Helpers::matrix_valid_vector_multiply_arg_size<EmuMath::Matrix
 [[nodiscard]] constexpr inline auto operator*=(const EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, EmuMath::Vector<RhsSize_, RhsT_>& rhs_vector_)
 	-> EmuMath::Vector<RhsSize_, RhsT_>&
 {
-	return EmuMath::Helpers::matrix_multiply_assign<LhsColumnMajor_>
+	EmuMath::Helpers::matrix_multiply_assign<LhsColumnMajor_>
 	(
 		lhs_matrix_,
 		rhs_vector_
 	);
+	return rhs_vector_;
 }
 
 // ADAPTIVE ARITHMETIC OPERATOR*: SPECIALISED MATRIX MULTIPLY
@@ -208,11 +210,12 @@ requires(EmuMath::Helpers::matrix_valid_matrix_multiply_assign_arg_size<EmuMath:
 	const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& rhs_matrix_
 ) -> EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, LhsT_, LhsColumnMajor_>&
 {
-	return EmuMath::Helpers::matrix_multiply_assign<LhsColumnMajor_>
+	EmuMath::Helpers::matrix_multiply_assign<LhsColumnMajor_>
 	(
 		lhs_matrix_,
 		rhs_matrix_
 	);
+	return lhs_matrix_;
 }
 #pragma endregion
 
