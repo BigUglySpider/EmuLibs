@@ -123,7 +123,7 @@ requires(EmuMath::Helpers::matrix_valid_matrix_multiply_arg_size<EmuMath::Matrix
 #pragma region ARITHMETIC_ASSIGN_OPERATORS
 // BASIC ARITHMETIC OPERATOR+=
 template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, class Rhs_>
-[[nodiscard]] constexpr inline auto operator+=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
+constexpr inline auto operator+=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
 	-> EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>&
 {
 	EmuMath::Helpers::matrix_add_assign<LhsColumnMajor_>
@@ -136,7 +136,7 @@ template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bo
 
 // BASIC ARITHMETIC OPERATOR-=
 template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, class Rhs_>
-[[nodiscard]] constexpr inline auto operator-=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
+constexpr inline auto operator-=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
 	-> EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>&
 {
 	EmuMath::Helpers::matrix_subtract_assign<LhsColumnMajor_>
@@ -149,7 +149,7 @@ template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bo
 
 // BASIC ARITHMETIC OPERATOR+=
 template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, class Rhs_>
-[[nodiscard]] constexpr inline auto operator/=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
+constexpr inline auto operator/=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
 	-> EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>&
 {
 	EmuMath::Helpers::matrix_divide_assign<LhsColumnMajor_>
@@ -162,7 +162,7 @@ template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bo
 
 // BASIC ARITHMETIC OPERATOR%=
 template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, class Rhs_>
-[[nodiscard]] constexpr inline auto operator%=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
+constexpr inline auto operator%=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
 	-> EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>&
 {
 	EmuMath::Helpers::matrix_mod_assign<LhsColumnMajor_>
@@ -176,7 +176,7 @@ template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bo
 // ADAPTIVE ARITHMETIC OPERATOR*= : UNSPECIALISED, FALLBACK TO BASIC MULTIPLICATION
 template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, class Rhs_>
 requires(!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>())
-[[nodiscard]] constexpr inline auto operator*=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
+constexpr inline auto operator*=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
 	-> EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>&
 {
 	EmuMath::Helpers::matrix_multiply_basic_assign<LhsColumnMajor_>
@@ -190,7 +190,7 @@ requires(!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>())
 // ADAPTIVE ARITHMETIC OPERATOR*=: SPECIALISED VECTOR MULTIPLY
 template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, std::size_t RhsSize_, typename RhsT_>
 requires(EmuMath::Helpers::matrix_valid_vector_multiply_arg_size<EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>, RhsSize_>())
-[[nodiscard]] constexpr inline auto operator*=(const EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, EmuMath::Vector<RhsSize_, RhsT_>& rhs_vector_)
+constexpr inline auto operator*=(const EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, EmuMath::Vector<RhsSize_, RhsT_>& rhs_vector_)
 	-> EmuMath::Vector<RhsSize_, RhsT_>&
 {
 	EmuMath::Helpers::matrix_multiply_assign<LhsColumnMajor_>
@@ -204,7 +204,7 @@ requires(EmuMath::Helpers::matrix_valid_vector_multiply_arg_size<EmuMath::Matrix
 // ADAPTIVE ARITHMETIC OPERATOR*: SPECIALISED MATRIX MULTIPLY
 template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_>
 requires(EmuMath::Helpers::matrix_valid_matrix_multiply_assign_arg_size<EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>, RhsNumColumns_, RhsNumRows_>())
-[[nodiscard]] constexpr inline auto operator*=
+constexpr inline auto operator*=
 (
 	EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_,
 	const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& rhs_matrix_
@@ -289,7 +289,7 @@ template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bo
 
 #pragma region BITWISE_ASSIGN
 template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, class Rhs_>
-[[nodiscard]] constexpr inline auto operator&=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
+constexpr inline auto operator&=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
 	-> EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>&
 {
 	EmuMath::Helpers::matrix_bitwise_and_assign<LhsNumColumns_, LhsNumRows_, typename EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>::value_type_uq, LhsColumnMajor_>
@@ -301,7 +301,7 @@ template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bo
 }
 
 template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, class Rhs_>
-[[nodiscard]] constexpr inline auto operator|=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
+constexpr inline auto operator|=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
 	-> EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>&
 {
 	EmuMath::Helpers::matrix_bitwise_or_assign<LhsNumColumns_, LhsNumRows_, typename EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>::value_type_uq, LhsColumnMajor_>
@@ -313,7 +313,7 @@ template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bo
 }
 
 template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, class Rhs_>
-[[nodiscard]] constexpr inline auto operator^=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
+constexpr inline auto operator^=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
 	-> EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>&
 {
 	EmuMath::Helpers::matrix_bitwise_xor_assign<LhsNumColumns_, LhsNumRows_, typename EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>::value_type_uq, LhsColumnMajor_>
@@ -325,7 +325,7 @@ template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bo
 }
 
 template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, class Rhs_>
-[[nodiscard]] constexpr inline auto operator<<=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
+constexpr inline auto operator<<=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
 	-> EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>&
 {
 	EmuMath::Helpers::matrix_shift_left_assign<LhsNumColumns_, LhsNumRows_, typename EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>::value_type_uq, LhsColumnMajor_>
@@ -338,7 +338,7 @@ template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bo
 
 
 template<std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, class Rhs_>
-[[nodiscard]] constexpr inline auto operator>>=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
+constexpr inline auto operator>>=(EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_, Rhs_&& rhs_)
 	-> EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>&
 {
 	EmuMath::Helpers::matrix_shift_right_assign<LhsNumColumns_, LhsNumRows_, typename EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>::value_type_uq, LhsColumnMajor_>
