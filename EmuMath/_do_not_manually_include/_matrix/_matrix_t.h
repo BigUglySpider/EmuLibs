@@ -2763,7 +2763,7 @@ EMU_CORE_MSVC_POP_WARNING_STACK
 		[[nodiscard]] constexpr inline EmuMath::Vector<RhsSize_, typename EmuMath::Vector<RhsSize_, RhsT_>::preferred_floating_point> Multiply
 		(
 			const EmuMath::Vector<RhsSize_, RhsT_>& rhs_vector_
-		)
+		) const
 		{
 			using rhs_fp = typename EmuMath::Vector<RhsSize_, RhsT_>::preferred_floating_point;
 			return EmuMath::Helpers::matrix_multiply<rhs_fp, OutColumnMajor_>(*this, rhs_vector_);
