@@ -356,7 +356,7 @@ template<std::size_t LhsSize_, typename LhsT_, typename Rhs_>
 /// <param name="rhs_">Argument appearing on the right-hand side of the comparison as in `EmuMath::Helpers::vector_cmp_equal`.</param>
 /// <returns>Boolean result of the comparison.</returns>
 template<bool IncludeNonContained_ = true, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-[[nodiscard]] constexpr inline bool operator==(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+[[nodiscard]] constexpr inline bool operator==(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 {
 	return EmuMath::Helpers::vector_cmp_equal<IncludeNonContained_>(lhs_vector_, std::forward<Rhs_>(rhs_));
 }
@@ -372,7 +372,7 @@ template<bool IncludeNonContained_ = true, std::size_t LhsSize_, typename LhsT_,
 /// <param name="rhs_">Argument appearing on the right-hand side of the comparison as in `EmuMath::Helpers::vector_cmp_not_equal`.</param>
 /// <returns>Boolean result of the comparison.</returns>
 template<bool IncludeNonContained_ = true, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-[[nodiscard]] constexpr inline bool operator!=(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+[[nodiscard]] constexpr inline bool operator!=(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 {
 	return EmuMath::Helpers::vector_cmp_not_equal<IncludeNonContained_>(lhs_vector_, std::forward<Rhs_>(rhs_));
 }
@@ -389,7 +389,7 @@ template<bool IncludeNonContained_ = true, std::size_t LhsSize_, typename LhsT_,
 /// <param name="rhs_">Argument appearing on the right-hand side of the comparison as in `EmuMath::Helpers::vector_cmp_less`.</param>
 /// <returns>Boolean result of the comparison.</returns>
 template<bool IncludeNonContained_ = true, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-[[nodiscard]] constexpr inline bool operator<(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+[[nodiscard]] constexpr inline bool operator<(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 {
 	return EmuMath::Helpers::vector_cmp_less<IncludeNonContained_>(lhs_vector_, std::forward<Rhs_>(rhs_));
 }
@@ -406,7 +406,7 @@ template<bool IncludeNonContained_ = true, std::size_t LhsSize_, typename LhsT_,
 /// <param name="rhs_">Argument appearing on the right-hand side of the comparison as in `EmuMath::Helpers::vector_cmp_greater`.</param>
 /// <returns>Boolean result of the comparison.</returns>
 template<bool IncludeNonContained_ = true, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-[[nodiscard]] constexpr inline bool operator>(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+[[nodiscard]] constexpr inline bool operator>(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 {
 	return EmuMath::Helpers::vector_cmp_greater<IncludeNonContained_>(lhs_vector_, std::forward<Rhs_>(rhs_));
 }
@@ -423,7 +423,7 @@ template<bool IncludeNonContained_ = true, std::size_t LhsSize_, typename LhsT_,
 /// <param name="rhs_">Argument appearing on the right-hand side of the comparison as in `EmuMath::Helpers::vector_cmp_less_equal`.</param>
 /// <returns>Boolean result of the comparison.</returns>
 template<bool IncludeNonContained_ = true, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-[[nodiscard]] constexpr inline bool operator<=(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+[[nodiscard]] constexpr inline bool operator<=(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 {
 	return EmuMath::Helpers::vector_cmp_less_equal<IncludeNonContained_>(lhs_vector_, std::forward<Rhs_>(rhs_));
 }
@@ -440,7 +440,7 @@ template<bool IncludeNonContained_ = true, std::size_t LhsSize_, typename LhsT_,
 /// <param name="rhs_">Argument appearing on the right-hand side of the comparison as in `EmuMath::Helpers::vector_cmp_greater_equal`.</param>
 /// <returns>Boolean result of the comparison.</returns>
 template<bool IncludeNonContained_ = true, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-[[nodiscard]] constexpr inline bool operator>=(EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+[[nodiscard]] constexpr inline bool operator>=(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 {
 	return EmuMath::Helpers::vector_cmp_greater_equal<IncludeNonContained_>(lhs_vector_, std::forward<Rhs_>(rhs_));
 }
