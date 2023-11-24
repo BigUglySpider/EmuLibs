@@ -39,7 +39,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 	{
 		using _out_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutFastMatrix_>::type;
 		using _in_scalar_mat_uq = typename EmuCore::TMP::remove_ref_cv<ScalarMatrix_>::type;
-		if constexpr (_out_fast_mat_uq::is_column_major == _in_scalar_mat_uq::is_column_major)
+		constexpr bool compatible_types = std::is_same_v<typename _out_fast_mat_uq::value_type, typename _in_scalar_mat_uq::stored_type>;
+		if constexpr (compatible_types && _out_fast_mat_uq::is_column_major == _in_scalar_mat_uq::is_column_major)
 		{
 			constexpr std::size_t major_index = RegisterIndex_ / _out_fast_mat_uq::num_registers_per_major;
 			constexpr std::size_t register_in_chunk_index = (RegisterIndex_ % _out_fast_mat_uq::num_registers_per_major);
