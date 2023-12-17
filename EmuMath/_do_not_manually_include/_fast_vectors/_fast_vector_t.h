@@ -3579,12 +3579,12 @@ namespace EmuMath
 	public:
 		/// <summary>
 		/// <para> Calculates the 3D cross product of this Vector and b_. </para>
-		/// <para> This is primarily designed for 128-bit registers of 32-bit components, and will perform automatic conversions if this Vector type does not match that. </para>
+		/// <para> This is primarily designed for single registers containing 4 elements, and will perform automatic conversions if this Vector type does not match that. </para>
 		/// <para> If this calculation is likely to be common with this Vector, it is recommended to convert it to match the design of this function. </para>
 		/// </summary>
 		[[nodiscard]] constexpr inline this_type Cross3(const this_type& b_) const
 		{
-			if constexpr (register_width == 128 && per_element_width == 32)
+			if constexpr (full_width_size == 4 && num_registers == 1)
 			{
 				register_type a0 = GetRegister<0>();
 				register_type b0 = b_.GetRegister<0>();
@@ -3598,15 +3598,15 @@ namespace EmuMath
 					b0 = EmuSIMD::bitwise_and(b0, mask);
 				}
 
-				register_type a0_1203 = EmuSIMD::shuffle<1, 2, 0, 3>(a0);
+				register_type a0_1203 = EmuSIMD::shuffle_full_width<1, 2, 0, 3>(a0);
 				register_type a1203_mul_b0123 = EmuSIMD::mul_all<per_element_width>(a0_1203, b0);
 				return this_type
 				(
 					EmuSIMD::fmsub<per_element_width>
 					(
 						a0_1203,
-						EmuSIMD::shuffle<2, 0, 1, 3>(b0),
-						EmuSIMD::shuffle<1, 2, 0, 3>(a1203_mul_b0123)
+						EmuSIMD::shuffle_full_width<2, 0, 1, 3>(b0),
+						EmuSIMD::shuffle_full_width<1, 2, 0, 3>(a1203_mul_b0123)
 					)
 				);
 			}
