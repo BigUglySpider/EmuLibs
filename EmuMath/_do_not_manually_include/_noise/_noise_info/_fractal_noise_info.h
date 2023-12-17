@@ -46,18 +46,19 @@ namespace EmuMath::Info
 			gain(make_valid_gain(gain_))
 		{
 		}
-		constexpr FractalNoiseInfo(const FractalNoiseInfo& to_copy) :
+		constexpr FractalNoiseInfo(const FractalNoiseInfo& to_copy) noexcept :
 			octaves(to_copy.octaves),
 			lacunarity(to_copy.lacunarity),
 			gain(to_copy.gain)
 		{
 		}
 
-		inline FractalNoiseInfo& operator=(const FractalNoiseInfo& to_copy)
+		inline FractalNoiseInfo& operator=(const FractalNoiseInfo& to_copy) noexcept
 		{
 			octaves = to_copy.octaves;
 			lacunarity = to_copy.lacunarity;
 			gain = to_copy.gain;
+			return *this;
 		}
 
 		[[nodiscard]] constexpr inline std::size_t GetOctaves() const noexcept
