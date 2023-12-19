@@ -80,6 +80,12 @@ namespace EmuCore::Concepts
 	{
 		{ lhs_ = rhs_ };
 	};
+
+	template<class T_>
+	concept IsVoid = std::is_void_v<T_>;
+
+	template<class T_>
+	concept IsNonVoid = !std::is_void_v<T_>;
 }
 
 namespace EmuConcepts
