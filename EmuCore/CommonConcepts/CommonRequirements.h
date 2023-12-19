@@ -74,6 +74,12 @@ namespace EmuCore::Concepts
 	{
 		{ item_(std::declval<Args_>()...) } -> Same<Returns_>;
 	};
+
+	template<class Rhs_, class To_>
+	concept AssignableTo = requires(To_ lhs_, Rhs_ rhs_)
+	{
+		{ lhs_ = rhs_ };
+	};
 }
 
 namespace EmuConcepts
