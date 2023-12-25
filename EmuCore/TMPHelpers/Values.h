@@ -414,6 +414,28 @@ namespace EmuCore::TMP
 			return false;
 		}
 	}
+
+	/// <summary>
+	/// <para> Conditional function which will either return the input reference or default-construct a specified type, depending on the input boolean. </para>
+	/// <para> If ReturnReference_ is true, this will return the input reference as-is. </para>
+	/// <para> If ReturnReference_ is false, this will return a default constructed item of type ConstructIfFalse_. </para>
+	/// <para> Useful for template functions where you may be conditionally using a local value or a reference to another item in the same spot. </para>
+	/// </summary>
+	/// <param name="reference_if_true_">Reference to return if the input boolean is true.</param>
+	/// <returns>Input reference if ReturnReference_ is true; otherwise a default-constructed item of type ConstructIfFalse_.</returns>
+	template<bool ReturnReference_, class ConstructIfFalse_, class ReferencedIn_>
+	[[nodiscard]] constexpr inline auto select_reference_or_default_construct(ReferencedIn_& reference_if_true_)
+		-> typename std::conditional<ReturnReference_, ReferencedIn_&, ConstructIfFalse_>::type
+	{
+		if constexpr (ReturnReference_)
+		{
+			return reference_if_true_;
+		}
+		else
+		{
+			return ConstructIfFalse_();
+		}
+	}
 }
 
 #endif
