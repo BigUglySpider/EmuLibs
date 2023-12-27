@@ -29,7 +29,7 @@ namespace EmuCore::TMP
 		static constexpr bool value = false;
 	};
 	template<class T_, typename Arg_>
-	struct has_subscript_operator<T_, Arg_, std::void_t<decltype(std::declval<T_>().operator[](std::declval<Arg_>()))>>
+	struct has_subscript_operator<T_, Arg_, std::void_t<decltype(std::declval<T_>()[std::declval<Arg_>()])>>
 	{
 		static constexpr bool value = true;
 	};
