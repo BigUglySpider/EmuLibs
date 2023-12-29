@@ -24,7 +24,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 			cmp_
 			(
 				_matrix_get_theoretical<ColumnIndices_, RowIndices_>(lhs_matrix_),
-				_matrix_get_arg<ColumnIndices_, RowIndices_, LhsMatrix_>(std::forward<Args_>(args_))...
+				_matrix_get_arg<ColumnIndices_, RowIndices_, LhsMatrix_>(std::forward<Args_>(args_)...)...
 			)
 		);
 		EMU_CORE_MSVC_POP_WARNING_STACK
@@ -48,7 +48,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 			cmp_
 			(
 				_matrix_get_theoretical<ColumnIndices_, RowIndices_>(lhs_matrix_),
-				_matrix_get_arg<ColumnIndices_, RowIndices_, LhsMatrix_>(std::forward<Args_>(args_))...
+				_matrix_get_arg<ColumnIndices_, RowIndices_, LhsMatrix_>(std::forward<Args_>(args_)...)...
 			)
 		);
 		EMU_CORE_MSVC_POP_WARNING_STACK
