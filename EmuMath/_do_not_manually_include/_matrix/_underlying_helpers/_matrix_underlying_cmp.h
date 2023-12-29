@@ -6,6 +6,19 @@
 
 namespace EmuMath::Helpers::_matrix_underlying
 {
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Cmp_, EmuConcepts::EmuMatrix LhsMatrix_, class...Args_>
+	[[nodiscard]] constexpr inline bool _matrix_cmp_for_index(LhsMatrix_&& lhs_matrix_, Cmp_& cmp_, Args_&&...args_)
+	{
+		EMU_CORE_MSVC_PUSH_WARNING_STACK
+		EMU_CORE_MSVC_DISABLE_WARNING(EMU_CORE_WARNING_BAD_MOVE)
+		return cmp_
+		(
+			_matrix_get_theoretical<ColumnIndex_, RowIndex_>(lhs_matrix_),
+			_matrix_get_arg<ColumnIndex_, RowIndex_, LhsMatrix_>(std::forward<Args_>(args_))...
+		);
+		EMU_CORE_MSVC_POP_WARNING_STACK
+	}
+
 	template<EmuConcepts::EmuMatrix LhsMatrix_, class Cmp_, std::size_t...ColumnIndices_, std::size_t...RowIndices_, class...Args_>
 	[[nodiscard]] constexpr inline bool _matrix_cmp_and
 	(
@@ -21,11 +34,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		return
 		(
 			... &&
-			cmp_
-			(
-				_matrix_get_theoretical<ColumnIndices_, RowIndices_>(lhs_matrix_),
-				_matrix_get_arg<ColumnIndices_, RowIndices_, LhsMatrix_>(std::forward<Args_>(args_)...)...
-			)
+			_matrix_cmp_for_index<ColumnIndices_, RowIndices_>(lhs_matrix_, cmp_, std::forward<Args_>(args_)...)
 		);
 		EMU_CORE_MSVC_POP_WARNING_STACK
 	}
@@ -45,11 +54,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		return
 		(
 			... ||
-			cmp_
-			(
-				_matrix_get_theoretical<ColumnIndices_, RowIndices_>(lhs_matrix_),
-				_matrix_get_arg<ColumnIndices_, RowIndices_, LhsMatrix_>(std::forward<Args_>(args_)...)...
-			)
+			_matrix_cmp_for_index<ColumnIndices_, RowIndices_>(lhs_matrix_, cmp_, std::forward<Args_>(args_)...)
 		);
 		EMU_CORE_MSVC_POP_WARNING_STACK
 	}
