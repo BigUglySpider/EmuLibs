@@ -11,27 +11,38 @@ namespace EmuCore
 	struct do_cmp_equal_to
 	{
 	private:
-		std::equal_to<void> comparator_;
+		using _cmp_type = std::equal_to<void>;
+		static_assert
+		(
+			std::is_invocable_r_v<bool, _cmp_type, const Lhs_&, const Rhs_&>,
+			"Invalid types for a default instantiation of EmuCore::do_cmp_equal_to: The types are not compatible when passed to std::equal_to<void> as const-reference arguments."
+		);
 
 	public:
-		constexpr do_cmp_equal_to()
+		constexpr do_cmp_equal_to() noexcept
 		{
 		}
-		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const noexcept(std::is_nothrow_invocable_v<_cmp_type, const Lhs_&, const Rhs_&>)
 		{
-			return comparator_(lhs_, rhs_);
+			return _cmp_type()(lhs_, rhs_);
 		}
 	};
 	template<>
 	struct do_cmp_equal_to<void, void>
 	{
-		constexpr do_cmp_equal_to()
+	private:
+		template<class Lhs_, class Rhs_>
+		using _cmp_template = EmuCore::do_cmp_equal_to<Lhs_, Rhs_>;
+
+	public:
+		constexpr do_cmp_equal_to() noexcept
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_)
+		requires(std::is_default_constructible_v<_cmp_template<Lhs_, Rhs_>> && std::is_invocable_r_v<bool, _cmp_template<Lhs_, Rhs_>, const Lhs_&, const Rhs_&>)
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const noexcept(noexcept(_cmp_template<Lhs_, Rhs_>()(lhs_, rhs_)))
 		{
-			return do_cmp_equal_to<Lhs_, Rhs_>()(lhs_, rhs_);
+			return _cmp_template<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
 	};
 
@@ -39,27 +50,38 @@ namespace EmuCore
 	struct do_cmp_not_equal_to
 	{
 	private:
-		std::not_equal_to<void> comparator_;
+		using _cmp_type = std::not_equal_to<void>;
+		static_assert
+		(
+			std::is_invocable_r_v<bool, _cmp_type, const Lhs_&, const Rhs_&>,
+			"Invalid types for a default instantiation of EmuCore::do_cmp_not_equal_to: The types are not compatible when passed to std::not_equal_to<void> as const-reference arguments."
+		);
 
 	public:
-		constexpr do_cmp_not_equal_to()
+		constexpr do_cmp_not_equal_to() noexcept
 		{
 		}
-		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const noexcept(std::is_nothrow_invocable_v<_cmp_type, const Lhs_&, const Rhs_&>)
 		{
-			return comparator_(lhs_, rhs_);
+			return _cmp_type()(lhs_, rhs_);
 		}
 	};
 	template<>
 	struct do_cmp_not_equal_to<void, void>
 	{
-		constexpr do_cmp_not_equal_to()
+	private:
+		template<class Lhs_, class Rhs_>
+		using _cmp_template = EmuCore::do_cmp_not_equal_to<Lhs_, Rhs_>;
+
+	public:
+		constexpr do_cmp_not_equal_to() noexcept
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_)
+		requires(std::is_default_constructible_v<_cmp_template<Lhs_, Rhs_>> && std::is_invocable_r_v<bool, _cmp_template<Lhs_, Rhs_>, const Lhs_&, const Rhs_&>)
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const noexcept(noexcept(_cmp_template<Lhs_, Rhs_>()(lhs_, rhs_)))
 		{
-			return do_cmp_not_equal_to<Lhs_, Rhs_>()(lhs_, rhs_);
+			return _cmp_template<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
 	};
 
@@ -67,27 +89,38 @@ namespace EmuCore
 	struct do_cmp_greater
 	{
 	private:
-		std::greater<void> comparator_;
+		using _cmp_type = std::greater<void>;
+		static_assert
+		(
+			std::is_invocable_r_v<bool, _cmp_type, const Lhs_&, const Rhs_&>,
+			"Invalid types for a default instantiation of EmuCore::do_cmp_greater: The types are not compatible when passed to std::greater<void> as const-reference arguments."
+		);
 
 	public:
-		constexpr do_cmp_greater()
+		constexpr do_cmp_greater() noexcept
 		{
 		}
-		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const noexcept(std::is_nothrow_invocable_v<_cmp_type, const Lhs_&, const Rhs_&>)
 		{
-			return comparator_(lhs_, rhs_);
+			return _cmp_type()(lhs_, rhs_);
 		}
 	};
 	template<>
 	struct do_cmp_greater<void, void>
 	{
-		constexpr do_cmp_greater()
+	private:
+		template<class Lhs_, class Rhs_>
+		using _cmp_template = EmuCore::do_cmp_greater<Lhs_, Rhs_>;
+
+	public:
+		constexpr do_cmp_greater() noexcept
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_)
+		requires(std::is_default_constructible_v<_cmp_template<Lhs_, Rhs_>> && std::is_invocable_r_v<bool, _cmp_template<Lhs_, Rhs_>, const Lhs_&, const Rhs_&>)
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const noexcept(noexcept(_cmp_template<Lhs_, Rhs_>()(lhs_, rhs_)))
 		{
-			return do_cmp_greater<Lhs_, Rhs_>()(lhs_, rhs_);
+			return _cmp_template<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
 	};
 
@@ -95,27 +128,38 @@ namespace EmuCore
 	struct do_cmp_less
 	{
 	private:
-		std::less<void> comparator_;
+		using _cmp_type = std::less<void>;
+		static_assert
+		(
+			std::is_invocable_r_v<bool, _cmp_type, const Lhs_&, const Rhs_&>,
+			"Invalid types for a default instantiation of EmuCore::do_cmp_less: The types are not compatible when passed to std::less<void> as const-reference arguments."
+		);
 
 	public:
-		constexpr do_cmp_less()
+		constexpr do_cmp_less() noexcept
 		{
 		}
-		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const noexcept(std::is_nothrow_invocable_v<_cmp_type, const Lhs_&, const Rhs_&>)
 		{
-			return comparator_(lhs_, rhs_);
+			return _cmp_type()(lhs_, rhs_);
 		}
 	};
 	template<>
 	struct do_cmp_less<void, void>
 	{
-		constexpr do_cmp_less()
+	private:
+		template<class Lhs_, class Rhs_>
+		using _cmp_template = EmuCore::do_cmp_less<Lhs_, Rhs_>;
+
+	public:
+		constexpr do_cmp_less() noexcept
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_)
+		requires(std::is_default_constructible_v<_cmp_template<Lhs_, Rhs_>> && std::is_invocable_r_v<bool, _cmp_template<Lhs_, Rhs_>, const Lhs_&, const Rhs_&>)
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const noexcept(noexcept(_cmp_template<Lhs_, Rhs_>()(lhs_, rhs_)))
 		{
-			return do_cmp_less<Lhs_, Rhs_>()(lhs_, rhs_);
+			return _cmp_template<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
 	};
 
@@ -123,27 +167,38 @@ namespace EmuCore
 	struct do_cmp_greater_equal
 	{
 	private:
-		std::greater_equal<void> comparator_;
+		using _cmp_type = std::greater_equal<void>;
+		static_assert
+		(
+			std::is_invocable_r_v<bool, _cmp_type, const Lhs_&, const Rhs_&>,
+			"Invalid types for a default instantiation of EmuCore::do_cmp_greater_equal: The types are not compatible when passed to std::greater_equal<void> as const-reference arguments."
+		);
 
 	public:
-		constexpr do_cmp_greater_equal()
+		constexpr do_cmp_greater_equal() noexcept
 		{
 		}
-		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const noexcept(std::is_nothrow_invocable_v<_cmp_type, const Lhs_&, const Rhs_&>)
 		{
-			return comparator_(lhs_, rhs_);
+			return _cmp_type()(lhs_, rhs_);
 		}
 	};
 	template<>
 	struct do_cmp_greater_equal<void, void>
 	{
-		constexpr do_cmp_greater_equal()
+	private:
+		template<class Lhs_, class Rhs_>
+		using _cmp_template = EmuCore::do_cmp_greater_equal<Lhs_, Rhs_>;
+
+	public:
+		constexpr do_cmp_greater_equal() noexcept
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_)
+		requires(std::is_default_constructible_v<_cmp_template<Lhs_, Rhs_>> && std::is_invocable_r_v<bool, _cmp_template<Lhs_, Rhs_>, const Lhs_&, const Rhs_&>)
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const noexcept(noexcept(_cmp_template<Lhs_, Rhs_>()(lhs_, rhs_)))
 		{
-			return do_cmp_greater_equal<Lhs_, Rhs_>()(lhs_, rhs_);
+			return _cmp_template<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
 	};
 
@@ -151,27 +206,38 @@ namespace EmuCore
 	struct do_cmp_less_equal
 	{
 	private:
-		std::less_equal<void> comparator_;
+		using _cmp_type = std::less_equal<void>;
+		static_assert
+		(
+			std::is_invocable_r_v<bool, _cmp_type, const Lhs_&, const Rhs_&>,
+			"Invalid types for a default instantiation of EmuCore::do_cmp_less_equal: The types are not compatible when passed to std::less_equal<void> as const-reference arguments."
+		);
 
 	public:
-		constexpr do_cmp_less_equal()
+		constexpr do_cmp_less_equal() noexcept
 		{
 		}
-		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const noexcept(std::is_nothrow_invocable_v<_cmp_type, const Lhs_&, const Rhs_&>)
 		{
-			return comparator_(lhs_, rhs_);
+			return _cmp_type()(lhs_, rhs_);
 		}
 	};
 	template<>
 	struct do_cmp_less_equal<void, void>
 	{
-		constexpr do_cmp_less_equal()
+	private:
+		template<class Lhs_, class Rhs_>
+		using _cmp_template = EmuCore::do_cmp_less_equal<Lhs_, Rhs_>;
+
+	public:
+		constexpr do_cmp_less_equal() noexcept
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_)
+		requires(std::is_default_constructible_v<_cmp_template<Lhs_, Rhs_>> && std::is_invocable_r_v<bool, _cmp_template<Lhs_, Rhs_>, const Lhs_&, const Rhs_&>)
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const noexcept(noexcept(_cmp_template<Lhs_, Rhs_>()(lhs_, rhs_)))
 		{
-			return do_cmp_less_equal<Lhs_, Rhs_>()(lhs_, rhs_);
+			return _cmp_template<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
 	};
 
@@ -180,12 +246,27 @@ namespace EmuCore
 	{
 	private:
 		using _cmp_less_equal = EmuCore::do_cmp_less_equal<A_, B_>;
+		[[nodiscard]] static constexpr inline bool _is_noexcept() noexcept
+		{
+			return
+			(
+				(std::is_nothrow_invocable_v<_cmp_less_equal, const A_&, const B_&>) &&
+				(
+					(std::is_constructible_v<Out_, const A_&> && std::is_nothrow_constructible_v<Out_, const A_&>) ||
+					(EmuCore::TMP::is_static_castable_v<const A_&, Out_> && std::is_nothrow_convertible_v<const A_&, Out_>)
+				) &&
+				(
+					(std::is_constructible_v<Out_, const B_&> && std::is_nothrow_constructible_v<Out_, const B_&>) ||
+					(EmuCore::TMP::is_static_castable_v<const B_&, Out_> && std::is_nothrow_convertible_v<const B_&, Out_>)
+				)
+			);
+		}
 
 	public:
-		constexpr do_min()
+		constexpr do_min() noexcept
 		{
 		}
-		[[nodiscard]] constexpr inline Out_ operator()(const A_& a_, const B_& b_) const
+		[[nodiscard]] constexpr inline Out_ operator()(const A_& a_, const B_& b_) const noexcept(_is_noexcept())
 		{
 			if (_cmp_less_equal()(a_, b_))
 			{
@@ -232,25 +313,37 @@ namespace EmuCore
 	template<>
 	struct do_min<void, void, void>
 	{
-		constexpr do_min()
+	private:
+		template<class A_, class B_, class Out_>
+		using _op_template = EmuCore::do_min<A_, B_, typename std::conditional<std::is_void_v<Out_>, A_, Out_>::type>;
+
+	public:
+		constexpr do_min() noexcept
 		{
 		}
-		template<typename A_, typename B_, typename Out_ = EmuCore::TMP::remove_ref_cv_t<A_>>
-		[[nodiscard]] constexpr inline std::invoke_result_t<do_min<A_, B_, Out_>, const A_&, const B_&> operator()(const A_& a_, const B_& b_)
+		template<typename Out_ = void, typename A_, typename B_>
+		requires(std::is_default_constructible_v<_op_template<A_, B_, Out_>> && std::is_invocable_v<_op_template<A_, B_, Out_>, const A_&, const B_&>)
+		[[nodiscard]] constexpr inline decltype(auto) operator()(const A_& a_, const B_& b_) const noexcept(noexcept(_op_template<A_, B_, Out_>()(a_, b_)))
 		{
-			return do_min<A_, B_, Out_>()(a_, b_);
+			return _op_template<A_, B_, Out_>()(a_, b_);
 		}
 	};
 	template<typename Out_>
 	struct do_min<void, void, Out_>
 	{
-		constexpr do_min()
+	private:
+		template<class A_, class B_>
+		using _op_template = EmuCore::do_min<A_, B_, Out_>;
+
+	public:
+		constexpr do_min() noexcept
 		{
 		}
 		template<typename A_, typename B_>
-		[[nodiscard]] constexpr inline std::invoke_result_t<do_min<A_, B_, Out_>, const A_&, const B_&> operator()(const A_& a_, const B_& b_)
+		requires(std::is_default_constructible_v<_op_template<A_, B_>> && std::is_invocable_v<_op_template<A_, B_>, const A_&, const B_&>)
+		[[nodiscard]] constexpr inline decltype(auto) operator()(const A_& a_, const B_& b_) const noexcept(noexcept(_op_template<A_, B_>()(a_, b_)))
 		{
-			return do_min<A_, B_, Out_>()(a_, b_);
+			return _op_template<A_, B_>()(a_, b_);
 		}
 	};
 
@@ -259,12 +352,27 @@ namespace EmuCore
 	{
 	private:
 		using _cmp_greater_equal = EmuCore::do_cmp_greater_equal<A_, B_>;
+		[[nodiscard]] static constexpr inline bool _is_noexcept() noexcept
+		{
+			return
+			(
+				(std::is_nothrow_invocable_v<_cmp_greater_equal, const A_&, const B_&>) &&
+				(
+					(std::is_constructible_v<Out_, const A_&> && std::is_nothrow_constructible_v<Out_, const A_&>) ||
+					(EmuCore::TMP::is_static_castable_v<const A_&, Out_> && std::is_nothrow_convertible_v<const A_&, Out_>)
+				) &&
+				(
+					(std::is_constructible_v<Out_, const B_&> && std::is_nothrow_constructible_v<Out_, const B_&>) ||
+					(EmuCore::TMP::is_static_castable_v<const B_&, Out_> && std::is_nothrow_convertible_v<const B_&, Out_>)
+				)
+			);
+		}
 
 	public:
-		constexpr do_max()
+		constexpr do_max() noexcept
 		{
 		}
-		[[nodiscard]] constexpr inline Out_ operator()(const A_& a_, const B_& b_) const
+		[[nodiscard]] constexpr inline Out_ operator()(const A_& a_, const B_& b_) const noexcept(_is_noexcept())
 		{
 			if (_cmp_greater_equal()(a_, b_))
 			{
@@ -311,25 +419,37 @@ namespace EmuCore
 	template<>
 	struct do_max<void, void, void>
 	{
-		constexpr do_max()
+	private:
+		template<class A_, class B_, class Out_>
+		using _op_template = EmuCore::do_max<A_, B_, typename std::conditional<std::is_void_v<Out_>, A_, Out_>::type>;
+
+	public:
+		constexpr do_max() noexcept
 		{
 		}
-		template<typename A_, typename B_, typename Out_ = EmuCore::TMP::remove_ref_cv_t<A_>>
-		[[nodiscard]] constexpr inline std::invoke_result_t<do_max<A_, B_, Out_>, const A_&, const B_&> operator()(const A_& a_, const B_& b_)
+		template<typename Out_ = void, typename A_, typename B_>
+		requires(std::is_default_constructible_v<_op_template<A_, B_, Out_>> && std::is_invocable_v<_op_template<A_, B_, Out_>, const A_&, const B_&>)
+		[[nodiscard]] constexpr inline decltype(auto) operator()(const A_& a_, const B_& b_) const noexcept(noexcept(_op_template<A_, B_, Out_>()(a_, b_)))
 		{
-			return do_max<A_, B_, Out_>()(a_, b_);
+			return _op_template<A_, B_, Out_>()(a_, b_);
 		}
 	};
 	template<typename Out_>
 	struct do_max<void, void, Out_>
 	{
-		constexpr do_max()
+	private:
+		template<class A_, class B_>
+		using _op_template = EmuCore::do_max<A_, B_, Out_>;
+
+	public:
+		constexpr do_max() noexcept
 		{
 		}
 		template<typename A_, typename B_>
-		[[nodiscard]] constexpr inline std::invoke_result_t<do_max<A_, B_, Out_>, const A_&, const B_&> operator()(const A_& a_, const B_& b_)
+		requires(std::is_default_constructible_v<_op_template<A_, B_>> && std::is_invocable_v<_op_template<A_, B_>, const A_&, const B_&>)
+		[[nodiscard]] constexpr inline decltype(auto) operator()(const A_& a_, const B_& b_) const noexcept(noexcept(_op_template<A_, B_>()(a_, b_)))
 		{
-			return do_max<A_, B_, Out_>()(a_, b_);
+			return _op_template<A_, B_>()(a_, b_);
 		}
 	};
 }
