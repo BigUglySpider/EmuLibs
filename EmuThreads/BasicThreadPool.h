@@ -563,6 +563,7 @@ namespace EmuThreads
 			// False warnings - MSVC doesn't properly tell that control is correctly handled for locks between functions here
 			EMU_CORE_MSVC_PUSH_WARNING_STACK;
 			EMU_CORE_MSVC_DISABLE_WARNING(26115);
+			EMU_CORE_MSVC_DISABLE_WARNING(26110);
 			if (!_threads_closing)
 			{
 				if (_task_queue.size() > 0)

@@ -27,6 +27,7 @@
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonAlgebra.h" />
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonMath.h" />
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonValues.h" />
+    <ClInclude Include="EmuCore\Collections\Range.hpp" />
     <ClInclude Include="EmuCore\Collections\RingBuffer.h" />
     <ClInclude Include="EmuCore\CommonConcepts\Arithmetic.h" />
     <ClInclude Include="EmuCore\CommonConcepts\Characters.h" />
@@ -72,6 +73,8 @@
     <ClInclude Include="EmuCore\TMPHelpers\UniqueVoid.hpp" />
     <ClInclude Include="EmuCore\TMPHelpers\Values.h" />
     <ClInclude Include="EmuCore\TMPHelpers\VariadicHelpers.h" />
+    <ClInclude Include="EmuIO\ConsoleColour.hpp" />
+    <ClInclude Include="EmuIO\POpen.hpp" />
     <ClInclude Include="EmuMath\BringHelpersToEmuMathNamespace.h" />
     <ClInclude Include="EmuMath\Colour.h" />
     <ClInclude Include="EmuMath\Common3D.h" />
@@ -149,6 +152,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_quaternion\_underlying_helpers\_fast_quaternion_underlying_to_euler.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_vectors\_fast_vector_t.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_vectors\_underlying_helpers\_fast_vector_tmp.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fraction.hpp" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_all_matrix_helpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_basic_arithmetic\_matrix_add.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_basic_arithmetic\_matrix_divide.h" />
@@ -414,6 +418,7 @@
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_underlying_specialisations\_shuffles\_simd_helpers_all_underlying_shuffle_specialisations.h" />
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_underlying_specialisations\_shuffles\_simd_helpers_underlying_128_shuffle_specialisations.h" />
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_underlying_specialisations\_simd_helpers_all_underlying_specialisations.h" />
+    <ClInclude Include="EmuStrings\FixedString.hpp" />
     <ClInclude Include="EmuThreads\BasicThreadPool.h" />
     <ClInclude Include="Tests.hpp" />
   </ItemGroup>
@@ -475,6 +480,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -489,6 +495,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -519,6 +526,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

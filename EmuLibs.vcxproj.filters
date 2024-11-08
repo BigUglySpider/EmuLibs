@@ -1202,5 +1202,20 @@
     <ClInclude Include="EmuCore\TMPHelpers\UniqueVoid.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuStrings\FixedString.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuCore\Collections\Range.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fraction.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuIO\POpen.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuIO\ConsoleColour.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -10,8 +10,7 @@
 #include "../TMPHelpers/VariadicHelpers.h"
 #include <cstddef>
 #include <functional>
-
-#include <iostream>
+#include <numeric>
 
 namespace EmuCore
 {
@@ -116,19 +115,13 @@ namespace EmuCore
 			}
 			else
 			{
-				if (val_ < T_(0))
-				{
-					// If trunc is different, we will have done a ceil since negative trunc == negative ceil
-					// --- As such, we need to subtract 1 from the truncated value if we do need to perform a round
-					T_ truncated_ = static_cast<T_>(static_cast<std::int64_t>(val_));
-					return (truncated_ == val_) ? val_ : (truncated_ - T_(1));
-				}
-				else
-				{
-					// Can take advantage of a higher range from an unsigned int if we know we're positive
-					// --- Additionally, positive trunc == positive floor
-					return static_cast<T_>(static_cast<std::uint64_t>(val_));
-				}
+				auto result_int = static_cast<std::int64_t>(val_); // Truncate - this is all we need for > 0
+				result_int -= static_cast<std::int64_t> // Only subtract 1 if < 0 (and original value contains fractional portion) as `floor(pos) == trunc(pos)`
+				(
+					(val_ != static_cast<typename std::remove_cvref<T_>::type>(result_int)) &&
+					(val_ < typename std::remove_cvref<T_>::type{})
+				);
+				return static_cast<typename std::remove_cvref<T_>::type>(result_int);
 			}
 		}
 	};
@@ -168,18 +161,13 @@ namespace EmuCore
 			}
 			else
 			{
-				if (val_ < T_(0))
-				{
-					// Negative trunc == negative ceil
-					return static_cast<T_>(static_cast<std::int64_t>(val_));
-				}
-				else
-				{
-					// When truncated, a positive value is equal to its floored value
-					// --- As such, when a truncation indicates a round should occur, we need to add 1 to the truncated value when positive
-					T_ truncated_ = static_cast<T_>(static_cast<std::uint64_t>(val_));
-					return (truncated_ == val_) ? val_ : (truncated_ + T_(1));
-				}
+				auto result_int = static_cast<std::int64_t>(val_); // Truncate - this is all we need for < 0
+				result_int += static_cast<std::int64_t> // Only add 1 if positive (and original value contains fractional portion) as `ceil(neg) == trunc(neg)`
+				(
+					(val_ != static_cast<typename std::remove_cvref<T_>::type>(result_int)) &&
+					(val_ > typename std::remove_cvref<T_>::type{})
+				);
+				return static_cast<typename std::remove_cvref<T_>::type>(result_int);
 			}
 		}
 	};
@@ -2244,6 +2232,57 @@ namespace EmuCore
 			return do_normalised_wrap<EmuCore::TMP::remove_ref_cv_t<T_>, WrapToOne_>()(std::forward<T_>(val_));
 		}
 	};
+
+	template<class A, class B = A>
+	struct do_gcd
+	{
+		[[nodiscard]] constexpr inline decltype(auto) operator()(const A& a_, const B& b_)
+		{
+			if constexpr (std::is_integral_v<typename std::remove_cvref<A>::type> && std::is_integral_v<typename std::remove_cvref<B>::type>)
+			{
+				constexpr bool a_is_bool = std::is_same_v<typename std::remove_cvref<A>::type, bool>;
+				constexpr bool b_is_bool = std::is_same_v<typename std::remove_cvref<B>::type, bool>;
+				if constexpr (a_is_bool)
+				{
+					// a bool
+					if constexpr (b_is_bool)
+					{
+						return a_ || b_;
+					}
+					else
+					{
+						return a_ ? typename std::remove_cvref<B>::type{ 1 } : b_;
+					}
+				}
+				else
+				{
+					// a not bool
+					if constexpr (b_is_bool)
+					{
+						return b_ ? typename std::remove_cvref<A>::type{ 1 } : a_;
+					}
+					else
+					{
+						return std::gcd(a_, b_);
+					}
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<A, B>(),
+					"Invalid type passed to the default implementation of EmuCore::do_gcd: Only integers are supported with the default implementation."
+				);
+			}
+		}
+	};
+	template<class B>
+	struct do_gcd<void, B>
+	{
+
+	};
+
 #pragma endregion
 }
 
