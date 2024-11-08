@@ -504,7 +504,7 @@ namespace EmuIO
 #if EMU_CORE_IS_MSVC
 				result = _pclose(_handle);
 #else
-				result = pclose(handle);
+				result = pclose(_handle);
 #endif
 			}
 			else

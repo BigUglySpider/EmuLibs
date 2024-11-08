@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := opt
 
-MAIN_SRCS = **.cpp
+MAIN_SRCS = ignore/**.cpp
 
 EMU_CORE_ROOT = EmuCore/
 

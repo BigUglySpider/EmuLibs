@@ -5,6 +5,7 @@
 #include "../TMPHelpers/TypeConvertors.h"
 #include <array>
 #include <bit>
+#include <climits>
 #include <cstddef>
 #include <cstdint>
 #include <utility>
