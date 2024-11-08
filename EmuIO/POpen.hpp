@@ -15,22 +15,35 @@
 
 namespace EmuIO
 {
-	template<bool Heap, std::size_t BufferLength>
+	/*
+	* @brief Determines the type of iterator that will be input to raw processor functions for a call to 
+	*		 `POpen::ProcessRaw` with the passed template parameters to customise the buffer.
+	*/
+	template<bool UsesHeap, std::size_t BufferLength>
 	using popen_raw_iterator_type = typename std::conditional
 	<
-		Heap,
+		UsesHeap,
 		std::vector<char>::const_iterator,
 		typename std::array<char, (BufferLength <= 2) ? 2 : BufferLength>::const_iterator
 	>::type;
 
+	/*
+	* @brief Constraint applied to functions input to `POpen::ProcessLines`.
+	*        Requires that the type `T` can be invoked when input a reference to a `std::string` (does not have to be constant).
+	*/
 	template<class T>
 	concept POpenLineProcessor = requires(typename std::remove_reference<T>::type& processor, std::string& line)
 	{
 		{ processor(line) };
 	};
 
-	template<class T, bool Heap, std::size_t BufferLength>
-	concept POpenRawProcessor = requires(typename std::remove_reference<T>::type & processor, popen_raw_iterator_type<Heap, BufferLength> begin, popen_raw_iterator_type<Heap, BufferLength> end)
+	/*
+	* @brief Constraint applied to functions input to `POpen::ProcessRaw`.
+	*        Requires that the type `T` can be invoked when input two iterators representing the `begin` and `end` (respectively) of the current chunk of raw data.
+	*        The iterator types used as input will be identical to `popen_raw_iterator_type<UsesHeap, BufferLength>`.
+	*/
+	template<class T, bool UsesHeap, std::size_t BufferLength>
+	concept POpenRawProcessor = requires(typename std::remove_reference<T>::type& processor, popen_raw_iterator_type<UsesHeap, BufferLength> begin, popen_raw_iterator_type<UsesHeap, BufferLength> end)
 	{
 		{ processor(begin, end) };
 	};
