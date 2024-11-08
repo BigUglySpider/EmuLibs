@@ -346,6 +346,7 @@ namespace EmuIO
 		* @param line_processor_func Function through which to process individual lines.
 		*                            Must satisfy the `POpenLineProcessor` concept.
 		* @param IncludeLineFeeds `true` to include line feeds at the end of lines passed to the processor; `false` to omit the line feeds.
+		*                         Defaults to `true`.
 		* @param BufferSize Size to use for the buffer when reading the output of the command handle.
 		*                   Does not affect the size of line strings input to `line_processor_func`.
 		*                   Will be clamped via `clamp_buffer_size`.
@@ -355,7 +356,7 @@ namespace EmuIO
 		*                       Defaults to `defaults_to_heap(BufferSize)`
 		* @returns The value returned after closing the handle once processing is complete.
 		*/
-		template<bool IncludeLineFeeds, std::size_t BufferSize = default_buffer_size, bool BufferUsesHeap = defaults_to_heap(BufferSize), POpenLineProcessor Func>
+		template<bool IncludeLineFeeds = true, std::size_t BufferSize = default_buffer_size, bool BufferUsesHeap = defaults_to_heap(BufferSize), POpenLineProcessor Func>
 		int ProcessLines(Func line_processor_func)
 		{
 			constexpr std::size_t clamped_size{ clamp_buffer_size(BufferSize) };
