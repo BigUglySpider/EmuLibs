@@ -73,6 +73,7 @@
     <ClInclude Include="EmuCore\TMPHelpers\UniqueVoid.hpp" />
     <ClInclude Include="EmuCore\TMPHelpers\Values.h" />
     <ClInclude Include="EmuCore\TMPHelpers\VariadicHelpers.h" />
+    <ClInclude Include="EmuIO\ArgParser.hpp" />
     <ClInclude Include="EmuIO\ConsoleColour.hpp" />
     <ClInclude Include="EmuIO\POpen.hpp" />
     <ClInclude Include="EmuMath\BringHelpersToEmuMathNamespace.h" />

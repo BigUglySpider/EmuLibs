@@ -6,6 +6,9 @@
 #include "../EmuCore/CommonPreprocessor/Compiler.h"
 
 #if EMU_CORE_IS_MSVC
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <Windows.h>
 #else
 #include <iostream>
