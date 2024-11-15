@@ -715,6 +715,57 @@ namespace EmuCore::TMP
 		using type = decltype(_make_sequence(_used_index_sequence()));
 	};
 
+	template<std::size_t UnfilteredCount>
+	struct odd_index_sequence_maker
+	{
+	private:
+		template<std::size_t...OutArrayIndices>
+		[[nodiscard]] static constexpr auto _get(std::index_sequence<OutArrayIndices...>) noexcept
+		{
+			if constexpr (sizeof...(OutArrayIndices) == 0)
+			{
+				return std::index_sequence<>{};
+			}
+			else
+			{
+				//constexpr std::array<std::size_t, sizeof...(OutArrayIndices)> indices_array{ _make_array<OutArrayIndices...>() };
+				return std::index_sequence<((OutArrayIndices * 2) + 1)...>{};
+			}
+		}
+
+	public:
+		static constexpr std::size_t size{ (UnfilteredCount / 2) };
+		using type = decltype(_get(std::make_index_sequence<size>{}));
+	};
+
+	template<std::size_t UnfilteredCount>
+	struct even_index_sequence_maker
+	{
+	private:
+		template<std::size_t...OutArrayIndices>
+		[[nodiscard]] static constexpr auto _get(std::index_sequence<OutArrayIndices...>) noexcept
+		{
+			if constexpr (sizeof...(OutArrayIndices) == 0)
+			{
+				return std::index_sequence<>{};
+			}
+			else
+			{
+				//constexpr std::array<std::size_t, sizeof...(OutArrayIndices)> indices_array{ _make_array<OutArrayIndices...>() };
+				return std::index_sequence<(OutArrayIndices * 2)...>{};
+			}
+		}
+
+	public:
+		static constexpr std::size_t size{ ((UnfilteredCount + 1) / 2) };
+		using type = decltype(_get(std::make_index_sequence<size>{}));
+	};
+
+	template<std::size_t UnfilteredCount>
+	using make_odd_index_sequence = typename odd_index_sequence_maker<UnfilteredCount>::type;
+	template<std::size_t UnfilteredCount>
+	using make_even_index_sequence = typename even_index_sequence_maker<UnfilteredCount>::type;
+
 	/// <summary>
 	/// <para> Helper type to perform a comparison of all constants to determine the last to compare true. </para>
 	/// <para> The provided CmpTemplate_ will be instantiated with a single T_ argument, and used to perform each comparison. </para>

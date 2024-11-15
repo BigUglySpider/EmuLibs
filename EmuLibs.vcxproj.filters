@@ -1220,5 +1220,11 @@
     <ClInclude Include="EmuIO\ArgParser.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuIO\_do_not_manually_include\_arg_parser\ParameterType.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuIO\_do_not_manually_include\_arg_parser\Parameter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

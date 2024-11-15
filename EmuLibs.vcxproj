@@ -76,6 +76,8 @@
     <ClInclude Include="EmuIO\ArgParser.hpp" />
     <ClInclude Include="EmuIO\ConsoleColour.hpp" />
     <ClInclude Include="EmuIO\POpen.hpp" />
+    <ClInclude Include="EmuIO\_do_not_manually_include\_arg_parser\Parameter.hpp" />
+    <ClInclude Include="EmuIO\_do_not_manually_include\_arg_parser\ParameterType.hpp" />
     <ClInclude Include="EmuMath\BringHelpersToEmuMathNamespace.h" />
     <ClInclude Include="EmuMath\Colour.h" />
     <ClInclude Include="EmuMath\Common3D.h" />
