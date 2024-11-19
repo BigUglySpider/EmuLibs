@@ -101,9 +101,19 @@ namespace EmuIO
 		requires((ParamType & ParameterType::Enum) != ParameterType::Enum)
 		[[nodiscard]] static Parameter make(DefaultValue&& default_value_)
 		{
-			constexpr bool valid_construction{ valid_construction_args_for_param_type<DefaultValue>(ParamType) };
-			static_assert(valid_construction, "Invalid construction args provided for the specified ParameterType.");
-
+			if constexpr (EmuConcepts::UnqualifiedMatch<DefaultValue, std::monostate>)
+			{
+				static_assert
+				(
+					(ParamType & ParameterType::Array) == ParameterType::Array,
+					"Invalid construction args provided for the specified ParameterType: `std::monostate` was provided, but this is only valid for ParameterTypes where the `Array` bit is enabled."
+				);
+			}
+			else
+			{
+				constexpr bool valid_construction{ valid_construction_args_for_param_type<DefaultValue>(ParamType) };
+				static_assert(valid_construction, "Invalid construction args provided for the specified ParameterType.");
+			}
 			return Parameter(ParamType, std::forward<DefaultValue>(default_value_));
 		}
 
@@ -141,33 +151,38 @@ namespace EmuIO
 			}
 		}
 
-		template<ParameterType ParamType, class...EnumInfoSets, std::size_t...FirstIndices, std::size_t...SecondIndices>
-		[[nodiscard]] static Parameter _underlying_make_enum_type_with_pairs(std::string default_enum_, std::tuple<EnumInfoSets...> enum_pairs, std::index_sequence<FirstIndices...>, std::index_sequence<SecondIndices...>)
+		template<ParameterType ParamType, class...EnumInfoSets>
+		requires((ParamType & ParameterType::Enum) == ParameterType::Enum && (ParamType & ParameterType::Array) == ParameterType::Array && sizeof...(EnumInfoSets) != 0)
+		[[nodiscard]] static Parameter make(std::monostate default_enum_, EnumInfoSets&&...enum_singles_or_pairs)
 		{
+			constexpr std::size_t enum_info_args_count{ sizeof...(EnumInfoSets) };
+			constexpr bool uses_string_values{ (ParamType & ParameterType::ValueTypeMask) == ParameterType::String };
+			constexpr std::size_t per_info_item_count{ uses_string_values ? 1 : 2 };
 			static_assert
 			(
-				(... && std::is_constructible_v<std::pair<std::string, typename EmuIO::parameter_type_value<ParamType>::type>,
-												typename std::tuple_element<FirstIndices,  std::tuple<EnumInfoSets...>>::type,
-												typename EmuIO::parameter_type_value<ParamType>::type>),
-				"Invalid arguments for making a non-string enum param: The values were not ordered in pairs that could successfully construct a `std::string` followed by the parameter's value type."
-			);
-			static_assert
-			(
-				(... && EmuCore::TMP::is_static_castable_v<decltype(std::forward<typename std::tuple_element<SecondIndices, std::tuple<EnumInfoSets...>>::type>(std::get<SecondIndices>(enum_pairs))),
-				                                           typename EmuIO::parameter_type_value<ParamType>::type>),
-				"Invalid arguments for makign a non-string enum param: The values were not ordered in pairs that could successfully convert the second value of each pair to the parameter's `value_type` via  a static_cast."
+				(enum_info_args_count % per_info_item_count) == 0,
+				"Invalid number of arguments for creating the enum info for a parameter: The input must come in sequential order of strings and values for each potential value if the value type of the parameter is `String`; otherwise there must be 1 string (and nothing else) for each potential value."
 			);
 
-			return Parameter
-			(
-				ParamType,
-				std::move(default_enum_),
-				std::pair<std::string, typename EmuIO::parameter_type_value<ParamType>::type>
+			if constexpr (uses_string_values)
+			{
+				static_assert
 				(
-					std::forward<typename std::tuple_element<FirstIndices,  std::tuple<EnumInfoSets...>>::type>(std::get<FirstIndices>(enum_pairs)),
-					static_cast<typename EmuIO::parameter_type_value<ParamType>::type>(std::forward<typename std::tuple_element<SecondIndices, std::tuple<EnumInfoSets...>>::type>(std::get<SecondIndices>(enum_pairs)))
-				)...
-			);
+					(... && std::is_constructible_v<std::string, EnumInfoSets>),
+					"Invalid arguments passed for creating a string enum parameter: At least one argument is not a valid type to construct `std::string`."
+				);
+				return Parameter(ParamType, std::move(default_enum_), std::string{ std::forward<EnumInfoSets>(enum_singles_or_pairs)... });
+			}
+			else
+			{
+				return _underlying_make_enum_type_with_pairs<ParamType>
+				(
+					std::move(default_enum_),
+					std::forward_as_tuple<EnumInfoSets&&...>(std::forward<EnumInfoSets>(enum_singles_or_pairs)...),
+					EmuCore::TMP::make_even_index_sequence<enum_info_args_count>(),
+					EmuCore::TMP::make_odd_index_sequence<enum_info_args_count>()
+				);
+			}
 		}
 
 		[[nodiscard]] constexpr const value_type& GetDefault() const noexcept
@@ -228,7 +243,7 @@ namespace EmuIO
 		*        If this is a const parameter: Returns an error if the value has already been modified.
 		* @param input_ String to parse as this paramter's value type and apply as described.
 		* @returns Optional string describing the error if one occurs.
-		           On success, this will not have a value (`std::nullopt`).
+		*          On success, this will not have a value (`std::nullopt`).
 		*/
 		std::optional<std::string> AppendInput(std::string input_)
 		{
@@ -244,6 +259,13 @@ namespace EmuIO
 			{
 				if ((type & ParameterType::Array) == ParameterType::Array)
 				{
+					if (!modified)
+					{
+						// Empty the array if this is the first parse since we don't want the defaults present anymore
+						// --- Especially considering having an empty monostate at the start on any array would be a little odd
+						values.clear();
+						inputs.clear();
+					}
 					values.emplace_back(std::move(new_item));
 					inputs.emplace_back(std::move(input_));
 				}
@@ -272,33 +294,48 @@ namespace EmuIO
 			return (type & ParameterType::Enum) == ParameterType::Enum;
 		}
 
-		[[nodiscard]] const std::string& GetEnumString() const
+		[[nodiscard]] std::string_view GetEnumString() const
 		{
 			if (!IsEnum())
 			{
 				throw _make_exception<std::runtime_error>("Attempted to access the enum string of a parameter whose type does not use enums (", arg_param_type_to_string(type), ')');
 			}
-			return get_enum_string_from_enum_info(*(current_enum_info.back()));
+			return get_enum_string_from_enum_info(current_enum_info.back());
 		}
 
-		[[nodiscard]] std::vector<const std::string*> GetAllEnumStringsArray() const
+		[[nodiscard]] std::vector<std::string_view> GetAllEnumStringsArray() const
 		{
-			std::vector<const std::string*> result{};
+			if (IsArray() && current_enum_info.back() == nullptr)
+			{
+				return std::vector<std::string_view>{};
+			}
+
+			std::vector<std::string_view> result{};
 			result.reserve(current_enum_info.size());
 			for (size_t i{ 0u }; i < current_enum_info.size(); ++i)
 			{
-				result[i] = &get_enum_string_from_enum_info(*(current_enum_info[i]));
+				auto* const this_enum_info{ current_enum_info[i] };
+				if (this_enum_info)
+				{
+					result[i] = get_enum_string_from_enum_info(this_enum_info);
+				}
+				else
+				{
+					using namespace std::string_view_literals;
+					result[i] = "null"sv;
+				}
 			}
 			return result;
 		}
 
-		[[nodiscard]] const std::string& GetDefaultEnumString() const
+		[[nodiscard]] std::string_view GetDefaultEnumString() const
 		{
 			if (!IsEnum())
 			{
 				throw _make_exception<std::runtime_error>("Attempted to access the default enum string of a parameter whose type does not use enums (", arg_param_type_to_string(type), ')');
 			}
-			return get_enum_string_from_enum_info(*default_enum_info);
+
+			return get_enum_string_from_enum_info(default_enum_info);
 		}
 
 		template<bool Indent = false>
@@ -319,7 +356,7 @@ namespace EmuIO
 			{
 				str << '\t';
 			}
-			_append_enum_info_to_stream(str, enum_info[0]);
+			_append_enum_info_to_stream(str, &(enum_info[0]));
 			if (num_valid_enums != 1)
 			{
 				size_t i{ 1u };
@@ -330,7 +367,7 @@ namespace EmuIO
 					{
 						str << '\t';
 					}
-					_append_enum_info_to_stream(str, enum_info[i]);
+					_append_enum_info_to_stream(str, &(enum_info[i]));
 				} while ((++i) < num_valid_enums);
 			}
 		}
@@ -470,7 +507,7 @@ namespace EmuIO
 		{
 			if (IsEnum())
 			{
-				_append_enum_info_to_stream(str, *(current_enum_info.back()));
+				_append_enum_info_to_stream(str, current_enum_info.back());
 			}
 			else
 			{
@@ -480,13 +517,19 @@ namespace EmuIO
 
 		void AppendAllValuesToStream(std::ostream& str) const
 		{
+			if (IsArray() && !modified && default_value.index() == 0)
+			{
+				str << "[]";
+				return;
+			}
+
 			str << '[';
 			if (IsEnum())
 			{
 				const std::size_t final_index{ current_enum_info.size() - 1 };
 				for (std::size_t i{ 0u }, end{ current_enum_info.size() }; i < end; ++i)
 				{
-					_append_enum_info_to_stream(str, *(current_enum_info[i]));
+					_append_enum_info_to_stream(str, current_enum_info[i]);
 					if (i != final_index)
 					{
 						str << ", ";
@@ -525,27 +568,49 @@ namespace EmuIO
 
 		void AppendDefaultValueToStream(std::ostream& str) const
 		{
+			const bool is_array{ IsArray() };
+			if (is_array)
+			{
+				if (default_value.index() == 0)
+				{
+					str << "[]";
+					return;
+				}
+				else
+				{
+					str << '[';
+				}
+			}
+
 			if (IsEnum())
 			{
-				_append_enum_info_to_stream(str, *default_enum_info);
+				_append_enum_info_to_stream(str, default_enum_info);
 			}
 			else
 			{
 				_append_value_to_stream(str, default_value);
 			}
+
+			if (is_array)
+			{
+				str << ']';
+			}
 		}
 
 		template<bool Value = true, bool Default = true, bool Modified = true, bool ValidEnums = true>
-		void AppendToStream(std::ostream& str) const
+		std::ostream& AppendToStream(std::ostream& str) const
 		{
 			if constexpr (Value)
 			{
+				str << "Value";
 				if (IsArray())
 				{
+					str << "s: ";
 					AppendAllValuesToStream(str);
 				}
 				else
 				{
+					str << ": ";
 					AppendValueToStream(str);
 				}
 			}
@@ -581,6 +646,7 @@ namespace EmuIO
 					AppendValidEnumStringsToStream<true>(str);
 				}
 			}
+			return str;
 		}
 
 	private:
@@ -612,15 +678,21 @@ namespace EmuIO
 			);
 		}
 
-		void _append_enum_info_to_stream(std::ostream& str, const enum_info_type& enum_info_) const
+		void _append_enum_info_to_stream(std::ostream& str, const enum_info_type* enum_info_) const
 		{
+			if (!enum_info_)
+			{
+				str << "null";
+				return;
+			}
+
 			if ((type & ParameterType::ValueTypeMask) == ParameterType::String)
 			{
-				str << std::get<std::string>(enum_info_);
+				str << std::get<std::string>(*enum_info_);
 			}
 			else
 			{
-				const std::pair<std::string, value_type> translated_info{ std::get<std::pair<std::string, value_type>>(enum_info_) };
+				const std::pair<std::string, value_type> translated_info{ std::get<std::pair<std::string, value_type>>(*enum_info_) };
 				str << '"' << std::get<std::string>(translated_info) << '"';
 				str << " (";
 				std::visit
@@ -629,7 +701,7 @@ namespace EmuIO
 					{
 						if constexpr (EmuConcepts::UnqualifiedMatch<decltype(val_), std::monostate>)
 						{
-							// Ignore monostate (should never be possible)
+							// Ignore monostate (should never be possible even with empty arrays)
 							return;
 						}
 						else if constexpr (EmuConcepts::UnqualifiedMatch<decltype(val_), std::int8_t> || EmuConcepts::UnqualifiedMatch<decltype(val_), std::uint8_t>)
@@ -670,6 +742,10 @@ namespace EmuIO
 						{
 							if ((type & ParameterType::Array) == ParameterType::Array)
 							{
+								if (!modified)
+								{
+									current_enum_info.clear();
+								}
 								current_enum_info.emplace_back(&this_enum_info);
 							}
 							else
@@ -690,6 +766,10 @@ namespace EmuIO
 						{
 							if ((type & ParameterType::Array) == ParameterType::Array)
 							{
+								if (!modified)
+								{
+									current_enum_info.clear();
+								}
 								current_enum_info.emplace_back(&this_enum_info);
 							}
 							else
@@ -1065,6 +1145,44 @@ namespace EmuIO
 				return std::monostate{}; // Should never be reached due to validation
 			}
 		}
+		
+		template<ParameterType ParamType, class...EnumInfoSets, std::size_t...FirstIndices, std::size_t...SecondIndices, class DefaultEnum>
+		[[nodiscard]] static Parameter _underlying_make_enum_type_with_pairs(DefaultEnum&& default_enum_, std::tuple<EnumInfoSets...> enum_pairs, std::index_sequence<FirstIndices...>, std::index_sequence<SecondIndices...>)
+		{
+			static_assert
+			(
+				(... && std::is_constructible_v<std::pair<std::string, typename EmuIO::parameter_type_value<ParamType>::type>,
+												typename std::tuple_element<FirstIndices,  std::tuple<EnumInfoSets...>>::type,
+												typename EmuIO::parameter_type_value<ParamType>::type>),
+				"Invalid arguments for making a non-string enum param: The values were not ordered in pairs that could successfully construct a `std::string` followed by the parameter's value type."
+			);
+			static_assert
+			(
+				(... && EmuCore::TMP::is_static_castable_v<decltype(std::forward<typename std::tuple_element<SecondIndices, std::tuple<EnumInfoSets...>>::type>(std::get<SecondIndices>(enum_pairs))),
+				                                           typename EmuIO::parameter_type_value<ParamType>::type>),
+				"Invalid arguments for makign a non-string enum param: The values were not ordered in pairs that could successfully convert the second value of each pair to the parameter's `value_type` via  a static_cast."
+			);
+
+			static_assert
+			(
+				(
+					EmuConcepts::UnqualifiedMatch<DefaultEnum, std::string> ||
+					(EmuConcepts::UnqualifiedMatch<DefaultEnum, std::monostate> && (ParamType & ParameterType::Array) == ParameterType::Array)
+				),
+				"Invalid type input for making an Enum type parameter with pairs: The default value must be a `std::string`, or optionally `std::monostate` if the parameter type is an array that should be initialised as empty."
+			);
+
+			return Parameter
+			(
+				ParamType,
+				std::forward<DefaultEnum>(default_enum_),
+				std::pair<std::string, typename EmuIO::parameter_type_value<ParamType>::type>
+				(
+					std::forward<typename std::tuple_element<FirstIndices,  std::tuple<EnumInfoSets...>>::type>(std::get<FirstIndices>(enum_pairs)),
+					static_cast<typename EmuIO::parameter_type_value<ParamType>::type>(std::forward<typename std::tuple_element<SecondIndices, std::tuple<EnumInfoSets...>>::type>(std::get<SecondIndices>(enum_pairs)))
+				)...
+			);
+		}
 
 		template<class Value>
 		Parameter(ParameterType type_, Value&& default_value_) :
@@ -1081,8 +1199,23 @@ namespace EmuIO
 			// --- We don't care about validating `default_value` as this constructor cannot be called directly,
 			//     and is instead called by a deferring static builder function
 			// --- Additionally, we don't care to validate that this isn't an enum since the static builder will check at compile time
-			default_value = _make_value(std::forward<Value>(default_value_));
-			values.emplace_back(default_value);
+			if constexpr (EmuConcepts::UnqualifiedMatch<Value, std::monostate>)
+			{
+				if (IsArray())
+				{
+					default_value.emplace<std::monostate>();
+					values.emplace_back(std::monostate{});
+				}
+				else
+				{
+					throw _make_exception<std::invalid_argument>("Failed to make a value for a `Parameter` as monostate was provided, but the type flags of the parameter do not allow it to be initialised as empty (this is only possible with arrays).");
+				}
+			}
+			else
+			{
+				default_value = _make_value(std::forward<Value>(default_value_));
+				values.emplace_back(default_value);
+			}
 			inputs.emplace_back();
 		}
 
@@ -1102,7 +1235,7 @@ namespace EmuIO
 			std::unordered_set<std::string_view> registered_enum_names{};
 			for (const enum_info_type& this_enum_info_ : enum_info)
 			{
-				std::string_view current_name{ get_enum_string_from_enum_info(this_enum_info_) };
+				std::string_view current_name{ get_enum_string_from_enum_info(&this_enum_info_) };
 				if (registered_enum_names.contains(current_name))
 				{
 					throw _make_exception<std::invalid_argument>("Invalid enum Parameter initialisation as a duplicate enum string has been provided: ", current_name);
@@ -1151,26 +1284,54 @@ namespace EmuIO
 				{
 					throw _make_exception<std::invalid_argument>("Failed to make a value for an enum `Parameter` as the provided string value could not be translated to one of the provided enum strings for that parameter.");
 				}
+				values.emplace_back(default_value);
+				inputs.emplace_back();
+			}
+			else if constexpr (EmuConcepts::UnqualifiedMatch<Value, std::monostate>)
+			{
+				if (IsArray())
+				{
+					default_enum_info = nullptr;
+					current_enum_info = { default_enum_info };
+					default_value.emplace<std::monostate>();
+					values.emplace_back(std::monostate{});
+					inputs.emplace_back();
+				}
+				else
+				{
+					throw _make_exception<std::invalid_argument>("Failed to make a value for an enum `Parameter` as monostate was provided, but the type flags of the parameter do not allow it to be initialised as empty (this is only possible with arrays).");
+				}
 			}
 			else
 			{
 				// This should be asserted beforehand by the static `make` helper
 				throw _make_exception<std::invalid_argument>("Failed to make a value for an enum `Parameter` as the input value could not be used to construct a string.");
 			}
-
-			values.emplace_back(default_value);
-			inputs.emplace_back();
 		}
 
-		[[nodiscard]] const std::string& get_enum_string_from_enum_info(const enum_info_type& enum_info_) const
+		[[nodiscard]] std::string_view get_enum_string_from_enum_info(const enum_info_type* enum_info_) const
 		{
 			if ((type & ParameterType::ValueTypeMask) == ParameterType::String)
 			{
-				return std::get<std::string>(enum_info_);
+				if (enum_info_)
+				{
+					return std::get<std::string>(*enum_info_);
+				}
+				else
+				{
+					return "null";
+				}
 			}
 			else
 			{
-				return std::get<std::pair<std::string, value_type>>(enum_info_).first;
+				if (enum_info_)
+				{
+					return std::get<std::pair<std::string, value_type>>(*enum_info_).first;
+				}
+				else
+				{
+					return "null";
+				}
 			}
 		}
 

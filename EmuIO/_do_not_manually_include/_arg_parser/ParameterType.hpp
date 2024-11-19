@@ -2,7 +2,7 @@
 #define EMU_IO_ARG_PARSER_PARAMETER_TYPE_HPP_INC_ 1
 
 #include <cstdint>
-#include <sstream>>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -93,13 +93,34 @@ namespace EmuIO
 	}
 
 	template<class T>
-	[[nodiscard]] constexpr inline ParameterType type_to_parameter_type_enum()
+	[[nodiscard]] constexpr inline ParameterType type_to_parameter_type_enum() noexcept
 	{
-		if constexpr (std::is_enum_v<typename std::remove_cvref<T>::type>)
+		if constexpr (std::is_pointer_v<typename std::remove_cvref<T>::type>)
+		{
+			static_assert(EmuCore::TMP::get_false<std::is_same_v<T, std::int32_t>>(), "Pointer type passed to EmuIO::type_to_parameter_type_enum.");
+		}
+		else if constexpr (std::is_enum_v<typename std::remove_cvref<T>::type>)
 		{
 			return
 			(
 				ParameterType::Enum |
+				type_to_parameter_type_enum<typename std::underlying_type<typename std::remove_cvref<T>::type>::type>()
+			);
+		}
+		else if constexpr (std::is_array_v<typename std::remove_cvref<T>::type>)
+		{
+			constexpr ParameterType unarrayed_type
+			{
+				type_to_parameter_type_enum<typename std::remove_extent<typename std::remove_cvref<T>::type>::type>()
+			};
+			static_assert((unarrayed_type & ParameterType::Array) == ParameterType{}, "Multidimensional arrays are not supported conversions for EmuIO::type_to_parameter_type_enum");
+			return unarrayed_type | ParameterType::Array;
+		}
+		else if constexpr (std::is_const_v<typename std::remove_reference<T>::type>)
+		{
+			return
+			(
+				ParameterType::Const |
 				type_to_parameter_type_enum<typename std::underlying_type<typename std::remove_cvref<T>::type>::type>()
 			);
 		}
@@ -149,8 +170,18 @@ namespace EmuIO
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<std::is_same_v<T, std::int32_t>>(), "Unsupported ype passed to EmuIO::type_to_parameter_type_enum.");
+			static_assert(EmuCore::TMP::get_false<std::is_same_v<T, std::int32_t>>(), "Unsupported type passed to EmuIO::type_to_parameter_type_enum.");
 		}
+	}
+
+	template<class ValueType, bool Array, bool Const, bool Enum>
+	[[nodiscard]] constexpr inline ParameterType make_parameter_type() noexcept
+	{
+		constexpr ParameterType array_bit{ Array ? ParameterType::Array : ParameterType{} };
+		constexpr ParameterType const_bit{ Const ? ParameterType::Const : ParameterType{} };
+		constexpr ParameterType enum_bit { Enum  ? ParameterType::Enum  : ParameterType{} };
+		constexpr ParameterType value_bit{ type_to_parameter_type_enum<ValueType>() };
+		return array_bit | const_bit | enum_bit | value_bit;
 	}
 
 	template<ParameterType Type>
