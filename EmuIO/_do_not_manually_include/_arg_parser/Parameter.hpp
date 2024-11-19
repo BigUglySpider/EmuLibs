@@ -72,7 +72,7 @@ namespace EmuIO
 		Parameter(const Parameter&) = delete;
 		Parameter& operator=(const Parameter&) = delete;
 
-		constexpr Parameter(Parameter&& to_move) noexcept :
+		Parameter(Parameter&& to_move) noexcept :
 			values{ std::move(to_move.values) },
 			inputs{ std::move(to_move.inputs) },
 			default_value{ std::move(to_move.default_value) },
@@ -84,7 +84,7 @@ namespace EmuIO
 		{
 		}
 
-		constexpr Parameter& operator=(Parameter&& to_move) noexcept
+		Parameter& operator=(Parameter&& to_move) noexcept
 		{
 			values = std::move(to_move.values);
 			inputs = std::move(to_move.inputs);
@@ -195,7 +195,7 @@ namespace EmuIO
 			return std::get<Out>(default_value);
 		}
 
-		[[nodiscard]] constexpr const value_type& GetValue() const noexcept
+		[[nodiscard]] const value_type& GetValue() const noexcept
 		{
 			return values.back();
 		}
@@ -205,7 +205,7 @@ namespace EmuIO
 			return std::get<Out>(values.back());
 		}
 
-		[[nodiscard]] constexpr const std::vector<value_type>& GetAllValues() const noexcept
+		[[nodiscard]] const std::vector<value_type>& GetAllValues() const noexcept
 		{
 			return values;
 		}
@@ -221,7 +221,7 @@ namespace EmuIO
 			return value_pointers;
 		}
 
-		[[nodiscard]] constexpr const std::string& GetInput() const noexcept
+		[[nodiscard]] const std::string& GetInput() const noexcept
 		{
 			return inputs.back();
 		}
@@ -444,7 +444,7 @@ namespace EmuIO
 			std::is_invocable_v<Func, const typename std::remove_cvref<T>::type&> &&
 			std::is_void_v<typename std::invoke_result<Func, const typename std::remove_cvref<T>::type&>::type>
 		)
-		[[nodiscard]] constexpr void UseMostRecentValue(Func&& func) const
+		constexpr void UseMostRecentValue(Func&& func) const
 		{
 			std::forward<Func>(func)(std::get<T>(values.back()));
 		}
