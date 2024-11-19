@@ -1340,6 +1340,26 @@ namespace EmuCore::TMP
 	template<class T_>
 	using logical_not_operator_result_t = typename logical_not_operator_result<T_>::type;
 #pragma endregion
+
+	template<class Func, class...Args>
+	struct invoking_has_return
+	{
+	private:
+		[[nodiscard]] static constexpr bool _get() noexcept
+		{
+			if constexpr (std::is_invocable_v<Func, Args...>)
+			{
+				return !std::is_void_v<decltype(std::declval<Func>()(std::forward<Args>(std::declval<Args>())...))>;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+	public:
+		static constexpr bool value = _get();
+	};
 }
 
 #endif

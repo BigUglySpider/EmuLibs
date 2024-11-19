@@ -7,6 +7,7 @@
 #include <type_traits>
 
 #include "../../../EmuCore/CommonConcepts/CommonRequirements.h"
+#include "../../../EmuCore/TMPHelpers/OperatorChecks.h"
 #include "../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuIO
@@ -320,6 +321,147 @@ namespace EmuIO
 			return "String Enum"sv;
 		default:
 			return "Invalid"sv;
+		}
+	}
+	
+	template<template<class, class...> class Trait, class...Ts>
+	[[nodiscard]] constexpr inline bool is_trait_satisfied_for_any_possible_param_value_pre() noexcept
+	{
+		return
+		(
+			Trait<Ts..., const std::int8_t&>::value   &&
+			Trait<Ts..., const std::int16_t&>::value  &&
+			Trait<Ts..., const std::int32_t&>::value  &&
+			Trait<Ts..., const std::int64_t&>::value  &&
+			Trait<Ts..., const std::uint8_t&>::value  &&
+			Trait<Ts..., const std::uint16_t&>::value &&
+			Trait<Ts..., const std::uint32_t&>::value &&
+			Trait<Ts..., const std::uint64_t&>::value &&
+			Trait<Ts..., const float&>::value         &&
+			Trait<Ts..., const double&>::value        &&
+			Trait<Ts..., const std::string&>::value
+		);
+	}
+
+	template<template<class, class...> class Trait, class...Ts>
+	[[nodiscard]] constexpr inline bool is_trait_satisfied_for_any_possible_param_value_post() noexcept
+	{
+		return
+		(
+			Trait<const std::int8_t&, Ts...>::value   &&
+			Trait<const std::int16_t&, Ts...>::value  &&
+			Trait<const std::int32_t&, Ts...>::value  &&
+			Trait<const std::int64_t&, Ts...>::value  &&
+			Trait<const std::uint8_t&, Ts...>::value  &&
+			Trait<const std::uint16_t&, Ts...>::value &&
+			Trait<const std::uint32_t&, Ts...>::value &&
+			Trait<const std::uint64_t&, Ts...>::value &&
+			Trait<const float&, Ts...>::value         &&
+			Trait<const double&, Ts...>::value        &&
+			Trait<const std::string&, Ts...>::value
+		);
+	}
+	
+	template<template<class, class...> class Trait, class...Ts>
+	[[nodiscard]] constexpr inline bool is_trait_matching_for_all_possible_param_values_pre() noexcept
+	{
+		return
+		(
+			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const std::int16_t&>::value)   &&
+			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const std::int32_t&>::value)  &&
+			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const std::int64_t&>::value)  &&
+			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const std::uint8_t&>::value)  &&
+			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const std::uint16_t&>::value) &&
+			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const std::uint32_t&>::value) &&
+			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const std::uint64_t&>::value) &&
+			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const float&>::value)         &&
+			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const double&>::value)        &&
+			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const std::string&>::value)
+		);
+	}
+	
+	template<template<class, class...> class Trait, class...Ts>
+	[[nodiscard]] constexpr inline bool is_trait_matching_for_all_possible_param_values_post() noexcept
+	{
+		return
+		(
+			(Trait<const std::int8_t&, Ts...>::value == Trait<const std::int16_t&, Ts...>::value)   &&
+			(Trait<const std::int8_t&, Ts...>::value == Trait<const std::int32_t&, Ts...>::value)  &&
+			(Trait<const std::int8_t&, Ts...>::value == Trait<const std::int64_t&, Ts...>::value)  &&
+			(Trait<const std::int8_t&, Ts...>::value == Trait<const std::uint8_t&, Ts...>::value)  &&
+			(Trait<const std::int8_t&, Ts...>::value == Trait<const std::uint16_t&, Ts...>::value) &&
+			(Trait<const std::int8_t&, Ts...>::value == Trait<const std::uint32_t&, Ts...>::value) &&
+			(Trait<const std::int8_t&, Ts...>::value == Trait<const std::uint64_t&, Ts...>::value) &&
+			(Trait<const std::int8_t&, Ts...>::value == Trait<const float&, Ts...>::value)         &&
+			(Trait<const std::int8_t&, Ts...>::value == Trait<const double&, Ts...>::value)        &&
+			(Trait<const std::int8_t&, Ts...>::value == Trait<const std::string&, Ts...>::value)
+		);
+	}
+
+	template<class Func, bool Returns = true, bool Assert = false>
+	[[nodiscard]] constexpr inline bool is_valid_function_for_any_possible_param_value() noexcept
+	{
+		constexpr bool invocable = is_trait_satisfied_for_any_possible_param_value_pre<std::is_invocable, Func>();
+		if constexpr (!invocable)
+		{
+			if constexpr (Assert)
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Func>(),
+					"Invalid function type provided as it cannot be invoked with every possible parameter value type."
+				);
+			}
+			return false;
+		}
+		else if constexpr (!Returns)
+		{
+			return true;
+		}
+		else
+		{
+			constexpr bool all_return_or_not = is_trait_matching_for_all_possible_param_values_pre<EmuCore::TMP::invoking_has_return, Func>();
+			if constexpr (!all_return_or_not)
+			{
+				if constexpr (Assert)
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Func>(),
+						"Invalid function type provided as it does not consistently return either void or non-void across all possible parameter value types. If return is not used, set the `Returns` flag to `false`."
+					);
+				}
+				return false;
+			}
+			else
+			{
+				using int8_return_type = typename std::invoke_result<Func, const std::int8_t&>::type;
+				if constexpr (std::is_void_v<int8_return_type>)
+				{
+					// Nothing else to do as we know all void by this point
+					return true;
+				}
+				else
+				{
+					constexpr bool all_return_same_type = is_trait_matching_for_all_possible_param_values_pre<std::is_invocable_r, int8_return_type, Func>();
+					if constexpr (all_return_same_type)
+					{
+						return true;
+					}
+					else
+					{
+						if constexpr (Assert)
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<Func>(),
+								"Invalid function type provided as it does not consistently return the same non-void type across all possible parameter value types. If return is not used, set the `Returns` flag to `false`."
+							);
+						}
+						return false;
+					}
+				}
+			}
 		}
 	}
 }

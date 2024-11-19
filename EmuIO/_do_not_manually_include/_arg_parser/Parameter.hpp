@@ -2,6 +2,7 @@
 #define EMU_IO_ARG_PARSER_PARAMETER_HPP_INC_ 1
 
 #include <cstdint>
+#include <iomanip>
 #include <limits>
 #include <optional>
 #include <ostream>
@@ -78,7 +79,8 @@ namespace EmuIO
 			type{ to_move.type },
 			enum_info{ std::move(to_move.enum_info) },
 			default_enum_info{ std::move(to_move.default_enum_info) },
-			current_enum_info{ std::move(to_move.current_enum_info) }
+			current_enum_info{ std::move(to_move.current_enum_info) },
+			modified{ to_move.modified }
 		{
 		}
 
@@ -89,6 +91,9 @@ namespace EmuIO
 			default_value = std::move(to_move.default_value);
 			type = to_move.type;
 			enum_info = std::move(to_move.enum_info);
+			default_enum_info = std::move(to_move.default_enum_info);
+			current_enum_info = std::move(to_move.current_enum_info);
+			modified = to_move.modified;
 			return *this;
 		}
 
@@ -232,6 +237,7 @@ namespace EmuIO
 					values[0] = std::move(new_item);
 					inputs[0] = std::move(input_);
 				}
+				modified = true;
 			}
 			return err;
 		}
@@ -275,7 +281,8 @@ namespace EmuIO
 			return get_enum_string_from_enum_info(*default_enum_info);
 		}
 
-		void AppendValidEnumStringsToStream(std::ostream& str)
+		template<bool Indent = false>
+		void AppendValidEnumStringsToStream(std::ostream& str) const
 		{
 			if (!IsEnum())
 			{
@@ -288,6 +295,10 @@ namespace EmuIO
 				return;
 			}
 
+			if constexpr (Indent)
+			{
+				str << '\t';
+			}
 			_append_enum_info_to_stream(str, enum_info[0]);
 			if (num_valid_enums != 1)
 			{
@@ -295,12 +306,292 @@ namespace EmuIO
 				do
 				{
 					str << '\n';
+					if constexpr (Indent)
+					{
+						str << '\t';
+					}
 					_append_enum_info_to_stream(str, enum_info[i]);
 				} while ((++i) < num_valid_enums);
 			}
 		}
 
+		template<bool ReturnResult, class Func>
+		requires(EmuIO::is_valid_function_for_any_possible_param_value<Func, ReturnResult, false>())
+		[[nodiscard]] constexpr decltype(auto) UseMostRecentValue(Func&& func) const
+		{
+			switch (type & ParameterType::ValueTypeMask)
+			{
+			case ParameterType::Int8:
+				if constexpr (ReturnResult) { return std::forward<Func>(func)(std::get<std::int8_t>(values.back())); }
+				else                        { std::forward<Func>(func)(std::get<std::int8_t>(values.back())); }
+				break;
+			case ParameterType::Int16:
+				if constexpr (ReturnResult) { return std::forward<Func>(func)(std::get<std::int16_t>(values.back())); }
+				else                        { std::forward<Func>(func)(std::get<std::int16_t>(values.back())); }
+				break;
+			case ParameterType::Int32:
+				if constexpr (ReturnResult) { return std::forward<Func>(func)(std::get<std::int32_t>(values.back())); }
+				else                        { std::forward<Func>(func)(std::get<std::int32_t>(values.back())); }
+				break;
+			case ParameterType::Int64:
+				if constexpr (ReturnResult) { return std::forward<Func>(func)(std::get<std::int64_t>(values.back())); }
+				else                        { std::forward<Func>(func)(std::get<std::int64_t>(values.back())); }
+				break;
+			case ParameterType::Uint8:
+				if constexpr (ReturnResult) { return std::forward<Func>(func)(std::get<std::uint8_t>(values.back())); }
+				else                        { std::forward<Func>(func)(std::get<std::uint8_t>(values.back())); }
+				break;
+			case ParameterType::Uint16:
+				if constexpr (ReturnResult) { return std::forward<Func>(func)(std::get<std::uint16_t>(values.back())); }
+				else                        { std::forward<Func>(func)(std::get<std::uint16_t>(values.back())); }
+				break;
+			case ParameterType::Uint32:
+				if constexpr (ReturnResult) { return std::forward<Func>(func)(std::get<std::uint32_t>(values.back())); }
+				else                        { std::forward<Func>(func)(std::get<std::uint32_t>(values.back())); }
+				break;
+			case ParameterType::Uint64:
+				if constexpr (ReturnResult) { return std::forward<Func>(func)(std::get<std::uint64_t>(values.back())); }
+				else                        { std::forward<Func>(func)(std::get<std::uint64_t>(values.back())); }
+				break;
+			case ParameterType::Float32:
+				if constexpr (ReturnResult) { return std::forward<Func>(func)(std::get<float>(values.back())); }
+				else                        { std::forward<Func>(func)(std::get<float>(values.back())); }
+				break;
+			case ParameterType::Float64:
+				if constexpr (ReturnResult) { return std::forward<Func>(func)(std::get<double>(values.back())); }
+				else                        { std::forward<Func>(func)(std::get<double>(values.back())); }
+				break;
+			case ParameterType::String:
+				if constexpr (ReturnResult) { return std::forward<Func>(func)(std::get<std::string>(values.back())); }
+				else                        { std::forward<Func>(func)(std::get<std::string>(values.back())); }
+				break;
+			default:
+				throw _make_exception<std::runtime_error>("Attempted to use the most recent value of a parameter whose type is in an invalid state.");
+			}
+		}
+
+		template<class T, class Func>
+		requires
+		(
+			std::is_invocable_v<Func, const typename std::remove_cvref<T>::type&> &&
+			!std::is_void_v<typename std::invoke_result<Func, const typename std::remove_cvref<T>::type&>::type>
+		)
+		[[nodiscard]] constexpr decltype(auto) UseMostRecentValue(Func&& func) const
+		{
+			return std::forward<Func>(func)(std::get<T>(values.back()));
+		}
+
+		template<class T, class Func>
+		requires
+		(
+			std::is_invocable_v<Func, const typename std::remove_cvref<T>::type&> &&
+			std::is_void_v<typename std::invoke_result<Func, const typename std::remove_cvref<T>::type&>::type>
+		)
+		[[nodiscard]] constexpr void UseMostRecentValue(Func&& func) const
+		{
+			std::forward<Func>(func)(std::get<T>(values.back()));
+		}
+
+		template<class Func>
+		requires(EmuIO::is_valid_function_for_any_possible_param_value<Func, false, false>())
+		[[nodiscard]] constexpr decltype(auto) UseAllValues(Func&& func) const
+		{
+			switch (type & ParameterType::ValueTypeMask)
+			{
+			case ParameterType::Int8:
+				UseAllValues<std::int8_t>(std::forward<Func>(func));
+				break;
+			case ParameterType::Int16:
+				UseAllValues<std::int16_t>(std::forward<Func>(func));
+				break;
+			case ParameterType::Int32:
+				UseAllValues<std::int32_t>(std::forward<Func>(func));
+				break;
+			case ParameterType::Int64:
+				UseAllValues<std::int64_t>(std::forward<Func>(func));
+				break;
+			case ParameterType::Uint8:
+				UseAllValues<std::uint8_t>(std::forward<Func>(func));
+				break;
+			case ParameterType::Uint16:
+				UseAllValues<std::uint16_t>(std::forward<Func>(func));
+				break;
+			case ParameterType::Uint32:
+				UseAllValues<std::uint32_t>(std::forward<Func>(func));
+				break;
+			case ParameterType::Uint64:
+				UseAllValues<std::uint64_t>(std::forward<Func>(func));
+				break;
+			case ParameterType::Float32:
+				UseAllValues<float>(std::forward<Func>(func));
+				break;
+			case ParameterType::Float64:
+				UseAllValues<double>(std::forward<Func>(func));
+				break;
+			case ParameterType::String:
+				UseAllValues<std::string>(std::forward<Func>(func));
+				break;
+			default:
+				throw _make_exception<std::runtime_error>("Attempted to use all values of a parameter whose type is in an invalid state.");
+			}
+		}
+
+		template<class T, class Func>
+		requires(std::is_invocable_v<Func, const typename std::remove_cvref<T>::type&>)
+		constexpr void UseAllValues(Func func) const
+		{
+			for (std::size_t i{ 0u }, end{ values.size() }; i < end; ++i)
+			{
+				func(std::get<T>(values[i]));
+			}
+		}
+
+		void AppendValueToStream(std::ostream& str) const
+		{
+			if (IsEnum())
+			{
+				_append_enum_info_to_stream(str, *(current_enum_info.back()));
+			}
+			else
+			{
+				_append_value_to_stream(str, values.back());
+			}
+		}
+
+		void AppendAllValuesToStream(std::ostream& str) const
+		{
+			str << '[';
+			if (IsEnum())
+			{
+				const std::size_t final_index{ current_enum_info.size() - 1 };
+				for (std::size_t i{ 0u }, end{ current_enum_info.size() }; i < end; ++i)
+				{
+					_append_enum_info_to_stream(str, *(current_enum_info[i]));
+					if (i != final_index)
+					{
+						str << ", ";
+					}
+				}
+			}
+			else
+			{
+				UseAllValues([&str, count = std::size_t{ 0u }, end = size_t{values.size()}](const auto& value_) mutable
+				{
+					if constexpr (EmuConcepts::UnqualifiedMatch<decltype(value_), std::monostate>)
+					{
+						str << "null";
+					}
+					else if constexpr (EmuConcepts::UnqualifiedMatch<decltype(value_), std::string>)
+					{
+						str << '"' << value_ << '"';
+					}
+					else if constexpr (EmuConcepts::UnqualifiedMatch<decltype(value_), std::int8_t> || EmuConcepts::UnqualifiedMatch<decltype(value_), std::uint8_t>)
+					{
+						// Cast to int to output numbers instead of characters
+						str << static_cast<int>(value_);
+					}
+					else
+					{
+						str << value_;
+					}
+					if ((++count) < end)
+					{
+						str << ", ";
+					}
+				});
+			}
+			str << ']';
+		}
+
+		void AppendDefaultValueToStream(std::ostream& str) const
+		{
+			if (IsEnum())
+			{
+				_append_enum_info_to_stream(str, *default_enum_info);
+			}
+			else
+			{
+				_append_value_to_stream(str, default_value);
+			}
+		}
+
+		template<bool Value = true, bool Default = true, bool Modified = true, bool ValidEnums = true>
+		void AppendToStream(std::ostream& str) const
+		{
+			if constexpr (Value)
+			{
+				if (IsArray())
+				{
+					AppendAllValuesToStream(str);
+				}
+				else
+				{
+					AppendValueToStream(str);
+				}
+			}
+
+			if constexpr (Default)
+			{
+				if constexpr (Value)
+				{
+					str << '\n';
+				}
+				str << "Default: ";
+				AppendDefaultValueToStream(str);
+			}
+
+			if constexpr (Modified)
+			{
+				if constexpr (Value || Default)
+				{
+					str << '\n';
+				}
+				str << "Modified: " << std::boolalpha << modified;
+			}
+
+			if constexpr (ValidEnums)
+			{
+				if (IsEnum())
+				{
+					if constexpr (Value || Default || Modified)
+					{
+						str << '\n';
+					}
+					str << "Possible values:\n";
+					AppendValidEnumStringsToStream<true>(str);
+				}
+			}
+		}
+
 	private:
+		static void _append_value_to_stream(std::ostream& str, const value_type& value_)
+		{
+			std::visit
+			(
+				[&str](const auto& translated_value)
+				{
+					if constexpr (EmuConcepts::UnqualifiedMatch<decltype(translated_value), std::monostate>)
+					{
+						str << "null";
+					}
+					else if constexpr (EmuConcepts::UnqualifiedMatch<decltype(translated_value), std::int8_t> || EmuConcepts::UnqualifiedMatch<decltype(translated_value), std::uint8_t>)
+					{
+						// Cast to int to output numbers instead of characters
+						str << static_cast<int>(translated_value);
+					}
+					else if constexpr (EmuConcepts::UnqualifiedMatch<decltype(translated_value), std::string>)
+					{
+						str << '"' << translated_value << '"';
+					}
+					else
+					{
+						str << translated_value;
+					}
+				},
+				value_
+			);
+		}
+
 		void _append_enum_info_to_stream(std::ostream& str, const enum_info_type& enum_info_) const
 		{
 			if ((type & ParameterType::ValueTypeMask) == ParameterType::String)
@@ -310,7 +601,7 @@ namespace EmuIO
 			else
 			{
 				const std::pair<std::string, value_type> translated_info{ std::get<std::pair<std::string, value_type>>(enum_info_) };
-				str << std::get<std::string>(translated_info);
+				str << '"' << std::get<std::string>(translated_info) << '"';
 				str << " (";
 				std::visit
 				(
@@ -763,7 +1054,8 @@ namespace EmuIO
 			type{ type_ },
 			enum_info{},
 			default_enum_info{ nullptr },
-			current_enum_info{ }
+			current_enum_info{},
+			modified{ false }
 		{
 			// Set everything or nothing relating to the initial value; `_make_value` will trigger an exception if erroneous
 			// --- We don't care about validating `default_value` as this constructor cannot be called directly,
@@ -783,7 +1075,8 @@ namespace EmuIO
 			type{ type_ },
 			enum_info{},
 			default_enum_info{ nullptr },
-			current_enum_info{}
+			current_enum_info{},
+			modified{false}
 		{
 			enum_info = std::vector<enum_info_type>{ std::forward<EnumInfos>(enum_infos)... };
 			std::unordered_set<std::string_view> registered_enum_names{};
@@ -868,6 +1161,7 @@ namespace EmuIO
 		std::vector<enum_info_type> enum_info;
 		const enum_info_type* default_enum_info;
 		std::vector<const enum_info_type*> current_enum_info;
+		bool modified;
 	};
 }
 
