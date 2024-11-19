@@ -221,8 +221,23 @@ namespace EmuIO
 			return type;
 		}
 
+		/*
+		* @brief Parses the input string and appends it as the most recent value for this parameter.
+		*        If this is an array parameter: Adds the parsed value to the end of its values array.
+		*        If this is a scalar parameter: Replaces the current value with the parsed value.
+		*        If this is a const parameter: Returns an error if the value has already been modified.
+		* @param input_ String to parse as this paramter's value type and apply as described.
+		* @returns Optional string describing the error if one occurs.
+		           On success, this will not have a value (`std::nullopt`).
+		*/
 		std::optional<std::string> AppendInput(std::string input_)
 		{
+			if (IsConst() && modified)
+			{
+				return _make_err_str("Input value `", input_, "` is ignored for parameter (of type ", arg_param_type_to_string(type),
+									 ") as its target parameter is flagged as constant and has already been set.");
+			}
+
 			std::optional<std::string> err{ std::nullopt };
 			value_type new_item = _parse_input(input_, err);
 			if (new_item.index() != 0) // Index 0 = monostate, translating to failure
@@ -245,6 +260,11 @@ namespace EmuIO
 		[[nodiscard]] constexpr bool IsArray() const noexcept
 		{
 			return (type & ParameterType::Array) == ParameterType::Array;
+		}
+
+		[[nodiscard]] constexpr bool IsConst() const noexcept
+		{
+			return (type & ParameterType::Const) == ParameterType::Const;
 		}
 
 		[[nodiscard]] constexpr bool IsEnum() const noexcept

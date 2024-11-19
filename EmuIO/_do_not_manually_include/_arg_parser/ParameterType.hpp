@@ -2,6 +2,7 @@
 #define EMU_IO_ARG_PARSER_PARAMETER_TYPE_HPP_INC_ 1
 
 #include <cstdint>
+#include <sstream>>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -16,7 +17,7 @@ namespace EmuIO
 	{
 		Array = 0x10000000,
 		Enum  = 0x20000000,
-		// TODO: Const
+		Const = 0x40000000,
 
 		Int8   = 0x00000001,
 		Int16  = 0x00000002,
@@ -61,7 +62,10 @@ namespace EmuIO
 		StringEnum = String | Enum,
 
 
-		ValueTypeMask = Int8 | Int16 | Int32 | Int64 | Uint8 | Uint16 | Uint32 | Uint64 | Float32 | Float64 | String
+		ValueTypeMask = Int8 | Int16 | Int32 | Int64 | Uint8 | Uint16 | Uint32 | Uint64 | Float32 | Float64 | String,
+		MetaMask      = Array | Enum | Const,
+
+		Invalid = ~(ValueTypeMask | MetaMask) // Invalid is a mask of all bits that are never used
 	};
 	[[nodiscard]] constexpr inline ParameterType operator|(const ParameterType a, const ParameterType b) noexcept
 	{
@@ -246,82 +250,68 @@ namespace EmuIO
 		}
 	}
 
-	[[nodiscard]] constexpr inline std::string_view arg_param_type_to_string(const ParameterType type) noexcept
+	[[nodiscard]] inline std::string arg_param_type_to_string(const ParameterType type) noexcept
 	{
-		using namespace std::string_view_literals;
-		switch (type)
+		std::ostringstream str{};
+
+		// Prefixes
+		if ((type & ParameterType::Const) == ParameterType::Const)
+		{
+			str << "Const ";
+		}
+
+		// Value type
+		switch (type & ParameterType::ValueTypeMask)
 		{
 		case ParameterType::Int8:
-			return "Int8"sv;
+			str << "Int8";
+			break;
 		case ParameterType::Int16:
-			return "Int16"sv;
+			str << "Int16";
+			break;
 		case ParameterType::Int32:
-			return "Int32"sv;
+			str << "Int32";
+			break;
 		case ParameterType::Int64:
-			return "Int64"sv;
+			str << "Int64";
+			break;
 		case ParameterType::Uint8:
-			return "Uint8"sv;
+			str << "Uint8";
+			break;
 		case ParameterType::Uint16:
-			return "Uint16"sv;
+			str << "Uint16";
+			break;
 		case ParameterType::Uint32:
-			return "Uint32"sv;
+			str << "Uint32";
+			break;
 		case ParameterType::Uint64:
-			return "Uint64"sv;
+			str << "Uint64";
+			break;
 		case ParameterType::Float32:
-			return "Float32"sv;
+			str << "Float32";
+			break;
 		case ParameterType::Float64:
-			return "Float64"sv;
+			str << "Float64";
+			break;
 		case ParameterType::String:
-			return "String"sv;
-
-		case ParameterType::Int8Array:
-			return "Int8 Array"sv;
-		case ParameterType::Int16Array:
-			return "Int16 Array"sv;
-		case ParameterType::Int32Array:
-			return "Int32 Array"sv;
-		case ParameterType::Int64Array:
-			return "Int64 Array"sv;
-		case ParameterType::Uint8Array:
-			return "Uint8 Array"sv;
-		case ParameterType::Uint16Array:
-			return "Uint16 Array"sv;
-		case ParameterType::Uint32Array:
-			return "Uint32 Array"sv;
-		case ParameterType::Uint64Array:
-			return "Uint64 Array"sv;
-		case ParameterType::Float32Array:
-			return "Float32 Array"sv;
-		case ParameterType::Float64Array:
-			return "Float64 Array"sv;
-		case ParameterType::StringArray:
-			return "String Array"sv;
-
-		case ParameterType::Int8Enum:
-			return "Int8 Enum"sv;
-		case ParameterType::Int16Enum:
-			return "Int16 Enum"sv;
-		case ParameterType::Int32Enum:
-			return "Int32 Enum"sv;
-		case ParameterType::Int64Enum:
-			return "Int64 Enum"sv;
-		case ParameterType::Uint8Enum:
-			return "Uint8 Enum"sv;
-		case ParameterType::Uint16Enum:
-			return "Uint16 Enum"sv;
-		case ParameterType::Uint32Enum:
-			return "Uint32 Enum"sv;
-		case ParameterType::Uint64Enum:
-			return "Uint64 Enum"sv;
-		case ParameterType::Float32Enum:
-			return "Float32 Enum"sv;
-		case ParameterType::Float64Enum:
-			return "Float64 Enum"sv;
-		case ParameterType::StringEnum:
-			return "String Enum"sv;
+			str << "String";
+			break;
 		default:
-			return "Invalid"sv;
+			str << "Invalid";
+			break;
 		}
+
+		// Suffixes
+		if ((type & ParameterType::Enum) == ParameterType::Enum)
+		{
+			str << " Enum";
+		}
+		if ((type & ParameterType::Array) == ParameterType::Array)
+		{
+			str << " Array";
+		}
+
+		return str.str();
 	}
 	
 	template<template<class, class...> class Trait, class...Ts>
