@@ -23,6 +23,7 @@ namespace EmuIO
 		Int16  = 0x00000002,
 		Int32  = 0x00000004,
 		Int64  = 0x00000008,
+
 		Uint8  = 0x00000010,
 		Uint16 = 0x00000020,
 		Uint32 = 0x00000040,
@@ -30,8 +31,8 @@ namespace EmuIO
 		
 		Float32 = 0x00000100,
 		Float64 = 0x00000200,
-
-		String = 0x00001000,
+		String  = 0x00000400,
+		Bool    = 0x00000800,
 
 		Int8Array   = Int8   | Array,
 		Int16Array  = Int16  | Array,
@@ -62,7 +63,7 @@ namespace EmuIO
 		StringEnum = String | Enum,
 
 
-		ValueTypeMask = Int8 | Int16 | Int32 | Int64 | Uint8 | Uint16 | Uint32 | Uint64 | Float32 | Float64 | String,
+		ValueTypeMask = Int8 | Int16 | Int32 | Int64 | Uint8 | Uint16 | Uint32 | Uint64 | Float32 | Float64 | String | Bool,
 		MetaMask      = Array | Enum | Const,
 
 		Invalid = ~(ValueTypeMask | MetaMask) // Invalid is a mask of all bits that are never used
@@ -121,8 +122,12 @@ namespace EmuIO
 			return
 			(
 				ParameterType::Const |
-				type_to_parameter_type_enum<typename std::underlying_type<typename std::remove_cvref<T>::type>::type>()
+				type_to_parameter_type_enum<typename std::remove_cvref<T>::type>()
 			);
+		}
+		else if constexpr (EmuConcepts::UnqualifiedMatch<T, bool>)
+		{
+			return ParameterType::Bool;
 		}
 		else if constexpr (EmuConcepts::UnqualifiedMatch<T, std::int8_t>)
 		{
@@ -190,7 +195,11 @@ namespace EmuIO
 	private:
 		[[nodiscard]] static constexpr auto _get() noexcept
 		{
-			if constexpr ((Type & ParameterType::Int8) == ParameterType::Int8)
+			if constexpr ((Type & ParameterType::Bool) == ParameterType::Bool)
+			{
+				return bool{};
+			}
+			else if constexpr ((Type & ParameterType::Int8) == ParameterType::Int8)
 			{
 				return std::int8_t{};
 			}
@@ -254,6 +263,8 @@ namespace EmuIO
 	{
 		switch (type & ParameterType::ValueTypeMask)
 		{
+		case ParameterType::Bool:
+			return std::is_constructible_v<bool, Args...>;
 		case ParameterType::Int8:
 			return std::is_constructible_v<std::int8_t, Args...>;
 		case ParameterType::Int16:
@@ -294,6 +305,9 @@ namespace EmuIO
 		// Value type
 		switch (type & ParameterType::ValueTypeMask)
 		{
+		case ParameterType::Bool:
+			str << "Bool";
+			break;
 		case ParameterType::Int8:
 			str << "Int8";
 			break;
@@ -350,6 +364,7 @@ namespace EmuIO
 	{
 		return
 		(
+			Trait<Ts..., const bool&>::value          &&
 			Trait<Ts..., const std::int8_t&>::value   &&
 			Trait<Ts..., const std::int16_t&>::value  &&
 			Trait<Ts..., const std::int32_t&>::value  &&
@@ -369,6 +384,7 @@ namespace EmuIO
 	{
 		return
 		(
+			Trait<const bool&, Ts...>::value          &&
 			Trait<const std::int8_t&, Ts...>::value   &&
 			Trait<const std::int16_t&, Ts...>::value  &&
 			Trait<const std::int32_t&, Ts...>::value  &&
@@ -388,16 +404,17 @@ namespace EmuIO
 	{
 		return
 		(
-			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const std::int16_t&>::value)   &&
-			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const std::int32_t&>::value)  &&
-			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const std::int64_t&>::value)  &&
-			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const std::uint8_t&>::value)  &&
-			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const std::uint16_t&>::value) &&
-			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const std::uint32_t&>::value) &&
-			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const std::uint64_t&>::value) &&
-			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const float&>::value)         &&
-			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const double&>::value)        &&
-			(Trait<Ts..., const std::int8_t&>::value == Trait<Ts..., const std::string&>::value)
+			(Trait<Ts..., const bool&>::value == Trait<Ts..., const std::int8_t&>::value)   &&
+			(Trait<Ts..., const bool&>::value == Trait<Ts..., const std::int16_t&>::value)  &&
+			(Trait<Ts..., const bool&>::value == Trait<Ts..., const std::int32_t&>::value)  &&
+			(Trait<Ts..., const bool&>::value == Trait<Ts..., const std::int64_t&>::value)  &&
+			(Trait<Ts..., const bool&>::value == Trait<Ts..., const std::uint8_t&>::value)  &&
+			(Trait<Ts..., const bool&>::value == Trait<Ts..., const std::uint16_t&>::value) &&
+			(Trait<Ts..., const bool&>::value == Trait<Ts..., const std::uint32_t&>::value) &&
+			(Trait<Ts..., const bool&>::value == Trait<Ts..., const std::uint64_t&>::value) &&
+			(Trait<Ts..., const bool&>::value == Trait<Ts..., const float&>::value)         &&
+			(Trait<Ts..., const bool&>::value == Trait<Ts..., const double&>::value)        &&
+			(Trait<Ts..., const bool&>::value == Trait<Ts..., const std::string&>::value)
 		);
 	}
 	
@@ -406,16 +423,17 @@ namespace EmuIO
 	{
 		return
 		(
-			(Trait<const std::int8_t&, Ts...>::value == Trait<const std::int16_t&, Ts...>::value)   &&
-			(Trait<const std::int8_t&, Ts...>::value == Trait<const std::int32_t&, Ts...>::value)  &&
-			(Trait<const std::int8_t&, Ts...>::value == Trait<const std::int64_t&, Ts...>::value)  &&
-			(Trait<const std::int8_t&, Ts...>::value == Trait<const std::uint8_t&, Ts...>::value)  &&
-			(Trait<const std::int8_t&, Ts...>::value == Trait<const std::uint16_t&, Ts...>::value) &&
-			(Trait<const std::int8_t&, Ts...>::value == Trait<const std::uint32_t&, Ts...>::value) &&
-			(Trait<const std::int8_t&, Ts...>::value == Trait<const std::uint64_t&, Ts...>::value) &&
-			(Trait<const std::int8_t&, Ts...>::value == Trait<const float&, Ts...>::value)         &&
-			(Trait<const std::int8_t&, Ts...>::value == Trait<const double&, Ts...>::value)        &&
-			(Trait<const std::int8_t&, Ts...>::value == Trait<const std::string&, Ts...>::value)
+			(Trait<const bool&, Ts...>::value == Trait<const std::int8_t&, Ts...>::value)   &&
+			(Trait<const bool&, Ts...>::value == Trait<const std::int16_t&, Ts...>::value)  &&
+			(Trait<const bool&, Ts...>::value == Trait<const std::int32_t&, Ts...>::value)  &&
+			(Trait<const bool&, Ts...>::value == Trait<const std::int64_t&, Ts...>::value)  &&
+			(Trait<const bool&, Ts...>::value == Trait<const std::uint8_t&, Ts...>::value)  &&
+			(Trait<const bool&, Ts...>::value == Trait<const std::uint16_t&, Ts...>::value) &&
+			(Trait<const bool&, Ts...>::value == Trait<const std::uint32_t&, Ts...>::value) &&
+			(Trait<const bool&, Ts...>::value == Trait<const std::uint64_t&, Ts...>::value) &&
+			(Trait<const bool&, Ts...>::value == Trait<const float&, Ts...>::value)         &&
+			(Trait<const bool&, Ts...>::value == Trait<const double&, Ts...>::value)        &&
+			(Trait<const bool&, Ts...>::value == Trait<const std::string&, Ts...>::value)
 		);
 	}
 
@@ -456,15 +474,15 @@ namespace EmuIO
 			}
 			else
 			{
-				using int8_return_type = typename std::invoke_result<Func, const std::int8_t&>::type;
-				if constexpr (std::is_void_v<int8_return_type>)
+				using bool_return_type = typename std::invoke_result<Func, const bool&>::type;
+				if constexpr (std::is_void_v<bool_return_type>)
 				{
 					// Nothing else to do as we know all void by this point
 					return true;
 				}
 				else
 				{
-					constexpr bool all_return_same_type = is_trait_matching_for_all_possible_param_values_pre<std::is_invocable_r, int8_return_type, Func>();
+					constexpr bool all_return_same_type = is_trait_matching_for_all_possible_param_values_pre<std::is_invocable_r, bool_return_type, Func>();
 					if constexpr (all_return_same_type)
 					{
 						return true;

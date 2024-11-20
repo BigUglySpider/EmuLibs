@@ -2,7 +2,6 @@
 #define EMU_IO_ARG_PARSER_PARAMETER_HPP_INC_ 1
 
 #include <cstdint>
-#include <iomanip>
 #include <limits>
 #include <optional>
 #include <ostream>
@@ -59,7 +58,8 @@ namespace EmuIO
 			std::int8_t, std::int16_t, std::int32_t, std::int64_t,
 			std::uint8_t, std::uint16_t, std::uint32_t, std::uint64_t,
 			float, double,
-			std::string
+			std::string,
+			bool
 		>;
 		using enum_info_type = std::variant
 		<
@@ -378,6 +378,10 @@ namespace EmuIO
 		{
 			switch (type & ParameterType::ValueTypeMask)
 			{
+			case ParameterType::Bool:
+				if constexpr (ReturnResult) { return std::forward<Func>(func)(std::get<bool>(values.back())); }
+				else { std::forward<Func>(func)(std::get<bool>(values.back())); }
+				break;
 			case ParameterType::Int8:
 				if constexpr (ReturnResult) { return std::forward<Func>(func)(std::get<std::int8_t>(values.back())); }
 				else                        { std::forward<Func>(func)(std::get<std::int8_t>(values.back())); }
@@ -455,6 +459,9 @@ namespace EmuIO
 		{
 			switch (type & ParameterType::ValueTypeMask)
 			{
+			case ParameterType::Bool:
+				UseAllValues<bool>(std::forward<Func>(func));
+				break;
 			case ParameterType::Int8:
 				UseAllValues<std::int8_t>(std::forward<Func>(func));
 				break;
@@ -548,6 +555,10 @@ namespace EmuIO
 					{
 						str << '"' << value_ << '"';
 					}
+					else if constexpr (EmuConcepts::UnqualifiedMatch<decltype(value_), bool>)
+					{
+						str << (value_ ? "True" : "False");
+					}
 					else if constexpr (EmuConcepts::UnqualifiedMatch<decltype(value_), std::int8_t> || EmuConcepts::UnqualifiedMatch<decltype(value_), std::uint8_t>)
 					{
 						// Cast to int to output numbers instead of characters
@@ -631,7 +642,7 @@ namespace EmuIO
 				{
 					str << '\n';
 				}
-				str << "Modified: " << std::boolalpha << modified;
+				str << "Modified: " << (modified ? "True" : "False");;
 			}
 
 			if constexpr (ValidEnums)
@@ -659,6 +670,10 @@ namespace EmuIO
 					if constexpr (EmuConcepts::UnqualifiedMatch<decltype(translated_value), std::monostate>)
 					{
 						str << "null";
+					}
+					else if constexpr (EmuConcepts::UnqualifiedMatch<decltype(translated_value), bool>)
+					{
+						str << (translated_value ? "True" : "False");
 					}
 					else if constexpr (EmuConcepts::UnqualifiedMatch<decltype(translated_value), std::int8_t> || EmuConcepts::UnqualifiedMatch<decltype(translated_value), std::uint8_t>)
 					{
@@ -701,13 +716,20 @@ namespace EmuIO
 					{
 						if constexpr (EmuConcepts::UnqualifiedMatch<decltype(val_), std::monostate>)
 						{
-							// Ignore monostate (should never be possible even with empty arrays)
-							return;
+							str << "null";
+						}
+						else if constexpr (EmuConcepts::UnqualifiedMatch<decltype(val_), bool>)
+						{
+							str << (val_ ? "True" : "False");
 						}
 						else if constexpr (EmuConcepts::UnqualifiedMatch<decltype(val_), std::int8_t> || EmuConcepts::UnqualifiedMatch<decltype(val_), std::uint8_t>)
 						{
 							// Cast to int to output numbers instead of characters
 							str << static_cast<int>(val_);
+						}
+						else if constexpr (EmuConcepts::UnqualifiedMatch<decltype(val_), std::string>)
+						{
+							str << '"' << val_ << '"';
 						}
 						else
 						{
@@ -787,6 +809,24 @@ namespace EmuIO
 			{
 				switch (type & ParameterType::ValueTypeMask)
 				{
+				case ParameterType::Bool:
+				{
+					std::string lower{ input_ };
+					std::transform(lower.begin(), lower.end(), lower.begin(), [](const char char_) { return std::tolower(char_); });
+					if (lower == "true" || lower == "yes" || lower == "1")
+					{
+						return true;
+					}
+					else if (lower == "false" || lower == "no" || lower == "0")
+					{
+						return false;
+					}
+					else
+					{
+						err.emplace(_make_err_str("Input value `", input_, "` is invalid for paramater (of type ", arg_param_type_to_string(type), ") as it cannot be successfully interpreted as the target value type."));
+					}
+					break;
+				}
 				case ParameterType::Int8:
 				{
 					try
@@ -1031,6 +1071,16 @@ namespace EmuIO
 		{
 			switch (type & ParameterType::ValueTypeMask)
 			{
+			case ParameterType::Bool:
+				if constexpr (std::is_constructible_v<bool, Value>)
+				{
+					return static_cast<bool>(std::forward<Value>(value_));
+				}
+				else
+				{
+					throw _make_exception<std::invalid_argument>("Failed to make a value for an `Parameter` as its value type could not be constructed with the input type. Target value type: ", arg_param_type_to_string(type & ParameterType::ValueTypeMask));
+				}
+				break;
 			case ParameterType::Int8:
 				if constexpr (std::is_constructible_v<std::int8_t, Value>)
 				{
