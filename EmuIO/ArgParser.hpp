@@ -211,15 +211,15 @@ namespace EmuIO
 				name_param_pair.second->AppendToStream<false, true, false, true>(str) << '\n';
 				if (name_param_pair.second->IsConst())
 				{
-					str << "Can only be set once.\n";
+					str << "Can only be set once (excluding the default value).\n";
 				}
 				else if (name_param_pair.second->IsArray())
 				{
-					str << "Can be set multiple times, adding each new value to the back of an expanding array.\n";
+					str << "Can be set multiple times, adding each new value to the back of an expanding array (the default array will be cleared when adding the first custom value).\n";
 				}
 				else
 				{
-					str << "Can be set multiple times, with the most-recently set value being the used value.\n";
+					str << "Can be set multiple times, with the most-recently set value being the used value (which overwrites the previous).\n";
 				}
 				str << separator << std::endl;
 			}
