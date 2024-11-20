@@ -266,9 +266,16 @@ namespace EmuIO
 					}
 
 					EmuIO::Parameter* param{ nullptr };
-					if (_try_get(arg, &param))
+					if (!_try_get(arg, &param))
 					{
-						int next_i{ i + 1 };
+						++err_count;
+						err_stream << "Invalid argument at position " << i << " (" << arg << "): It is not registered as a valid parameter." << std::endl;
+						if constexpr (ReturnOnError) { return err_count; }
+						else { continue; }
+					}
+					else
+					{
+						const int next_i{ i + 1 };
 						if (next_i < argc)
 						{
 							std::string next_arg{ argv[next_i] };
@@ -302,7 +309,7 @@ namespace EmuIO
 								if (append_err.has_value())
 								{
 									++err_count;
-									err_stream << "Invalid argument pair at position " << i << ", " << next_i << " (" << arg << ", " << next_arg << "): " << *append_err << std::endl;
+									err_stream << "Invalid argument pair at position " << (i - 1) << ", " << next_i << " (" << arg << ", " << next_arg << "): " << *append_err << std::endl;
 									if constexpr (ReturnOnError) { return err_count; }
 									else { continue; }
 								}
