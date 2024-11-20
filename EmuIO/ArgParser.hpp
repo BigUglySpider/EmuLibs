@@ -227,7 +227,7 @@ namespace EmuIO
 		}
 
 		template<bool ReturnOnError>
-		std::size_t Parse(int argc, const char** argv, std::ostream& err_stream)
+		std::size_t Parse(int argc, const char** argv, std::ostream& out_stream, std::ostream& err_stream)
 		{
 			std::size_t err_count{ 0u };
 			for (int i{ 0 }; i < argc; ++i)
@@ -268,10 +268,17 @@ namespace EmuIO
 					EmuIO::Parameter* param{ nullptr };
 					if (!_try_get(arg, &param))
 					{
-						++err_count;
-						err_stream << "Invalid argument at position " << i << " (" << arg << "): It is not registered as a valid parameter." << std::endl;
-						if constexpr (ReturnOnError) { return err_count; }
-						else { continue; }
+						if (arg == "--help" || arg == "-h")
+						{
+							Help(out_stream);
+						}
+						else
+						{
+							++err_count;
+							err_stream << "Invalid argument at position " << i << " (" << arg << "): It is not registered as a valid parameter." << std::endl;
+							if constexpr (ReturnOnError) { return err_count; }
+							else { continue; }
+						}
 					}
 					else
 					{
