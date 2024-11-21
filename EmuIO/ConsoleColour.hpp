@@ -15,6 +15,10 @@
 #include <string>
 #endif
 
+// Define to use virtual terminal for handling colours in Windows
+// --- Be aware that, although most modern users will be able to use this, it is not entirely cross-generation compatible
+//#define EMU_IO_USE_VIRTUAL_TERMINAL_IN_WINDOWS
+
 namespace EmuIO
 {
 	/*
@@ -24,7 +28,7 @@ namespace EmuIO
 	*/
 	enum class ConsoleColour : std::uint32_t
 	{
-#if EMU_CORE_IS_MSVC
+#if EMU_CORE_IS_MSVC && !defined(EMU_IO_USE_VIRTUAL_TERMINAL_IN_WINDOWS)
 		Black       = 0,
 		Blue        = 1,
 		Green       = 2,
@@ -59,15 +63,30 @@ namespace EmuIO
 		LightYellow = 93,
 		LightWhite  = 97,
 #endif
-		Gray      = Grey,
-		Aqua      = Cyan,
-		LightAqua = LightCyan
+
+		Gray      = Grey,     // Alias of `Grey`
+		Aqua      = Cyan,     // Alias of `Cyan`
+		LightAqua = LightCyan // Alias of `LightCyan
 	};
 
 	inline void SetConsoleColour(const ConsoleColour colour)
 	{
 #if EMU_CORE_IS_MSVC
+	#ifdef EMU_IO_USE_VIRTUAL_TERMINAL_IN_WINDOWS
+		static bool _enabled_virtual{ false };
+		if (!_enabled_virtual)
+		{
+			HANDLE _stdout_handle{ GetStdHandle(STD_OUTPUT_HANDLE) };
+			DWORD _mode{};
+			GetConsoleMode(_stdout_handle, &_mode);
+			_mode |= ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+			SetConsoleMode(_stdout_handle, _mode);
+			_enabled_virtual = true;
+		}
+		std::cout << (std::string{ "\033[" } + std::to_string(static_cast<int>(colour)) + "m");
+	#else
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), static_cast<WORD>(colour));
+	#endif
 #else
 		std::cout << (std::string{ "\033[" } + std::to_string(static_cast<int>(colour)) + "m");
 #endif

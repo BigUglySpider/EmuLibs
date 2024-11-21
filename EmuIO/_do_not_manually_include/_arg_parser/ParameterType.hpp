@@ -62,7 +62,6 @@ namespace EmuIO
 
 		StringEnum = String | Enum,
 
-
 		ValueTypeMask = Int8 | Int16 | Int32 | Int64 | Uint8 | Uint16 | Uint32 | Uint64 | Float32 | Float64 | String | Bool,
 		MetaMask      = Array | Enum | Const,
 
