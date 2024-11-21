@@ -410,8 +410,8 @@ namespace EmuIO
 			return str;
 		}
 
-		template<bool ReturnOnError>
-		std::size_t Parse(int argc, const char** argv, std::ostream& out_stream, std::ostream& err_stream)
+		template<bool ReturnOnError, class OutStream, class ErrStream>
+		std::size_t Parse(int argc, const char** argv, OutStream&& out_stream, ErrStream&& err_stream)
 		{
 			std::size_t err_count{ 0u };
 			for (int i{ 0 }; i < argc; ++i)

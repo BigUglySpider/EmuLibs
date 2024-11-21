@@ -2,6 +2,7 @@
 #define EMU_IO_CONSOLE_COLOUR_HPP_INC_ 1
 
 #include <cstdint>
+#include <iostream>
 
 #include "../EmuCore/CommonPreprocessor/Compiler.h"
 
@@ -11,7 +12,6 @@
 #endif
 #include <Windows.h>
 #else
-#include <iostream>
 #include <string>
 #endif
 
@@ -91,6 +91,59 @@ namespace EmuIO
 		std::cout << (std::string{ "\033[" } + std::to_string(static_cast<int>(colour)) + "m");
 #endif
 	}
+
+	template<bool Err>
+	class PrintColoured
+	{
+	public:
+		static constexpr EmuIO::ConsoleColour default_colour = EmuIO::ConsoleColour::LightWhite;
+
+		PrintColoured(EmuIO::ConsoleColour colour_) :
+			_colour{ colour_ }
+		{
+		}
+
+		template<class T>
+		PrintColoured<Err>& operator<<(T&& to_append)
+		{
+			SetConsoleColour(_colour);
+			if constexpr (Err)
+			{
+				std::cerr << std::forward<T>(to_append);
+			}
+			else
+			{
+				std::cout << std::forward<T>(to_append);
+			}
+			SetConsoleColour(default_colour);
+			return *this;
+		}
+
+		PrintColoured<Err>& operator<<(std::ostream& (*pManip)(std::ostream&))
+		{
+			(*pManip)(std::cout);
+			return *this;
+		}
+
+		template<class...Ts>
+		requires(sizeof...(Ts) != 0)
+		PrintColoured& Append(Ts&&...to_append)
+		{
+			SetConsoleColour(_colour);
+			if constexpr (Err)
+			{
+				((std::cerr << std::forward<Ts>(to_append)), ...);
+			}
+			else
+			{
+				((std::cout << std::forward<Ts>(to_append)), ...);
+			}
+			SetConsoleColour(default_colour);
+		}
+
+	private:
+		EmuIO::ConsoleColour _colour;
+	};
 }
 
 #endif
