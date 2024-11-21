@@ -86,6 +86,12 @@ namespace EmuCore::Concepts
 
 	template<class T_>
 	concept IsNonVoid = !std::is_void_v<T_>;
+
+	template<class T, class Target>
+	concept CanExplicitlyConstruct = requires(T && item)
+	{
+		{ Target{ std::forward<T>(item) } };
+	};
 }
 
 namespace EmuConcepts

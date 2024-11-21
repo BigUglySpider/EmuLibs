@@ -101,6 +101,7 @@ namespace EmuIO
 			return false;
 		}
 
+		// Register basic parameter
 		template<EmuIO::ParameterType Type, class DefaultValue>
 		requires((Type & EmuIO::ParameterType::Enum) == EmuIO::ParameterType{} && !EmuConcepts::UnqualifiedMatch<DefaultValue, std::monostate>)
 		void RegisterParameter(std::string name, std::string desc, DefaultValue&& default_value)
@@ -116,6 +117,15 @@ namespace EmuIO
 			));
 		}
 
+		template<EmuIO::ParameterType Type, class DefaultValue, EmuConcepts::CanExplicitlyConstruct<std::string>...Aliases>
+		requires((Type & EmuIO::ParameterType::Enum) == EmuIO::ParameterType{} && !EmuConcepts::UnqualifiedMatch<DefaultValue, std::monostate> && sizeof...(Aliases) != 0)
+		void RegisterParameter(std::string name, std::string desc, DefaultValue&& default_value, Aliases&&...aliases)
+		{
+			RegisterParameter<Type>(name, std::move(desc), std::forward<DefaultValue>(default_value));
+			AddAliases(std::move(name), std::forward<Aliases>(aliases)...);
+		}
+
+		// Register basic array parameter defaulting to empty
 		template<EmuIO::ParameterType Type>
 		requires((Type & EmuIO::ParameterType::Enum) == EmuIO::ParameterType{} && (Type & EmuIO::ParameterType::Array) == EmuIO::ParameterType::Array)
 		void RegisterParameter(std::string name, std::string desc, std::monostate default_as_empty_array)
@@ -131,6 +141,15 @@ namespace EmuIO
 			));
 		}
 
+		template<EmuIO::ParameterType Type, EmuConcepts::CanExplicitlyConstruct<std::string>...Aliases>
+		requires((Type & EmuIO::ParameterType::Enum) == EmuIO::ParameterType{} && (Type & EmuIO::ParameterType::Array) == EmuIO::ParameterType::Array && sizeof...(Aliases) != 0)
+		void RegisterParameter(std::string name, std::string desc, std::monostate default_as_empty_array, Aliases&&...aliases)
+		{
+			RegisterParameter<Type>(name, std::move(desc), std::move(default_as_empty_array));
+			AddAliases(std::move(name), std::forward<Aliases>(aliases)...);
+		}
+
+		// Register basic parameter with `Type` enum determined by the input `ParamType`
 		template<class ParamType, class DefaultValue>
 		requires(!EmuConcepts::UnqualifiedMatch<DefaultValue, std::monostate>)
 		void RegisterParameter(std::string name, std::string desc, DefaultValue&& default_value)
@@ -143,6 +162,20 @@ namespace EmuIO
 			);
 		}
 
+		template<class ParamType, class DefaultValue, EmuConcepts::CanExplicitlyConstruct<std::string>...Aliases>
+		requires(!EmuConcepts::UnqualifiedMatch<DefaultValue, std::monostate> && sizeof...(Aliases) != 0)
+		void RegisterParameter(std::string name, std::string desc, DefaultValue&& default_value, Aliases&&...aliases)
+		{
+			RegisterParameter<EmuIO::type_to_parameter_type_enum<ParamType>()>
+			(
+				name,
+				std::move(desc),
+				std::forward<DefaultValue>(default_value)
+			);
+			AddAliases(std::move(name), std::forward<Aliases>(aliases)...);
+		}
+
+		// Register basic array parameter with `Type` enum determined by the input `ParamType` defaulting to empty
 		template<class ParamType>
 		requires(std::is_array_v<typename std::remove_cvref<ParamType>::type>)
 		void RegisterParameter(std::string name, std::string desc, std::monostate default_as_empty_array)
@@ -155,6 +188,148 @@ namespace EmuIO
 			);
 		}
 
+		template<class ParamType, EmuConcepts::CanExplicitlyConstruct<std::string>...Aliases>
+		requires(std::is_array_v<typename std::remove_cvref<ParamType>::type>)
+		void RegisterParameter(std::string name, std::string desc, std::monostate default_as_empty_array, Aliases&&...aliases)
+		{
+			RegisterParameter<EmuIO::type_to_parameter_type_enum<ParamType>()>
+			(
+				name,
+				std::move(desc),
+				std::move(default_as_empty_array)
+			);
+			AddAliases(std::move(name), std::forward<Aliases>(aliases)...);
+		}
+
+		// Register enum parameter with info types
+		template<ParameterType Type, EmuConcepts::CanExplicitlyConstruct<typename EmuIO::parameter_enum_builder_arg<Type | ParameterType::Enum>::type>...EnumInfos>
+		requires(sizeof...(EnumInfos) != 0)
+		void RegisterEnumParameter(std::string name, std::string desc, std::string default_enum, EnumInfos&&...enum_infos)
+		{
+			_throw_if_invalid_new_name(name);
+
+			param_to_aliases_map.emplace(std::make_pair(name, std::vector<std::string>{}));
+			parameter_descriptions.emplace(std::make_pair(name, std::move(desc)));
+			parameters.emplace(std::make_pair
+			(
+				std::move(name),
+				EmuIO::Parameter::make<Type | ParameterType::Enum>(std::move(default_enum), std::forward<EnumInfos>(enum_infos)...)
+			));
+		}
+
+		// Register enum array parameter with info types, defaulting to empty array
+		template<ParameterType Type, EmuConcepts::CanExplicitlyConstruct<typename EmuIO::parameter_enum_builder_arg<Type | ParameterType::Enum>::type>...EnumInfos>
+		requires(sizeof...(EnumInfos) != 0 && (Type & ParameterType::Array) == ParameterType::Array)
+		void RegisterEnumParameter(std::string name, std::string desc, std::monostate default_empty_array, EnumInfos&&...enum_infos)
+		{
+			_throw_if_invalid_new_name(name);
+
+			param_to_aliases_map.emplace(std::make_pair(name, std::vector<std::string>{}));
+			parameter_descriptions.emplace(std::make_pair(name, std::move(desc)));
+			parameters.emplace(std::make_pair
+			(
+				std::move(name),
+				EmuIO::Parameter::make<Type | ParameterType::Enum>(std::move(default_empty_array), std::forward<EnumInfos>(enum_infos)...)
+			));
+		}
+
+		// Register enum parameter with inline arguments to form info pairs - only used for non-string-valued enums
+		template<ParameterType Type, class...NameValueArgSequenceForEnumInfos>
+		requires((Type & ParameterType::String) != ParameterType::String && valid_scalar_args_for_enum_builder_arg<Type | ParameterType::Enum, NameValueArgSequenceForEnumInfos...>::value)
+		void RegisterEnumParameter(std::string name, std::string desc, std::string default_enum, NameValueArgSequenceForEnumInfos&&...enum_infos_name_value_sequence)
+		{
+			_throw_if_invalid_new_name(name);
+
+			param_to_aliases_map.emplace(std::make_pair(name, std::vector<std::string>{}));
+			parameter_descriptions.emplace(std::make_pair(name, std::move(desc)));
+			parameters.emplace(std::make_pair
+			(
+				std::move(name),
+				EmuIO::Parameter::make<Type | ParameterType::Enum>(std::move(default_enum), std::forward<NameValueArgSequenceForEnumInfos>(enum_infos_name_value_sequence)...)
+			));
+		}
+
+		// Register enum array parameter with inline arguments to form info pairs, defaulting to empty array - only used for non-string-valued enums
+		template<ParameterType Type, class...NameValueArgSequenceForEnumInfos>
+		requires((Type & ParameterType::String) != ParameterType::String && (Type & ParameterType::Array) == ParameterType::Array && valid_scalar_args_for_enum_builder_arg<Type | ParameterType::Enum, NameValueArgSequenceForEnumInfos...>::value)
+		void RegisterEnumParameter(std::string name, std::string desc, std::monostate default_empty_array, NameValueArgSequenceForEnumInfos&&...enum_infos_name_value_sequence)
+		{
+			_throw_if_invalid_new_name(name);
+
+			param_to_aliases_map.emplace(std::make_pair(name, std::vector<std::string>{}));
+			parameter_descriptions.emplace(std::make_pair(name, std::move(desc)));
+			parameters.emplace(std::make_pair
+			(
+				std::move(name),
+				EmuIO::Parameter::make<Type | ParameterType::Enum>(std::move(default_empty_array), std::forward<NameValueArgSequenceForEnumInfos>(enum_infos_name_value_sequence)...)
+			));
+		}
+
+
+
+
+
+
+		// Register enum parameter with info types
+		// --- Additionally determines `Type` enum from the input `ParamType`
+		template<class ParamType, EmuConcepts::CanExplicitlyConstruct<typename EmuIO::parameter_enum_builder_arg<EmuIO::type_to_parameter_type_enum<ParamType>() | ParameterType::Enum>::type>...EnumInfos>
+		requires(sizeof...(EnumInfos) != 0)
+		void RegisterEnumParameter(std::string name, std::string desc, std::string default_enum, EnumInfos&&...enum_infos)
+		{
+			RegisterEnumParameter<EmuIO::type_to_parameter_type_enum<ParamType>()>
+			(
+				std::move(name),
+				std::move(desc),
+				std::move(default_enum),
+				std::forward<EnumInfos>(enum_infos)...
+			);
+		}
+
+		// Register enum array parameter with info types, defaulting to empty array
+		// --- Additionally determines `Type` enum from the input `ParamType`
+		template<class ParamType, EmuConcepts::CanExplicitlyConstruct<typename EmuIO::parameter_enum_builder_arg<EmuIO::type_to_parameter_type_enum<ParamType>() | ParameterType::Enum>::type>...EnumInfos>
+		requires(sizeof...(EnumInfos) != 0 && std::is_array_v<ParamType>)
+		void RegisterEnumParameter(std::string name, std::string desc, std::monostate default_empty_array, EnumInfos&&...enum_infos)
+		{
+			RegisterEnumParameter<EmuIO::type_to_parameter_type_enum<ParamType>()>
+			(
+				std::move(name),
+				std::move(desc),
+				std::move(default_empty_array),
+				std::forward<EnumInfos>(enum_infos)...
+			);
+		}
+
+		// Register enum parameter with inline arguments to form info pairs - only used for non-string-valued enums
+		// --- Additionally determines `Type` enum from the input `ParamType`
+		template<class ParamType, class...NameValueArgSequenceForEnumInfos>
+		requires((EmuIO::type_to_parameter_type_enum<ParamType>() & ParameterType::String) != ParameterType::String && valid_scalar_args_for_enum_builder_arg<EmuIO::type_to_parameter_type_enum<ParamType>() | ParameterType::Enum, NameValueArgSequenceForEnumInfos...>::value)
+		void RegisterEnumParameter(std::string name, std::string desc, std::string default_enum, NameValueArgSequenceForEnumInfos&&...enum_infos_name_value_sequence)
+		{
+			RegisterEnumParameter<EmuIO::type_to_parameter_type_enum<ParamType>()>
+			(
+				std::move(name),
+				std::move(desc),
+				std::move(default_enum),
+				std::forward<NameValueArgSequenceForEnumInfos>(enum_infos_name_value_sequence)...
+			);
+		}
+
+		// Register enum array parameter with inline arguments to form info pairs, defaulting to empty array - only used for non-string-valued enums
+		// --- Additionally determines `Type` enum from the input `ParamType`
+		template<class ParamType, class...NameValueArgSequenceForEnumInfos>
+		requires((EmuIO::type_to_parameter_type_enum<ParamType>() & ParameterType::String) != ParameterType::String && std::is_array_v<ParamType> && valid_scalar_args_for_enum_builder_arg<EmuIO::type_to_parameter_type_enum<ParamType>() | ParameterType::Enum, NameValueArgSequenceForEnumInfos...>::value)
+		void RegisterEnumParameter(std::string name, std::string desc, std::monostate default_empty_array, NameValueArgSequenceForEnumInfos&&...enum_infos_name_value_sequence)
+		{
+			RegisterEnumParameter<EmuIO::type_to_parameter_type_enum<ParamType>()>
+			(
+				std::move(name),
+				std::move(desc),
+				std::move(default_empty_array),
+				std::forward<NameValueArgSequenceForEnumInfos>(enum_infos_name_value_sequence)...
+			);
+		}
+
 		void AddAlias(const std::string& name, std::string alias)
 		{
 			_throw_if_invalid_new_name(alias);
@@ -162,11 +337,19 @@ namespace EmuIO
 			param_to_aliases_map[name].emplace_back(std::move(alias));
 		}
 
-		template<class...AliasStrings>
-		requires(sizeof...(AliasStrings) != 0 && (... && std::is_constructible_v<std::string, AliasStrings>))
+		template<EmuConcepts::CanExplicitlyConstruct<std::string>...AliasStrings>
+		requires(sizeof...(AliasStrings) > 1)
 		void AddAliases(const std::string& name, AliasStrings&&...aliases)
 		{
 			((AddAlias(name, std::string{ std::forward<AliasStrings>(aliases) })), ...);
+		}
+
+		template<EmuConcepts::CanExplicitlyConstruct<std::string> AliasString>
+		void AddAliases(std::string name, AliasString alias)
+		{
+			_throw_if_invalid_new_name(alias);
+			param_to_aliases_map[name].emplace_back(std::forward<AliasString>(alias));
+			alias_to_param_map.emplace(std::make_pair(std::forward<AliasString>(alias), std::move(name)));
 		}
 
 		[[nodiscard]] bool ContainsNameOrAlias(const std::string& name_or_alias) const
@@ -176,6 +359,7 @@ namespace EmuIO
 
 		std::ostream& Help(std::ostream& str, std::string_view separator = default_help_separator) const
 		{
+			str << separator << '\n';
 			str << program_name << '\n';
 			if (program_desc.has_value())
 			{
@@ -208,7 +392,7 @@ namespace EmuIO
 				}
 				str << '\n';
 
-				name_param_pair.second->AppendToStream<false, true, false, true>(str) << '\n';
+				name_param_pair.second->AppendToStream<true, false, true, false, true>(str) << '\n';
 				if (name_param_pair.second->IsConst())
 				{
 					str << "Can only be set once (excluding the default value).\n";

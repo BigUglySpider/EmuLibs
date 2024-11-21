@@ -49,6 +49,36 @@ namespace EmuIO
 		using type = decltype(get());
 	};
 
+	template<ParameterType Type, class...ScalarArgs>
+	struct valid_scalar_args_for_enum_builder_arg
+	{
+		static constexpr bool value{ false };
+	};
+	template<ParameterType Type, class FirstScalarArg>
+	requires((Type & ParameterType::ValueTypeMask) == ParameterType::String)
+	struct valid_scalar_args_for_enum_builder_arg<Type, FirstScalarArg>
+	{
+		static constexpr bool value{ std::is_constructible_v<std::string, FirstScalarArg> };
+	};
+	template<ParameterType Type, class FirstScalarArg, class...RemainingScalarArgs>
+	requires((Type & ParameterType::ValueTypeMask) == ParameterType::String)
+	struct valid_scalar_args_for_enum_builder_arg<Type, FirstScalarArg, RemainingScalarArgs...>
+	{
+		static constexpr bool value{ std::is_constructible_v<std::string, FirstScalarArg> && (... && std::is_constructible_v<std::string, RemainingScalarArgs>) };
+	};
+	template<ParameterType Type, class NameArg, class ValueArg>
+	requires((Type & ParameterType::ValueTypeMask) != ParameterType::String)
+	struct valid_scalar_args_for_enum_builder_arg<Type, NameArg, ValueArg>
+	{
+		static constexpr bool value{ std::is_constructible_v<typename parameter_enum_builder_arg<Type | ParameterType::Enum>::type, NameArg, ValueArg> };
+	};
+	template<ParameterType Type, class NameArg, class ValueArg, class...RemainingArgs>
+	requires((Type & ParameterType::ValueTypeMask) != ParameterType::String)
+	struct valid_scalar_args_for_enum_builder_arg<Type, NameArg, ValueArg, RemainingArgs...>
+	{
+		static constexpr bool value{ valid_scalar_args_for_enum_builder_arg<Type, NameArg, ValueArg>::value && valid_scalar_args_for_enum_builder_arg<Type, RemainingArgs...>::value };
+	};
+
 	class Parameter
 	{
 	public:
@@ -118,7 +148,7 @@ namespace EmuIO
 		}
 
 		template<ParameterType ParamType, class...EnumInfoSets>
-		requires((ParamType & ParameterType::Enum) == ParameterType::Enum && sizeof...(EnumInfoSets) != 0)
+		requires((ParamType & ParameterType::Enum) == ParameterType::Enum && sizeof...(EnumInfoSets) != 0 && !(... && EmuConcepts::CanExplicitlyConstruct<EnumInfoSets, typename EmuIO::parameter_enum_builder_arg<ParamType>::type>))
 		[[nodiscard]] static Parameter make(std::string default_enum_, EnumInfoSets&&...enum_singles_or_pairs)
 		{
 			constexpr std::size_t enum_info_args_count{ sizeof...(EnumInfoSets) };
@@ -152,7 +182,7 @@ namespace EmuIO
 		}
 
 		template<ParameterType ParamType, class...EnumInfoSets>
-		requires((ParamType & ParameterType::Enum) == ParameterType::Enum && (ParamType & ParameterType::Array) == ParameterType::Array && sizeof...(EnumInfoSets) != 0)
+		requires((ParamType & ParameterType::Enum) == ParameterType::Enum && (ParamType & ParameterType::Array) == ParameterType::Array && sizeof...(EnumInfoSets) != 0 && !(... && EmuConcepts::CanExplicitlyConstruct<EnumInfoSets, typename EmuIO::parameter_enum_builder_arg<ParamType>::type>))
 		[[nodiscard]] static Parameter make(std::monostate default_enum_, EnumInfoSets&&...enum_singles_or_pairs)
 		{
 			constexpr std::size_t enum_info_args_count{ sizeof...(EnumInfoSets) };
@@ -183,6 +213,20 @@ namespace EmuIO
 					EmuCore::TMP::make_odd_index_sequence<enum_info_args_count>()
 				);
 			}
+		}
+
+		template<ParameterType ParamType, class...EnumInfos>
+		requires((ParamType & ParameterType::Enum) == ParameterType::Enum && sizeof...(EnumInfos) != 0 && (... && EmuConcepts::CanExplicitlyConstruct<EnumInfos, typename EmuIO::parameter_enum_builder_arg<ParamType>::type>))
+		[[nodiscard]] static Parameter make(std::string default_enum_, EnumInfos&&...enum_infos_)
+		{
+			return Parameter(ParamType, std::move(default_enum_), std::forward<EnumInfos>(enum_infos_)...);
+		}
+
+		template<ParameterType ParamType, class...EnumInfos>
+		requires((ParamType& ParameterType::Enum) == ParameterType::Enum && (ParamType & ParameterType::Array) == ParameterType::Array && sizeof...(EnumInfos) != 0 && (... && EmuConcepts::CanExplicitlyConstruct<EnumInfos, typename EmuIO::parameter_enum_builder_arg<ParamType>::type>))
+		[[nodiscard]] static Parameter make(std::monostate default_enum_, EnumInfos&&...enum_infos_)
+		{
+			return Parameter(ParamType, std::move(default_enum_), std::forward<EnumInfos>(enum_infos_)...);
 		}
 
 		[[nodiscard]] constexpr const value_type& GetDefault() const noexcept
@@ -608,11 +652,21 @@ namespace EmuIO
 			}
 		}
 
-		template<bool Value = true, bool Default = true, bool Modified = true, bool ValidEnums = true>
+		template<bool Type = true, bool Value = true, bool Default = true, bool Modified = true, bool ValidEnums = true>
 		std::ostream& AppendToStream(std::ostream& str) const
 		{
+			if constexpr (Type)
+			{
+				str << EmuIO::arg_param_type_to_string(type);
+			}
+
 			if constexpr (Value)
 			{
+				if constexpr (Type)
+				{
+					str << '\n';
+				}
+
 				str << "Value";
 				if (IsArray())
 				{
@@ -628,7 +682,7 @@ namespace EmuIO
 
 			if constexpr (Default)
 			{
-				if constexpr (Value)
+				if constexpr (Type || Value)
 				{
 					str << '\n';
 				}
@@ -638,7 +692,7 @@ namespace EmuIO
 
 			if constexpr (Modified)
 			{
-				if constexpr (Value || Default)
+				if constexpr (Type || Value || Default)
 				{
 					str << '\n';
 				}
@@ -649,7 +703,7 @@ namespace EmuIO
 			{
 				if (IsEnum())
 				{
-					if constexpr (Value || Default || Modified)
+					if constexpr (Type || Value || Default || Modified)
 					{
 						str << '\n';
 					}
@@ -703,7 +757,7 @@ namespace EmuIO
 
 			if ((type & ParameterType::ValueTypeMask) == ParameterType::String)
 			{
-				str << std::get<std::string>(*enum_info_);
+				str << '"' << std::get<std::string>(*enum_info_) << '"';
 			}
 			else
 			{
