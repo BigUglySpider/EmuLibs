@@ -164,10 +164,10 @@ namespace EmuIO
 			{
 				static_assert
 				(
-					(... && std::is_constructible_v<std::string, EnumInfoSets>),
+					(... && EmuConcepts::CanExplicitlyConstruct<EnumInfoSets, std::string>),
 					"Invalid arguments passed for creating a string enum parameter: At least one argument is not a valid type to construct `std::string`."
 				);
-				return Parameter(ParamType, std::move(default_enum_), std::string{ std::forward<EnumInfoSets>(enum_singles_or_pairs)... });
+				return Parameter(ParamType, std::move(default_enum_), std::string{ std::forward<EnumInfoSets>(enum_singles_or_pairs) }...);
 			}
 			else
 			{
@@ -198,10 +198,10 @@ namespace EmuIO
 			{
 				static_assert
 				(
-					(... && std::is_constructible_v<std::string, EnumInfoSets>),
+					(... && EmuConcepts::CanExplicitlyConstruct<EnumInfoSets, std::string>),
 					"Invalid arguments passed for creating a string enum parameter: At least one argument is not a valid type to construct `std::string`."
 				);
-				return Parameter(ParamType, std::move(default_enum_), std::string{ std::forward<EnumInfoSets>(enum_singles_or_pairs)... });
+				return Parameter(ParamType, std::move(default_enum_), std::string{ std::forward<EnumInfoSets>(enum_singles_or_pairs) }...);
 			}
 			else
 			{
