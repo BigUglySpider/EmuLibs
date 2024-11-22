@@ -300,7 +300,8 @@ namespace EmuIO
 
 			if constexpr (!InArrayMode)
 			{
-				if (input_.starts_with('[') && input_.ends_with(']'))
+				// Don't do special parsing if we're not even an array param
+				if (IsArray() && input_.starts_with('[') && input_.ends_with(']'))
 				{
 					// Array mode
 					input_ = input_.substr(1, input_.size() - 2);
