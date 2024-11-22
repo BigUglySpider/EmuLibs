@@ -309,13 +309,13 @@ namespace EmuIO
 						return _make_err_str("Input value `", input_, "` is an empty array and thus has not changed anything.");
 					}
 
-					constexpr auto separator{ ',' };
+					using namespace std::string_view_literals;
+					constexpr std::string_view separator{ ","sv };
 					std::string err_str{};
 					std::size_t search_offset{ 0u };
 					std::size_t current_begin{ 0u };
 					do
 					{
-						using namespace std::string_literals;
 						const std::size_t separator_i{ input_.find(separator, search_offset) };
 						if (separator_i == std::string::npos)
 						{
@@ -342,21 +342,63 @@ namespace EmuIO
 						}
 						else
 						{
-							// Skip if escaped (and also erase the escape character)
 							if (input_[separator_i - 1] == '\\')
 							{
-								input_.erase(separator_i - 1);
-								search_offset = separator_i; // this will be the character after the escaped separator since its preceding char is gone now
-								continue;
+								const std::size_t escape_index{ separator_i - 1 };
+								if (escape_index > 0 && input_[escape_index - 1] == '\\')
+								{
+									// Do not use the backslash to escape the separator since the users seems to want it as part of the string
+									// --- This means this separator is valid so we don't move to a new loop iteration here
+									// --- We want to erase one backslash since that's what we're escaping, and this will offset `separator_i` by -1
+									input_.erase(escape_index);
+									--separator_i;
+								}
+								else
+								{
+									// Skip this separator as its escaped and thus part of the input
+									input_.erase(escape_index);
+									search_offset = separator_i + (separator.size() - 1); // this will be the character after the escaped separator since its preceding char is gone now
+									continue;
+								}
 							}
 
-							std::optional<std::string> current_err{ AppendInput<true>(input_.substr(current_begin, separator_i - current_begin)) };
+							std::string this_value = input_.substr(current_begin, separator_i - current_begin);
+							if (!this_value.empty())
+							{
+								if (std::isspace(this_value[0]))
+								{
+									std::size_t whitespace_count{ 1u };
+									while (whitespace_count < this_value.size())
+									{
+										if (std::isspace(this_value[whitespace_count]))
+										{
+											++whitespace_count;
+										}
+										else
+										{
+											break;
+										}
+									}
+									this_value = this_value.substr(whitespace_count);
+								}
+								else if (this_value.size() > 1)
+								{
+									if (this_value[0] == '\\' && (std::isspace(this_value[1]) || this_value[1] == '\\'))
+									{
+										// Space escaped to say "this is part of my input and not just to make my input command more human-readable")
+										// --- As a result, clear the escape backslash
+										// --- We also clear it if we're escaping an escape backslash since that'll be needed to allow strings that start as "\ " for example
+										this_value = this_value.substr(1);
+									}
+								}
+							}
+							std::optional<std::string> current_err{ AppendInput<true>(this_value) };
 							if (current_err.has_value())
 							{
 								if (!err_str.empty()) err_str += '\n';
 								err_str += (std::move(*current_err));
 							}
-							search_offset = separator_i + 1;
+							search_offset = separator_i + separator.size();
 							current_begin = search_offset;
 						}
 					} while (true); // Broken manually inside loop when there are no more separators
