@@ -320,8 +320,7 @@ namespace EmuIO
 						std::size_t separator_i{ input_.find(separator, search_offset) };
 						if (separator_i == std::string::npos)
 						{
-							std::string this_value = _array_substr(input_, current_begin);
-							std::optional<std::string> current_err{ AppendInput<true>(this_value) };
+							std::optional<std::string> current_err{ AppendInput<true>(_array_substr(input_, current_begin)) };
 							if (current_err.has_value())
 							{
 								if (!err_str.empty()) err_str += '\n';
@@ -364,8 +363,7 @@ namespace EmuIO
 								}
 							}
 
-							std::string this_value = _array_substr(input_, current_begin, separator_i - current_begin);
-							std::optional<std::string> current_err{ AppendInput<true>(this_value) };
+							std::optional<std::string> current_err{ AppendInput<true>(_array_substr(input_, current_begin, separator_i - current_begin)) };
 							if (current_err.has_value())
 							{
 								if (!err_str.empty()) err_str += '\n';
