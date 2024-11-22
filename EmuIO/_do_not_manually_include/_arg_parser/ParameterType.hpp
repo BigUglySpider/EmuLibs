@@ -104,14 +104,14 @@ namespace EmuIO
 			return
 			(
 				ParameterType::Enum |
-				type_to_parameter_type_enum<typename std::underlying_type<typename std::remove_cvref<T>::type>::type>()
+				type_to_parameter_type_enum<typename EmuCore::TMP::conditional_const<std::is_const_v<T>, typename std::underlying_type<typename std::remove_cvref<T>::type>::type>::type>()
 			);
 		}
 		else if constexpr (std::is_array_v<typename std::remove_cvref<T>::type>)
 		{
 			constexpr ParameterType unarrayed_type
 			{
-				type_to_parameter_type_enum<typename std::remove_extent<typename std::remove_cvref<T>::type>::type>()
+				type_to_parameter_type_enum<typename std::remove_extent<typename std::remove_reference<T>::type>::type>()
 			};
 			static_assert((unarrayed_type & ParameterType::Array) == ParameterType{}, "Multidimensional arrays are not supported conversions for EmuIO::type_to_parameter_type_enum");
 			return unarrayed_type | ParameterType::Array;
