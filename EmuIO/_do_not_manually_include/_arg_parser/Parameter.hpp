@@ -797,7 +797,7 @@ namespace EmuIO
 						return std::move(err_str);
 					}
 				}
-				else if (input_.starts_with("\\[") || input_.starts_with("\\\\[")
+				else if (input_.starts_with("\\[") || input_.starts_with("\\\\["))
 				{
 					input_ = input_.substr(1);
 				}
