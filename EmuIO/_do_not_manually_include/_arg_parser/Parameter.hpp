@@ -289,133 +289,9 @@ namespace EmuIO
 		* @returns Optional string describing the error if one occurs.
 		*          On success, this will not have a value (`std::nullopt`).
 		*/
-		template<bool InArrayMode = false>
 		std::optional<std::string> AppendInput(std::string input_)
 		{
-			if (IsConst() && modified)
-			{
-				return _make_err_str("Input value `", input_, "` is ignored for parameter (of type ", arg_param_type_to_string(type),
-									 ") as its target parameter is flagged as constant and has already been set.");
-			}
-
-			if constexpr (!InArrayMode)
-			{
-				// Don't do special parsing if we're not even an array param
-				if (IsArray() && input_.starts_with('[') && input_.ends_with(']'))
-				{
-					// Array mode
-					input_ = input_.substr(1, input_.size() - 2);
-					if (input_.empty())
-					{
-						return _make_err_str("Input value `", input_, "` is an empty array and thus has not changed anything.");
-					}
-
-					using namespace std::string_view_literals;
-					constexpr std::string_view separator{ ","sv };
-					std::string err_str{};
-					std::size_t search_offset{ 0u };
-					std::size_t current_begin{ 0u };
-					const bool modified_before_call{ modified };
-					do
-					{
-						modified &= modified_before_call; // Prevent unwanted errors throughout array setting, we'll set this manually at the end of the array
-						std::size_t separator_i{ input_.find(separator, search_offset) };
-						if (separator_i == std::string::npos)
-						{
-							std::optional<std::string> current_err{ AppendInput<true>(_array_substr(input_, current_begin)) };
-							if (current_err.has_value())
-							{
-								if (!err_str.empty()) err_str += '\n';
-								err_str += (std::move(*current_err));
-							}
-							break;
-						}
-						else if (separator_i == 0)
-						{
-							// Just an empty string; we won't disallow this as it could have some meaning for some implementation
-							std::optional<std::string> current_err{ AppendInput<true>("") };
-							if (current_err.has_value())
-							{
-								if (!err_str.empty()) err_str += '\n';
-								err_str += (std::move(*current_err));
-							}
-							++search_offset;
-							++current_begin;
-							continue;
-						}
-						else
-						{
-							if (input_[separator_i - 1] == '\\')
-							{
-								const std::size_t escape_index{ separator_i - 1 };
-								if (escape_index > 0 && input_[escape_index - 1] == '\\')
-								{
-									// Do not use the backslash to escape the separator since the users seems to want it as part of the string
-									// --- This means this separator is valid so we don't move to a new loop iteration here
-									// --- We want to erase one backslash since that's what we're escaping, and this will offset `separator_i` by -1
-									input_.erase(escape_index);
-									--separator_i;
-								}
-								else
-								{
-									// Skip this separator as its escaped and thus part of the input
-									input_.erase(escape_index);
-									search_offset = separator_i + (separator.size() - 1); // this will be the character after the escaped separator since its preceding char is gone now
-									continue;
-								}
-							}
-
-							std::optional<std::string> current_err{ AppendInput<true>(_array_substr(input_, current_begin, separator_i - current_begin)) };
-							if (current_err.has_value())
-							{
-								if (!err_str.empty()) err_str += '\n';
-								err_str += (std::move(*current_err));
-							}
-							search_offset = separator_i + separator.size();
-							current_begin = search_offset;
-						}
-					} while (true); // Broken manually inside loop when there are no more separators
-					modified = true;
-
-					if (err_str.empty())
-					{
-						return std::nullopt;
-					}
-					else
-					{
-						return std::move(err_str);
-					}
-				}
-				else if (input_.starts_with("\\["))
-				{
-					input_ = input_.substr(1);
-				}
-			}
-
-			std::optional<std::string> err{ std::nullopt };
-			value_type new_item = _parse_input(input_, err);
-			if (new_item.index() != 0) // Index 0 = monostate, translating to failure
-			{
-				if ((type & ParameterType::Array) == ParameterType::Array)
-				{
-					if (!modified)
-					{
-						// Empty the array if this is the first parse since we don't want the defaults present anymore
-						// --- Especially considering having an empty monostate at the start on any array would be a little odd
-						values.clear();
-						inputs.clear();
-					}
-					values.emplace_back(std::move(new_item));
-					inputs.emplace_back(std::move(input_));
-				}
-				else
-				{
-					values[0] = std::move(new_item);
-					inputs[0] = std::move(input_);
-				}
-				modified = true;
-			}
-			return err;
+			return _append_input<false>(std::move(input_));
 		}
 
 		[[nodiscard]] constexpr bool IsArray() const noexcept
@@ -810,6 +686,158 @@ namespace EmuIO
 		}
 
 	private:
+		template<bool InArrayMode>
+		[[nodiscard]] std::optional<std::string> _append_input(std::string input_)
+		{
+			// Skip this check to prevent false errors due to modification flag changing when setting a const array via array input
+			if constexpr (!InArrayMode)
+			{
+				if (IsConst() && modified)
+				{
+					return _make_err_str("Input value `", input_, "` is ignored for parameter (of type ", arg_param_type_to_string(type),
+										 ") as its target parameter is flagged as constant and has already been set.");
+				}
+			}
+
+			// If not in array mode, try to enter it
+			// --- If we enter array mode, the area under this branch will not be executed
+			if constexpr (!InArrayMode)
+			{
+				// Don't do special parsing if we're not even an array param
+				if (IsArray() && input_.starts_with('[') && input_.ends_with(']'))
+				{
+					// Array mode
+					input_ = input_.substr(1, input_.size() - 2);
+					if (input_.empty())
+					{
+						return _make_err_str("Input value `", input_, "` is an empty array and thus has not changed anything.");
+					}
+
+					if (!modified)
+					{
+						// Empty the array if this is the first parse since we don't want the defaults present anymore
+						// --- Especially considering having an empty monostate at the start on any array would be a little odd
+						// --- We do this once here instead of increasing the complexity of checks for child calls
+						values.clear();
+						inputs.clear();
+					}
+
+					using namespace std::string_view_literals;
+					constexpr std::string_view separator{ ","sv };
+					std::string err_str{};
+					std::size_t search_offset{ 0u };
+					std::size_t current_begin{ 0u };
+
+					do
+					{
+						std::size_t separator_i{ input_.find(separator, search_offset) };
+						if (separator_i == std::string::npos)
+						{
+							std::optional<std::string> current_err{ _append_input<true>(_array_substr(input_, current_begin)) };
+							if (current_err.has_value())
+							{
+								if (!err_str.empty()) err_str += '\n';
+								err_str += (std::move(*current_err));
+							}
+							break;
+						}
+						else if (separator_i == 0)
+						{
+							// Just an empty string; we won't disallow this as it could have some meaning for some implementation
+							std::optional<std::string> current_err{ _append_input<true>("") };
+							if (current_err.has_value())
+							{
+								if (!err_str.empty()) err_str += '\n';
+								err_str += (std::move(*current_err));
+							}
+							++search_offset;
+							++current_begin;
+							continue;
+						}
+						else
+						{
+							if (input_[separator_i - 1] == '\\')
+							{
+								const std::size_t escape_index{ separator_i - 1 };
+								if (escape_index > 0 && input_[escape_index - 1] == '\\')
+								{
+									// Do not use the backslash to escape the separator since the users seems to want it as part of the string
+									// --- This means this separator is valid so we don't move to a new loop iteration here
+									// --- We want to erase one backslash since that's what we're escaping, and this will offset `separator_i` by -1
+									input_.erase(escape_index);
+									--separator_i;
+								}
+								else
+								{
+									// Skip this separator as its escaped and thus part of the input
+									input_.erase(escape_index);
+									search_offset = separator_i + (separator.size() - 1); // this will be the character after the escaped separator since its preceding char is gone now
+									continue;
+								}
+							}
+
+							std::optional<std::string> current_err{ _append_input<true>(_array_substr(input_, current_begin, separator_i - current_begin)) };
+							if (current_err.has_value())
+							{
+								if (!err_str.empty()) err_str += '\n';
+								err_str += (std::move(*current_err));
+							}
+							search_offset = separator_i + separator.size();
+							current_begin = search_offset;
+						}
+					} while (true); // Broken manually inside loop when there are no more separators
+					modified = true; // Need to set at the end as we're preventing the internal calls from setting it
+
+					if (err_str.empty())
+					{
+						return std::nullopt;
+					}
+					else
+					{
+						return std::move(err_str);
+					}
+				}
+				else if (input_.starts_with("\\[") || input_.starts_with("\\\\[")
+				{
+					input_ = input_.substr(1);
+				}
+			}
+
+			std::optional<std::string> err{ std::nullopt };
+			value_type new_item = _parse_input(input_, err);
+			if (new_item.index() != 0) // Index 0 = monostate, translating to failure
+			{
+				if ((type & ParameterType::Array) == ParameterType::Array)
+				{
+					// Initial clear is handled by the calling array mode, so don't do it here since it'll break input parsing
+					if constexpr (!InArrayMode)
+					{
+						if (!modified)
+						{
+							// Empty the array if this is the first parse since we don't want the defaults present anymore
+							// --- Especially considering having an empty monostate at the start on any array would be a little odd
+							values.clear();
+							inputs.clear();
+						}
+					}
+					values.emplace_back(std::move(new_item));
+					inputs.emplace_back(std::move(input_));
+				}
+				else
+				{
+					values[0] = std::move(new_item);
+					inputs[0] = std::move(input_);
+				}
+
+				// Handled by the array mode that called this to avoid duplicate sets for each array item, so just skip here
+				if constexpr (!InArrayMode)
+				{
+					modified = true;
+				}
+			}
+			return err;
+		}
+
 		[[nodiscard]] static std::string _array_substr(const std::string& input_, std::size_t begin, std::size_t count = std::string::npos)
 		{
 			std::string result = input_.substr(begin, count);
