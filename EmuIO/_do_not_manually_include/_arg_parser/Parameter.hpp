@@ -289,12 +289,91 @@ namespace EmuIO
 		* @returns Optional string describing the error if one occurs.
 		*          On success, this will not have a value (`std::nullopt`).
 		*/
+		template<bool InArrayMode = false>
 		std::optional<std::string> AppendInput(std::string input_)
 		{
 			if (IsConst() && modified)
 			{
 				return _make_err_str("Input value `", input_, "` is ignored for parameter (of type ", arg_param_type_to_string(type),
 									 ") as its target parameter is flagged as constant and has already been set.");
+			}
+
+			if constexpr (!InArrayMode)
+			{
+				if (input_.starts_with('[') && input_.ends_with(']'))
+				{
+					// Array mode
+					input_ = input_.substr(1, input_.size() - 2);
+					if (input_.empty())
+					{
+						return _make_err_str("Input value `", input_, "` is an empty array and thus has not changed anything.");
+					}
+
+					constexpr auto separator{ ',' };
+					std::string err_str{};
+					std::size_t search_offset{ 0u };
+					std::size_t current_begin{ 0u };
+					do
+					{
+						using namespace std::string_literals;
+						const std::size_t separator_i{ input_.find(separator, search_offset) };
+						if (separator_i == std::string::npos)
+						{
+							std::optional<std::string> current_err{ AppendInput<true>(input_.substr(current_begin)) };
+							if (current_err.has_value())
+							{
+								if (!err_str.empty()) err_str += '\n';
+								err_str += (std::move(*current_err));
+							}
+							break;
+						}
+						else if (separator_i == 0)
+						{
+							// Just an empty string; we won't disallow this as it could have some meaning for some implementation
+							std::optional<std::string> current_err{ AppendInput<true>("") };
+							if (current_err.has_value())
+							{
+								if (!err_str.empty()) err_str += '\n';
+								err_str += (std::move(*current_err));
+							}
+							++search_offset;
+							++current_begin;
+							continue;
+						}
+						else
+						{
+							// Skip if escaped (and also erase the escape character)
+							if (input_[separator_i - 1] == '\\')
+							{
+								input_.erase(separator_i - 1);
+								search_offset = separator_i; // this will be the character after the escaped separator since its preceding char is gone now
+								continue;
+							}
+
+							std::optional<std::string> current_err{ AppendInput<true>(input_.substr(current_begin, separator_i - current_begin)) };
+							if (current_err.has_value())
+							{
+								if (!err_str.empty()) err_str += '\n';
+								err_str += (std::move(*current_err));
+							}
+							search_offset = separator_i + 1;
+							current_begin = search_offset;
+						}
+					} while (true); // Broken manually inside loop when there are no more separators
+
+					if (err_str.empty())
+					{
+						return std::nullopt;
+					}
+					else
+					{
+						return std::move(err_str);
+					}
+				}
+				else if (input_.starts_with("\\["))
+				{
+					input_ = input_.substr(1);
+				}
 			}
 
 			std::optional<std::string> err{ std::nullopt };
