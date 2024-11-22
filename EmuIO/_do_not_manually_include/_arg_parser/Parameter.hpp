@@ -320,7 +320,8 @@ namespace EmuIO
 						std::size_t separator_i{ input_.find(separator, search_offset) };
 						if (separator_i == std::string::npos)
 						{
-							std::optional<std::string> current_err{ AppendInput<true>(input_.substr(current_begin)) };
+							std::string this_value = _array_substr(input_, current_begin);
+							std::optional<std::string> current_err{ AppendInput<true>(this_value) };
 							if (current_err.has_value())
 							{
 								if (!err_str.empty()) err_str += '\n';
@@ -363,36 +364,7 @@ namespace EmuIO
 								}
 							}
 
-							std::string this_value = input_.substr(current_begin, separator_i - current_begin);
-							if (!this_value.empty())
-							{
-								if (std::isspace(this_value[0]))
-								{
-									std::size_t whitespace_count{ 1u };
-									while (whitespace_count < this_value.size())
-									{
-										if (std::isspace(this_value[whitespace_count]))
-										{
-											++whitespace_count;
-										}
-										else
-										{
-											break;
-										}
-									}
-									this_value = this_value.substr(whitespace_count);
-								}
-								else if (this_value.size() > 1)
-								{
-									if (this_value[0] == '\\' && (std::isspace(this_value[1]) || this_value[1] == '\\'))
-									{
-										// Space escaped to say "this is part of my input and not just to make my input command more human-readable")
-										// --- As a result, clear the escape backslash
-										// --- We also clear it if we're escaping an escape backslash since that'll be needed to allow strings that start as "\ " for example
-										this_value = this_value.substr(1);
-									}
-								}
-							}
+							std::string this_value = _array_substr(input_, current_begin, separator_i - current_begin);
 							std::optional<std::string> current_err{ AppendInput<true>(this_value) };
 							if (current_err.has_value())
 							{
@@ -837,6 +809,42 @@ namespace EmuIO
 		}
 
 	private:
+		[[nodiscard]] static std::string _array_substr(const std::string& input_, std::size_t begin, std::size_t count = std::string::npos)
+		{
+			std::string result = input_.substr(begin, count);
+			if (!result.empty())
+			{
+				if (std::isspace(result[0]))
+				{
+					// Unescaped, so clear whitespace as it's considered padding to help with command readability in this context
+					std::size_t whitespace_count{ 1u };
+					while (whitespace_count < result.size())
+					{
+						if (std::isspace(result[whitespace_count]))
+						{
+							++whitespace_count;
+						}
+						else
+						{
+							break;
+						}
+					}
+					return result.substr(whitespace_count);
+				}
+				else if (result.size() > 1)
+				{
+					if (result[0] == '\\' && (std::isspace(result[1]) || result[1] == '\\'))
+					{
+						// Space escaped to say "this is part of my input and not just to make my input command more human-readable")
+						// --- As a result, clear the escape backslash
+						// --- We also clear it if we're escaping an escape backslash since that'll be needed to allow strings that start as "\ " for example
+						return result.substr(1);
+					}
+				}
+			}
+			return result;
+		}
+
 		static void _append_value_to_stream(std::ostream& str, const value_type& value_)
 		{
 			std::visit
