@@ -315,8 +315,10 @@ namespace EmuIO
 					std::string err_str{};
 					std::size_t search_offset{ 0u };
 					std::size_t current_begin{ 0u };
+					const bool modified_before_call{ modified };
 					do
 					{
+						modified &= modified_before_call; // Prevent unwanted errors throughout array setting, we'll set this manually at the end of the array
 						std::size_t separator_i{ input_.find(separator, search_offset) };
 						if (separator_i == std::string::npos)
 						{
@@ -373,6 +375,7 @@ namespace EmuIO
 							current_begin = search_offset;
 						}
 					} while (true); // Broken manually inside loop when there are no more separators
+					modified = true;
 
 					if (err_str.empty())
 					{
