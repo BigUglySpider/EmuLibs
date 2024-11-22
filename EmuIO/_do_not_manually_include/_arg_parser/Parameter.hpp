@@ -317,7 +317,7 @@ namespace EmuIO
 					std::size_t current_begin{ 0u };
 					do
 					{
-						const std::size_t separator_i{ input_.find(separator, search_offset) };
+						std::size_t separator_i{ input_.find(separator, search_offset) };
 						if (separator_i == std::string::npos)
 						{
 							std::optional<std::string> current_err{ AppendInput<true>(input_.substr(current_begin)) };
