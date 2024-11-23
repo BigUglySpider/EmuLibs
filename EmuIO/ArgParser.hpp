@@ -357,7 +357,8 @@ namespace EmuIO
 			return parameters.contains(name_or_alias) || alias_to_param_map.contains(name_or_alias);
 		}
 
-		std::ostream& Help(std::ostream& str, std::string_view separator = default_help_separator) const
+		template<class Str>
+		void Help(Str&& str, std::string_view separator = default_help_separator) const
 		{
 			str << separator << '\n';
 			str << program_name << '\n';
@@ -407,7 +408,6 @@ namespace EmuIO
 				}
 				str << separator << std::endl;
 			}
-			return str;
 		}
 
 		template<bool ReturnOnError, class OutStream, class ErrStream>
@@ -454,7 +454,7 @@ namespace EmuIO
 					{
 						if (arg == "--help" || arg == "-h")
 						{
-							Help(out_stream);
+							Help(std::forward<OutStream>(out_stream));
 						}
 						else
 						{
