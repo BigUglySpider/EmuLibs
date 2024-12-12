@@ -29,6 +29,10 @@ namespace EmuIO
 		}
 
 	public:
+		/*
+		* @brief Names reserved by the ArgParser which may not be used to name/alias parameters as they have predefined responses.
+		*        `"--help" | "-h"`: Outputs help information based on the parser's current context to the provided output stream (NOT the error stream).
+		*/
 		static constexpr auto reserved_names = EmuCore::TMP::make_std_array<std::string_view>
 		(
 			"--help", "-h"
@@ -43,6 +47,15 @@ namespace EmuIO
 		}
 
 	public:
+		enum class AccessPresenceFlag : std::uint16_t
+		{
+			Unknown          = 0x00,
+			BaseParam        = 0x01,
+			Alias            = 0x02,
+			BaseParamOrAlias = 0x04 | BaseParam | Alias,
+			AliasOrBaseParam = 0x08 | BaseParam | Alias
+		};
+
 		[[nodiscard]] static constexpr bool is_reserved_name(const std::string_view& name) noexcept
 		{
 			return _is_reserved_name(name, std::make_index_sequence<reserved_names.size()>());
@@ -66,16 +79,76 @@ namespace EmuIO
 		{
 		}
 
+		/*
+		* @brief Shorthand for `Get(const std::string&)`.
+		*        See said function for a clearer description on how the access works.
+		* @returns Constant reference to the parameter referenced by the input `name_or_alias`.
+		*/
+		template<AccessPresenceFlag PresenceFlag = AccessPresenceFlag::Unknown>
 		[[nodiscard]] const EmuIO::Parameter& operator[](const std::string& name_or_alias) const
 		{
-			const EmuIO::Parameter* param{ nullptr };
-			if (!TryGet(name_or_alias, &param))
+			if constexpr (PresenceFlag == AccessPresenceFlag::Unknown)
 			{
-				throw _make_exception<std::out_of_range>("Attempted to retrieve a parameter whose name does not exist, even as an alias (", name_or_alias, ')');
+				const EmuIO::Parameter* param{ nullptr };
+				if (!TryGet(name_or_alias, &param))
+				{
+					throw _make_exception<std::out_of_range>("Attempted to retrieve a parameter whose name does not exist, even as an alias (", name_or_alias, ')');
+				}
+				return *param;
 			}
-			return *param;
+			else if constexpr (PresenceFlag == AccessPresenceFlag::BaseParam)
+			{
+				return parameters.at(name_or_alias);
+			}
+			else if constexpr (PresenceFlag == AccessPresenceFlag::Alias)
+			{
+				return parameters.at(alias_to_param_map.at(name_or_alias));
+			}
+			else if constexpr (PresenceFlag == AccessPresenceFlag::BaseParamOrAlias)
+			{
+				auto it{ parameters.find(name_or_alias) };
+				return (it != parameters.end()) ? it->second : parameters.at(alias_to_param_map.at(name_or_alias));
+			}
+			else if constexpr (PresenceFlag == AccessPresenceFlag::AliasOrBaseParam)
+			{
+				auto it{ alias_to_param_map.find(name_or_alias) };
+				return (it != alias_to_param_map.end()) ? parameters.at(it->second) : parameters.at(name_or_alias);
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<PresenceFlag>(), "Invalid `PresenceFlag` passed to access a parameter inside of an arg parser.");
+				throw _make_exception<std::out_of_range>("Invalid `PresenceFlag`"); // Never called due to static_assert
+			}
 		}
 
+		/*
+		* @brief Returns a constant reference to the parameter with the given name or alias.
+		* @param name_or_alias Name (or alias) of the parameter to retrieve.
+		* @param PresenceFlag Access hint which can be used to optimise the access with guarantees from the caller.
+		*                     This must not be changed from `Unknown` unless you can fully guarantee that the input exists as a name or alias.
+		*					  Possible values include:
+		*                     - `Unknown` (default): No guarantees; the parser will safely throw an exception if the input name or alias does not exist.
+		*                     - `BaseParam`: The input `name_or_alias` is guaranteed to be the exact name used by a registered parameter; NOT an alias.
+		*                     - `Alias`: The input `name_or_alias` is guaranteed to be an exact alias for a registered parameter; NOT the base name of a parameter.
+		*                     - `BaseParamOrAlias`: The input `name_or_alias` is guaranteed to be the exact name or alias used by a registered parameter; could be either, but most likely the base param name.
+		*                     - `AliasOrBaseParam`: The input `name_or_alias` is guaranteed to be the exact name or alias used by a registered parameter; could be either, but most likely an alias
+		*                     NOTE: `BaseParamOrAlias` and `AliasOrBaseParam` are functionally identical, but may implement optimisations to target access for the more-likely option first.
+		*                           There is no necessary advantage to choosing one over the other if it is unknown which is more likely.
+		* @returns Constant reference to the parameter referenced by the input `name_or_alias`.
+		*/
+		template<AccessPresenceFlag PresenceFlag = AccessPresenceFlag::Unknown>
+		[[nodiscard]] const EmuIO::Parameter& Get(const std::string& name_or_alias) const
+		{
+			return this->operator[]<PresenceFlag>(name_or_alias);
+		}
+
+		/*
+		* @brief Tries to retrieve a parameter by the given name or alias, outputting a constant pointer to it at the pointer pointed to by `out_param`.
+		* @param name_or_alias Name or alias of the parameter to try and retrieve.
+		* @param out_param Pointer to a constant Parameter pointer which will be output to if the target parameter is found.
+		*                  This will not be modified if the target parameter is not found; test the return value of this function to determine success.
+		* @returns `true` if the target parameter was found and the output pointer written to; otherwise `false`.
+		*/
 		[[nodiscard]] bool TryGet(const std::string& name_or_alias, const EmuIO::Parameter** out_param) const
 		{
 			auto param_it{ parameters.find(name_or_alias) };
@@ -265,11 +338,6 @@ namespace EmuIO
 			));
 		}
 
-
-
-
-
-
 		// Register enum parameter with info types
 		// --- Additionally determines `Type` enum from the input `ParamType`
 		template<class ParamType, EmuConcepts::CanExplicitlyConstruct<typename EmuIO::parameter_enum_builder_arg<EmuIO::type_to_parameter_type_enum<ParamType>() | ParameterType::Enum>::type>...EnumInfos>
@@ -330,6 +398,15 @@ namespace EmuIO
 			);
 		}
 
+		/*
+		* @param Adds an alias for the parameter registered with the given `name`.
+		*        Said parameter may be referenced with `alias` after this call, both in-program and by an end-user.
+		*        For example, for a `--config` command, you can pass an alias `-c` to give the end-user a shorthand `-c` to refer to that parameter in the command line.
+		* @param name Registered name of the parameter to reference. Must not be an alias to said parameter.
+		* @param alias New alias for the target parameter.
+		*              Must follow the usual naming rules of parameters.
+		*              Cannot conflict with any other names or aliases.
+		*/
 		void AddAlias(const std::string& name, std::string alias)
 		{
 			_throw_if_invalid_new_name(alias);
@@ -337,30 +414,45 @@ namespace EmuIO
 			param_to_aliases_map[name].emplace_back(std::move(alias));
 		}
 
+		/*
+		* @param Adds 1 or more alias for the parameter registered with the given `name`.
+		*        Said parameter may be referenced with any of the input aliases after this call, both in-program and by an end-user.
+		*        For example, for a `--config` command, you can pass an alias `-c` to give the end-user a shorthand `-c` to refer to that parameter in the command line.
+		* @param name Registered name of the parameter to reference. Must not be an alias to said parameter.
+		* @param aliases 1 or more values which each represent a new alias for the target parameter.
+		*                Must follow the usual naming rules of parameters.
+		*                Cannot conflict with any other names or aliases.
+		*                May be any type, but each input type must be valid for explicitly constructing a `std::string` with curly-brace syntax.
+		*/
 		template<EmuConcepts::CanExplicitlyConstruct<std::string>...AliasStrings>
-		requires(sizeof...(AliasStrings) > 1)
+		requires(sizeof...(AliasStrings) >= 1)
 		void AddAliases(const std::string& name, AliasStrings&&...aliases)
 		{
 			((AddAlias(name, std::string{ std::forward<AliasStrings>(aliases) })), ...);
 		}
 
-		template<EmuConcepts::CanExplicitlyConstruct<std::string> AliasString>
-		void AddAliases(std::string name, AliasString alias)
-		{
-			_throw_if_invalid_new_name(alias);
-			param_to_aliases_map[name].emplace_back(std::forward<AliasString>(alias));
-			alias_to_param_map.emplace(std::make_pair(std::forward<AliasString>(alias), std::move(name)));
-		}
-
+		/*
+		* @brief Checks if the input string exists as either a registered parameter name or an alias to a parameter.
+		* @param name_or_alias Name or alias to search for.
+		* @returns `true` if `name_or_alias` exists as a parameter (or an alias to one) in this parser; otherwise `false`.
+		*/
 		[[nodiscard]] bool ContainsNameOrAlias(const std::string& name_or_alias) const
 		{
 			return parameters.contains(name_or_alias) || alias_to_param_map.contains(name_or_alias);
 		}
 
+		/*
+		* @brief Appends help information regarding this program and its registered parameters to the input `str`.
+		* @param str Any type which can have information appended to it as per a `std::ostream`.
+		*            This is a templatised type to support input of wrappers around `std::ostream` instances.
+		* @param separator Separator to split sections of the output help.
+		*                  Defaults to `ArgParser::default_help_separator`.
+		*                  Will always be immediately followed by `std::endl`.
+		*/
 		template<class Str>
 		void Help(Str&& str, std::string_view separator = default_help_separator) const
 		{
-			str << separator << '\n';
+			str << separator << std::endl;
 			str << program_name << '\n';
 			if (program_desc.has_value())
 			{
@@ -406,10 +498,31 @@ namespace EmuIO
 				{
 					str << "Can be set multiple times, with the most-recently set value being the used value (which overwrites the previous).\n";
 				}
+				if (name_param_pair.second->IsArray())
+				{
+					str << "\tCan set multiple values in one argument by passing in the format \"[arg0, arg1, arg2, ..., argN]\".\n";
+					if (name_param_pair.second->IsConst())
+					{
+						str << "\tThis is the only way to provide input for a constant array with size > 1.\n";
+					}
+				}
 				str << separator << std::endl;
 			}
 		}
 
+		/*
+		* @brief Parses the input command line arguments `argv[0:argc]` under the constraints of this parser's current context.
+		*        Outputs information via the provided streams.
+		*        Certain arguments will trigger predefined responses. See `ArgParser::reserved_names` for information on these responses.
+		* @param argc Number of command line arguments. Expected to be `argc` as passed to `main`.
+		* @param argv Array of C-strings representing individual command line arguments. Expected to be `argv` as passed to `main`.
+		* @param out_stream Stream to output general info to (e.g. help if the `argv` contains `--help` or `-h`).
+		* @param err_stream Stream to output errors to (e.g. invalid arguments).
+		* @param ReturnOnError If `true`, parsing will be cancelled and this function will return immediately as soon as an error is encountered and logged to `err_stream`.
+		*                      If `false`, parsing will skip to the next argument if an invalid argument is detected.
+		* @returns The total number of errors encountered during parsing.
+		*          `0` indicates a total success in parsing.
+		*/
 		template<bool ReturnOnError, class OutStream, class ErrStream>
 		std::size_t Parse(int argc, const char** argv, OutStream&& out_stream, ErrStream&& err_stream)
 		{
